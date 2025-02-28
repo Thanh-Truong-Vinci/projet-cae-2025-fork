@@ -1,8 +1,28 @@
-### Mac
-.DS_Store
-### Windows
-Thumbs.db
-### Linux
-lost+found
+### OS files
+.DS_Store            # MacOS
+Thumbs.db           # Windows
+lost+found          # Linux
+
+### Environment Variables
 .env
 *.env
+
+### Node.js
+node_modules/       # Dépendances Node.js
+npm-debug.log       # Logs npm
+yarn.lock           # Fichier de lock Yarn
+
+### Maven (Spring API)
+target/             # Dossier de build Maven
+*.log               # Fichiers de log
+*.class             # Fichiers compilés Java
+
+### IDEs / Editors
+.idea/              # IntelliJ
+.vscode/            # VSCode
+*.iml               # Fichiers de projet IntelliJ
+*.swp               # Fichiers temporaires Vim
+
+### Docker
+docker-compose.override.yml
+docker-compose.override.*
