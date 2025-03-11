@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Credentials {
 
-  private String username;
+  private String email;
   private String password;
 }
