@@ -39,19 +39,19 @@ public class UserService {
   /**
    * Create a JWT token.
    *
-   * @param username the username to included in the claim
+   * @param email the email to included in the claim
    * @return the JWT token
    */
-  public AuthenticatedUser createJwtToken(String username) {
+  public AuthenticatedUser createJwtToken(String email) {
     String token = JWT.create()
         .withIssuer("auth0")
-        .withClaim("username", username)
+        .withClaim("email", email)
         .withIssuedAt(new Date())
         .withExpiresAt(new Date(System.currentTimeMillis() + lifetimeJwt))
         .sign(algorithm);
 
     AuthenticatedUser authenticatedUser = new AuthenticatedUser();
-    authenticatedUser.setUsername(username);
+    authenticatedUser.setEmail(email);
     authenticatedUser.setToken(token);
 
     return authenticatedUser;
@@ -61,11 +61,11 @@ public class UserService {
    * Verify a JWT token.
    *
    * @param token the token to verify
-   * @return the username if the token is valid, null otherwise
+   * @return the email if the token is valid, null otherwise
    */
   public String verifyJwtToken(String token) {
     try {
-      return JWT.require(algorithm).build().verify(token).getClaim("username").asString();
+      return JWT.require(algorithm).build().verify(token).getClaim("email").asString();
     } catch (Exception e) {
       return null;
     }
