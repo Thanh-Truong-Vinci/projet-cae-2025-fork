@@ -121,7 +121,7 @@ public class UserService {
           String tel) {
 
     if (userRepository.findByEmail(email) != null) {
-      return null; // L'email è già registrata
+      return null;
     }
 
     createOne(nom, prenom, email, password, rue, numeroRue, codePostal, commune, pays, tel);

@@ -1,12 +1,12 @@
 @baseUrl = http://localhost:3000
 
-### Try to login an unknow user
+### Try to login an unknown user
 POST {{baseUrl}}/auths/login
 Content-Type: application/json
 
 {
-  "username":"unknown",
-  "password":"admin"
+  "email": "unknown",
+  "password": "admin"
 }
 
 ### Create the default admin
@@ -14,8 +14,16 @@ POST {{baseUrl}}/auths/register
 Content-Type: application/json
 
 {
-  "username":"admin",
-  "password":"admin"
+  "nom": "Admin",
+  "prenom": "User",
+  "email": "admin@example.com",
+  "password": "admin",
+  "rue": "Admin Street",
+  "numeroRue": "1",
+  "codePostal": "1000",
+  "commune": "Admin City",
+  "pays": "Admin Country",
+  "tel": "123456789"
 }
 
 ### Login the default admin
@@ -23,18 +31,25 @@ POST {{baseUrl}}/auths/login
 Content-Type: application/json
 
 {
-  "username":"admin",
-  "password":"admin"
+  "email": "admin@example.com",
+  "password": "admin"
 }
-
 
 ### Create the manager user
 POST {{baseUrl}}/auths/register
 Content-Type: application/json
 
 {
-  "username":"manager",
-  "password":"manager"
+  "nom": "Manager",
+  "prenom": "User",
+  "email": "manager@example.com",
+  "password": "manager",
+  "rue": "Manager Street",
+  "numeroRue": "2",
+  "codePostal": "2000",
+  "commune": "Manager City",
+  "pays": "Manager Country",
+  "tel": "987654321"
 }
 
 ### Login the manager user
@@ -42,6 +57,6 @@ POST {{baseUrl}}/auths/login
 Content-Type: application/json
 
 {
-  "username":"manager",
-  "password":"manager"
+  "email": "manager@example.com",
+  "password": "manager"
 }
