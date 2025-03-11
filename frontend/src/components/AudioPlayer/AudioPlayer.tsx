@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react'
 
 interface AudioPlayerProps {
-  sound: string;
-  actionToBePerformed: boolean;
-  clearActionToBePerformed: () => void;
+  sound: string
+  actionToBePerformed: boolean
+  clearActionToBePerformed: () => void
 }
 
 const AudioPlayer = ({
@@ -11,19 +11,19 @@ const AudioPlayer = ({
   actionToBePerformed,
   clearActionToBePerformed,
 }: AudioPlayerProps) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false)
+  const audioRef = useRef<HTMLAudioElement>(null)
 
   useEffect(() => {
-    const audioElement = audioRef.current;
+    const audioElement = audioRef.current
 
     if (audioElement && actionToBePerformed) {
-      console.log('actionToBePerformed', actionToBePerformed);
-      if (audioElement.paused) audioElement.play();
-      else audioElement.pause();
-      clearActionToBePerformed();
+      console.log('actionToBePerformed', actionToBePerformed)
+      if (audioElement.paused) audioElement.play()
+      else audioElement.pause()
+      clearActionToBePerformed()
     }
-  }, [actionToBePerformed, clearActionToBePerformed]);
+  }, [actionToBePerformed, clearActionToBePerformed])
 
   return (
     <div>
@@ -41,7 +41,7 @@ const AudioPlayer = ({
         <i>{isPlaying ? 'Playing' : 'Paused'}</i>
       </p>
     </div>
-  );
-};
+  )
+}
 
-export default AudioPlayer;
+export default AudioPlayer

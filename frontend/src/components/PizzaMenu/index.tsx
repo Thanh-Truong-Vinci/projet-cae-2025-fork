@@ -7,15 +7,15 @@ import {
   TableRow,
   Paper,
   useTheme,
-} from '@mui/material';
+} from '@mui/material'
 
-import { Pizza } from '../../types';
+import { Pizza } from '../../types'
 
 interface PizzaMenuProps {
-  pizzas: Pizza[];
+  pizzas: Pizza[]
 }
 const PizzaMenu = ({ pizzas }: PizzaMenuProps) => {
-  const theme = useTheme();
+  const theme = useTheme()
   return (
     <TableContainer component={Paper}>
       <Table
@@ -51,7 +51,7 @@ const PizzaMenu = ({ pizzas }: PizzaMenuProps) => {
         </TableBody>
       </Table>
     </TableContainer>
-  );
-};
+  )
+}
 
-export default PizzaMenu;
+export default PizzaMenu

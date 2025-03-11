@@ -1,46 +1,46 @@
 interface Pizza {
-  id: number;
-  title: string;
-  content: string;
+  id: number
+  title: string
+  content: string
 }
 
-type NewPizza = Omit<Pizza, 'id'>;
+type NewPizza = Omit<Pizza, 'id'>
 
 interface Drink {
-  title: string;
-  image: string;
-  volume: string;
-  price: string;
+  title: string
+  image: string
+  volume: string
+  price: string
 }
 
 interface PizzeriaContext {
-  pizzas: Pizza[];
-  setPizzas: (pizzas: Pizza[]) => void;
-  actionToBePerformed: boolean;
-  setActionToBePerformed: (actionToBePerformed: boolean) => void;
-  clearActionToBePerformed: () => void;
-  drinks: Drink[];
-  addPizza: (newPizza: NewPizza) => Promise<void>;
+  pizzas: Pizza[]
+  setPizzas: (pizzas: Pizza[]) => void
+  actionToBePerformed: boolean
+  setActionToBePerformed: (actionToBePerformed: boolean) => void
+  clearActionToBePerformed: () => void
+  drinks: Drink[]
+  addPizza: (newPizza: NewPizza) => Promise<void>
 }
 
 interface UserContextType {
-  authenticatedUser: MaybeAuthenticatedUser;
-  registerUser: (newUser: User) => Promise<void>;
-  loginUser: (user: User) => Promise<void>;
-  clearUser: () => void;
+  authenticatedUser: MaybeAuthenticatedUser
+  registerUser: (newUser: User) => Promise<void>
+  loginUser: (user: User) => Promise<void>
+  clearUser: () => void
 }
 
 interface User {
-  username: string;
-  password: string;
+  username: string
+  password: string
 }
 
 interface AuthenticatedUser {
-  username: string;
-  token: string;
+  username: string
+  token: string
 }
 
-type MaybeAuthenticatedUser = AuthenticatedUser | undefined;
+type MaybeAuthenticatedUser = AuthenticatedUser | undefined
 
 export type {
   Pizza,
@@ -51,4 +51,4 @@ export type {
   AuthenticatedUser,
   MaybeAuthenticatedUser,
   UserContextType,
-};
+}

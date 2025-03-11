@@ -1,36 +1,36 @@
-import { useState, SyntheticEvent, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Box, Button, TextField, useTheme } from '@mui/material';
-import { UserContextType } from '../../types';
-import { UserContext } from '../../contexts/UserContext';
-import './index.css';
+import { useState, SyntheticEvent, useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Box, Button, TextField, useTheme } from '@mui/material'
+import { UserContextType } from '../../types'
+import { UserContext } from '../../contexts/UserContext'
+import './index.css'
 
 const LoginPage = () => {
-  const { loginUser }: UserContextType = useContext(UserContext);
-  const navigate = useNavigate();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const theme = useTheme();
+  const { loginUser }: UserContextType = useContext(UserContext)
+  const navigate = useNavigate()
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const theme = useTheme()
 
   const handleSubmit = async (e: SyntheticEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     try {
-      await loginUser({ username, password });
-      navigate('/');
+      await loginUser({ username, password })
+      navigate('/')
     } catch (err) {
-      console.error('LoginPage::error: ', err);
+      console.error('LoginPage::error: ', err)
     }
-  };
+  }
 
   const handleUsernameInputChange = (e: SyntheticEvent) => {
-    const input = e.target as HTMLInputElement;
-    setUsername(input.value);
-  };
+    const input = e.target as HTMLInputElement
+    setUsername(input.value)
+  }
 
   const handlePasswordChange = (e: SyntheticEvent) => {
-    const input = e.target as HTMLInputElement;
-    setPassword(input.value);
-  };
+    const input = e.target as HTMLInputElement
+    setPassword(input.value)
+  }
 
   return (
     <Box
@@ -81,7 +81,7 @@ const LoginPage = () => {
         </Button>
       </form>
     </Box>
-  );
-};
+  )
+}
 
-export default LoginPage;
+export default LoginPage

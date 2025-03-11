@@ -1,18 +1,18 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import './index.css'
 
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import App from './components/App/index.tsx';
-import HomePage from './components/pages/HomePage.tsx';
-import AddPizzaPage from './components/pages/AddPizzaPage.tsx';
-import RegisterPage from './components/pages/RegisterPage.tsx';
-import LoginPage from './components/pages/LoginPage.tsx';
-import { UserContextProvider } from './contexts/UserContext.tsx';
-import '@fontsource/roboto/700.css';
-import CssBaseline from '@mui/material/CssBaseline';
-import { ThemeProvider } from '@mui/material/styles';
-import theme from './themes.ts';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom'
+import App from './components/App/index.tsx'
+import HomePage from './components/pages/HomePage.tsx'
+import AddPizzaPage from './components/pages/AddPizzaPage.tsx'
+import RegisterPage from './components/pages/RegisterPage.tsx'
+import LoginPage from './components/pages/LoginPage.tsx'
+import { UserContextProvider } from './contexts/UserContext.tsx'
+import '@fontsource/roboto/700.css'
+import CssBaseline from '@mui/material/CssBaseline'
+import { ThemeProvider } from '@mui/material/styles'
+import theme from './themes.ts'
 
 const router = createBrowserRouter([
   {
@@ -37,7 +37,7 @@ const router = createBrowserRouter([
       },
     ],
   },
-]);
+])
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -47,5 +47,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <RouterProvider router={router} />
       </UserContextProvider>
     </ThemeProvider>
-  </React.StrictMode>,
-);
+  </React.StrictMode>
+)

@@ -1,13 +1,13 @@
-import { useNavigate } from 'react-router-dom';
-import { useContext } from 'react';
-import { AppBar, Toolbar, Button, Typography } from '@mui/material';
-import { UserContext } from '../../contexts/UserContext';
-import { UserContextType } from '../../types';
+import { useNavigate } from 'react-router-dom'
+import { useContext } from 'react'
+import { AppBar, Toolbar, Button, Typography } from '@mui/material'
+import { UserContext } from '../../contexts/UserContext'
+import { UserContextType } from '../../types'
 
 const NavBar = () => {
   const { authenticatedUser, clearUser } =
-    useContext<UserContextType>(UserContext);
-  const navigate = useNavigate();
+    useContext<UserContextType>(UserContext)
+  const navigate = useNavigate()
 
   return (
     <AppBar position="static">
@@ -30,7 +30,7 @@ const NavBar = () => {
         ) : (
           <>
             <Button color="inherit" onClick={() => navigate('/register')}>
-                S'inscrire
+              S'inscrire
             </Button>
             <Button color="inherit" onClick={() => navigate('/login')}>
               Se connecter
@@ -39,7 +39,7 @@ const NavBar = () => {
         )}
       </Toolbar>
     </AppBar>
-  );
-};
+  )
+}
 
-export default NavBar;
+export default NavBar

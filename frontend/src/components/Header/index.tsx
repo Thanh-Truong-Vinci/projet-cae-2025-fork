@@ -1,21 +1,21 @@
-import { Box, Container, Typography, useTheme } from '@mui/material';
-import { useState } from 'react';
+import { Box, Container, Typography, useTheme } from '@mui/material'
+import { useState } from 'react'
 
 interface HeaderProps {
-  title: string;
-  version: number;
-  handleHeaderClick: () => void;
+  title: string
+  version: number
+  handleHeaderClick: () => void
 }
 
 const Header = ({ title, handleHeaderClick }: HeaderProps) => {
-  const theme = useTheme();
-  const [menuPrinted, setMenuPrinted] = useState(false);
+  const theme = useTheme()
+  const [menuPrinted, setMenuPrinted] = useState(false)
 
   const handleClick = () => {
-    console.log(`value of menuPrinted before click: ${menuPrinted}`);
-    setMenuPrinted(!menuPrinted);
-    handleHeaderClick();
-  };
+    console.log(`value of menuPrinted before click: ${menuPrinted}`)
+    setMenuPrinted(!menuPrinted)
+    handleHeaderClick()
+  }
 
   return (
     <Box
@@ -36,7 +36,7 @@ const Header = ({ title, handleHeaderClick }: HeaderProps) => {
         </Typography>
       </Container>
     </Box>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header
