@@ -30,7 +30,7 @@ const NavBar = () => {
         ) : (
           <>
             <Button color="inherit" onClick={() => navigate('/register')}>
-              Créer un utilisateur
+                S'inscrire
             </Button>
             <Button color="inherit" onClick={() => navigate('/login')}>
               Se connecter
