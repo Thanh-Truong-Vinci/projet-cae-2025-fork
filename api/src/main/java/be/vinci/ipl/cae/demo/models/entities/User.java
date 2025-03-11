@@ -1,31 +1,55 @@
 package be.vinci.ipl.cae.demo.models.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.time.LocalDate;
 
 /**
  * User entity.
  */
 @Entity
-@Table(name = "users")
+@Table(name = "clients")
 @Data
 @NoArgsConstructor
 public class User {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id_client")
   private Long id;
 
   @Column(nullable = false)
-  private String username;
+  private String nom;
 
   @Column(nullable = false)
-  private String password;
+  private String prenom;
 
+  @Column(nullable = false)
+  private String rue;
+
+  @Column(name = "numero_rue", nullable = false)
+  private String numeroRue;
+
+  private String boite;
+
+  @Column(name = "code_postal", nullable = false)
+  private String codePostal;
+
+  @Column(nullable = false)
+  private String commune;
+
+  @Column(nullable = false)
+  private String pays;
+
+  private String tel;
+
+  @Column(nullable = false, unique = true)
+  private String email;
+
+  @Column(nullable = false)
+  private String mdp;
+
+  @Column(name = "date_inscription", nullable = false)
+  private LocalDate dateInscription;
 }

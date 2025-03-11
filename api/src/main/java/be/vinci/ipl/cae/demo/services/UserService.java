@@ -5,6 +5,8 @@ import be.vinci.ipl.cae.demo.models.entities.User;
 import be.vinci.ipl.cae.demo.repositories.UserRepository;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+
+import java.time.LocalDate;
 import java.util.Date;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -74,65 +76,93 @@ public class UserService {
   /**
    * Login a user.
    *
-   * @param username the username
+   * @param email the email
    * @param password the password
    * @return the authenticated user if the login is successful, null otherwise
    */
-  public AuthenticatedUser login(String username, String password) {
-    User user = userRepository.findByUsername(username);
+  public AuthenticatedUser login(String email, String password) {
+    User user = userRepository.findByEmail(email);
     if (user == null) {
       return null;
     }
 
-    if (!passwordEncoder.matches(password, user.getPassword())) {
+    if (!passwordEncoder.matches(password, user.getMdp())) {
       return null;
     }
 
-    System.out.println(createJwtToken(username));
+    System.out.println(createJwtToken(email));
 
-    return createJwtToken(username);
+    return createJwtToken(email);
   }
 
   /**
    * Register a new user.
    *
-   * @param username the username
+   * @param email the email
    * @param password the password
    * @return the authenticated user if the registration is successful, null otherwise
    */
-  public AuthenticatedUser register(String username, String password) {
-    User user = userRepository.findByUsername(username);
+  public AuthenticatedUser register(String email, String password) {
+    User user = userRepository.findByEmail(email);
     if (user != null) {
       return null;
     }
 
-    createOne(username, password);
+    createOne(email, password);
 
-    return createJwtToken(username);
+    return createJwtToken(email);
   }
 
   /**
-   * Read a user from its username.
+   * Read a user from its email.
    *
-   * @param username the username
+   * @param email the email
    * @return the user if it exists, null otherwise
    */
-  public User readOneFromUsername(String username) {
-    return userRepository.findByUsername(username);
+  public User readOneFromEmail(String email) {
+    return userRepository.findByEmail(email);
   }
 
   /**
    * Create a new user.
    *
-   * @param username the username
+   * @param nom the last name
+   * @param prenom the first name
+   * @param email the email
    * @param password the password
+   * @param rue the street
+   * @param numeroRue the street number
+   * @param codePostal the postal code
+   * @param commune the commune
+   * @param pays the country
+   * @param tel the phone number (optional)
    */
-  public void createOne(String username, String password) {
+  public void createOne(
+          String nom,
+          String prenom,
+          String email,
+          String password,
+          String rue,
+          String numeroRue,
+          String codePostal,
+          String commune,
+          String pays,
+          String tel) {
+
     String hashedPassword = passwordEncoder.encode(password);
 
     User user = new User();
-    user.setUsername(username);
-    user.setPassword(hashedPassword);
+    user.setNom(nom);
+    user.setPrenom(prenom);
+    user.setEmail(email);
+    user.setMdp(hashedPassword);
+    user.setRue(rue);
+    user.setNumeroRue(numeroRue);
+    user.setCodePostal(codePostal);
+    user.setCommune(commune);
+    user.setPays(pays);
+    user.setTel(tel);
+    user.setDateInscription(LocalDate.now());
 
     userRepository.save(user);
   }
