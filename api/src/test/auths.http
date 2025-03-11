@@ -1,14 +1,5 @@
 @baseUrl = http://localhost:3000
 
-### Try to login an unknown user
-POST {{baseUrl}}/auths/login
-Content-Type: application/json
-
-{
-  "email": "unknown",
-  "password": "admin"
-}
-
 ### Create the default admin
 POST {{baseUrl}}/auths/register
 Content-Type: application/json
@@ -26,7 +17,88 @@ Content-Type: application/json
   "tel": "123456789"
 }
 
-### Login the default admin
+### Create with invalid email
+POST {{baseUrl}}/auths/register
+Content-Type: application/json
+
+{
+  "nom": "Invalid",
+  "prenom": "Email",
+  "email": "invalid-email",
+  "password": "password",
+  "rue": "Invalid Street",
+  "numeroRue": "3",
+  "codePostal": "3000",
+  "commune": "Invalid City",
+  "pays": "Invalid Country",
+  "tel": "111111111"
+}
+
+### Create without 'nom' attribute
+POST {{baseUrl}}/auths/register
+Content-Type: application/json
+
+{
+  "prenom": "User",
+  "email": "user@example.com",
+  "password": "password",
+  "rue": "User Street",
+  "numeroRue": "4",
+  "codePostal": "4000",
+  "commune": "User City",
+  "pays": "User Country",
+  "tel": "222222222"
+}
+
+### Create without 'prenom' attribute
+POST {{baseUrl}}/auths/register
+Content-Type: application/json
+
+{
+  "nom": "User",
+  "email": "user@example.com",
+  "password": "password",
+  "rue": "User Street",
+  "numeroRue": "4",
+  "codePostal": "4000",
+  "commune": "User City",
+  "pays": "User Country",
+  "tel": "222222222"
+}
+
+### Create without 'email' attribute
+POST {{baseUrl}}/auths/register
+Content-Type: application/json
+
+{
+  "nom": "User",
+  "prenom": "User",
+  "password": "password",
+  "rue": "User Street",
+  "numeroRue": "4",
+  "codePostal": "4000",
+  "commune": "User City",
+  "pays": "User Country",
+  "tel": "222222222"
+}
+
+### Create without 'password' attribute
+POST {{baseUrl}}/auths/register
+Content-Type: application/json
+
+{
+  "nom": "User",
+  "prenom": "User",
+  "email": "user@example.com",
+  "rue": "User Street",
+  "numeroRue": "4",
+  "codePostal": "4000",
+  "commune": "User City",
+  "pays": "User Country",
+  "tel": "222222222"
+}
+
+### Login admin
 POST {{baseUrl}}/auths/login
 Content-Type: application/json
 
@@ -35,28 +107,27 @@ Content-Type: application/json
   "password": "admin"
 }
 
-### Create the manager user
-POST {{baseUrl}}/auths/register
-Content-Type: application/json
-
-{
-  "nom": "Manager",
-  "prenom": "User",
-  "email": "manager@example.com",
-  "password": "manager",
-  "rue": "Manager Street",
-  "numeroRue": "2",
-  "codePostal": "2000",
-  "commune": "Manager City",
-  "pays": "Manager Country",
-  "tel": "987654321"
-}
-
-### Login the manager user
+### Login unknown user
 POST {{baseUrl}}/auths/login
 Content-Type: application/json
 
 {
-  "email": "manager@example.com",
-  "password": "manager"
+  "email": "unknown@example.com",
+  "password": "unknown"
+}
+
+### Login without email
+POST {{baseUrl}}/auths/login
+Content-Type: application/json
+
+{
+  "password": "password"
+}
+
+### Login without password
+POST {{baseUrl}}/auths/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com"
 }
