@@ -48,7 +48,7 @@ public class User {
   private String email;
 
   @Column(nullable = false)
-  private String mdp;
+  private String password;
 
   @Column(name = "date_inscription", nullable = false)
   private LocalDate dateInscription;

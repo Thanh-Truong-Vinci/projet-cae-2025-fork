@@ -84,7 +84,7 @@ public class UserService {
       return null;
     }
 
-    if (!passwordEncoder.matches(password, user.getMdp())) {
+    if (!passwordEncoder.matches(password, user.getPassword())) {
       return null;
     }
 
@@ -172,7 +172,7 @@ public class UserService {
     user.setNom(nom);
     user.setPrenom(prenom);
     user.setEmail(email);
-    user.setMdp(hashedPassword);
+    user.setPassword(hashedPassword);
     user.setRue(rue);
     user.setNumeroRue(numeroRue);
     user.setCodePostal(codePostal);
