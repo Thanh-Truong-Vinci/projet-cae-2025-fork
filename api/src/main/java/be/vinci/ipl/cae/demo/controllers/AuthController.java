@@ -2,6 +2,7 @@ package be.vinci.ipl.cae.demo.controllers;
 
 import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedUser;
 import be.vinci.ipl.cae.demo.models.dtos.Credentials;
+import be.vinci.ipl.cae.demo.models.dtos.CredentialsRegister;
 import be.vinci.ipl.cae.demo.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +29,20 @@ public class AuthController {
     this.userService = userService;
   }
 
+  private boolean isInvalidCredentialsRegister(CredentialsRegister credentials) {
+    return credentials == null
+            || credentials.getNom() == null || credentials.getNom().isBlank()
+            || credentials.getPrenom() == null || credentials.getPrenom().isBlank()
+            || credentials.getEmail() == null || credentials.getEmail().isBlank()
+            || credentials.getPassword() == null || credentials.getPassword().isBlank()
+            || credentials.getRue() == null || credentials.getRue().isBlank()
+            || credentials.getNumeroRue() == null || credentials.getNumeroRue().isBlank()
+            || credentials.getCodePostal() == null || credentials.getCodePostal().isBlank()
+            || credentials.getCommune() == null || credentials.getCommune().isBlank()
+            || credentials.getPays() == null || credentials.getPays().isBlank();
+  }
+
+
   private boolean isInvalidCredentials(Credentials credentials) {
     return credentials == null
         || credentials.getEmail() == null
@@ -43,19 +58,30 @@ public class AuthController {
    * @return the authenticated user.
    */
   @PostMapping("/register")
-  public AuthenticatedUser register(@RequestBody Credentials credentials) {
-    if (isInvalidCredentials(credentials)) {
+  public AuthenticatedUser register(@RequestBody CredentialsRegister credentials) {
+    if (isInvalidCredentialsRegister(credentials)) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
 
-    AuthenticatedUser user = userService.register(credentials.getEmail(),
-        credentials.getPassword());
+    AuthenticatedUser user = userService.register(
+            credentials.getNom(),
+            credentials.getPrenom(),
+            credentials.getEmail(),
+            credentials.getPassword(),
+            credentials.getRue(),
+            credentials.getNumeroRue(),
+            credentials.getCodePostal(),
+            credentials.getCommune(),
+            credentials.getPays(),
+            credentials.getTel()
+    );
 
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.CONFLICT);
     }
     return user;
   }
+
 
   /**
    * Login a user.

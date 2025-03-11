@@ -17,8 +17,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
-  private int unusedVariable = 0;
-
   private static final String jwtSecret = "ilovemypizza!";
   private static final long lifetimeJwt = 24 * 60 * 60 * 1000; // 24 hours
 
@@ -98,20 +96,39 @@ public class UserService {
   /**
    * Register a new user.
    *
+   * @param nom the last name
+   * @param prenom the first name
    * @param email the email
    * @param password the password
+   * @param rue the street
+   * @param numeroRue the street number
+   * @param codePostal the postal code
+   * @param commune the commune
+   * @param pays the country
+   * @param tel the phone number (optional)
    * @return the authenticated user if the registration is successful, null otherwise
    */
-  public AuthenticatedUser register(String email, String password) {
-    User user = userRepository.findByEmail(email);
-    if (user != null) {
-      return null;
+  public AuthenticatedUser register(
+          String nom,
+          String prenom,
+          String email,
+          String password,
+          String rue,
+          String numeroRue,
+          String codePostal,
+          String commune,
+          String pays,
+          String tel) {
+
+    if (userRepository.findByEmail(email) != null) {
+      return null; // L'email è già registrata
     }
 
-    createOne(email, password);
+    createOne(nom, prenom, email, password, rue, numeroRue, codePostal, commune, pays, tel);
 
     return createJwtToken(email);
   }
+
 
   /**
    * Read a user from its email.
