@@ -9,8 +9,6 @@ import {
   PizzeriaContext,
   UserContextType,
 } from '../../types';
-import NavBar from '../Navbar';
-
 import { UserContext } from '../../contexts/UserContext';
 import Box from '@mui/material/Box';
 import pizza from '../../assets/images/pizza.jpg';
@@ -61,14 +59,11 @@ const App = () => {
   async function getAllPizzas() {
     try {
       const response = await fetch('/api/pizzas');
-
       if (!response.ok)
         throw new Error(
           `fetch error : ${response.status} : ${response.statusText}`,
         );
-
       const pizzas = await response.json();
-
       return pizzas;
     } catch (err) {
       console.error('getAllPizzas::error: ', err);
@@ -90,23 +85,17 @@ const App = () => {
         },
       };
 
-      const response = await fetch('/api/pizzas', options); // fetch retourne une "promise" => on attend la réponse
-
+      const response = await fetch('/api/pizzas', options);
       if (!response.ok)
         throw new Error(
           `fetch error : ${response.status} : ${response.statusText}`,
         );
 
-      const createdPizza = await response.json(); // json() retourne une "promise" => on attend les données
-
+      const createdPizza = await response.json();
       setPizzas([...pizzas, createdPizza]);
     } catch (err) {
       console.error('AddPizza::error: ', err);
     }
-  };
-
-  const handleHeaderClick = () => {
-    setActionToBePerformed(true);
   };
 
   const clearActionToBePerformed = () => {
@@ -117,10 +106,10 @@ const App = () => {
     addPizza,
     pizzas,
     setPizzas,
+    drinks,
     actionToBePerformed,
     setActionToBePerformed,
     clearActionToBePerformed,
-    drinks,
   };
 
   return (
@@ -133,21 +122,10 @@ const App = () => {
         backgroundSize: 'cover',
       }}
     >
-      <Header
-        title="We love Pizza"
-        version={0 + 1}
-        handleHeaderClick={handleHeaderClick}
-      />
-      <Container
-        component="main"
-        sx={{
-          flex: '1',
-        }}
-      >
-        <NavBar />
+      <Header title="Terroire & Cie" />
+      <Container component="main" sx={{ flex: '1' }}>
         <Outlet context={fullPizzaContext} />
       </Container>
-
       <Footer />
     </Box>
   );

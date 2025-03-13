@@ -1,40 +1,44 @@
-import { Box, Container, Typography, useTheme } from '@mui/material';
-import { useState } from 'react';
+import { Box, Typography } from '@mui/material';
+import NavBar from '../Navbar';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   title: string;
-  version: number;
-  handleHeaderClick: () => void;
 }
 
-const Header = ({ title, handleHeaderClick }: HeaderProps) => {
-  const theme = useTheme();
-  const [menuPrinted, setMenuPrinted] = useState(false);
-
-  const handleClick = () => {
-    console.log(`value of menuPrinted before click: ${menuPrinted}`);
-    setMenuPrinted(!menuPrinted);
-    handleHeaderClick();
-  };
+const Header = ({ title }: HeaderProps) => {
+  const navigate = useNavigate();
 
   return (
     <Box
       component="header"
       sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         px: 2,
-        backgroundColor:
-          theme.palette.mode === 'light'
-            ? theme.palette.primary.light
-            : theme.palette.primary.dark,
-        color: (theme) => theme.palette.primary.contrastText,
+        py: 1,
+        backgroundColor: 'white',
+        borderBottom: '1px solid #ddd',
       }}
-      onClick={handleClick}
     >
-      <Container maxWidth="sm">
-        <Typography variant="h1">
-          {menuPrinted ? `${title}... and rarely do we hate it!` : title}
-        </Typography>
-      </Container>
+      {/* Titre aligné à gauche et cliquable */}
+      <Typography 
+        variant="h6" 
+        sx={{ 
+          fontWeight: 'bold',
+          cursor: 'pointer',
+          '&:hover': {
+            color: 'primary.main',
+          },
+        }}
+        onClick={() => navigate('/')}
+      >
+        {title}
+      </Typography>
+
+      {/* Navbar alignée à droite */}
+      <NavBar />
     </Box>
   );
 };
