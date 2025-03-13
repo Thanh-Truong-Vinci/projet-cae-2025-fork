@@ -12,6 +12,7 @@ import java.time.LocalDate;
 
 /**
  * Client entity.
+ *
  */
 @Entity
 @Table(name = "clients")
