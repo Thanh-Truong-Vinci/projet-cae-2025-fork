@@ -1,11 +1,10 @@
 package be.vinci.ipl.cae.demo.services;
 
 import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedUser;
-import be.vinci.ipl.cae.demo.models.entities.User;
+import be.vinci.ipl.cae.demo.models.entities.Client;
 import be.vinci.ipl.cae.demo.repositories.UserRepository;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-
 import java.time.LocalDate;
 import java.util.Date;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -79,7 +78,7 @@ public class UserService {
    * @return the authenticated user if the login is successful, null otherwise
    */
   public AuthenticatedUser login(String email, String password) {
-    User user = userRepository.findByEmail(email);
+    Client user = userRepository.findByEmail(email);
     if (user == null) {
       return null;
     }
@@ -136,7 +135,7 @@ public class UserService {
    * @param email the email
    * @return the user if it exists, null otherwise
    */
-  public User readOneFromEmail(String email) {
+  public Client readOneFromEmail(String email) {
     return userRepository.findByEmail(email);
   }
 
@@ -168,7 +167,7 @@ public class UserService {
 
     String hashedPassword = passwordEncoder.encode(password);
 
-    User user = new User();
+    Client user = new Client();
     user.setNom(nom);
     user.setPrenom(prenom);
     user.setEmail(email);

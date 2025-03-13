@@ -1,6 +1,6 @@
 package be.vinci.ipl.cae.demo.configuration;
 
-import be.vinci.ipl.cae.demo.models.entities.User;
+import be.vinci.ipl.cae.demo.models.entities.Client;
 import be.vinci.ipl.cae.demo.services.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -45,13 +45,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
    * @throws IOException      the IO exception.
    */
   @Override
-  protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
-                                  @NonNull FilterChain filterChain) throws ServletException, IOException {
+  protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                  @NonNull HttpServletResponse response,
+                                  @NonNull FilterChain filterChain)
+          throws ServletException, IOException {
     String token = request.getHeader("Authorization");
     if (token != null) {
       String email = userService.verifyJwtToken(token);
       if (email != null) {
-        User user = userService.readOneFromEmail(email);
+        Client user = userService.readOneFromEmail(email);
         if (user != null) {
           List<GrantedAuthority> authorities = new ArrayList<>();
           if ("admin".equals(email)) { // TODO replace "admin" with the email of the admin user

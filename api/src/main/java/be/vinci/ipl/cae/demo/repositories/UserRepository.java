@@ -1,6 +1,6 @@
 package be.vinci.ipl.cae.demo.repositories;
 
-import be.vinci.ipl.cae.demo.models.entities.User;
+import be.vinci.ipl.cae.demo.models.entities.Client;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
  * User repository.
  */
 @Repository
-public interface UserRepository extends CrudRepository<User, Long> {
+public interface UserRepository extends CrudRepository<Client, Long> {
 
   /**
    * Find a user by its email.
@@ -16,5 +16,5 @@ public interface UserRepository extends CrudRepository<User, Long> {
    * @param email the email
    * @return the user
    */
-  User findByEmail(String email);
+  Client findByEmail(String email);
 }

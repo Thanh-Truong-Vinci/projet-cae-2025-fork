@@ -1,14 +1,14 @@
 package be.vinci.ipl.cae.demo.models.entities;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Column;
-import jakarta.persistence.GenerationType;
+import java.time.LocalDate;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDate;
 
 /**
  * Client entity.
