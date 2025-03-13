@@ -117,10 +117,18 @@ public class AuthController {
   @PostMapping("/me")
   public AuthenticatedUser refreshToken(@RequestBody TokenRequest request) {
     String email = clientService.verifyJwtToken(request.getToken());
+
     if (email == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
-    return clientService.createJwtToken(email);
+
+    AuthenticatedUser client = clientService.createJwtToken(email);
+
+    if (client == null) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+    }
+
+    return client;
   }
 
 }
