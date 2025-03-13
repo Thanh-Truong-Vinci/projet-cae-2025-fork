@@ -1,18 +1,23 @@
 package be.vinci.ipl.cae.demo.models.entities;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.GenerationType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 /**
- * User entity.
+ * Client entity.
  */
 @Entity
 @Table(name = "clients")
 @Data
 @NoArgsConstructor
-public class User {
+public class Client {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

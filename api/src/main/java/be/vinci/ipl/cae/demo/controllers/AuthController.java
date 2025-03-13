@@ -3,6 +3,7 @@ package be.vinci.ipl.cae.demo.controllers;
 import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedUser;
 import be.vinci.ipl.cae.demo.models.dtos.Credentials;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsRegister;
+import be.vinci.ipl.cae.demo.models.dtos.TokenRequest;
 import be.vinci.ipl.cae.demo.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -103,6 +104,23 @@ public class AuthController {
     }
 
     return user;
+  }
+
+  /**
+   * Refresh the token.
+   * This endpoint receives a token, verifies its validity (including expiration)
+   * and returns a new token with a new expiration date.
+   *
+   * @param request the token request containing the token to verify.
+   * @return a new token if verification is successful.
+   */
+  @PostMapping("/me")
+  public AuthenticatedUser refreshToken(@RequestBody TokenRequest request) {
+    String email = userService.verifyJwtToken(request.getToken());
+    if (email == null) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+    }
+    return userService.createJwtToken(email);
   }
 
 }
