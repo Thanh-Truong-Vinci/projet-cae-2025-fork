@@ -1,13 +1,13 @@
-import { Box, Typography } from '@mui/material';
-import NavBar from '../Navbar';
-import { useNavigate } from 'react-router-dom';
+import { Box, Typography } from '@mui/material'
+import NavBar from '../Navbar'
+import { useNavigate } from 'react-router-dom'
 
 interface HeaderProps {
-  title: string;
+  title: string
 }
 
 const Header = ({ title }: HeaderProps) => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   return (
     <Box
@@ -23,9 +23,9 @@ const Header = ({ title }: HeaderProps) => {
       }}
     >
       {/* Titre aligné à gauche et cliquable */}
-      <Typography 
-        variant="h6" 
-        sx={{ 
+      <Typography
+        variant="h6"
+        sx={{
           fontWeight: 'bold',
           cursor: 'pointer',
           '&:hover': {
@@ -43,4 +43,4 @@ const Header = ({ title }: HeaderProps) => {
   )
 }
 
-export default Header;
+export default Header

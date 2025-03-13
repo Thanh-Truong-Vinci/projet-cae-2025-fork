@@ -8,12 +8,12 @@ import {
   Pizza,
   PizzeriaContext,
   UserContextType,
-} from '../../types';
+} from '../../types'
 
-import { UserContext } from '../../contexts/UserContext';
-import Box from '@mui/material/Box';
-import pizza from '../../assets/images/pizza.jpg';
-import { Container } from '@mui/material';
+import { UserContext } from '../../contexts/UserContext'
+import Box from '@mui/material/Box'
+import pizza from '../../assets/images/pizza.jpg'
+import { Container } from '@mui/material'
 
 const drinks: Drink[] = [
   {
@@ -59,16 +59,16 @@ const App = () => {
 
   async function getAllPizzas() {
     try {
-      const response = await fetch('/api/pizzas');
+      const response = await fetch('/api/pizzas')
 
       if (!response.ok)
         throw new Error(
-          `fetch error : ${response.status} : ${response.statusText}`,
-        );
+          `fetch error : ${response.status} : ${response.statusText}`
+        )
 
-      const pizzas = await response.json();
+      const pizzas = await response.json()
 
-      return pizzas;
+      return pizzas
     } catch (err) {
       console.error('getAllPizzas::error: ', err)
       throw err
@@ -89,21 +89,20 @@ const App = () => {
         },
       }
 
-      const response = await fetch('/api/pizzas', options); // fetch retourne une "promise" => on attend la réponse
+      const response = await fetch('/api/pizzas', options) // fetch retourne une "promise" => on attend la réponse
 
       if (!response.ok)
         throw new Error(
           `fetch error : ${response.status} : ${response.statusText}`
         )
 
-      const createdPizza = await response.json(); // json() retourne une "promise" => on attend les données
+      const createdPizza = await response.json() // json() retourne une "promise" => on attend les données
 
-      setPizzas([...pizzas, createdPizza]);
+      setPizzas([...pizzas, createdPizza])
     } catch (err) {
       console.error('AddPizza::error: ', err)
     }
-  };
-
+  }
 
   const clearActionToBePerformed = () => {
     setActionToBePerformed(false)
@@ -117,7 +116,7 @@ const App = () => {
     setActionToBePerformed,
     clearActionToBePerformed,
     drinks,
-  };
+  }
 
   return (
     <Box

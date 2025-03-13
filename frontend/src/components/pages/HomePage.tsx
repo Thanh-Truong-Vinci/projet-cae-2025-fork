@@ -1,15 +1,11 @@
-
-import PizzaMenu from '../PizzaMenu';
-import DrinkMenu from '../DrinkMenu';
-import { useOutletContext } from 'react-router-dom';
-import { PizzeriaContext } from '../../types';
-import { Container, Typography } from '@mui/material';
+import PizzaMenu from '../PizzaMenu'
+import DrinkMenu from '../DrinkMenu'
+import { useOutletContext } from 'react-router-dom'
+import { PizzeriaContext } from '../../types'
+import { Container, Typography } from '@mui/material'
 
 const HomePage = () => {
-  const {
-    pizzas,
-    drinks,
-  }: PizzeriaContext = useOutletContext()
+  const { pizzas, drinks }: PizzeriaContext = useOutletContext()
 
   return (
     <Container component="main" sx={{ mt: 8, mb: 2, flex: '1' }} maxWidth="sm">
@@ -20,7 +16,6 @@ const HomePage = () => {
         Because we love JS, you can also click on the header to stop / start the
         music ; )
       </Typography>
-
 
       <PizzaMenu pizzas={pizzas} />
 
