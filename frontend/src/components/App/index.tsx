@@ -9,7 +9,6 @@ import {
   PizzeriaContext,
   UserContextType,
 } from '../../types';
-import NavBar from '../Navbar';
 
 import { UserContext } from '../../contexts/UserContext';
 import Box from '@mui/material/Box';
@@ -105,9 +104,6 @@ const App = () => {
     }
   };
 
-  const handleHeaderClick = () => {
-    setActionToBePerformed(true);
-  };
 
   const clearActionToBePerformed = () => {
     setActionToBePerformed(false)
