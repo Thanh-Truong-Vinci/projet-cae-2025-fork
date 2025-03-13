@@ -13,16 +13,16 @@ vi.mock('react-router-dom', async () => {
 })
 
 describe('LoginPage', () => {
-  test('renders a form with username and password inputs', () => {
+  test('renders a form with login and password inputs', () => {
     render(
       <MemoryRouter>
         <LoginPage />
       </MemoryRouter>
     )
-    const usernameInput = screen.getByLabelText(/username/i)
+    const loginInput = screen.getByLabelText(/login/i)
     const passwordInput = screen.getByLabelText(/password/i)
 
-    expect(usernameInput).toBeTruthy()
+    expect(loginInput).toBeTruthy()
     expect(passwordInput).toBeTruthy()
   })
 
@@ -46,18 +46,18 @@ describe('LoginPage', () => {
       </MemoryRouter>
     )
 
-    const usernameInput = screen.getByLabelText(/username/i)
+    const loginInput = screen.getByLabelText(/login/i)
     const passwordInput = screen.getByLabelText(/password/i)
     const submitButton = screen.getByRole('button', {
       name: /s'authentifier/i,
     })
 
-    fireEvent.change(usernameInput, { target: { value: 'testuser' } })
+    fireEvent.change(loginInput, { target: { value: 'testuser' } })
     fireEvent.change(passwordInput, { target: { value: 'password' } })
     fireEvent.click(submitButton)
 
     expect(loginUserMock).toHaveBeenCalledWith({
-      username: 'testuser',
+      login: 'testuser',
       password: 'password',
     })
 
@@ -88,18 +88,18 @@ describe('LoginPage', () => {
       </MemoryRouter>
     )
 
-    const usernameInput = screen.getByLabelText(/username/i)
+    const loginInput = screen.getByLabelText(/login/i)
     const passwordInput = screen.getByLabelText(/password/i)
     const submitButton = screen.getByRole('button', {
       name: /s'authentifier/i,
     })
 
-    fireEvent.change(usernameInput, { target: { value: 'testuser' } })
+    fireEvent.change(loginInput, { target: { value: 'testuser' } })
     fireEvent.change(passwordInput, { target: { value: 'password' } })
     fireEvent.click(submitButton)
 
     expect(loginUserMock).toHaveBeenCalledWith({
-      username: 'testuser',
+      login: 'testuser',
       password: 'password',
     })
 
