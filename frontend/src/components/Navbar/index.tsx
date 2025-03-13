@@ -10,35 +10,53 @@ const NavBar = () => {
   const navigate = useNavigate()
 
   return (
-    <AppBar position="static">
-      <Toolbar>
-        <Button color="inherit" onClick={() => navigate('/')}>
-          Home
-        </Button>
-        {authenticatedUser ? (
-          <>
-            <Button color="inherit" onClick={() => navigate('/add-pizza')}>
-              Ajouter une pizza
-            </Button>
-            <Button color="inherit" onClick={() => clearUser()}>
-              Se déconnecter
-            </Button>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              Hello dear {authenticatedUser.login}
-            </Typography>
-          </>
-        ) : (
-          <>
-            <Button color="inherit" onClick={() => navigate('/register')}>
-              S'inscrire
-            </Button>
-            <Button color="inherit" onClick={() => navigate('/login')}>
-              Se connecter
-            </Button>
-          </>
-        )}
-      </Toolbar>
-    </AppBar>
+    <Box sx={{ display: 'flex', gap: 1 }}>
+      {authenticatedUser ? (
+        <>
+          <Button
+            variant="outlined"
+            color="inherit"
+            onClick={() => navigate('/add-pizza')}
+          >
+            Ajouter une pizza
+          </Button>
+          <Button variant="outlined" color="inherit" onClick={clearUser}>
+            Se déconnecter
+          </Button>
+        </>
+      ) : (
+        <>
+          <Button
+            variant="outlined"
+            sx={{
+              color: 'green',
+              borderColor: 'green',
+              '&:hover': {
+                borderColor: 'darkgreen',
+                backgroundColor: 'rgba(0, 128, 0, 0.04)',
+              },
+            }}
+            onClick={() => navigate('/register')}
+          >
+            S'inscrire
+          </Button>
+          <Button
+            variant="outlined"
+            sx={{
+              color: 'green',
+              borderColor: 'green',
+              '&:hover': {
+                borderColor: 'darkgreen',
+                backgroundColor: 'rgba(0, 128, 0, 0.04)',
+              },
+            }}
+            onClick={() => navigate('/login')}
+          >
+            Se connecter
+          </Button>
+        </>
+      )}
+    </Box>
   )
 }
 
