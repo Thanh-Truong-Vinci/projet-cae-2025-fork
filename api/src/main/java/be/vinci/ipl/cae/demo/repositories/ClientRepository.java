@@ -5,16 +5,16 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * User repository.
+ * Client repository.
  */
 @Repository
-public interface UserRepository extends CrudRepository<Client, Long> {
+public interface ClientRepository extends CrudRepository<Client, Long> {
 
   /**
-   * Find a user by its email.
+   * Find a client by its email.
    *
    * @param email the email
-   * @return the user
+   * @return the client
    */
   Client findByEmail(String email);
 }

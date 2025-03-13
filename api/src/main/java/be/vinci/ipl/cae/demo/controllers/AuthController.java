@@ -4,7 +4,7 @@ import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedUser;
 import be.vinci.ipl.cae.demo.models.dtos.Credentials;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsRegister;
 import be.vinci.ipl.cae.demo.models.dtos.TokenRequest;
-import be.vinci.ipl.cae.demo.services.UserService;
+import be.vinci.ipl.cae.demo.services.ClientService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,21 +13,21 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * AuthController to handle user authentication.
+ * AuthController to handle client authentication.
  */
 @RestController
 @RequestMapping("/auths")
 public class AuthController {
 
-  private final UserService userService;
+  private final ClientService clientService;
 
   /**
    * Constructor for AuthController.
    *
-   * @param userService the injected UserService.
+   * @param clientService the injected ClientService.
    */
-  public AuthController(UserService userService) {
-    this.userService = userService;
+  public AuthController(ClientService clientService) {
+    this.clientService = clientService;
   }
 
   private boolean isInvalidCredentialsRegister(CredentialsRegister credentials) {
@@ -53,10 +53,10 @@ public class AuthController {
   }
 
   /**
-   * Register a new user.
+   * Register a new client.
    *
-   * @param credentials the user credentials from the request body.
-   * @return the authenticated user.
+   * @param credentials the client credentials from the request body.
+   * @return the authenticated client.
    */
   @PostMapping("/register")
   public AuthenticatedUser register(@RequestBody CredentialsRegister credentials) {
@@ -64,7 +64,7 @@ public class AuthController {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
 
-    AuthenticatedUser user = userService.register(
+    AuthenticatedUser client = clientService.register(
             credentials.getNom(),
             credentials.getPrenom(),
             credentials.getEmail(),
@@ -77,18 +77,18 @@ public class AuthController {
             credentials.getTel()
     );
 
-    if (user == null) {
+    if (client == null) {
       throw new ResponseStatusException(HttpStatus.CONFLICT);
     }
-    return user;
+    return client;
   }
 
 
   /**
-   * Login a user.
+   * Login a client.
    *
-   * @param credentials the user credentials from the request body
-   * @return the authenticated user.
+   * @param credentials the client credentials from the request body
+   * @return the authenticated client.
    */
   @PostMapping("/login")
   public AuthenticatedUser login(@RequestBody Credentials credentials) {
@@ -96,14 +96,14 @@ public class AuthController {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
 
-    AuthenticatedUser user = userService.login(credentials.getEmail(),
+    AuthenticatedUser client = clientService.login(credentials.getEmail(),
         credentials.getPassword());
 
-    if (user == null) {
+    if (client == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
-    return user;
+    return client;
   }
 
   /**
@@ -116,11 +116,11 @@ public class AuthController {
    */
   @PostMapping("/me")
   public AuthenticatedUser refreshToken(@RequestBody TokenRequest request) {
-    String email = userService.verifyJwtToken(request.getToken());
+    String email = clientService.verifyJwtToken(request.getToken());
     if (email == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
-    return userService.createJwtToken(email);
+    return clientService.createJwtToken(email);
   }
 
 }

@@ -1,7 +1,7 @@
 package be.vinci.ipl.cae.demo.configuration;
 
 import be.vinci.ipl.cae.demo.models.entities.Client;
-import be.vinci.ipl.cae.demo.services.UserService;
+import be.vinci.ipl.cae.demo.services.ClientService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,15 +24,15 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Configuration
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-  private final UserService userService;
+  private final ClientService clientService;
 
   /**
    * Constructor for JwtAuthenticationFilter.
    *
-   * @param userService the injected UserService.
+   * @param clientService the injected UserService.
    */
-  public JwtAuthenticationFilter(UserService userService) {
-    this.userService = userService;
+  public JwtAuthenticationFilter(ClientService clientService) {
+    this.clientService = clientService;
   }
 
   /**
@@ -51,9 +51,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
           throws ServletException, IOException {
     String token = request.getHeader("Authorization");
     if (token != null) {
-      String email = userService.verifyJwtToken(token);
+      String email = clientService.verifyJwtToken(token);
       if (email != null) {
-        Client user = userService.readOneFromEmail(email);
+        Client user = clientService.readOneFromEmail(email);
         if (user != null) {
           List<GrantedAuthority> authorities = new ArrayList<>();
           if ("admin".equals(email)) { // TODO replace "admin" with the email of the admin user

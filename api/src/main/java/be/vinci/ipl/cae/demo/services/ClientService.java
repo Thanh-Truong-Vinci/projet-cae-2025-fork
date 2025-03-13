@@ -2,7 +2,7 @@ package be.vinci.ipl.cae.demo.services;
 
 import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedUser;
 import be.vinci.ipl.cae.demo.models.entities.Client;
-import be.vinci.ipl.cae.demo.repositories.UserRepository;
+import be.vinci.ipl.cae.demo.repositories.ClientRepository;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import java.time.LocalDate;
@@ -11,10 +11,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
- * User service.
+ * Client service.
  */
 @Service
-public class UserService {
+public class ClientService {
 
   private static final String jwtSecret = "ilovemypizza!";
   private static final long lifetimeJwt = 24 * 60 * 60 * 1000; // 24 hours
@@ -22,17 +22,17 @@ public class UserService {
   private static final Algorithm algorithm = Algorithm.HMAC256(jwtSecret);
 
   private final BCryptPasswordEncoder passwordEncoder;
-  private final UserRepository userRepository;
+  private final ClientRepository clientRepository;
 
   /**
    * Constructor.
    *
    * @param passwordEncoder the password encoder
-   * @param userRepository  the user repository
+   * @param clientRepository  the client repository
    */
-  public UserService(BCryptPasswordEncoder passwordEncoder, UserRepository userRepository) {
+  public ClientService(BCryptPasswordEncoder passwordEncoder, ClientRepository clientRepository) {
     this.passwordEncoder = passwordEncoder;
-    this.userRepository = userRepository;
+    this.clientRepository = clientRepository;
   }
 
   /**
@@ -71,19 +71,19 @@ public class UserService {
   }
 
   /**
-   * Login a user.
+   * Login a client.
    *
    * @param email the email
    * @param password the password
-   * @return the authenticated user if the login is successful, null otherwise
+   * @return the authenticated client if the login is successful, null otherwise
    */
   public AuthenticatedUser login(String email, String password) {
-    Client user = userRepository.findByEmail(email);
-    if (user == null) {
+    Client client = clientRepository.findByEmail(email);
+    if (client == null) {
       return null;
     }
 
-    if (!passwordEncoder.matches(password, user.getPassword())) {
+    if (!passwordEncoder.matches(password, client.getPassword())) {
       return null;
     }
 
@@ -93,7 +93,7 @@ public class UserService {
   }
 
   /**
-   * Register a new user.
+   * Register a new client.
    *
    * @param nom the last name
    * @param prenom the first name
@@ -105,7 +105,7 @@ public class UserService {
    * @param commune the commune
    * @param pays the country
    * @param tel the phone number (optional)
-   * @return the authenticated user if the registration is successful, null otherwise
+   * @return the authenticated client if the registration is successful, null otherwise
    */
   public AuthenticatedUser register(
           String nom,
@@ -119,7 +119,7 @@ public class UserService {
           String pays,
           String tel) {
 
-    if (userRepository.findByEmail(email) != null) {
+    if (clientRepository.findByEmail(email) != null) {
       return null;
     }
 
@@ -130,17 +130,17 @@ public class UserService {
 
 
   /**
-   * Read a user from its email.
+   * Read a client from its email.
    *
    * @param email the email
-   * @return the user if it exists, null otherwise
+   * @return the client if it exists, null otherwise
    */
   public Client readOneFromEmail(String email) {
-    return userRepository.findByEmail(email);
+    return clientRepository.findByEmail(email);
   }
 
   /**
-   * Create a new user.
+   * Create a new client.
    *
    * @param nom the last name
    * @param prenom the first name
@@ -167,20 +167,20 @@ public class UserService {
 
     String hashedPassword = passwordEncoder.encode(password);
 
-    Client user = new Client();
-    user.setNom(nom);
-    user.setPrenom(prenom);
-    user.setEmail(email);
-    user.setPassword(hashedPassword);
-    user.setRue(rue);
-    user.setNumeroRue(numeroRue);
-    user.setCodePostal(codePostal);
-    user.setCommune(commune);
-    user.setPays(pays);
-    user.setTel(tel);
-    user.setDateInscription(LocalDate.now());
+    Client client = new Client();
+    client.setNom(nom);
+    client.setPrenom(prenom);
+    client.setEmail(email);
+    client.setPassword(hashedPassword);
+    client.setRue(rue);
+    client.setNumeroRue(numeroRue);
+    client.setCodePostal(codePostal);
+    client.setCommune(commune);
+    client.setPays(pays);
+    client.setTel(tel);
+    client.setDateInscription(LocalDate.now());
 
-    userRepository.save(user);
+    clientRepository.save(client);
   }
 
 }
