@@ -30,6 +30,12 @@ public class AuthController {
     this.clientService = clientService;
   }
 
+  /**
+   * Checks if the provided registration credentials are invalid.
+   *
+   * @param credentials the registration credentials to check.
+   * @return true if the credentials are invalid, false otherwise.
+   */
   private boolean isInvalidCredentialsRegister(CredentialsRegister credentials) {
     return credentials == null
             || credentials.getNom() == null || credentials.getNom().isBlank()
@@ -43,13 +49,18 @@ public class AuthController {
             || credentials.getPays() == null || credentials.getPays().isBlank();
   }
 
-
+  /**
+   * Checks if the provided login credentials are invalid.
+   *
+   * @param credentials the login credentials to check.
+   * @return true if the credentials are invalid, false otherwise.
+   */
   private boolean isInvalidCredentials(Credentials credentials) {
     return credentials == null
-        || credentials.getEmail() == null
-        || credentials.getEmail().isBlank()
-        || credentials.getPassword() == null
-        || credentials.getPassword().isBlank();
+            || credentials.getEmail() == null
+            || credentials.getEmail().isBlank()
+            || credentials.getPassword() == null
+            || credentials.getPassword().isBlank();
   }
 
   /**
@@ -57,6 +68,7 @@ public class AuthController {
    *
    * @param credentials the client credentials from the request body.
    * @return the authenticated client.
+   * @throws ResponseStatusException if the credentials are invalid or the email is already in use.
    */
   @PostMapping("/register")
   public AuthenticatedUser register(@RequestBody CredentialsRegister credentials) {
@@ -83,12 +95,12 @@ public class AuthController {
     return client;
   }
 
-
   /**
    * Login a client.
    *
-   * @param credentials the client credentials from the request body
+   * @param credentials the client credentials from the request body.
    * @return the authenticated client.
+   * @throws ResponseStatusException if the credentials are invalid or the login fails.
    */
   @PostMapping("/login")
   public AuthenticatedUser login(@RequestBody Credentials credentials) {
@@ -97,7 +109,7 @@ public class AuthController {
     }
 
     AuthenticatedUser client = clientService.login(credentials.getEmail(),
-        credentials.getPassword());
+            credentials.getPassword());
 
     if (client == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
@@ -113,6 +125,7 @@ public class AuthController {
    *
    * @param request the token request containing the token to verify.
    * @return a new token if verification is successful.
+   * @throws ResponseStatusException if the token is invalid or the verification fails.
    */
   @PostMapping("/me")
   public AuthenticatedUser refreshToken(@RequestBody TokenRequest request) {

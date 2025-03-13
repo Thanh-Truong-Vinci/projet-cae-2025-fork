@@ -38,16 +38,16 @@ public class ClientService {
   /**
    * Create a JWT token.
    *
-   * @param email the email to included in the claim
-   * @return the JWT token
+   * @param email the email to include in the claim
+   * @return the authenticated user with the JWT token
    */
   public AuthenticatedUser createJwtToken(String email) {
     String token = JWT.create()
-        .withIssuer("auth0")
-        .withClaim("email", email)
-        .withIssuedAt(new Date())
-        .withExpiresAt(new Date(System.currentTimeMillis() + lifetimeJwt))
-        .sign(algorithm);
+            .withIssuer("auth0")
+            .withClaim("email", email)
+            .withIssuedAt(new Date())
+            .withExpiresAt(new Date(System.currentTimeMillis() + lifetimeJwt))
+            .sign(algorithm);
 
     AuthenticatedUser authenticatedUser = new AuthenticatedUser();
     authenticatedUser.setEmail(email);
@@ -87,8 +87,6 @@ public class ClientService {
       return null;
     }
 
-    System.out.println(createJwtToken(email));
-
     return createJwtToken(email);
   }
 
@@ -127,7 +125,6 @@ public class ClientService {
 
     return createJwtToken(email);
   }
-
 
   /**
    * Read a client from its email.
