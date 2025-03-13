@@ -1,7 +1,7 @@
-import { useEffect, useState, useCallback, useContext } from 'react';
-import { Outlet } from 'react-router-dom';
-import Footer from '../Footer';
-import Header from '../Header';
+import { useEffect, useState, useCallback, useContext } from 'react'
+import { Outlet } from 'react-router-dom'
+import Footer from '../Footer'
+import Header from '../Header'
 import {
   Drink,
   NewPizza,
@@ -9,6 +9,8 @@ import {
   PizzeriaContext,
   UserContextType,
 } from '../../types';
+import NavBar from '../Navbar';
+
 import { UserContext } from '../../contexts/UserContext';
 import Box from '@mui/material/Box';
 import pizza from '../../assets/images/pizza.jpg';
@@ -36,45 +38,48 @@ const drinks: Drink[] = [
     volume: 'Volume: 50cl',
     price: '1,50 €',
   },
-];
+]
 
 const App = () => {
-  const [actionToBePerformed, setActionToBePerformed] = useState(false);
-  const [pizzas, setPizzas] = useState<Pizza[]>([]);
-  const { authenticatedUser } = useContext<UserContextType>(UserContext);
+  const [actionToBePerformed, setActionToBePerformed] = useState(false)
+  const [pizzas, setPizzas] = useState<Pizza[]>([])
+  const { authenticatedUser } = useContext<UserContextType>(UserContext)
 
   const fetchPizzas = useCallback(async () => {
     try {
-      const pizzas = await getAllPizzas();
-      setPizzas(pizzas);
+      const pizzas = await getAllPizzas()
+      setPizzas(pizzas)
     } catch (err) {
-      console.error('HomePage::error: ', err);
+      console.error('HomePage::error: ', err)
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
-    fetchPizzas();
-  }, [fetchPizzas]);
+    fetchPizzas()
+  }, [fetchPizzas])
 
   async function getAllPizzas() {
     try {
       const response = await fetch('/api/pizzas');
+
       if (!response.ok)
         throw new Error(
           `fetch error : ${response.status} : ${response.statusText}`,
         );
+
       const pizzas = await response.json();
+
       return pizzas;
     } catch (err) {
-      console.error('getAllPizzas::error: ', err);
-      throw err;
+      console.error('getAllPizzas::error: ', err)
+      throw err
     }
   }
 
   const addPizza = async (newPizza: NewPizza) => {
     try {
       if (!authenticatedUser) {
-        throw new Error('You must be authenticated to add a pizza');
+        throw new Error('You must be authenticated to add a pizza')
       }
       const options = {
         method: 'POST',
@@ -83,33 +88,39 @@ const App = () => {
           'Content-Type': 'application/json',
           Authorization: authenticatedUser.token,
         },
-      };
+      }
 
-      const response = await fetch('/api/pizzas', options);
+      const response = await fetch('/api/pizzas', options); // fetch retourne une "promise" => on attend la réponse
+
       if (!response.ok)
         throw new Error(
-          `fetch error : ${response.status} : ${response.statusText}`,
-        );
+          `fetch error : ${response.status} : ${response.statusText}`
+        )
 
-      const createdPizza = await response.json();
+      const createdPizza = await response.json(); // json() retourne une "promise" => on attend les données
+
       setPizzas([...pizzas, createdPizza]);
     } catch (err) {
-      console.error('AddPizza::error: ', err);
+      console.error('AddPizza::error: ', err)
     }
   };
 
-  const clearActionToBePerformed = () => {
-    setActionToBePerformed(false);
+  const handleHeaderClick = () => {
+    setActionToBePerformed(true);
   };
+
+  const clearActionToBePerformed = () => {
+    setActionToBePerformed(false)
+  }
 
   const fullPizzaContext: PizzeriaContext = {
     addPizza,
     pizzas,
     setPizzas,
-    drinks,
     actionToBePerformed,
     setActionToBePerformed,
     clearActionToBePerformed,
+    drinks,
   };
 
   return (
@@ -128,7 +139,7 @@ const App = () => {
       </Container>
       <Footer />
     </Box>
-  );
-};
+  )
+}
 
-export default App;
+export default App

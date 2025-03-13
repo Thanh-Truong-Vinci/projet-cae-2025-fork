@@ -9,7 +9,7 @@ const HomePage = () => {
   const {
     pizzas,
     drinks,
-  }: PizzeriaContext = useOutletContext();
+  }: PizzeriaContext = useOutletContext()
 
   return (
     <Container component="main" sx={{ mt: 8, mb: 2, flex: '1' }} maxWidth="sm">
@@ -26,7 +26,7 @@ const HomePage = () => {
 
       <DrinkMenu title="Notre Menu de Boissons" drinks={drinks} />
     </Container>
-  );
-};
+  )
+}
 
-export default HomePage;
+export default HomePage

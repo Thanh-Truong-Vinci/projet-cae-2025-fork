@@ -41,12 +41,12 @@ Les principales méthodes offertes par **sessionStorage** et **localStorage** so
 Cette méthode permet d'enregistrer, pour une clé donnée, la valeur associée :
 
 ```ts numbered highlighting="5"
-const storeName = 'user';
+const storeName = 'user'
 
 const setUserSessionData = (user) => {
-  const storageValue = JSON.stringify(user);
-  localStorage.setItem(storeName, storageValue);
-};
+  const storageValue = JSON.stringify(user)
+  localStorage.setItem(storeName, storageValue)
+}
 ```
 
 Pour enregistrer un objet JS sous forme de string, il suffit de le sérialiser à l'aide de la méthode `JSON.stringify()`.
@@ -56,13 +56,13 @@ Pour enregistrer un objet JS sous forme de string, il suffit de le sérialiser �
 Cette méthode permet d'obtenir la valeur associée à la clé donnée en argument :
 
 ```ts numbered highlighting="4"
-const storeName = 'user';
+const storeName = 'user'
 
 const getUserSessionData = () => {
-  const retrievedUser = localStorage.getItem(storeName);
-  if (!retrievedUser) return;
-  return JSON.parse(retrievedUser);
-};
+  const retrievedUser = localStorage.getItem(storeName)
+  if (!retrievedUser) return
+  return JSON.parse(retrievedUser)
+}
 ```
 
 Pour cet exemple, comme la valeur a été sérialisée, nous pouvons récupérer l'objet grâce à la méthode **`JSON.parse()`**.
@@ -72,11 +72,11 @@ Pour cet exemple, comme la valeur a été sérialisée, nous pouvons récupérer
 Cette méthode permet d'effacer une clé / valeur :
 
 ```ts numbered highlighting="4"
-const storeName = 'user';
+const storeName = 'user'
 
 const removeSessionData = () => {
-  localStorage.removeItem(storeName);
-};
+  localStorage.removeItem(storeName)
+}
 ```
 
 ## `clear()`
@@ -143,7 +143,7 @@ Ainsi, nous allons définir le fetch du register au sein de `App` en y ajoutant 
 ```tsx
 // code existant
 const [authenticatedUser, setAuthenticatedUser] =
-  useState<MaybeAuthenticatedUser>(undefined);
+  useState<MaybeAuthenticatedUser>(undefined)
 // ...
 const registerUser = async (newUser: NewUser) => {
   try {
@@ -153,24 +153,24 @@ const registerUser = async (newUser: NewUser) => {
       headers: {
         'Content-Type': 'application/json',
       },
-    };
+    }
 
-    const response = await fetch('/api/auths/register', options);
+    const response = await fetch('/api/auths/register', options)
 
     if (!response.ok)
       throw new Error(
-        `fetch error : ${response.status} : ${response.statusText}`,
-      );
+        `fetch error : ${response.status} : ${response.statusText}`
+      )
 
-    const createdUser: AuthenticatedUser = await response.json();
+    const createdUser: AuthenticatedUser = await response.json()
 
-    setAuthenticatedUser(createdUser);
-    console.log('createdUser: ', createdUser);
+    setAuthenticatedUser(createdUser)
+    console.log('createdUser: ', createdUser)
   } catch (err) {
-    console.error('registerUser::error: ', err);
-    throw err;
+    console.error('registerUser::error: ', err)
+    throw err
   }
-};
+}
 // reste du code
 
 const fullPizzaContext: PizzeriaContext = {
@@ -182,7 +182,7 @@ const fullPizzaContext: PizzeriaContext = {
   clearActionToBePerformed,
   drinks,
   registerUser,
-};
+}
 ```
 
 Comme le contexte a été mis à jour, nous devons mettre à jour le type associé `PizzeriaContext`, ainsi que créer :
@@ -195,27 +195,27 @@ Pour cela, veuillez mettre à jour `/src/types.ts` :
 
 ```ts
 interface PizzeriaContext {
-  pizzas: Pizza[];
-  setPizzas: (pizzas: Pizza[]) => void;
-  actionToBePerformed: boolean;
-  setActionToBePerformed: (actionToBePerformed: boolean) => void;
-  clearActionToBePerformed: () => void;
-  drinks: Drink[];
-  addPizza: (newPizza: NewPizza) => Promise<void>;
-  registerUser: (newUser: User) => Promise<void>;
+  pizzas: Pizza[]
+  setPizzas: (pizzas: Pizza[]) => void
+  actionToBePerformed: boolean
+  setActionToBePerformed: (actionToBePerformed: boolean) => void
+  clearActionToBePerformed: () => void
+  drinks: Drink[]
+  addPizza: (newPizza: NewPizza) => Promise<void>
+  registerUser: (newUser: User) => Promise<void>
 }
 
 interface User {
-  username: string;
-  password: string;
+  username: string
+  password: string
 }
 
 interface AuthenticatedUser {
-  username: string;
-  token: string;
+  username: string
+  token: string
 }
 
-type MaybeAuthenticatedUser = AuthenticatedUser | undefined;
+type MaybeAuthenticatedUser = AuthenticatedUser | undefined
 
 export type {
   Pizza,
@@ -225,44 +225,44 @@ export type {
   User,
   AuthenticatedUser,
   MaybeAuthenticatedUser,
-};
+}
 ```
 
 Et voici le code de la nouvelle `RegisterPage` qui fait appel au contexte pour récupérer la fonction `registerUser` :
 
 ```tsx numbered
-import { useState, SyntheticEvent } from 'react';
-import './index.css';
-import { useNavigate, useOutletContext } from 'react-router-dom';
-import { PizzeriaContext } from '../../types';
+import { useState, SyntheticEvent } from 'react'
+import './index.css'
+import { useNavigate, useOutletContext } from 'react-router-dom'
+import { PizzeriaContext } from '../../types'
 
 const RegisterPage = () => {
-  const { registerUser }: PizzeriaContext = useOutletContext();
+  const { registerUser }: PizzeriaContext = useOutletContext()
 
-  const navigate = useNavigate();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const navigate = useNavigate()
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
 
   const handleSubmit = (e: SyntheticEvent) => {
-    e.preventDefault();
-    registerUser({ username, password });
-    navigate('/');
-  };
+    e.preventDefault()
+    registerUser({ username, password })
+    navigate('/')
+  }
 
   const handleSubmit = async (e: SyntheticEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     try {
-      await registerUser({ username, password });
-      navigate('/');
+      await registerUser({ username, password })
+      navigate('/')
     } catch (err) {
-      console.error('RegisterPage::error: ', err);
+      console.error('RegisterPage::error: ', err)
     }
-  };
+  }
 
   const handlePasswordChange = (e: SyntheticEvent) => {
-    const input = e.target as HTMLInputElement;
-    setPassword(input.value);
-  };
+    const input = e.target as HTMLInputElement
+    setPassword(input.value)
+  }
 
   return (
     <div>
@@ -289,10 +289,10 @@ const RegisterPage = () => {
         <button type="submit">Créer le compte</button>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default RegisterPage;
+export default RegisterPage
 ```
 
 Maintenant nous devons mettre à jour la configuration de notre router pour offrir la `RegisterPage` : pour ce faire, veuillez mettre à jour `/src/main.tsx` :
@@ -317,18 +317,18 @@ const router = createBrowserRouter([
       },
     ],
   },
-]);
+])
 ```
 
 Il faut aussi mettre à jour la `Navbar` :
 
 ```tsx
 interface NavBarProps {
-  authenticatedUser: MaybeAuthenticatedUser;
+  authenticatedUser: MaybeAuthenticatedUser
 }
 
 const NavBar = ({ authenticatedUser }: NavBarProps) => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   if (authenticatedUser) {
     return (
@@ -338,7 +338,7 @@ const NavBar = ({ authenticatedUser }: NavBarProps) => {
           Ajouter une pizza
         </button>
       </nav>
-    );
+    )
   }
 
   return (
@@ -349,8 +349,8 @@ const NavBar = ({ authenticatedUser }: NavBarProps) => {
       </button>
       <button onClick={() => navigate('/login')}>Se connecter</button>
     </nav>
-  );
-};
+  )
+}
 ```
 
 Ici nous avons ajouté un paramètre qui contiendra, l'éventuel `authenticatedUser` si l'utilisateur vient de créer son compte (ou s'il s'est loggué, mais nous verrons ça plus tard).
@@ -371,7 +371,7 @@ return (
     </main>
     <Footer />
   </div>
-);
+)
 ```
 
 Veuillez exécuter le frontend et vous assurer que l'utilisateur que vous tentez de créer est bien créé par votre API.
@@ -391,24 +391,24 @@ const loginUser = async (user: User) => {
       headers: {
         'Content-Type': 'application/json',
       },
-    };
+    }
 
-    const response = await fetch('/api/auths/login', options);
+    const response = await fetch('/api/auths/login', options)
 
     if (!response.ok)
       throw new Error(
-        `fetch error : ${response.status} : ${response.statusText}`,
-      );
+        `fetch error : ${response.status} : ${response.statusText}`
+      )
 
-    const authenticatedUser: AuthenticatedUser = await response.json();
-    console.log('authenticatedUser: ', authenticatedUser);
+    const authenticatedUser: AuthenticatedUser = await response.json()
+    console.log('authenticatedUser: ', authenticatedUser)
 
-    setAuthenticatedUser(authenticatedUser);
+    setAuthenticatedUser(authenticatedUser)
   } catch (err) {
-    console.error('loginUser::error: ', err);
-    throw err;
+    console.error('loginUser::error: ', err)
+    throw err
   }
-};
+}
 
 // Reste du code
 
@@ -422,59 +422,59 @@ const fullPizzaContext: PizzeriaContext = {
   drinks,
   registerUser,
   loginUser,
-};
+}
 ```
 
 Comme le contexte a été mis à jour, nous devons mettre à jour le type associé `PizzeriaContext` au sein de `/src/types.ts` :
 
 ```ts
 interface PizzeriaContext {
-  pizzas: Pizza[];
-  setPizzas: (pizzas: Pizza[]) => void;
-  actionToBePerformed: boolean;
-  setActionToBePerformed: (actionToBePerformed: boolean) => void;
-  clearActionToBePerformed: () => void;
-  drinks: Drink[];
-  addPizza: (newPizza: NewPizza) => Promise<void>;
-  registerUser: (newUser: User) => Promise<void>;
-  loginUser: (user: User) => Promise<void>;
+  pizzas: Pizza[]
+  setPizzas: (pizzas: Pizza[]) => void
+  actionToBePerformed: boolean
+  setActionToBePerformed: (actionToBePerformed: boolean) => void
+  clearActionToBePerformed: () => void
+  drinks: Drink[]
+  addPizza: (newPizza: NewPizza) => Promise<void>
+  registerUser: (newUser: User) => Promise<void>
+  loginUser: (user: User) => Promise<void>
 }
 ```
 
 Et voici le code de la nouvelle `LoginPage` qui fait appel au contexte pour récupérer la fonction `loginUser` :
 
 ```tsx numbered
-import { useState, SyntheticEvent } from 'react';
-import './index.css';
-import { useNavigate, useOutletContext } from 'react-router-dom';
-import { PizzeriaContext } from '../../types';
+import { useState, SyntheticEvent } from 'react'
+import './index.css'
+import { useNavigate, useOutletContext } from 'react-router-dom'
+import { PizzeriaContext } from '../../types'
 
 const LoginPage = () => {
-  const { loginUser }: PizzeriaContext = useOutletContext();
+  const { loginUser }: PizzeriaContext = useOutletContext()
 
-  const navigate = useNavigate();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const navigate = useNavigate()
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
 
   const handleSubmit = async (e: SyntheticEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     try {
-      await loginUser({ username, password });
-      navigate('/');
+      await loginUser({ username, password })
+      navigate('/')
     } catch (err) {
-      console.error('LoginPage::error: ', err);
+      console.error('LoginPage::error: ', err)
     }
-  };
+  }
 
   const handleUsernameInputChange = (e: SyntheticEvent) => {
-    const input = e.target as HTMLInputElement;
-    setUsername(input.value);
-  };
+    const input = e.target as HTMLInputElement
+    setUsername(input.value)
+  }
 
   const handlePasswordChange = (e: SyntheticEvent) => {
-    const input = e.target as HTMLInputElement;
-    setPassword(input.value);
-  };
+    const input = e.target as HTMLInputElement
+    setPassword(input.value)
+  }
 
   return (
     <div>
@@ -501,10 +501,10 @@ const LoginPage = () => {
         <button type="submit">S'authentifier</button>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default LoginPage;
+export default LoginPage
 ```
 
 Maintenant nous devons mettre à jour la configuration de notre router pour offrir la `LoginPage` : pour ce faire, veuillez mettre à jour `/src/main.tsx` :
@@ -533,14 +533,14 @@ const router = createBrowserRouter([
       },
     ],
   },
-]);
+])
 ```
 
 Il faut aussi mettre à jour la `Navbar` :
 
 ```tsx
 const NavBar = ({ authenticatedUser }: NavBarProps) => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   if (authenticatedUser) {
     return (
@@ -550,7 +550,7 @@ const NavBar = ({ authenticatedUser }: NavBarProps) => {
           Ajouter une pizza
         </button>
       </nav>
-    );
+    )
   }
 
   return (
@@ -561,8 +561,8 @@ const NavBar = ({ authenticatedUser }: NavBarProps) => {
       </button>
       <button onClick={() => navigate('/login')}>Se connecter</button>
     </nav>
-  );
-};
+  )
+}
 ```
 
 Veuillez exécuter le frontend et vous assurer que pour l'utilisateur préalablement créé, vous pouvez l'utiliser pour vous logguer.
@@ -590,21 +590,21 @@ Commme nous allons réutiliser un même traitement (tant dans login que dans reg
 Veuillez créer un nouveau script `/src/utils/session.ts` et y ajouter ce code-ci :
 
 ```ts
-import { AuthenticatedUser, MaybeAuthenticatedUser } from '../types';
+import { AuthenticatedUser, MaybeAuthenticatedUser } from '../types'
 
 const storeAuthenticatedUser = (authenticatedUser: AuthenticatedUser) => {
-  localStorage.setItem('authenticatedUser', JSON.stringify(authenticatedUser));
-};
+  localStorage.setItem('authenticatedUser', JSON.stringify(authenticatedUser))
+}
 
 const getAuthenticatedUser = (): MaybeAuthenticatedUser => {
-  const authenticatedUser = localStorage.getItem('authenticatedUser');
+  const authenticatedUser = localStorage.getItem('authenticatedUser')
 
-  if (!authenticatedUser) return undefined;
+  if (!authenticatedUser) return undefined
 
-  return JSON.parse(authenticatedUser);
-};
+  return JSON.parse(authenticatedUser)
+}
 
-export { storeAuthenticatedUser, getAuthenticatedUser };
+export { storeAuthenticatedUser, getAuthenticatedUser }
 ```
 
 Veuillez mettre à jour `App` afin de faire appelle à `storeAuthenticatedUser` lors du login et du register :
@@ -618,26 +618,26 @@ const registerUser = async (newUser: User) => {
       headers: {
         'Content-Type': 'application/json',
       },
-    };
+    }
 
-    const response = await fetch('/api/auths/register', options);
+    const response = await fetch('/api/auths/register', options)
 
     if (!response.ok)
       throw new Error(
-        `fetch error : ${response.status} : ${response.statusText}`,
-      );
+        `fetch error : ${response.status} : ${response.statusText}`
+      )
 
-    const createdUser: AuthenticatedUser = await response.json();
+    const createdUser: AuthenticatedUser = await response.json()
 
-    setAuthenticatedUser(createdUser);
-    storeAuthenticatedUser(createdUser);
+    setAuthenticatedUser(createdUser)
+    storeAuthenticatedUser(createdUser)
 
-    console.log('createdUser: ', createdUser);
+    console.log('createdUser: ', createdUser)
   } catch (err) {
-    console.error('registerUser::error: ', err);
-    throw err;
+    console.error('registerUser::error: ', err)
+    throw err
   }
-};
+}
 
 const loginUser = async (user: User) => {
   try {
@@ -647,25 +647,25 @@ const loginUser = async (user: User) => {
       headers: {
         'Content-Type': 'application/json',
       },
-    };
+    }
 
-    const response = await fetch('/api/auths/login', options);
+    const response = await fetch('/api/auths/login', options)
 
     if (!response.ok)
       throw new Error(
-        `fetch error : ${response.status} : ${response.statusText}`,
-      );
+        `fetch error : ${response.status} : ${response.statusText}`
+      )
 
-    const authenticatedUser: AuthenticatedUser = await response.json();
-    console.log('authenticatedUser: ', authenticatedUser);
+    const authenticatedUser: AuthenticatedUser = await response.json()
+    console.log('authenticatedUser: ', authenticatedUser)
 
-    setAuthenticatedUser(authenticatedUser);
-    storeAuthenticatedUser(authenticatedUser);
+    setAuthenticatedUser(authenticatedUser)
+    storeAuthenticatedUser(authenticatedUser)
   } catch (err) {
-    console.error('loginUser::error: ', err);
-    throw err;
+    console.error('loginUser::error: ', err)
+    throw err
   }
-};
+}
 ```
 
 💭 A quel moment devons nous faire appel à `getAuthenticatedUser` pour récupérer les données du `localStorage` ?  
@@ -673,12 +673,12 @@ En fait, cela doit se faire au chargement de la page. Et nous souhaitons, si nou
 
 ```tsx
 useEffect(() => {
-  fetchPizzas();
-  const authenticatedUser = getAuthenticatedUser();
+  fetchPizzas()
+  const authenticatedUser = getAuthenticatedUser()
   if (authenticatedUser) {
-    setAuthenticatedUser(authenticatedUser);
+    setAuthenticatedUser(authenticatedUser)
   }
-}, []);
+}, [])
 ```
 
 Veuillez connecter un utilisateur et faire un refresh de la page... Et voila, vous devriez rester connecté : )
@@ -696,9 +696,9 @@ Veuillez donc mettre à jour `App` en lui ajoutant cette fonction `clearUser` et
 ```tsx
 //....
 const clearUser = () => {
-  clearAuthenticatedUser();
-  setAuthenticatedUser(undefined);
-};
+  clearAuthenticatedUser()
+  setAuthenticatedUser(undefined)
+}
 // ... reste du code
 return (
   <div className="page">
@@ -713,19 +713,19 @@ return (
     </main>
     <Footer />
   </div>
-);
+)
 ```
 
 Voici le code de la `Navbar` mis à jour pour ajouter l'élement de déconnexion et l'action associée :
 
 ```tsx
 interface NavBarProps {
-  authenticatedUser: MaybeAuthenticatedUser;
-  clearUser: () => void;
+  authenticatedUser: MaybeAuthenticatedUser
+  clearUser: () => void
 }
 
 const NavBar = ({ authenticatedUser, clearUser }: NavBarProps) => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   if (authenticatedUser) {
     return (
@@ -736,7 +736,7 @@ const NavBar = ({ authenticatedUser, clearUser }: NavBarProps) => {
         </button>
         <button onClick={() => clearUser()}>Se déconnecter</button>
       </nav>
-    );
+    )
   }
 
   return (
@@ -747,8 +747,8 @@ const NavBar = ({ authenticatedUser, clearUser }: NavBarProps) => {
       </button>
       <button onClick={() => navigate('/login')}>Se connecter</button>
     </nav>
-  );
-};
+  )
+}
 ```
 
 Veuillez tester l'application, vous connecter, déconnecter... Cela devrait bien fonctionner.

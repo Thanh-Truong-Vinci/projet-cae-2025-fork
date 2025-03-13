@@ -40,7 +40,7 @@ const Header = ({ title }: HeaderProps) => {
       {/* Navbar alignée à droite */}
       <NavBar />
     </Box>
-  );
-};
+  )
+}
 
 export default Header;

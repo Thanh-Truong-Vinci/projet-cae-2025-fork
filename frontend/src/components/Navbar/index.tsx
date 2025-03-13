@@ -6,8 +6,8 @@ import { UserContextType } from '../../types';
 
 const NavBar = () => {
   const { authenticatedUser, clearUser } =
-    useContext<UserContextType>(UserContext);
-  const navigate = useNavigate();
+    useContext<UserContextType>(UserContext)
+  const navigate = useNavigate()
 
   return (
     <Box sx={{ display: 'flex', gap: 1 }}>

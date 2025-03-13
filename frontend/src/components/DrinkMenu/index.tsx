@@ -6,16 +6,16 @@ import {
   Typography,
   Grid2,
   useTheme,
-} from '@mui/material';
-import { Drink } from '../../types';
+} from '@mui/material'
+import { Drink } from '../../types'
 
 interface DrinkMenuProps {
-  title: string;
-  drinks: Drink[];
+  title: string
+  drinks: Drink[]
 }
 
 const DrinkMenu = ({ title, drinks }: DrinkMenuProps) => {
-  const theme = useTheme();
+  const theme = useTheme()
   return (
     <Container>
       <Typography
@@ -55,7 +55,7 @@ const DrinkMenu = ({ title, drinks }: DrinkMenuProps) => {
         ))}
       </Grid2>
     </Container>
-  );
-};
+  )
+}
 
-export default DrinkMenu;
+export default DrinkMenu

@@ -1,9 +1,9 @@
-import { Box, Container, Typography, useTheme } from '@mui/material';
-import logo from '../../assets/images/js-logo.png';
-import { Copyright } from '@mui/icons-material';
+import { Box, Container, Typography, useTheme } from '@mui/material'
+import logo from '../../assets/images/js-logo.png'
+import { Copyright } from '@mui/icons-material'
 
 const Footer = () => {
-  const theme = useTheme();
+  const theme = useTheme()
 
   return (
     <Box
@@ -35,7 +35,7 @@ const Footer = () => {
         </Box>
       </Container>
     </Box>
-  );
-};
+  )
+}
 
-export default Footer;
+export default Footer
