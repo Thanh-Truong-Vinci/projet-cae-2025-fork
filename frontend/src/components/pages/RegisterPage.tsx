@@ -32,7 +32,7 @@ const RegisterPage = () => {
     e.preventDefault()
     try {
       await registerUser({
-        username: formData.email, // Mapping email vers username
+        login: formData.email, // Mapping email vers username
         password: formData.mdp, // Mapping mdp vers password
       })
       navigate('/')

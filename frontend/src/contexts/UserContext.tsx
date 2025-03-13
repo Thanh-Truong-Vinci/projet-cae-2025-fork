@@ -14,7 +14,31 @@ import {
 const defaultUserContext: UserContextType = {
   authenticatedUser: undefined,
   registerUser: async () => {},
-  loginUser: async () => {},
+  loginUser: async (user: User) => {
+    try {
+      const options = {
+        method: 'POST',
+        body: JSON.stringify(user),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+
+      const response = await fetch('/api/auths/login', options)
+
+      if (!response.ok)
+        throw new Error(
+          `fetch error : ${response.status} : ${response.statusText}`
+        )
+
+      const authenticatedUser: AuthenticatedUser = await response.json()
+
+      return authenticatedUser
+    } catch (err) {
+      console.error('loginUser::error: ', err)
+      throw err
+    }
+  },
   clearUser: () => {},
 }
 
@@ -52,7 +76,7 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
-  const loginUser = async (user: User) => {
+  const loginUser = async (user: User): Promise<AuthenticatedUser> => {
     try {
       const options = {
         method: 'POST',
@@ -74,6 +98,7 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
 
       setAuthenticatedUser(authenticatedUser)
       storeAuthenticatedUser(authenticatedUser)
+      return authenticatedUser
     } catch (err) {
       console.error('loginUser::error: ', err)
       throw err
