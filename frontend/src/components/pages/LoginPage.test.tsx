@@ -58,7 +58,7 @@ describe('LoginPage', () => {
     fireEvent.click(submitButton)
 
     expect(loginUserMock).toHaveBeenCalledWith({
-      login: 'testuser',
+      email: 'testuser',
       password: 'password',
     })
 
@@ -101,7 +101,7 @@ describe('LoginPage', () => {
     fireEvent.click(submitButton)
 
     expect(loginUserMock).toHaveBeenCalledWith({
-      login: 'testuser',
+      email: 'testuser',
       password: 'password',
     })
 
