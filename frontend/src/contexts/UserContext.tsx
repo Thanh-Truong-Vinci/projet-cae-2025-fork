@@ -94,7 +94,7 @@ const UserContext = createContext<UserContextType>(defaultUserContext)
 const UserContextProvider = ({ children }: { children: ReactNode }) => {
   const [authenticatedUser, setAuthenticatedUser] =
     useState<MaybeAuthenticatedUser>(undefined)
- 
+
   const authsMe = async (token: string) => {
     try {
       const response = await fetch('/api/auths/me', {

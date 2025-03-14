@@ -12,15 +12,17 @@ const App = () => {
 
   useEffect(() => {
     const validateToken = async () => {
-      const token = document.cookie.split('; ').find(row => row.startsWith('token='))
+      const token = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('token='))
       if (token) {
         const tokenValue = token.split('=')[1]
-        authsMe(tokenValue);
+        authsMe(tokenValue)
       }
     }
 
     validateToken()
-  },)
+  })
 
   return (
     <Box
@@ -34,7 +36,7 @@ const App = () => {
     >
       <Header title="Terroire & Cie" />
       <Container component="main" sx={{ flex: '1' }}>
-        <Outlet/>
+        <Outlet />
       </Container>
       <Footer />
     </Box>
