@@ -99,12 +99,7 @@ const RegisterPage = () => {
 
         {/* Boîte & Code postal */}
         <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
-          <TextField
-            name="box"
-            label="Box"
-            fullWidth
-            onChange={handleChange}
-          />
+          <TextField name="box" label="Box" fullWidth onChange={handleChange} />
           <TextField
             name="postalCode"
             label="Postal Code"
