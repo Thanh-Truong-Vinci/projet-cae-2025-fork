@@ -9,18 +9,16 @@ const NavBar = () => {
     useContext<UserContextType>(UserContext)
   const navigate = useNavigate()
 
+  const handleLogout = async () => {
+    document.cookie = 'token=; path=/; max-age=-1'
+    clearUser()
+  }
+
   return (
     <Box sx={{ display: 'flex', gap: 1 }}>
       {authenticatedUser ? (
         <>
-          <Button
-            variant="outlined"
-            color="inherit"
-            onClick={() => navigate('/add-pizza')}
-          >
-            Ajouter une pizza
-          </Button>
-          <Button variant="outlined" color="inherit" onClick={clearUser}>
+          <Button variant="outlined" color="inherit" onClick={handleLogout}>
             Se déconnecter
           </Button>
         </>
