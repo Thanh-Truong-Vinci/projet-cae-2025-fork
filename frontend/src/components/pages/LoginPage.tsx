@@ -9,21 +9,21 @@ import {
   useTheme,
   Typography,
 } from '@mui/material'
-import { UserContextType, User, AuthenticatedUser } from '../../types'
+import { UserContextType, LoginUser, AuthenticatedUser } from '../../types'
 import { UserContext } from '../../contexts/UserContext'
 import './index.css'
 
 const LoginPage = () => {
   const { loginUser } = useContext<UserContextType>(UserContext)
   const navigate = useNavigate()
-  const [login, setLogin] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
   const theme = useTheme()
 
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault()
-    const user: User = { login, password }
+    const user: LoginUser = { email, password }
     try {
       const authenticatedUser: AuthenticatedUser = await loginUser(user)
       if (rememberMe && authenticatedUser) {
@@ -37,7 +37,7 @@ const LoginPage = () => {
 
   const handleLoginChange = (e: SyntheticEvent) => {
     const input = e.target as HTMLInputElement
-    setLogin(input.value)
+    setEmail(input.value)
   }
 
   const handlePasswordChange = (e: SyntheticEvent) => {
@@ -67,11 +67,11 @@ const LoginPage = () => {
         <Box sx={{ marginBottom: 2 }}>
           <TextField
             fullWidth
-            id="login"
-            name="login"
+            id="email"
+            name="email"
             label="Email ou Login"
             variant="outlined"
-            value={login}
+            value={email}
             onChange={handleLoginChange}
             required
             color="primary"

@@ -32,8 +32,17 @@ const RegisterPage = () => {
     e.preventDefault()
     try {
       await registerUser({
-        login: formData.email, // Mapping email vers username
-        password: formData.mdp, // Mapping mdp vers password
+        nom: formData.nom,
+        prenom: formData.prenom,
+        rue: formData.rue,
+        numeroRue: formData.numero_rue,
+        boite: formData.boite,
+        codePostal: formData.code_postal,
+        commune: formData.commune,
+        pays: formData.pays,
+        tel: formData.tel,
+        email: formData.email,
+        password: formData.mdp,
       })
       navigate('/')
     } catch (err) {

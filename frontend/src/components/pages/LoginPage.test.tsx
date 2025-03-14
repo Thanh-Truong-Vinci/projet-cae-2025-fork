@@ -31,6 +31,7 @@ describe('LoginPage', () => {
     const navigateMock = vi.fn()
     const mockContextValue = {
       authenticatedUser: undefined,
+      authsMe: vi.fn(),
       registerUser: vi.fn(),
       loginUser: loginUserMock,
       clearUser: vi.fn(),
@@ -75,6 +76,7 @@ describe('LoginPage', () => {
       .mockImplementation(() => {})
     const mockContextValue = {
       authenticatedUser: undefined,
+      authsMe: vi.fn(),
       registerUser: vi.fn(),
       loginUser: loginUserMock,
       clearUser: vi.fn(),
