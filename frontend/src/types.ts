@@ -7,15 +7,15 @@ interface UserContextType {
 }
 
 interface User {
-  nom: string
-  prenom: string
-  rue: string
-  numeroRue: string
-  boite?: string
-  codePostal: string
-  commune: string
-  pays: string
-  tel: string
+  name: string
+  firstname: string
+  street: string
+  number: string
+  box?: string
+  postalCode: string
+  city: string
+  country: string
+  phoneNumber: string
   email: string
   password: string
 }

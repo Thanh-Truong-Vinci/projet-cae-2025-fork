@@ -10,17 +10,17 @@ const RegisterPage = () => {
   const navigate = useNavigate()
 
   const [formData, setFormData] = useState({
-    nom: '',
-    prenom: '',
-    rue: '',
-    numero_rue: '',
-    boite: '',
-    code_postal: '',
-    commune: '',
-    pays: '',
-    tel: '',
+    name: '',
+    firstname: '',
+    street: '',
+    number: '',
+    box: '',
+    postalCode: '',
+    city: '',
+    country: '',
+    phoneNumber: '',
     email: '',
-    mdp: '',
+    password: '',
   })
 
   const handleChange = (e: SyntheticEvent) => {
@@ -32,17 +32,17 @@ const RegisterPage = () => {
     e.preventDefault()
     try {
       await registerUser({
-        nom: formData.nom,
-        prenom: formData.prenom,
-        rue: formData.rue,
-        numeroRue: formData.numero_rue,
-        boite: formData.boite,
-        codePostal: formData.code_postal,
-        commune: formData.commune,
-        pays: formData.pays,
-        tel: formData.tel,
+        name: formData.name,
+        firstname: formData.firstname,
+        street: formData.street,
+        number: formData.number,
+        box: formData.box,
+        postalCode: formData.postalCode,
+        city: formData.city,
+        country: formData.country,
+        phoneNumber: formData.phoneNumber,
         email: formData.email,
-        password: formData.mdp,
+        password: formData.password,
       })
       navigate('/')
     } catch (err) {
@@ -65,32 +65,32 @@ const RegisterPage = () => {
         }}
       >
         <TextField
-          name="nom"
-          label="Nom"
+          name="name"
+          label="Name"
           fullWidth
           onChange={handleChange}
           required
           sx={{ mb: 1 }}
         />
         <TextField
-          name="prenom"
-          label="Prénom"
+          name="firstname"
+          label="First Name"
           fullWidth
           onChange={handleChange}
           required
           sx={{ mb: 1 }}
         />
         <TextField
-          name="rue"
-          label="Rue"
+          name="street"
+          label="Street"
           fullWidth
           onChange={handleChange}
           required
           sx={{ mb: 1 }}
         />
         <TextField
-          name="numero_rue"
-          label="Numéro de rue"
+          name="number"
+          label="Number"
           fullWidth
           onChange={handleChange}
           required
@@ -100,14 +100,14 @@ const RegisterPage = () => {
         {/* Boîte & Code postal */}
         <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
           <TextField
-            name="boite"
-            label="Boîte"
+            name="box"
+            label="Box"
             fullWidth
             onChange={handleChange}
           />
           <TextField
-            name="code_postal"
-            label="Code postal"
+            name="postalCode"
+            label="Postal Code"
             fullWidth
             onChange={handleChange}
             required
@@ -117,15 +117,15 @@ const RegisterPage = () => {
         {/* Commune & Pays */}
         <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
           <TextField
-            name="commune"
-            label="Commune"
+            name="city"
+            label="City"
             fullWidth
             onChange={handleChange}
             required
           />
           <TextField
-            name="pays"
-            label="Pays"
+            name="country"
+            label="Country"
             fullWidth
             onChange={handleChange}
             required
@@ -133,8 +133,8 @@ const RegisterPage = () => {
         </Box>
 
         <TextField
-          name="tel"
-          label="Téléphone"
+          name="phoneNumber"
+          label="Phone Number"
           fullWidth
           onChange={handleChange}
           required
@@ -150,8 +150,8 @@ const RegisterPage = () => {
           sx={{ mb: 1 }}
         />
         <TextField
-          name="mdp"
-          label="Mot de passe"
+          name="password"
+          label="Password"
           type="password"
           fullWidth
           onChange={handleChange}
