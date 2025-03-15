@@ -7,8 +7,11 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import java.time.LocalDate;
 import java.util.Date;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Client service.
@@ -117,6 +120,10 @@ public class ClientService {
           String country,
           String phoneNumber) {
 
+    if (!isValidEmail(email)) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid email format");
+    }
+
     if (clientRepository.findByEmail(email) != null) {
       return null;
     }
@@ -178,5 +185,16 @@ public class ClientService {
     client.setDateInscription(LocalDate.now());
 
     clientRepository.save(client);
+  }
+
+  /**
+   * Validates the email format using a regular expression.
+   *
+   * @param email the email to validate
+   * @return true if the email format is valid, false otherwise
+   */
+  private boolean isValidEmail(String email) {
+    String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+    return email.matches(emailRegex);
   }
 }
