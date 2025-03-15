@@ -38,15 +38,15 @@ public class AuthController {
    */
   private boolean isInvalidCredentialsRegister(CredentialsRegister credentials) {
     return credentials == null
-            || credentials.getNom() == null || credentials.getNom().isBlank()
-            || credentials.getPrenom() == null || credentials.getPrenom().isBlank()
+            || credentials.getName() == null || credentials.getName().isBlank()
+            || credentials.getFirstname() == null || credentials.getFirstname().isBlank()
             || credentials.getEmail() == null || credentials.getEmail().isBlank()
             || credentials.getPassword() == null || credentials.getPassword().isBlank()
-            || credentials.getRue() == null || credentials.getRue().isBlank()
-            || credentials.getNumeroRue() == null || credentials.getNumeroRue().isBlank()
-            || credentials.getCodePostal() == null || credentials.getCodePostal().isBlank()
-            || credentials.getCommune() == null || credentials.getCommune().isBlank()
-            || credentials.getPays() == null || credentials.getPays().isBlank();
+            || credentials.getStreet() == null || credentials.getStreet().isBlank()
+            || credentials.getNumber() == null || credentials.getNumber().isBlank()
+            || credentials.getPostalCode() == null || credentials.getPostalCode().isBlank()
+            || credentials.getCity() == null || credentials.getCity().isBlank()
+            || credentials.getCountry() == null || credentials.getCountry().isBlank();
   }
 
   /**
@@ -77,16 +77,16 @@ public class AuthController {
     }
 
     AuthenticatedUser client = clientService.register(
-            credentials.getNom(),
-            credentials.getPrenom(),
+            credentials.getName(),
+            credentials.getFirstname(),
             credentials.getEmail(),
             credentials.getPassword(),
-            credentials.getRue(),
-            credentials.getNumeroRue(),
-            credentials.getCodePostal(),
-            credentials.getCommune(),
-            credentials.getPays(),
-            credentials.getTel()
+            credentials.getStreet(),
+            credentials.getNumber(),
+            credentials.getPostalCode(),
+            credentials.getCity(),
+            credentials.getCountry(),
+            credentials.getPhoneNumber()
     );
 
     if (client == null) {
@@ -143,5 +143,4 @@ public class AuthController {
 
     return client;
   }
-
 }

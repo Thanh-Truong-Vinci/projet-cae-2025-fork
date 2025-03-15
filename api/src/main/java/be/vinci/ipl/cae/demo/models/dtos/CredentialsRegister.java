@@ -10,14 +10,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CredentialsRegister {
 
-  private String nom;
-  private String prenom;
+  private String name;
+  private String firstname;
   private String email;
   private String password;
-  private String rue;
-  private String numeroRue;
-  private String codePostal;
-  private String commune;
-  private String pays;
-  private String tel;
+  private String street;
+  private String number;
+  private String box;
+  private String postalCode;
+  private String city;
+  private String country;
+  private String phoneNumber;
 }

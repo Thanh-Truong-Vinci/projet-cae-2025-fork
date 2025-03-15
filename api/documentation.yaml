@@ -93,10 +93,10 @@ components:
     CredentialsRegister:
       type: object
       properties:
-        nom:
+        name:
           type: string
           example: User
-        prenom:
+        firstname:
           type: string
           example: Example
         email:
@@ -105,22 +105,25 @@ components:
         password:
           type: string
           example: password
-        rue:
+        street:
           type: string
           example: User Street
-        numeroRue:
+        number:
           type: string
           example: 1
-        codePostal:
+        box:
+          type: string
+          example: ""
+        postalCode:
           type: string
           example: 1000
-        commune:
+        city:
           type: string
           example: User City
-        pays:
+        country:
           type: string
           example: User Country
-        tel:
+        phoneNumber:
           type: string
           example: 123456789
     AuthenticatedUser:

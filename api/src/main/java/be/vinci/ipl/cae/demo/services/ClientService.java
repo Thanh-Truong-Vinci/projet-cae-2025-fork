@@ -93,35 +93,35 @@ public class ClientService {
   /**
    * Register a new client.
    *
-   * @param nom the last name
-   * @param prenom the first name
+   * @param name the last name
+   * @param firstname the first name
    * @param email the email
    * @param password the password
-   * @param rue the street
-   * @param numeroRue the street number
-   * @param codePostal the postal code
-   * @param commune the commune
-   * @param pays the country
-   * @param tel the phone number (optional)
+   * @param street the street
+   * @param number the street number
+   * @param postalCode the postal code
+   * @param city the city
+   * @param country the country
+   * @param phoneNumber the phone number (optional)
    * @return the authenticated client if the registration is successful, null otherwise
    */
   public AuthenticatedUser register(
-          String nom,
-          String prenom,
+          String name,
+          String firstname,
           String email,
           String password,
-          String rue,
-          String numeroRue,
-          String codePostal,
-          String commune,
-          String pays,
-          String tel) {
+          String street,
+          String number,
+          String postalCode,
+          String city,
+          String country,
+          String phoneNumber) {
 
     if (clientRepository.findByEmail(email) != null) {
       return null;
     }
 
-    createOne(nom, prenom, email, password, rue, numeroRue, codePostal, commune, pays, tel);
+    createOne(name, firstname, email, password, street, number, postalCode, city, country, phoneNumber);
 
     return createJwtToken(email);
   }
@@ -139,45 +139,44 @@ public class ClientService {
   /**
    * Create a new client.
    *
-   * @param nom the last name
-   * @param prenom the first name
+   * @param name the last name
+   * @param firstname the first name
    * @param email the email
    * @param password the password
-   * @param rue the street
-   * @param numeroRue the street number
-   * @param codePostal the postal code
-   * @param commune the commune
-   * @param pays the country
-   * @param tel the phone number (optional)
+   * @param street the street
+   * @param number the street number
+   * @param postalCode the postal code
+   * @param city the city
+   * @param country the country
+   * @param phoneNumber the phone number (optional)
    */
   public void createOne(
-          String nom,
-          String prenom,
+          String name,
+          String firstname,
           String email,
           String password,
-          String rue,
-          String numeroRue,
-          String codePostal,
-          String commune,
-          String pays,
-          String tel) {
+          String street,
+          String number,
+          String postalCode,
+          String city,
+          String country,
+          String phoneNumber) {
 
     String hashedPassword = passwordEncoder.encode(password);
 
     Client client = new Client();
-    client.setNom(nom);
-    client.setPrenom(prenom);
+    client.setName(name);
+    client.setFirstname(firstname);
     client.setEmail(email);
     client.setPassword(hashedPassword);
-    client.setRue(rue);
-    client.setNumeroRue(numeroRue);
-    client.setCodePostal(codePostal);
-    client.setCommune(commune);
-    client.setPays(pays);
-    client.setTel(tel);
+    client.setStreet(street);
+    client.setNumber(number);
+    client.setPostalCode(postalCode);
+    client.setCity(city);
+    client.setCountry(country);
+    client.setPhoneNumber(phoneNumber);
     client.setDateInscription(LocalDate.now());
 
     clientRepository.save(client);
   }
-
 }

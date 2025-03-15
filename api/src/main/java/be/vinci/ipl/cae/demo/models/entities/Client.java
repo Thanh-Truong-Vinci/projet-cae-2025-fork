@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 
 /**
  * Client entity.
- *
  */
 @Entity
 @Table(name = "clients")
@@ -26,29 +25,29 @@ public class Client {
   private Long id;
 
   @Column(nullable = false)
-  private String nom;
+  private String name;
 
   @Column(nullable = false)
-  private String prenom;
+  private String firstname;
 
   @Column(nullable = false)
-  private String rue;
+  private String street;
 
-  @Column(name = "numero_rue", nullable = false)
-  private String numeroRue;
+  @Column(name = "number", nullable = false)
+  private String number;
 
-  private String boite;
+  private String box;
 
-  @Column(name = "code_postal", nullable = false)
-  private String codePostal;
-
-  @Column(nullable = false)
-  private String commune;
+  @Column(name = "postal_code", nullable = false)
+  private String postalCode;
 
   @Column(nullable = false)
-  private String pays;
+  private String city;
 
-  private String tel;
+  @Column(nullable = false)
+  private String country;
+
+  private String phoneNumber;
 
   @Column(nullable = false, unique = true)
   private String email;

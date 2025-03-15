@@ -5,16 +5,17 @@ POST {{baseUrl}}/auths/register
 Content-Type: application/json
 
 {
-  "nom": "Admin",
-  "prenom": "User",
+  "name": "Admin",
+  "firstname": "User",
   "email": "admin@example.com",
   "password": "admin",
-  "rue": "Admin Street",
-  "numeroRue": "1",
-  "codePostal": "1000",
-  "commune": "Admin City",
-  "pays": "Admin Country",
-  "tel": "123456789"
+  "street": "Admin Street",
+  "number": "1",
+  "box": "",
+  "postalCode": "1000",
+  "city": "Admin City",
+  "country": "Admin Country",
+  "phoneNumber": "123456789"
 }
 
 ### Create with invalid email
@@ -22,48 +23,51 @@ POST {{baseUrl}}/auths/register
 Content-Type: application/json
 
 {
-  "nom": "Invalid",
-  "prenom": "Email",
+  "name": "Invalid",
+  "firstname": "Email",
   "email": "invalid-email",
   "password": "password",
-  "rue": "Invalid Street",
-  "numeroRue": "3",
-  "codePostal": "3000",
-  "commune": "Invalid City",
-  "pays": "Invalid Country",
-  "tel": "111111111"
+  "street": "Invalid Street",
+  "number": "3",
+  "box": "",
+  "postalCode": "3000",
+  "city": "Invalid City",
+  "country": "Invalid Country",
+  "phoneNumber": "111111111"
 }
 
-### Create without 'nom' attribute
+### Create without 'name' attribute
 POST {{baseUrl}}/auths/register
 Content-Type: application/json
 
 {
-  "prenom": "User",
+  "firstname": "User",
   "email": "user@example.com",
   "password": "password",
-  "rue": "User Street",
-  "numeroRue": "4",
-  "codePostal": "4000",
-  "commune": "User City",
-  "pays": "User Country",
-  "tel": "222222222"
+  "street": "User Street",
+  "number": "4",
+  "box": "",
+  "postalCode": "4000",
+  "city": "User City",
+  "country": "User Country",
+  "phoneNumber": "222222222"
 }
 
-### Create without 'prenom' attribute
+### Create without 'firstname' attribute
 POST {{baseUrl}}/auths/register
 Content-Type: application/json
 
 {
-  "nom": "User",
+  "name": "User",
   "email": "user@example.com",
   "password": "password",
-  "rue": "User Street",
-  "numeroRue": "4",
-  "codePostal": "4000",
-  "commune": "User City",
-  "pays": "User Country",
-  "tel": "222222222"
+  "street": "User Street",
+  "number": "4",
+  "box": "",
+  "postalCode": "4000",
+  "city": "User City",
+  "country": "User Country",
+  "phoneNumber": "222222222"
 }
 
 ### Create without 'email' attribute
@@ -71,15 +75,16 @@ POST {{baseUrl}}/auths/register
 Content-Type: application/json
 
 {
-  "nom": "User",
-  "prenom": "User",
+  "name": "User",
+  "firstname": "User",
   "password": "password",
-  "rue": "User Street",
-  "numeroRue": "4",
-  "codePostal": "4000",
-  "commune": "User City",
-  "pays": "User Country",
-  "tel": "222222222"
+  "street": "User Street",
+  "number": "4",
+  "box": "",
+  "postalCode": "4000",
+  "city": "User City",
+  "country": "User Country",
+  "phoneNumber": "222222222"
 }
 
 ### Create without 'password' attribute
@@ -87,15 +92,16 @@ POST {{baseUrl}}/auths/register
 Content-Type: application/json
 
 {
-  "nom": "User",
-  "prenom": "User",
+  "name": "User",
+  "firstname": "User",
   "email": "user@example.com",
-  "rue": "User Street",
-  "numeroRue": "4",
-  "codePostal": "4000",
-  "commune": "User City",
-  "pays": "User Country",
-  "tel": "222222222"
+  "street": "User Street",
+  "number": "4",
+  "box": "",
+  "postalCode": "4000",
+  "city": "User City",
+  "country": "User Country",
+  "phoneNumber": "222222222"
 }
 
 ### Login admin
