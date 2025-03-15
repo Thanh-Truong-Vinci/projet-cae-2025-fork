@@ -70,6 +70,7 @@ const RegisterPage = () => {
           fullWidth
           onChange={handleChange}
           required
+          data-testid="name-input"
           sx={{ mb: 1 }}
         />
         <TextField
@@ -78,6 +79,7 @@ const RegisterPage = () => {
           fullWidth
           onChange={handleChange}
           required
+          data-testid="firstname-input"
           sx={{ mb: 1 }}
         />
         <TextField
@@ -86,6 +88,7 @@ const RegisterPage = () => {
           fullWidth
           onChange={handleChange}
           required
+          data-testid="street-input"
           sx={{ mb: 1 }}
         />
         <TextField
@@ -94,18 +97,26 @@ const RegisterPage = () => {
           fullWidth
           onChange={handleChange}
           required
+          data-testid="number-input"
           sx={{ mb: 1 }}
         />
 
         {/* Boîte & Code postal */}
         <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
-          <TextField name="box" label="Box" fullWidth onChange={handleChange} />
+          <TextField
+            name="box"
+            label="Box"
+            fullWidth
+            onChange={handleChange}
+            data-testid="box-input"
+          />
           <TextField
             name="postalCode"
             label="Postal Code"
             fullWidth
             onChange={handleChange}
             required
+            data-testid="postalCode-input"
           />
         </Box>
 
@@ -117,6 +128,7 @@ const RegisterPage = () => {
             fullWidth
             onChange={handleChange}
             required
+            data-testid="city-input"
           />
           <TextField
             name="country"
@@ -124,6 +136,7 @@ const RegisterPage = () => {
             fullWidth
             onChange={handleChange}
             required
+            data-testid="country-input"
           />
         </Box>
 
@@ -133,6 +146,7 @@ const RegisterPage = () => {
           fullWidth
           onChange={handleChange}
           required
+          data-testid="phoneNumber-input"
           sx={{ mb: 1 }}
         />
         <TextField
@@ -142,6 +156,7 @@ const RegisterPage = () => {
           fullWidth
           onChange={handleChange}
           required
+          data-testid="email-input"
           sx={{ mb: 1 }}
         />
         <TextField
@@ -151,6 +166,7 @@ const RegisterPage = () => {
           fullWidth
           onChange={handleChange}
           required
+          data-testid="password-input"
           sx={{ mb: 1 }}
         />
 
