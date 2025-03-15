@@ -7,7 +7,6 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import java.time.LocalDate;
 import java.util.Date;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -128,7 +127,8 @@ public class ClientService {
       return null;
     }
 
-    createOne(name, firstname, email, password, street, number, postalCode, city, country, phoneNumber);
+    createOne(name, firstname, email, password, street,
+            number, postalCode, city, country, phoneNumber);
 
     return createJwtToken(email);
   }
