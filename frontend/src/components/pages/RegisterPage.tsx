@@ -1,6 +1,6 @@
 import { useState, SyntheticEvent, useContext } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Box, Button, TextField, Typography } from '@mui/material'
+import { Box, Button, TextField, Typography, useTheme } from '@mui/material'
 import { UserContextType } from '../../types'
 import { UserContext } from '../../contexts/UserContext'
 import './index.css'
@@ -8,6 +8,7 @@ import './index.css'
 const RegisterPage = () => {
   const { registerUser }: UserContextType = useContext(UserContext)
   const navigate = useNavigate()
+  const theme = useTheme()
 
   const [formData, setFormData] = useState({
     name: '',
@@ -44,7 +45,7 @@ const RegisterPage = () => {
         email: formData.email,
         password: formData.password,
       })
-      navigate('/')
+      navigate('/login')
     } catch (err) {
       console.error('RegisterPage::error: ', err)
     }
@@ -65,93 +66,190 @@ const RegisterPage = () => {
         }}
       >
         <TextField
+          fullWidth
+          id="name"
           name="name"
           label="Name"
-          fullWidth
+          variant="outlined"
+          value={formData.name}
           onChange={handleChange}
           required
-          sx={{ mb: 1 }}
+          color="primary"
+          data-testid="name-input"
+          sx={{
+            input: { color: theme.palette.secondary.contrastText },
+            mb: 1,
+          }}
         />
         <TextField
+          fullWidth
+          id="firstname"
           name="firstname"
-          label="First Name"
-          fullWidth
+          label="First name"
+          variant="outlined"
+          value={formData.firstname}
           onChange={handleChange}
           required
-          sx={{ mb: 1 }}
+          color="primary"
+          data-testid="firstname-input"
+          sx={{
+            input: { color: theme.palette.secondary.contrastText },
+            mb: 1,
+          }}
         />
         <TextField
+          fullWidth
+          id="street"
           name="street"
           label="Street"
-          fullWidth
+          variant="outlined"
+          value={formData.street}
           onChange={handleChange}
           required
-          sx={{ mb: 1 }}
+          color="primary"
+          data-testid="street-input"
+          sx={{
+            input: { color: theme.palette.secondary.contrastText },
+            mb: 1,
+          }}
         />
         <TextField
+          fullWidth
+          id="number"
           name="number"
           label="Number"
-          fullWidth
+          variant="outlined"
+          value={formData.number}
           onChange={handleChange}
           required
-          sx={{ mb: 1 }}
+          color="primary"
+          data-testid="number-input"
+          sx={{
+            input: { color: theme.palette.secondary.contrastText },
+            mb: 1,
+          }}
         />
 
         {/* Boîte & Code postal */}
         <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
-          <TextField name="box" label="Box" fullWidth onChange={handleChange} />
           <TextField
-            name="postalCode"
-            label="Postal Code"
             fullWidth
+            id="box"
+            name="box"
+            label="Box"
+            variant="outlined"
+            value={formData.box}
+            onChange={handleChange}
+            color="primary"
+            data-testid="box-input"
+            sx={{
+              input: { color: theme.palette.secondary.contrastText },
+              mb: 1,
+            }}
+          />
+          <TextField
+            fullWidth
+            id="postalCode"
+            name="postalCode"
+            label="Postal code"
+            variant="outlined"
+            value={formData.postalCode}
             onChange={handleChange}
             required
+            color="primary"
+            data-testid="postalCode-input"
+            sx={{
+              input: { color: theme.palette.secondary.contrastText },
+              mb: 1,
+            }}
           />
         </Box>
 
         {/* Commune & Pays */}
         <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
           <TextField
+            fullWidth
+            id="city"
             name="city"
             label="City"
-            fullWidth
+            variant="outlined"
+            value={formData.city}
             onChange={handleChange}
             required
+            color="primary"
+            data-testid="city-input"
+            sx={{
+              input: { color: theme.palette.secondary.contrastText },
+              mb: 1,
+            }}
           />
           <TextField
+            fullWidth
+            id="country"
             name="country"
             label="Country"
-            fullWidth
+            variant="outlined"
+            value={formData.country}
             onChange={handleChange}
             required
+            color="primary"
+            data-testid="country-input"
+            sx={{
+              input: { color: theme.palette.secondary.contrastText },
+              mb: 1,
+            }}
           />
         </Box>
 
         <TextField
-          name="phoneNumber"
-          label="Phone Number"
           fullWidth
+          id="phoneNumber"
+          name="phoneNumber"
+          label="Phone number"
+          variant="outlined"
+          value={formData.phoneNumber}
           onChange={handleChange}
           required
-          sx={{ mb: 1 }}
+          color="primary"
+          data-testid="phoneNumber-input"
+          sx={{
+            input: { color: theme.palette.secondary.contrastText },
+            mb: 1,
+          }}
         />
         <TextField
+          fullWidth
+          id="email"
           name="email"
           label="Email"
           type="email"
-          fullWidth
+          variant="outlined"
+          value={formData.email}
           onChange={handleChange}
           required
-          sx={{ mb: 1 }}
+          color="primary"
+          data-testid="email-input"
+          sx={{
+            input: { color: theme.palette.secondary.contrastText },
+            mb: 1,
+          }}
         />
         <TextField
+          fullWidth
+          id="password"
           name="password"
           label="Password"
           type="password"
-          fullWidth
+          variant="outlined"
+          value={formData.password}
           onChange={handleChange}
           required
-          sx={{ mb: 1 }}
+          color="primary"
+          data-testid="password-input"
+          sx={{
+            input: { color: theme.palette.secondary.contrastText },
+            mb: 1,
+          }}
         />
 
         <Button
