@@ -8,6 +8,7 @@ import {
   FormControlLabel,
   useTheme,
   Typography,
+  Alert,
 } from '@mui/material'
 import { UserContextType, LoginUser, AuthenticatedUser } from '../../types'
 import { UserContext } from '../../contexts/UserContext'
@@ -19,12 +20,14 @@ const LoginPage = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const theme = useTheme()
 
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault()
     const user: LoginUser = { email, password }
     try {
+      setErrorMessage(null)
       const authenticatedUser: AuthenticatedUser = await loginUser(user)
       if (rememberMe && authenticatedUser) {
         document.cookie = `token=${authenticatedUser.token}; path=/; max-age=31536000` // 1 year
@@ -32,6 +35,7 @@ const LoginPage = () => {
       navigate('/')
     } catch (err) {
       console.error('LoginPage::error: ', err)
+      setErrorMessage('Email ou mot de passe incorrect.')
     }
   }
 
@@ -64,6 +68,11 @@ const LoginPage = () => {
         Se connecter
       </Typography>
       <form onSubmit={handleSubmit}>
+        {errorMessage && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {errorMessage}
+          </Alert>
+        )}
         <Box sx={{ marginBottom: 2 }}>
           <TextField
             fullWidth
@@ -78,6 +87,7 @@ const LoginPage = () => {
             sx={{
               input: { color: theme.palette.secondary.contrastText },
             }}
+            error={!!errorMessage}
           />
         </Box>
         <Box sx={{ marginBottom: 2 }}>
@@ -86,6 +96,7 @@ const LoginPage = () => {
             id="password"
             name="password"
             label="Password"
+            type="password"
             variant="outlined"
             value={password}
             onChange={handlePasswordChange}
@@ -94,6 +105,7 @@ const LoginPage = () => {
             sx={{
               input: { color: theme.palette.secondary.contrastText },
             }}
+            error={!!errorMessage}
           />
         </Box>
         <Box sx={{ marginBottom: 2 }}>
