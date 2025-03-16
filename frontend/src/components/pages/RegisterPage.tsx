@@ -179,7 +179,6 @@ const RegisterPage = () => {
           />
         </Box>
 
-        {/* Commune & Pays */}
         <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
           <TextField
             fullWidth

@@ -67,7 +67,6 @@ describe('RegisterPage', () => {
       </MemoryRouter>
     )
 
-    // Obtenir l'élément input à l'intérieur de chaque TextField
     const nameInput = screen.getByLabelText(/Name/)
     const firstnameInput = screen.getByLabelText(/First name/)
     const streetInput = screen.getByLabelText(/Street/)
@@ -81,7 +80,6 @@ describe('RegisterPage', () => {
     const passwordInput = screen.getByLabelText(/Password/)
     const confirmPasswordInput = screen.getByLabelText(/Confirm password/)
 
-    // Pas besoin de vérifier si les éléments existent, getByLabelText lèvera une erreur s'ils n'existent pas
     fireEvent.change(nameInput, { target: { value: 'John' } })
     fireEvent.change(firstnameInput, { target: { value: 'Doe' } })
     fireEvent.change(streetInput, { target: { value: 'Main St' } })
@@ -147,7 +145,6 @@ describe('RegisterPage', () => {
       </MemoryRouter>
     )
 
-    // Utiliser la même méthode que dans le test de succès
     const nameInput = screen.getByLabelText(/Name/)
     const firstnameInput = screen.getByLabelText(/First name/)
     const streetInput = screen.getByLabelText(/Street/)
@@ -161,7 +158,6 @@ describe('RegisterPage', () => {
     const passwordInput = screen.getByLabelText(/Password/)
     const confirmPasswordInput = screen.getByLabelText(/Confirm password/)
 
-    // Remplir les champs pour permettre la soumission du formulaire
     fireEvent.change(nameInput, { target: { value: 'John' } })
     fireEvent.change(firstnameInput, { target: { value: 'Doe' } })
     fireEvent.change(streetInput, { target: { value: 'Main St' } })
@@ -189,7 +185,7 @@ describe('RegisterPage', () => {
       expect(navigateMock).not.toHaveBeenCalled()
     })
 
-    // Vérifier que le message d'erreur d'email est affiché
+    // Check if the correct error is displayed
     const emailErrorMessage = await screen.findByText(
       'Cette adresse email est déjà utilisée.'
     )
@@ -197,5 +193,71 @@ describe('RegisterPage', () => {
 
     // Restore console.error
     consoleErrorSpy.mockRestore()
+  })
+  test('displays error when passwords do not match', async () => {
+    const registerUserMock = vi.fn()
+    const navigateMock = vi.fn()
+    const mockContextValue = {
+      authenticatedUser: undefined,
+      authsMe: vi.fn(),
+      registerUser: registerUserMock,
+      loginUser: vi.fn(),
+      clearUser: vi.fn(),
+    }
+
+    vi.mocked(useNavigate).mockReturnValue(navigateMock)
+
+    render(
+      <MemoryRouter>
+        <UserContext.Provider value={mockContextValue}>
+          <RegisterPage />
+        </UserContext.Provider>
+      </MemoryRouter>
+    )
+
+    // Get input fields
+    const nameInput = screen.getByLabelText(/Name/)
+    const firstnameInput = screen.getByLabelText(/First name/)
+    const streetInput = screen.getByLabelText(/Street/)
+    const numberInput = screen.getByLabelText(/Number/)
+    const boxInput = screen.getByLabelText(/Box/)
+    const postalCodeInput = screen.getByLabelText(/Postal code/)
+    const cityInput = screen.getByLabelText(/City/)
+    const countryInput = screen.getByLabelText(/Country/)
+    const phoneNumberInput = screen.getByLabelText(/Phone number/)
+    const emailInput = screen.getByLabelText(/Email/)
+    const passwordInput = screen.getByLabelText(/Password/)
+    const confirmPasswordInput = screen.getByLabelText(/Confirm password/)
+
+    // Fill in the form with different passwords
+    fireEvent.change(nameInput, { target: { value: 'John' } })
+    fireEvent.change(firstnameInput, { target: { value: 'Doe' } })
+    fireEvent.change(streetInput, { target: { value: 'Main St' } })
+    fireEvent.change(numberInput, { target: { value: '123' } })
+    fireEvent.change(boxInput, { target: { value: 'A' } })
+    fireEvent.change(postalCodeInput, { target: { value: '12345' } })
+    fireEvent.change(cityInput, { target: { value: 'City' } })
+    fireEvent.change(countryInput, { target: { value: 'Country' } })
+    fireEvent.change(phoneNumberInput, { target: { value: '1234567890' } })
+    fireEvent.change(emailInput, { target: { value: 'test@example.com' } })
+    fireEvent.change(passwordInput, { target: { value: 'password123' } })
+    fireEvent.change(confirmPasswordInput, {
+      target: { value: 'differentPassword' },
+    })
+
+    const submitButton = screen.getByRole('button', { name: /s'inscrire/i })
+    fireEvent.click(submitButton)
+
+    // Verify the error message is displayed
+    const errorMessage = await screen.findByText(
+      'Les mots de passe ne correspondent pas.'
+    )
+    expect(errorMessage).toBeDefined()
+
+    // Verify that registerUser was not called
+    expect(registerUserMock).not.toHaveBeenCalled()
+
+    // Verify that navigation did not occur
+    expect(navigateMock).not.toHaveBeenCalled()
   })
 })
