@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { vi, describe, test, expect, beforeEach } from 'vitest'
 import NavBar from './index'
@@ -83,5 +83,30 @@ describe('NavBar', () => {
 
     expect(registerButton).toBeNull()
     expect(loginButton).toBeNull()
+  })
+  test('navigates to /register when register button is clicked', () => {
+    const mockContextValue = {
+      authenticatedUser: undefined,
+      authsMe: vi.fn(),
+      registerUser: vi.fn(),
+      loginUser: vi.fn(),
+      clearUser: vi.fn(),
+    }
+
+    render(
+      <MemoryRouter>
+        <UserContext.Provider value={mockContextValue}>
+          <NavBar />
+        </UserContext.Provider>
+      </MemoryRouter>
+    )
+
+    const registerButton = screen.getByText(/S'inscrire/i)
+
+    expect(registerButton).toBeDefined()
+
+    fireEvent.click(registerButton)
+
+    expect(navigateMock).toHaveBeenCalledWith('/register')
   })
 })
