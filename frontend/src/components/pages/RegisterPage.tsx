@@ -22,7 +22,12 @@ const RegisterPage = () => {
     phoneNumber: '',
     email: '',
     password: '',
+    confirmPassword: '',
   })
+
+  const [errorPasword, setErrorPassword] = useState<string | null>(null)
+
+  const [errorEmail, setErrorEmail] = useState<string | null>(null)
 
   const handleChange = (e: SyntheticEvent) => {
     const target = e.target as HTMLInputElement
@@ -31,6 +36,13 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault()
+
+    if (formData.password !== formData.confirmPassword) {
+      setErrorEmail(null)
+      setErrorPassword('Les mots de passe ne correspondent pas.')
+      return
+    }
+
     try {
       await registerUser({
         name: formData.name,
@@ -48,6 +60,8 @@ const RegisterPage = () => {
       navigate('/login')
     } catch (err) {
       console.error('RegisterPage::error: ', err)
+      setErrorEmail('Cette adresse email est déjà utilisée.')
+      setErrorPassword(null)
     }
   }
 
@@ -165,7 +179,6 @@ const RegisterPage = () => {
           />
         </Box>
 
-        {/* Commune & Pays */}
         <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
           <TextField
             fullWidth
@@ -233,6 +246,8 @@ const RegisterPage = () => {
             input: { color: theme.palette.secondary.contrastText },
             mb: 1,
           }}
+          error={!!errorEmail}
+          helperText={errorEmail}
         />
         <TextField
           fullWidth
@@ -250,6 +265,22 @@ const RegisterPage = () => {
             input: { color: theme.palette.secondary.contrastText },
             mb: 1,
           }}
+        />
+        <TextField
+          fullWidth
+          id="confirmPassword"
+          name="confirmPassword"
+          label="Confirm password"
+          type="password"
+          variant="outlined"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          required
+          color="primary"
+          data-testid="confirmPassword-input"
+          sx={{ input: { color: theme.palette.secondary.contrastText }, mb: 1 }}
+          error={!!errorPasword}
+          helperText={errorPasword}
         />
 
         <Button
