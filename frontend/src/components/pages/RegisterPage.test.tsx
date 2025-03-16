@@ -113,4 +113,76 @@ describe('RegisterPage', () => {
       expect(navigateMock).toHaveBeenCalledWith('/login')
     })
   })
+
+  test('handles error when registerUser fails', async () => {
+    // Mock registerUser to throw an error
+    const registerUserMock = vi
+      .fn()
+      .mockRejectedValue(new Error('Registration failed'))
+    const navigateMock = vi.fn()
+    const mockContextValue = {
+      authenticatedUser: undefined,
+      authsMe: vi.fn(),
+      registerUser: registerUserMock,
+      loginUser: vi.fn(),
+      clearUser: vi.fn(),
+    }
+
+    // Mock console.error
+    const consoleErrorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {})
+
+    vi.mocked(useNavigate).mockReturnValue(navigateMock)
+
+    render(
+      <MemoryRouter>
+        <UserContext.Provider value={mockContextValue}>
+          <RegisterPage />
+        </UserContext.Provider>
+      </MemoryRouter>
+    )
+
+    // Utiliser la même méthode que dans le test de succès
+    const nameInput = screen.getByLabelText(/Name/)
+    const firstnameInput = screen.getByLabelText(/First name/)
+    const streetInput = screen.getByLabelText(/Street/)
+    const numberInput = screen.getByLabelText(/Number/)
+    const boxInput = screen.getByLabelText(/Box/)
+    const postalCodeInput = screen.getByLabelText(/Postal code/)
+    const cityInput = screen.getByLabelText(/City/)
+    const countryInput = screen.getByLabelText(/Country/)
+    const phoneNumberInput = screen.getByLabelText(/Phone number/)
+    const emailInput = screen.getByLabelText(/Email/)
+    const passwordInput = screen.getByLabelText(/Password/)
+
+    // Remplir les champs pour permettre la soumission du formulaire
+    fireEvent.change(nameInput, { target: { value: 'John' } })
+    fireEvent.change(firstnameInput, { target: { value: 'Doe' } })
+    fireEvent.change(streetInput, { target: { value: 'Main St' } })
+    fireEvent.change(numberInput, { target: { value: '123' } })
+    fireEvent.change(boxInput, { target: { value: 'A' } })
+    fireEvent.change(postalCodeInput, { target: { value: '12345' } })
+    fireEvent.change(cityInput, { target: { value: 'City' } })
+    fireEvent.change(countryInput, { target: { value: 'Country' } })
+    fireEvent.change(phoneNumberInput, { target: { value: '1234567890' } })
+    fireEvent.change(emailInput, { target: { value: 'test@example.com' } })
+    fireEvent.change(passwordInput, { target: { value: 'password' } })
+
+    const submitButton = screen.getByRole('button', { name: /s'inscrire/i })
+    fireEvent.click(submitButton)
+
+    await waitFor(() => {
+      // Verify that console.error was called
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'RegisterPage::error: ',
+        expect.any(Error)
+      )
+      // Verify that navigation was not triggered
+      expect(navigateMock).not.toHaveBeenCalled()
+    })
+
+    // Restore console.error
+    consoleErrorSpy.mockRestore()
+  })
 })
