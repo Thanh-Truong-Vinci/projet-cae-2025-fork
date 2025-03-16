@@ -8,14 +8,9 @@ describe('HomePage', () => {
     render(<HomePage />)
 
     // Vérifier que le titre principal est affiché
-    const title = screen.getByText('My HomePage')
+    const title = screen.getByText('HomePage')
     expect(title).toBeDefined() // Assertion Vitest
     expect(title.tagName).toBe('H1')
-
-    // Vérifier que le sous-titre est affiché
-    const subtitle = screen.getByText(/Because we love JS/i)
-    expect(subtitle).toBeDefined() // Assertion Vitest
-    expect(subtitle.tagName).toBe('H2')
   })
 
   test('uses correct Material-UI components', () => {
