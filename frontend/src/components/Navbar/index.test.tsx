@@ -41,8 +41,8 @@ describe('NavBar', () => {
     )
 
     // Check that the login and register buttons are in the document
-    const registerButton = screen.getByText(/S'inscrire/i)
-    const loginButton = screen.getByText(/Se connecter/i)
+    const registerButton = screen.getByText(/Inscription/i)
+    const loginButton = screen.getByText(/Connexion/i)
 
     expect(registerButton).toBeDefined()
     expect(loginButton).toBeDefined()
@@ -78,8 +78,8 @@ describe('NavBar', () => {
     expect(logoutButton).toBeDefined()
 
     // Check that the login and register buttons are not in the document
-    const registerButton = screen.queryByText(/S'inscrire/i)
-    const loginButton = screen.queryByText(/Se connecter/i)
+    const registerButton = screen.queryByText(/Inscription/i)
+    const loginButton = screen.queryByText(/Connexion/i)
 
     expect(registerButton).toBeNull()
     expect(loginButton).toBeNull()
@@ -101,7 +101,7 @@ describe('NavBar', () => {
       </MemoryRouter>
     )
 
-    const registerButton = screen.getByText(/S'inscrire/i)
+    const registerButton = screen.getByText(/Inscription/i)
 
     expect(registerButton).toBeDefined()
 
@@ -127,7 +127,7 @@ describe('NavBar', () => {
       </MemoryRouter>
     )
 
-    const loginButton = screen.getByText(/Se connecter/i)
+    const loginButton = screen.getByText(/Connexion/i)
     fireEvent.click(loginButton)
 
     expect(navigateMock).toHaveBeenCalledWith('/login')
