@@ -109,4 +109,27 @@ describe('NavBar', () => {
 
     expect(navigateMock).toHaveBeenCalledWith('/register')
   })
+
+  test('navigates to /login when login button is clicked', () => {
+    const mockContextValue = {
+      authenticatedUser: undefined,
+      authsMe: vi.fn(),
+      registerUser: vi.fn(),
+      loginUser: vi.fn(),
+      clearUser: vi.fn(),
+    }
+
+    render(
+      <MemoryRouter>
+        <UserContext.Provider value={mockContextValue}>
+          <NavBar />
+        </UserContext.Provider>
+      </MemoryRouter>
+    )
+
+    const loginButton = screen.getByText(/Se connecter/i)
+    fireEvent.click(loginButton)
+
+    expect(navigateMock).toHaveBeenCalledWith('/login')
+  })
 })
