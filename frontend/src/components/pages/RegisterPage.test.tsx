@@ -30,6 +30,7 @@ describe('RegisterPage', () => {
     const phoneNumberInput = screen.getByTestId('phoneNumber-input')
     const emailInput = screen.getByTestId('email-input')
     const passwordInput = screen.getByTestId('password-input')
+    const confirmPasswordInput = screen.getByTestId('confirmPassword-input')
 
     expect(nameInput).toBeTruthy()
     expect(firstnameInput).toBeTruthy()
@@ -42,6 +43,7 @@ describe('RegisterPage', () => {
     expect(phoneNumberInput).toBeTruthy()
     expect(emailInput).toBeTruthy()
     expect(passwordInput).toBeTruthy()
+    expect(confirmPasswordInput).toBeTruthy()
   })
 
   test('calls registerUser and navigates to LoginPage when the form is submitted', async () => {
@@ -77,6 +79,7 @@ describe('RegisterPage', () => {
     const phoneNumberInput = screen.getByLabelText(/Phone number/)
     const emailInput = screen.getByLabelText(/Email/)
     const passwordInput = screen.getByLabelText(/Password/)
+    const confirmPasswordInput = screen.getByLabelText(/Confirm password/)
 
     // Pas besoin de vérifier si les éléments existent, getByLabelText lèvera une erreur s'ils n'existent pas
     fireEvent.change(nameInput, { target: { value: 'John' } })
@@ -90,6 +93,7 @@ describe('RegisterPage', () => {
     fireEvent.change(phoneNumberInput, { target: { value: '1234567890' } })
     fireEvent.change(emailInput, { target: { value: 'test@example.com' } })
     fireEvent.change(passwordInput, { target: { value: 'password' } })
+    fireEvent.change(confirmPasswordInput, { target: { value: 'password' } })
 
     const submitButton = screen.getByRole('button', { name: /s'inscrire/i })
 
@@ -114,7 +118,7 @@ describe('RegisterPage', () => {
     })
   })
 
-  test('handles error when registerUser fails', async () => {
+  test('handles error when registerUser fails because the email is already used', async () => {
     // Mock registerUser to throw an error
     const registerUserMock = vi
       .fn()
@@ -155,6 +159,7 @@ describe('RegisterPage', () => {
     const phoneNumberInput = screen.getByLabelText(/Phone number/)
     const emailInput = screen.getByLabelText(/Email/)
     const passwordInput = screen.getByLabelText(/Password/)
+    const confirmPasswordInput = screen.getByLabelText(/Confirm password/)
 
     // Remplir les champs pour permettre la soumission du formulaire
     fireEvent.change(nameInput, { target: { value: 'John' } })
@@ -168,19 +173,27 @@ describe('RegisterPage', () => {
     fireEvent.change(phoneNumberInput, { target: { value: '1234567890' } })
     fireEvent.change(emailInput, { target: { value: 'test@example.com' } })
     fireEvent.change(passwordInput, { target: { value: 'password' } })
+    fireEvent.change(confirmPasswordInput, { target: { value: 'password' } })
 
     const submitButton = screen.getByRole('button', { name: /s'inscrire/i })
+
     fireEvent.click(submitButton)
 
     await waitFor(() => {
       // Verify that console.error was called
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Cette adresse email est déjà utilisée.',
+        'RegisterPage::error: ',
         expect.any(Error)
       )
       // Verify that navigation was not triggered
       expect(navigateMock).not.toHaveBeenCalled()
     })
+
+    // Vérifier que le message d'erreur d'email est affiché
+    const emailErrorMessage = await screen.findByText(
+      'Cette adresse email est déjà utilisée.'
+    )
+    expect(emailErrorMessage).toBeDefined()
 
     // Restore console.error
     consoleErrorSpy.mockRestore()
