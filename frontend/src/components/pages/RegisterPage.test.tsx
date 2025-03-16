@@ -118,7 +118,7 @@ describe('RegisterPage', () => {
     // Mock registerUser to throw an error
     const registerUserMock = vi
       .fn()
-      .mockRejectedValue(new Error('Registration failed'))
+      .mockRejectedValue(new Error('Cette adresse email est déjà utilisée.'))
     const navigateMock = vi.fn()
     const mockContextValue = {
       authenticatedUser: undefined,
@@ -175,7 +175,7 @@ describe('RegisterPage', () => {
     await waitFor(() => {
       // Verify that console.error was called
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'RegisterPage::error: ',
+        'Cette adresse email est déjà utilisée.',
         expect.any(Error)
       )
       // Verify that navigation was not triggered
