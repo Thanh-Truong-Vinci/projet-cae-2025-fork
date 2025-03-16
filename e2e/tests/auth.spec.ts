@@ -18,7 +18,8 @@ const testUser = {
     country: faker.location.country(),
     phoneNumber: faker.phone.number(),
     email: faker.internet.email(),
-    password: "test123"
+    password: "test123",
+    confirmPassword: "test123"
   };
 
 test.describe("Authentication", () => {
@@ -47,12 +48,7 @@ test.describe("Authentication", () => {
       // Tenter de s'inscrire à nouveau avec le même email
       await registerWith(page, testUser);
       
-      const message = await page.waitForEvent(
-        "console",
-        (msg) => msg.type() === "error"
-      );
-      
-      expect(message.text()).toContain("409");
+      await expect(page.getByText("Cette adresse email est déjà utilisée.")).toBeVisible();
     });
   });
 
@@ -118,12 +114,7 @@ test.describe("Authentication", () => {
 
       await loginWith(page, formData);
 
-      const message = await page.waitForEvent(
-        "console",
-        (msg) => msg.type() === "error"
-      );
-
-      expect(message.text()).toContain("401");
+      await expect(page.getByText("Email ou mot de passe incorrect.")).toBeVisible();
     });
 
     test("TC2.4: should not login a user when the email doesn't exist", async ({ page }) => {
@@ -135,12 +126,8 @@ test.describe("Authentication", () => {
   
         await loginWith(page, formData);
   
-        const message = await page.waitForEvent(
-          "console",
-          (msg) => msg.type() === "error"
-        );
-  
-        expect(message.text()).toContain("401");
+        await expect(page.getByText("Email ou mot de passe incorrect.")).toBeVisible();
       });
+      
   });
 });

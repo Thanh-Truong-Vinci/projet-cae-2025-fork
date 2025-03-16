@@ -18,6 +18,7 @@ const registerWith = async (page: Page, formData: {
   phoneNumber: string;
   email: string;
   password: string;
+  confirmPassword: string;
 }) => {
   await page.locator('[data-testid="name-input"] input').fill(formData.name);
   await page.locator('[data-testid="firstname-input"] input').fill(formData.firstname);
@@ -30,6 +31,7 @@ const registerWith = async (page: Page, formData: {
   await page.locator('[data-testid="phoneNumber-input"] input').fill(formData.phoneNumber);
   await page.locator('[data-testid="email-input"] input').fill(formData.email);
   await page.locator('[data-testid="password-input"] input').fill(formData.password);
+  await page.locator('[data-testid="confirmPassword-input"] input').fill(formData.confirmPassword);
   await page.getByRole("button", { name: "S'inscrire" }).click();
 };
 
