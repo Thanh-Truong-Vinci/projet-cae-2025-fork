@@ -1,4 +1,4 @@
-import { createContext, useState, ReactNode } from 'react'
+import { createContext, useState, ReactNode, useCallback } from 'react'
 import {
   MaybeAuthenticatedUser,
   UserContextType,
@@ -28,7 +28,8 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
   const [authenticatedUser, setAuthenticatedUser] =
     useState<MaybeAuthenticatedUser>(undefined)
 
-  const authsMe = async (token: string): Promise<void> => {
+  const authsMe = useCallback(async (token: string): Promise<void> => {
+
     try {
       const response = await fetch('/api/auths/me', {
         method: 'POST',
@@ -50,9 +51,9 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
       console.error('Token validation failed:', error)
       throw error
     }
-  }
+  }, [])
 
-  const registerUser = async (newUser: User) => {
+  const registerUser = useCallback(async (newUser: User) => {
     try {
       const options = {
         method: 'POST',
@@ -70,17 +71,14 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
         )
 
       const createdUser: AuthenticatedUser = await response.json()
-
-      setAuthenticatedUser(createdUser)
-      storeAuthenticatedUser(createdUser)
       console.log('createdUser: ', createdUser)
     } catch (err) {
       console.error('registerUser::error: ', err)
       throw err
     }
-  }
+  }, [])
 
-  const loginUser = async (user: LoginUser): Promise<AuthenticatedUser> => {
+  const loginUser = useCallback(async (user: LoginUser): Promise<AuthenticatedUser> => {
     try {
       const options = {
         method: 'POST',
@@ -98,8 +96,10 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
         )
 
       const authenticatedUser: AuthenticatedUser = await response.json()
-      console.log('authenticatedUser: ', authenticatedUser)
-
+      
+      // Set token with timestamp
+      document.cookie = `token=${authenticatedUser.token}; timestamp=${Date.now()}`
+      
       setAuthenticatedUser(authenticatedUser)
       storeAuthenticatedUser(authenticatedUser)
       return authenticatedUser
@@ -107,7 +107,7 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
       console.error('loginUser::error: ', err)
       throw err
     }
-  }
+  }, [])
 
   const clearUser = () => {
     clearAuthenticatedUser()
