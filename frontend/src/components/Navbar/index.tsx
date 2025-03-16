@@ -36,7 +36,7 @@ const NavBar = () => {
             }}
             onClick={() => navigate('/register')}
           >
-            S'inscrire
+            Inscription
           </Button>
           <Button
             variant="outlined"
@@ -50,7 +50,7 @@ const NavBar = () => {
             }}
             onClick={() => navigate('/login')}
           >
-            Se connecter
+            Connexion
           </Button>
         </>
       )}

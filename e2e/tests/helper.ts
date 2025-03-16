@@ -2,7 +2,7 @@ import { Page, expect } from "@playwright/test";
 
 const goFromHomePageToRegisterPage = async (page: Page) => {
   await page.goto("http://localhost:5173/");
-  await page.getByText("S'inscrire").click();
+  await page.getByText("Inscription").click();
   await expect(page).toHaveURL("http://localhost:5173/register");
 };
 
@@ -19,23 +19,23 @@ const registerWith = async (page: Page, formData: {
   email: string;
   password: string;
 }) => {
-  await page.getByRole("textbox", { name: "Name" }).fill(formData.name);
-  await page.getByRole("textbox", { name: "First Name" }).fill(formData.firstname);
-  await page.getByRole("textbox", { name: "Street" }).fill(formData.street);
-  await page.getByRole("textbox", { name: "Number" }).fill(formData.number);
-  await page.getByRole("textbox", { name: "Box" }).fill(formData.box);
-  await page.getByRole("textbox", { name: "Postal Code" }).fill(formData.postalCode);
-  await page.getByRole("textbox", { name: "City" }).fill(formData.city);
-  await page.getByRole("textbox", { name: "Country" }).fill(formData.country);
-  await page.getByRole("textbox", { name: "Phone Number" }).fill(formData.phoneNumber);
-  await page.getByRole("textbox", { name: "Email" }).fill(formData.email);
-  await page.getByRole("textbox", { name: "Password" }).fill(formData.password);
+  await page.locator('[data-testid="name-input"] input').fill(formData.name);
+  await page.locator('[data-testid="firstname-input"] input').fill(formData.firstname);
+  await page.locator('[data-testid="street-input"] input').fill(formData.street);
+  await page.locator('[data-testid="number-input"] input').fill(formData.number);
+  await page.locator('[data-testid="box-input"] input').fill(formData.box);
+  await page.locator('[data-testid="postalCode-input"] input').fill(formData.postalCode);
+  await page.locator('[data-testid="city-input"] input').fill(formData.city);
+  await page.locator('[data-testid="country-input"] input').fill(formData.country);
+  await page.locator('[data-testid="phoneNumber-input"] input').fill(formData.phoneNumber);
+  await page.locator('[data-testid="email-input"] input').fill(formData.email);
+  await page.locator('[data-testid="password-input"] input').fill(formData.password);
   await page.getByRole("button", { name: "S'inscrire" }).click();
 };
 
 const goFromHomePageToLoginPage = async (page: Page) => {
   await page.goto("http://localhost:5173/");
-  await page.getByText("Se connecter").click();
+  await page.getByText("Connexion").click();
   await expect(page).toHaveURL("http://localhost:5173/login");
 };
 

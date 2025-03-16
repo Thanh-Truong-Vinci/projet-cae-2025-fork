@@ -23,6 +23,16 @@ test.describe("Register", () => {
     };
 
     await registerWith(page, formData);
+
+    await expect(page).toHaveURL("http://localhost:5173/");
+
+    await expect(page.getByText("Se déconnecter")).toBeVisible();
+
+    await page.getByText("Se déconnecter").click();
+
+    await expect(page).toHaveURL("http://localhost:5173/");
+
+    await expect(page.getByText("Inscription")).toBeVisible();
   });
 
   test("TC2.1: should not register a new user when existing email is used", async ({ page }) => {

@@ -69,7 +69,7 @@ const LoginPage = () => {
             fullWidth
             id="email"
             name="email"
-            label="Email ou Login"
+            label="Email or Login"
             variant="outlined"
             value={email}
             onChange={handleLoginChange}
