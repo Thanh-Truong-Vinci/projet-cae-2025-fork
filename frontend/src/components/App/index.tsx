@@ -7,22 +7,25 @@ import { Container } from '@mui/material'
 import { useContext, useEffect } from 'react'
 import { UserContextType } from '../../types'
 import { UserContext } from '../../contexts/UserContext'
+
 const App = () => {
+
   const { authsMe } = useContext<UserContextType>(UserContext)
 
   useEffect(() => {
+    console.log('UseEffect')
     const validateToken = async () => {
       const token = document.cookie
         .split('; ')
         .find((row) => row.startsWith('token='))
       if (token) {
         const tokenValue = token.split('=')[1]
-        authsMe(tokenValue)
+        await authsMe(tokenValue)
       }
     }
 
     validateToken()
-  })
+  }, [authsMe])
 
   return (
     <Box

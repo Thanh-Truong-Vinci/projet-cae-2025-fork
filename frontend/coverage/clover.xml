@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1742138064518" clover="3.2.0">
-  <project timestamp="1742138064518" name="All files">
-    <metrics statements="627" coveredstatements="330" conditionals="20" coveredconditionals="11" methods="24" coveredmethods="8" elements="671" coveredelements="349" complexity="0" loc="627" ncloc="627" packages="8" files="12" classes="12"/>
+<coverage generated="1742140962286" clover="3.2.0">
+  <project timestamp="1742140962286" name="All files">
+    <metrics statements="633" coveredstatements="344" conditionals="20" coveredconditionals="12" methods="24" coveredmethods="9" elements="677" coveredelements="365" complexity="0" loc="633" ncloc="633" packages="8" files="12" classes="12"/>
     <package name="src">
       <metrics statements="52" coveredstatements="0" conditionals="3" coveredconditionals="1" methods="3" coveredmethods="1"/>
       <file name="main.tsx" path="C:\Users\32498\Desktop\2BINbis\CAE\cae-group-09\frontend\src\main.tsx">
@@ -232,17 +232,17 @@
       </file>
     </package>
     <package name="src.components.pages">
-      <metrics statements="330" coveredstatements="317" conditionals="13" coveredconditionals="10" methods="9" coveredmethods="7"/>
+      <metrics statements="336" coveredstatements="331" conditionals="13" coveredconditionals="11" methods="9" coveredmethods="8"/>
       <file name="HomePage.tsx" path="C:\Users\32498\Desktop\2BINbis\CAE\cae-group-09\frontend\src\components\pages\HomePage.tsx">
-        <metrics statements="8" coveredstatements="0" conditionals="1" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="1" count="0" type="cond" truecount="0" falsecount="1"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="6" count="0" type="stmt"/>
-        <line num="9" count="0" type="stmt"/>
-        <line num="15" count="0" type="stmt"/>
-        <line num="17" count="0" type="stmt"/>
+        <metrics statements="8" coveredstatements="8" conditionals="1" coveredconditionals="1" methods="1" coveredmethods="1"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="3" count="1" type="cond" truecount="1" falsecount="0"/>
+        <line num="4" count="2" type="stmt"/>
+        <line num="5" count="2" type="stmt"/>
+        <line num="6" count="2" type="stmt"/>
+        <line num="9" count="2" type="stmt"/>
+        <line num="15" count="2" type="stmt"/>
+        <line num="17" count="1" type="stmt"/>
       </file>
       <file name="LoginPage.tsx" path="C:\Users\32498\Desktop\2BINbis\CAE\cae-group-09\frontend\src\components\pages\LoginPage.tsx">
         <metrics statements="87" coveredstatements="82" conditionals="8" coveredconditionals="6" methods="5" coveredmethods="4"/>
@@ -335,7 +335,7 @@
         <line num="119" count="1" type="stmt"/>
       </file>
       <file name="RegisterPage.tsx" path="C:\Users\32498\Desktop\2BINbis\CAE\cae-group-09\frontend\src\components\pages\RegisterPage.tsx">
-        <metrics statements="235" coveredstatements="235" conditionals="4" coveredconditionals="4" methods="3" coveredmethods="3"/>
+        <metrics statements="241" coveredstatements="241" conditionals="4" coveredconditionals="4" methods="3" coveredmethods="3"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
@@ -562,15 +562,21 @@
         <line num="251" count="25" type="stmt"/>
         <line num="252" count="25" type="stmt"/>
         <line num="255" count="25" type="stmt"/>
+        <line num="256" count="25" type="stmt"/>
+        <line num="257" count="25" type="stmt"/>
         <line num="258" count="25" type="stmt"/>
         <line num="259" count="25" type="stmt"/>
         <line num="260" count="25" type="stmt"/>
         <line num="261" count="25" type="stmt"/>
-        <line num="262" count="25" type="stmt"/>
-        <line num="263" count="25" type="stmt"/>
         <line num="264" count="25" type="stmt"/>
+        <line num="265" count="25" type="stmt"/>
+        <line num="266" count="25" type="stmt"/>
+        <line num="267" count="25" type="stmt"/>
+        <line num="268" count="25" type="stmt"/>
+        <line num="269" count="25" type="stmt"/>
         <line num="270" count="25" type="stmt"/>
-        <line num="272" count="1" type="stmt"/>
+        <line num="276" count="25" type="stmt"/>
+        <line num="278" count="1" type="stmt"/>
       </file>
     </package>
     <package name="src.contexts">
