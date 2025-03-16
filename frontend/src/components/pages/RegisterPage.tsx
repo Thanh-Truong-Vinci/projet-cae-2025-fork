@@ -45,7 +45,7 @@ const RegisterPage = () => {
         email: formData.email,
         password: formData.password,
       })
-      navigate('/')
+      navigate('/login')
     } catch (err) {
       console.error('RegisterPage::error: ', err)
     }
@@ -53,7 +53,7 @@ const RegisterPage = () => {
 
   return (
     <Box className="register-form" sx={{ maxWidth: 1000, margin: 'auto' }}>
-      <Typography variant="h4" align="center" color="success" gutterBottom>
+      <Typography variant="h4" align="center" color="primary" gutterBottom>
         S'inscrire
       </Typography>
 
@@ -252,14 +252,20 @@ const RegisterPage = () => {
           }}
         />
 
-        <Button type="submit" variant="contained" color="success" fullWidth>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          fullWidth
+          sx={{ mb: 2 }}
+        >
           S'inscrire
         </Button>
         <Button
           component={Link}
           to="/login"
           variant="contained"
-          color="success"
+          color="primary"
           fullWidth
         >
           Vous avez un compte ? Connectez vous

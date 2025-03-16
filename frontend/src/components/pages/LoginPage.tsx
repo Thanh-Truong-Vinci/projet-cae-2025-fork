@@ -60,7 +60,7 @@ const LoginPage = () => {
         boxShadow: 2,
       }}
     >
-      <Typography variant="h4" align="center" color="success" gutterBottom>
+      <Typography variant="h4" align="center" color="primary" gutterBottom>
         Se connecter
       </Typography>
       <form onSubmit={handleSubmit}>
