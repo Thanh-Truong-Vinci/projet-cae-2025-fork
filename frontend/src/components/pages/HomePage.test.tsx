@@ -6,10 +6,8 @@ describe('HomePage', () => {
   test('renders the homepage with correct title and subtitle', () => {
     render(<HomePage />)
 
-    // Vérifier que le titre principal est affiché
-    const title = screen.getByText('HomePage')
     // Verify that the main title is displayed
-    const title = screen.getByText('My HomePage')
+    const title = screen.getByText('HomePage')
     expect(title).toBeDefined() // Assertion Vitest
     expect(title.tagName).toBe('H1')
   })
