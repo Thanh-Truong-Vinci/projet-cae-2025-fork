@@ -29,7 +29,6 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
     useState<MaybeAuthenticatedUser>(undefined)
 
   const authsMe = useCallback(async (token: string): Promise<void> => {
-
     try {
       const response = await fetch('/api/auths/me', {
         method: 'POST',
@@ -78,36 +77,39 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [])
 
-  const loginUser = useCallback(async (user: LoginUser): Promise<AuthenticatedUser> => {
-    try {
-      const options = {
-        method: 'POST',
-        body: JSON.stringify(user),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+  const loginUser = useCallback(
+    async (user: LoginUser): Promise<AuthenticatedUser> => {
+      try {
+        const options = {
+          method: 'POST',
+          body: JSON.stringify(user),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+
+        const response = await fetch('/api/auths/login', options)
+
+        if (!response.ok)
+          throw new Error(
+            `fetch error : ${response.status} : ${response.statusText}`
+          )
+
+        const authenticatedUser: AuthenticatedUser = await response.json()
+
+        // Set token with timestamp
+        document.cookie = `token=${authenticatedUser.token}; timestamp=${Date.now()}`
+
+        setAuthenticatedUser(authenticatedUser)
+        storeAuthenticatedUser(authenticatedUser)
+        return authenticatedUser
+      } catch (err) {
+        console.error('loginUser::error: ', err)
+        throw err
       }
-
-      const response = await fetch('/api/auths/login', options)
-
-      if (!response.ok)
-        throw new Error(
-          `fetch error : ${response.status} : ${response.statusText}`
-        )
-
-      const authenticatedUser: AuthenticatedUser = await response.json()
-      
-      // Set token with timestamp
-      document.cookie = `token=${authenticatedUser.token}; timestamp=${Date.now()}`
-      
-      setAuthenticatedUser(authenticatedUser)
-      storeAuthenticatedUser(authenticatedUser)
-      return authenticatedUser
-    } catch (err) {
-      console.error('loginUser::error: ', err)
-      throw err
-    }
-  }, [])
+    },
+    []
+  )
 
   const clearUser = () => {
     clearAuthenticatedUser()

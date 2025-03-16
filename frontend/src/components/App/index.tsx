@@ -9,7 +9,6 @@ import { UserContextType } from '../../types'
 import { UserContext } from '../../contexts/UserContext'
 
 const App = () => {
-
   const { authsMe } = useContext<UserContextType>(UserContext)
 
   useEffect(() => {
