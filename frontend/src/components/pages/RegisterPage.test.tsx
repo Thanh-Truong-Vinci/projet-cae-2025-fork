@@ -67,6 +67,7 @@ describe('RegisterPage', () => {
       </MemoryRouter>
     )
 
+    // Get the input element inside each TextField
     const nameInput = screen.getByLabelText(/Name/)
     const firstnameInput = screen.getByLabelText(/First name/)
     const streetInput = screen.getByLabelText(/Street/)
@@ -80,6 +81,7 @@ describe('RegisterPage', () => {
     const passwordInput = screen.getByLabelText(/Password/)
     const confirmPasswordInput = screen.getByLabelText(/Confirm password/)
 
+    // No need to verify if elements exist, getByLabelText will throw an error if they don't exist
     fireEvent.change(nameInput, { target: { value: 'John' } })
     fireEvent.change(firstnameInput, { target: { value: 'Doe' } })
     fireEvent.change(streetInput, { target: { value: 'Main St' } })
@@ -145,6 +147,7 @@ describe('RegisterPage', () => {
       </MemoryRouter>
     )
 
+    // Select inputs by label
     const nameInput = screen.getByLabelText(/Name/)
     const firstnameInput = screen.getByLabelText(/First name/)
     const streetInput = screen.getByLabelText(/Street/)
@@ -158,6 +161,7 @@ describe('RegisterPage', () => {
     const passwordInput = screen.getByLabelText(/Password/)
     const confirmPasswordInput = screen.getByLabelText(/Confirm password/)
 
+    // Fill in the fields to submit the form
     fireEvent.change(nameInput, { target: { value: 'John' } })
     fireEvent.change(firstnameInput, { target: { value: 'Doe' } })
     fireEvent.change(streetInput, { target: { value: 'Main St' } })
