@@ -132,4 +132,39 @@ describe('NavBar', () => {
 
     expect(navigateMock).toHaveBeenCalledWith('/login')
   })
+
+  test('calls handleLogout when logout button is clicked', () => {
+    // Mock document.cookie
+    const documentCookieSpy = vi.spyOn(document, 'cookie', 'set')
+
+    const clearUserMock = vi.fn()
+    const mockContextValue = {
+      authenticatedUser: {
+        email: 'test@example.com',
+        token: 'fake-token',
+        // Add other required fields for authenticatedUser
+      },
+      authsMe: vi.fn(),
+      registerUser: vi.fn(),
+      loginUser: vi.fn(),
+      clearUser: clearUserMock,
+    }
+
+    render(
+      <MemoryRouter>
+        <UserContext.Provider value={mockContextValue}>
+          <NavBar />
+        </UserContext.Provider>
+      </MemoryRouter>
+    )
+
+    const logoutButton = screen.getByText(/Se déconnecter/i)
+    fireEvent.click(logoutButton)
+
+    // Check that document.cookie was set to expire the token
+    expect(documentCookieSpy).toHaveBeenCalledWith('token=; path=/; max-age=-1')
+
+    // Check that clearUser was called
+    expect(clearUserMock).toHaveBeenCalled()
+  })
 })
