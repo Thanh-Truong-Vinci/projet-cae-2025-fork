@@ -65,7 +65,7 @@ describe('RegisterPage', () => {
       </MemoryRouter>
     )
 
-    // Obtenir l'élément input à l'intérieur de chaque TextField
+    // Get the input element inside each TextField
     const nameInput = screen.getByLabelText(/Name/)
     const firstnameInput = screen.getByLabelText(/First name/)
     const streetInput = screen.getByLabelText(/Street/)
@@ -78,7 +78,7 @@ describe('RegisterPage', () => {
     const emailInput = screen.getByLabelText(/Email/)
     const passwordInput = screen.getByLabelText(/Password/)
 
-    // Pas besoin de vérifier si les éléments existent, getByLabelText lèvera une erreur s'ils n'existent pas
+    // No need to verify if elements exist, getByLabelText will throw an error if they don't exist
     fireEvent.change(nameInput, { target: { value: 'John' } })
     fireEvent.change(firstnameInput, { target: { value: 'Doe' } })
     fireEvent.change(streetInput, { target: { value: 'Main St' } })
@@ -143,7 +143,7 @@ describe('RegisterPage', () => {
       </MemoryRouter>
     )
 
-    // Utiliser la même méthode que dans le test de succès
+    // Select inputs by label
     const nameInput = screen.getByLabelText(/Name/)
     const firstnameInput = screen.getByLabelText(/First name/)
     const streetInput = screen.getByLabelText(/Street/)
@@ -156,7 +156,7 @@ describe('RegisterPage', () => {
     const emailInput = screen.getByLabelText(/Email/)
     const passwordInput = screen.getByLabelText(/Password/)
 
-    // Remplir les champs pour permettre la soumission du formulaire
+    // Fill in the fields to submit the form
     fireEvent.change(nameInput, { target: { value: 'John' } })
     fireEvent.change(firstnameInput, { target: { value: 'Doe' } })
     fireEvent.change(streetInput, { target: { value: 'Main St' } })

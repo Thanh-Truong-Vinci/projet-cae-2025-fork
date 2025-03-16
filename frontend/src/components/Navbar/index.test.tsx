@@ -51,4 +51,37 @@ describe('NavBar', () => {
     const logoutButton = screen.queryByText(/Se déconnecter/i)
     expect(logoutButton).toBeNull()
   })
+
+  test('renders logout button when user is authenticated', () => {
+    const mockContextValue = {
+      authenticatedUser: {
+        email: 'test@example.com',
+        token: 'fake-token',
+        // Add other required fields for authenticatedUser
+      },
+      authsMe: vi.fn(),
+      registerUser: vi.fn(),
+      loginUser: vi.fn(),
+      clearUser: vi.fn(),
+    }
+
+    render(
+      <MemoryRouter>
+        <UserContext.Provider value={mockContextValue}>
+          <NavBar />
+        </UserContext.Provider>
+      </MemoryRouter>
+    )
+
+    // Check that the logout button is in the document
+    const logoutButton = screen.getByText(/Se déconnecter/i)
+    expect(logoutButton).toBeDefined()
+
+    // Check that the login and register buttons are not in the document
+    const registerButton = screen.queryByText(/S'inscrire/i)
+    const loginButton = screen.queryByText(/Se connecter/i)
+
+    expect(registerButton).toBeNull()
+    expect(loginButton).toBeNull()
+  })
 })
