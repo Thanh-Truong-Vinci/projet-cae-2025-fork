@@ -271,7 +271,7 @@ const RegisterPage = () => {
           fullWidth
           id="confirmPassword"
           name="confirmPassword"
-          label="Confirm Password"
+          label="Confirm password"
           type="password"
           variant="outlined"
           value={formData.confirmPassword}
