@@ -34,6 +34,7 @@ frontend test:
   script:
     - cd frontend
     - npm install
+    - npm run format
     - npm run lint
     - npm run coverage
   artifacts:
@@ -72,6 +73,7 @@ e2e tests:
     - sleep 30
     - cd ../e2e
     - npm install
+    - npm run format
   script:
     - npx playwright test
   artifacts:
