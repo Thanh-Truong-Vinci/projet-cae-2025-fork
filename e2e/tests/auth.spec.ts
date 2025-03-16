@@ -33,7 +33,7 @@ test.describe("Authentication", () => {
 
       await registerWith(page, testUser);
 
-      await expect(page).toHaveURL("http://auths:5173/login");
+      await expect(page).toHaveURL("http://localhost:5173/login");
       await expect(page.getByText("Se connecter")).toBeVisible();
     });
 
@@ -41,7 +41,7 @@ test.describe("Authentication", () => {
       // Première inscription avec testUser
       await registerWith(page, testUser);
       
-      await expect(page).toHaveURL("http://auths:5173/login");
+      await expect(page).toHaveURL("http://localhost:5173/login");
       
       await goFromHomePageToRegisterPage(page);
       
@@ -78,7 +78,7 @@ test.describe("Authentication", () => {
 
       await loginWith(page, formData);
 
-      await expect(page).toHaveURL("http://auths:5173/");
+      await expect(page).toHaveURL("http://localhost:5173/");
 
       const welcomeMessage = await page.getByText(`Hello dear ${testUser.email}`);
       await expect(welcomeMessage).toBeVisible();
@@ -93,7 +93,7 @@ test.describe("Authentication", () => {
   
         await loginWith(page, formData);
   
-        await expect(page).toHaveURL("http://auths:5173/");
+        await expect(page).toHaveURL("http://localhost:5173/");
   
         const welcomeMessage = await page.getByText(`Hello dear ${testUser.email}`);
         await expect(welcomeMessage).toBeVisible();
@@ -101,7 +101,7 @@ test.describe("Authentication", () => {
         await expect(page.getByText("Se déconnecter")).toBeVisible();
         await page.getByText("Se déconnecter").click();
 
-        await expect(page).toHaveURL("http://auths:5173/")
+        await expect(page).toHaveURL("http://localhost:5173/")
         await expect(page.getByText("Inscription")).toBeVisible();
       });
 
