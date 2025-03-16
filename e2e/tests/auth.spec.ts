@@ -32,26 +32,15 @@ test.describe("Authentication", () => {
 
       await registerWith(page, testUser);
 
-      await expect(page).toHaveURL("http://localhost:5173/");
-
-      await expect(page.getByText("Se déconnecter")).toBeVisible();
-
-      await page.getByText("Se déconnecter").click();
-
-      await expect(page).toHaveURL("http://localhost:5173/");
-
-      await expect(page.getByText("Inscription")).toBeVisible();
+      await expect(page).toHaveURL("http://localhost:5173/login");
+      await expect(page.getByText("Se connecter")).toBeVisible();
     });
 
     test("TC1.2: should not register a new user when existing email is used", async ({ page }) => {
       // Première inscription avec testUser
       await registerWith(page, testUser);
       
-      await expect(page).toHaveURL("http://localhost:5173/");
-
-      await expect(page.getByText("Se déconnecter")).toBeVisible();
-
-      await page.getByText("Se déconnecter").click();
+      await expect(page).toHaveURL("http://localhost:5173/login");
       
       await goFromHomePageToRegisterPage(page);
       
@@ -77,9 +66,6 @@ test.describe("Authentication", () => {
       await goFromHomePageToRegisterPage(page);
       await registerWith(page, testUser);
       
-      // Se déconnecter ensuite
-      await page.getByText("Se déconnecter").click();
-      
       await page.close();
     });
     
@@ -102,7 +88,28 @@ test.describe("Authentication", () => {
       await expect(welcomeMessage).toBeVisible();
     });
 
-    test("TC2.2: should not login a user when the password is incorrect", async ({ page }) => {
+    test("TC2.2: should successfully logout when user clicks on logout button", async ({ page }) => {
+        const formData = {
+          email: testUser.email,
+          password: testUser.password,
+          rememberMe: true,
+        };
+  
+        await loginWith(page, formData);
+  
+        await expect(page).toHaveURL("http://localhost:5173/");
+  
+        const welcomeMessage = await page.getByText(`Hello dear ${testUser.email}`);
+        await expect(welcomeMessage).toBeVisible();
+
+        await expect(page.getByText("Se déconnecter")).toBeVisible();
+        await page.getByText("Se déconnecter").click();
+
+        await expect(page).toHaveURL("http://localhost:5173/")
+        await expect(page.getByText("Inscription")).toBeVisible();
+      });
+
+    test("TC2.3: should not login a user when the password is incorrect", async ({ page }) => {
       const formData = {
         email: testUser.email,
         password: "wrongpassword",
@@ -119,7 +126,7 @@ test.describe("Authentication", () => {
       expect(message.text()).toContain("401");
     });
 
-    test("TC2.3: should not login a user when the email doesn't exist", async ({ page }) => {
+    test("TC2.4: should not login a user when the email doesn't exist", async ({ page }) => {
         const formData = {
           email: "notexist" + faker.internet.email(),
           password: "test123",
