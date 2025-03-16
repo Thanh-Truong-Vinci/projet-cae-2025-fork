@@ -24,7 +24,7 @@ const App = () => {
     }
 
     validateToken()
-  }, [])
+  }, [authsMe])
 
   return (
     <Box
