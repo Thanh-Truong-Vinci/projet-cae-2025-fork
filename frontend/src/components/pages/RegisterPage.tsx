@@ -283,7 +283,6 @@ const RegisterPage = () => {
           error={!!errorPasword}
           helperText={errorPasword}
         />
-        
 
         <Button
           type="submit"
