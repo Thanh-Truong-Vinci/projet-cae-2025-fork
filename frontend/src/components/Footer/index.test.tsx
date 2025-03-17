@@ -75,4 +75,13 @@ describe('Footer', () => {
     // Check that it has styles applied (we can't check computed styles directly)
     expect(footerElement.tagName.toLowerCase()).toBe('footer')
   })
+  test('renders content in a container', () => {
+    renderWithTheme(<Footer />)
+
+    // Check for Container component
+    const container = screen
+      .getByText('Une application développée par le groupe09')
+      .closest('div')
+    expect(container).toBeDefined()
+  })
 })
