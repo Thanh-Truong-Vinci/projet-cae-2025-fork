@@ -27,8 +27,9 @@ const RegisterPage = () => {
 
   const [errorEmail, setErrorEmail] = useState<string | null>(null)
   const [errorPasword, setErrorPasword] = useState<string | null>(null)
-  const [errorConfirmPasword, setErrorConfirmPasword] = useState<string | null>(null)
-
+  const [errorConfirmPasword, setErrorConfirmPasword] = useState<string | null>(
+    null
+  )
 
   const handleChange = (e: SyntheticEvent) => {
     const target = e.target as HTMLInputElement
@@ -38,12 +39,15 @@ const RegisterPage = () => {
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault()
 
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+    const passwordRegex =
+      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
 
     if (!passwordRegex.test(formData.password)) {
       setErrorEmail(null)
       setErrorConfirmPasword(null)
-      setErrorPasword('Le mot de passe doit contenir au moins 8 caractères, une lettre, un chiffre et un caractère spécial.')
+      setErrorPasword(
+        'Le mot de passe doit contenir au moins 8 caractères, une lettre, un chiffre et un caractère spécial.'
+      )
       return
     }
 
