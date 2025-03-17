@@ -1,5 +1,5 @@
 import { render, screen, cleanup } from '@testing-library/react'
-import { describe, test, expect, vi, afterEach } from 'vitest'
+import { describe, test, expect, afterEach } from 'vitest'
 import Footer from './index'
 import { ThemeProvider, createTheme } from '@mui/material'
 
@@ -24,9 +24,20 @@ describe('Footer', () => {
 
   test('displays the correct text content', () => {
     renderWithTheme(<Footer />)
-    const jsLoveText = screen.getByText('But we also love JS')
+    const jsLoveText = screen.getByText(
+      'Une application développée par le groupe09'
+    )
     expect(jsLoveText).toBeDefined()
-    const brandText = screen.getByText(/myAmazingPizzeria/i)
+    const brandText = screen.getByText(/Terroirs Unis/i)
     expect(brandText).toBeDefined()
+  })
+  test('displays the logo image', () => {
+    renderWithTheme(<Footer />)
+
+    // Find image by its tag since it has empty alt text
+    const logoImage = document.querySelector('img')
+    expect(logoImage).toBeDefined()
+    // Check width attribute
+    expect(logoImage?.getAttribute('width')).toBe('50')
   })
 })

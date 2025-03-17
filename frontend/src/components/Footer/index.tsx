@@ -24,10 +24,12 @@ const Footer = () => {
             color: theme.palette.secondary.contrastText,
           }}
         >
-          <Typography variant="body1">But we also love JS</Typography>
+          <Typography variant="body1">
+            Une application développée par le groupe09
+          </Typography>
           <Typography>
             <Copyright />
-            myAmazingPizzeria
+            Terroirs Unis
           </Typography>
         </Box>
         <Box sx={{ display: 'inline-block' }}>
