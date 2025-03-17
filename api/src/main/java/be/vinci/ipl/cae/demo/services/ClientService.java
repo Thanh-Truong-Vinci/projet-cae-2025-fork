@@ -154,17 +154,6 @@ public class ClientService {
     if (!isValidEmail(email)) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid email format");
     }
-    
-    // Validate password strength
-    if (!isStrongPassword(password)) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
-          "Password must be at least 8 characters and contain letters and numbers");
-    }
-    
-    // Check if phone number is provided and validate it
-    if (!isValidPhoneNumber(phoneNumber)) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid phone number format");
-    }
 
     // Check if email already exists
     if (clientRepository.findByEmail(email) != null) {
@@ -286,30 +275,5 @@ public class ClientService {
     String emailRegex =
             "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}$";
     return email != null && email.matches(emailRegex);
-  }
-  
-  /**
-   * Validates the password strength.
-   *
-   * @param password the password to validate
-   * @return true if the password is strong enough, false otherwise
-   */
-  public boolean isStrongPassword(String password) {
-    // At least 8 chars, contains both letters and numbers
-    return password != null && password.length() >= 8
-            && password.matches(".*[a-zA-Z].*")
-            && password.matches(".*\\d.*");
-  }
-  
-  /**
-   * Validates the phone number format.
-   *
-   * @param phoneNumber the phone number to validate
-   * @return true if the phone number format is valid, false otherwise
-   */
-  public boolean isValidPhoneNumber(String phoneNumber) {
-    // More flexible phone number validation that supports various formats
-    return phoneNumber != null && phoneNumber.matches(
-            "^[+]?[(]?[0-9]{1,4}[)]?([-\\s.]?[0-9]{1,5}){1,4}$");
   }
 }

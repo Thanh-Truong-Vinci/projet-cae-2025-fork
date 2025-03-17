@@ -286,149 +286,6 @@ class ClientServiceTest {
     }
 
     @Test
-    void register_WeakPassword_ThrowsException() {
-        // Act & Assert
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> 
-            clientService.register(
-                "User", "Example", "user@example.com", "weak", 
-                "User Street", "1", "1000", 
-                "User City", "User Country", "123456789"
-            )
-        );
-        
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
-        assertTrue(exception.getReason().contains("Password must be"));
-    }
-
-    @Test
-    void register_InvalidPhoneNumber_ThrowsException() {
-        // Act & Assert
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> 
-            clientService.register(
-                "User", "Example", "user@example.com", "Password123", 
-                "User Street", "1", "1000", 
-                "User City", "User Country", "invalid-phone"
-            )
-        );
-        
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
-        assertTrue(exception.getReason().contains("Invalid phone number"));
-    }
-
-    @Test
-    void isValidEmail_ValidEmail_ReturnsTrue() {
-        // Act & Assert
-        assertTrue(clientService.isValidEmail("user@example.com"));
-        assertTrue(clientService.isValidEmail("user.name+tag@example.co.uk"));
-    }
-
-    @Test
-    void isValidEmail_InvalidEmail_ReturnsFalse() {
-        // Act & Assert
-        assertFalse(clientService.isValidEmail("invalid-email"));
-        assertFalse(clientService.isValidEmail("user@"));
-        assertFalse(clientService.isValidEmail("@example.com"));
-        assertFalse(clientService.isValidEmail(null));
-    }
-
-    @Test
-    void isStrongPassword_StrongPassword_ReturnsTrue() {
-        // Act & Assert
-        assertTrue(clientService.isStrongPassword("Password123"));
-        assertTrue(clientService.isStrongPassword("1234abcd"));
-    }
-
-    @Test
-    void isStrongPassword_WeakPassword_ReturnsFalse() {
-        // Act & Assert
-        assertFalse(clientService.isStrongPassword("pass"));
-        assertFalse(clientService.isStrongPassword("12345678"));
-        assertFalse(clientService.isStrongPassword("abcdefgh"));
-        assertFalse(clientService.isStrongPassword(null));
-    }
-
-    @Test
-    void isValidPhoneNumber_ValidPhoneNumber_ReturnsTrue() {
-        // Act & Assert
-        assertTrue(clientService.isValidPhoneNumber("1234567890"));
-        assertTrue(clientService.isValidPhoneNumber("+1-234-567-8901"));
-        assertTrue(clientService.isValidPhoneNumber("(123) 456-7890"));
-    }
-
-    @Test
-    void isValidPhoneNumber_InvalidPhoneNumber_ReturnsFalse() {
-        // Act & Assert
-        assertFalse(clientService.isValidPhoneNumber("phone"));
-        assertFalse(clientService.isValidPhoneNumber("123-abc-7890"));
-        assertFalse(clientService.isValidPhoneNumber(null));
-    }
-
-    @Test
-    void readOneFromEmail_ValidEmail_ReturnsClient() {
-        // Arrange
-        String email = "user@example.com";
-        Client client = new Client();
-        client.setEmail(email);
-        
-        when(clientRepository.findByEmail(email)).thenReturn(client);
-
-        // Act
-        Client result = clientService.readOneFromEmail(email);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals(email, result.getEmail());
-    }
-
-    @Test
-    void readOneFromEmail_NullEmail_ReturnsNull() {
-        // Act
-        Client result = clientService.readOneFromEmail(null);
-
-        // Assert
-        assertNull(result);
-        verify(clientRepository, never()).findByEmail(any());
-    }
-
-    @Test
-    void readOneFromEmail_BlankEmail_ReturnsNull() {
-        // Act
-        Client result = clientService.readOneFromEmail(" ");
-
-        // Assert
-        assertNull(result);
-        verify(clientRepository, never()).findByEmail(any());
-    }
-    
-    @Test
-    void createOne_ValidData_CreatesClient() {
-        // Arrange
-        String email = "user@example.com";
-        String password = "password";
-        String hashedPassword = "hashedPassword";
-        
-        when(passwordEncoder.encode(password)).thenReturn(hashedPassword);
-
-        // Act
-        clientService.createOne(
-            "User", "Example", email, password, 
-            "User Street", "1", "1000", 
-            "User City", "User Country", "123456789"
-        );
-
-        // Assert
-        ArgumentCaptor<Client> clientCaptor = ArgumentCaptor.forClass(Client.class);
-        verify(clientRepository).save(clientCaptor.capture());
-        
-        Client savedClient = clientCaptor.getValue();
-        assertEquals("User", savedClient.getName());
-        assertEquals("Example", savedClient.getFirstname());
-        assertEquals(email, savedClient.getEmail());
-        assertEquals(hashedPassword, savedClient.getPassword());
-        assertEquals(LocalDate.now(), savedClient.getDateInscription());
-    }
-
-    @Test
     void validateRegistrationFields_MissingFirstname_ThrowsException() {
         // Act & Assert
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> 
@@ -713,5 +570,86 @@ class ClientServiceTest {
             assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getStatusCode());
             assertTrue(exception.getReason().contains("Token generation failed"));
         }
+    }
+
+    @Test
+    void readOneFromEmail_ValidEmail_ReturnsClient() {
+        // Arrange
+        String email = "user@example.com";
+        Client client = new Client();
+        client.setEmail(email);
+        
+        when(clientRepository.findByEmail(email)).thenReturn(client);
+
+        // Act
+        Client result = clientService.readOneFromEmail(email);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(email, result.getEmail());
+    }
+
+    @Test
+    void readOneFromEmail_NullEmail_ReturnsNull() {
+        // Act
+        Client result = clientService.readOneFromEmail(null);
+
+        // Assert
+        assertNull(result);
+        verify(clientRepository, never()).findByEmail(any());
+    }
+
+    @Test
+    void readOneFromEmail_BlankEmail_ReturnsNull() {
+        // Act
+        Client result = clientService.readOneFromEmail(" ");
+
+        // Assert
+        assertNull(result);
+        verify(clientRepository, never()).findByEmail(any());
+    }
+    
+    @Test
+    void createOne_ValidData_CreatesClient() {
+        // Arrange
+        String email = "user@example.com";
+        String password = "password";
+        String hashedPassword = "hashedPassword";
+        
+        when(passwordEncoder.encode(password)).thenReturn(hashedPassword);
+
+        // Act
+        clientService.createOne(
+            "User", "Example", email, password, 
+            "User Street", "1", "1000", 
+            "User City", "User Country", "123456789"
+        );
+
+        // Assert
+        ArgumentCaptor<Client> clientCaptor = ArgumentCaptor.forClass(Client.class);
+        verify(clientRepository).save(clientCaptor.capture());
+        
+        Client savedClient = clientCaptor.getValue();
+        assertEquals("User", savedClient.getName());
+        assertEquals("Example", savedClient.getFirstname());
+        assertEquals(email, savedClient.getEmail());
+        assertEquals(hashedPassword, savedClient.getPassword());
+        assertEquals(LocalDate.now(), savedClient.getDateInscription());
+    }
+
+    @Test
+    void isValidEmail_ValidEmail_ReturnsTrue() {
+        // Act & Assert
+        assertTrue(clientService.isValidEmail("user@example.com"));
+        assertTrue(clientService.isValidEmail("user.name+tag@example.co.uk"));
+    }
+
+    @Test
+    void isValidEmail_InvalidEmail_ReturnsFalse() {
+        // Act & Assert
+        assertFalse(clientService.isValidEmail("invalid-email"));
+        assertFalse(clientService.isValidEmail("user@"));
+        assertFalse(clientService.isValidEmail("@example.com"));
+        assertFalse(clientService.isValidEmail(null));
     }
 }
