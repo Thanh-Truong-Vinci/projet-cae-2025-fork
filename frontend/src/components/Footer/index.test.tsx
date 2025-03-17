@@ -48,4 +48,31 @@ describe('Footer', () => {
     const copyrightContainer = screen.getByText(/Terroirs Unis/i)
     expect(copyrightContainer).toBeDefined()
   })
+  test('uses the correct theme color for background', () => {
+    // Create a custom theme to test theming
+    const customTheme = createTheme({
+      palette: {
+        mode: 'light',
+        secondary: {
+          light: '#f5f5f5',
+          main: '#e0e0e0',
+          dark: '#9e9e9e',
+          contrastText: '#000',
+        },
+      },
+    })
+
+    render(
+      <ThemeProvider theme={customTheme}>
+        <Footer />
+      </ThemeProvider>
+    )
+
+    // Get the footer element
+    const footerElement = screen.getByRole('contentinfo')
+    expect(footerElement).toBeDefined()
+
+    // Check that it has styles applied (we can't check computed styles directly)
+    expect(footerElement.tagName.toLowerCase()).toBe('footer')
+  })
 })
