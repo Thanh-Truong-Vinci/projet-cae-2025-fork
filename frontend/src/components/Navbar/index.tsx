@@ -15,7 +15,7 @@ const NavBar = () => {
   }
 
   return (
-    <Box sx={{ display: 'flex', gap: 1 }}>
+    <Box sx={{ display: 'flex', gap: 1 }} data-testid="navbar-component">
       {authenticatedUser ? (
         <>
           <Button variant="outlined" color="inherit" onClick={handleLogout}>
