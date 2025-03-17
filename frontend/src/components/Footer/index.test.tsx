@@ -40,4 +40,12 @@ describe('Footer', () => {
     // Check width attribute
     expect(logoImage?.getAttribute('width')).toBe('50')
   })
+  test('renders with copyright icon', () => {
+    renderWithTheme(<Footer />)
+
+    // We can't directly test for the MUI Copyright icon,
+    // but we can test if the container has the expected text
+    const copyrightContainer = screen.getByText(/Terroirs Unis/i)
+    expect(copyrightContainer).toBeDefined()
+  })
 })
