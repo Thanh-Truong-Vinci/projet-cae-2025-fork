@@ -5,6 +5,7 @@ import be.vinci.ipl.cae.demo.models.dtos.Credentials;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsRegister;
 import be.vinci.ipl.cae.demo.models.dtos.TokenRequest;
 import be.vinci.ipl.cae.demo.services.ClientService;
+import be.vinci.ipl.cae.demo.utils.ValidationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,36 +32,69 @@ public class AuthController {
   }
 
   /**
-   * Checks if the provided registration credentials are invalid.
+   * Validates common credential fields (email and password).
    *
-   * @param credentials the registration credentials to check.
-   * @return true if the credentials are invalid, false otherwise.
+   * @param email the email to validate
+   * @param password the password to validate
+   * @throws ResponseStatusException with specific message if validation fails
    */
-  private boolean isInvalidCredentialsRegister(CredentialsRegister credentials) {
-    return credentials == null
-            || credentials.getName() == null || credentials.getName().isBlank()
-            || credentials.getFirstname() == null || credentials.getFirstname().isBlank()
-            || credentials.getEmail() == null || credentials.getEmail().isBlank()
-            || credentials.getPassword() == null || credentials.getPassword().isBlank()
-            || credentials.getStreet() == null || credentials.getStreet().isBlank()
-            || credentials.getNumber() == null || credentials.getNumber().isBlank()
-            || credentials.getPostalCode() == null || credentials.getPostalCode().isBlank()
-            || credentials.getCity() == null || credentials.getCity().isBlank()
-            || credentials.getCountry() == null || credentials.getCountry().isBlank();
+  private void validateCommonCredentials(String email, String password) {
+    ValidationUtils.validateCredentials(email, password);
   }
 
   /**
-   * Checks if the provided login credentials are invalid.
+   * Validates registration credentials.
    *
-   * @param credentials the login credentials to check.
-   * @return true if the credentials are invalid, false otherwise.
+   * @param credentials the registration credentials to check
+   * @throws ResponseStatusException with specific message if validation fails
    */
-  private boolean isInvalidCredentials(Credentials credentials) {
-    return credentials == null
-            || credentials.getEmail() == null
-            || credentials.getEmail().isBlank()
-            || credentials.getPassword() == null
-            || credentials.getPassword().isBlank();
+  private void validateCredentialsRegister(CredentialsRegister credentials) {
+    if (credentials == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Credentials cannot be null");
+    }
+    if (credentials.getName() == null || credentials.getName().isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name is required");
+    }
+    if (credentials.getFirstname() == null || credentials.getFirstname().isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Firstname is required");
+    }
+
+    // Validate common fields
+    validateCommonCredentials(credentials.getEmail(), credentials.getPassword());
+
+    if (credentials.getStreet() == null || credentials.getStreet().isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Street is required");
+    }
+    if (credentials.getNumber() == null || credentials.getNumber().isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Street number is required");
+    }
+    if (credentials.getPostalCode() == null || credentials.getPostalCode().isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Postal code is required");
+    }
+    if (credentials.getCity() == null || credentials.getCity().isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "City is required");
+    }
+    if (credentials.getCountry() == null || credentials.getCountry().isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Country is required");
+    }
+    if (credentials.getPhoneNumber() == null || credentials.getPhoneNumber().isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Phone number is required");
+    }
+  }
+
+  /**
+   * Validates login credentials.
+   *
+   * @param credentials the login credentials to check
+   * @throws ResponseStatusException with specific message if validation fails
+   */
+  private void validateCredentials(Credentials credentials) {
+    if (credentials == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Credentials cannot be null");
+    }
+    
+    // Validate common fields
+    validateCommonCredentials(credentials.getEmail(), credentials.getPassword());
   }
 
   /**
@@ -72,27 +106,33 @@ public class AuthController {
    */
   @PostMapping("/register")
   public AuthenticatedUser register(@RequestBody CredentialsRegister credentials) {
-    if (isInvalidCredentialsRegister(credentials)) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-    }
+    validateCredentialsRegister(credentials);
 
-    AuthenticatedUser client = clientService.register(
-            credentials.getName(),
-            credentials.getFirstname(),
-            credentials.getEmail(),
-            credentials.getPassword(),
-            credentials.getStreet(),
-            credentials.getNumber(),
-            credentials.getPostalCode(),
-            credentials.getCity(),
-            credentials.getCountry(),
-            credentials.getPhoneNumber()
-    );
+    try {
+      AuthenticatedUser client = clientService.register(
+              credentials.getName(),
+              credentials.getFirstname(),
+              credentials.getEmail(),
+              credentials.getPassword(),
+              credentials.getStreet(),
+              credentials.getNumber(),
+              credentials.getPostalCode(),
+              credentials.getCity(),
+              credentials.getCountry(),
+              credentials.getPhoneNumber()
+      );
 
-    if (client == null) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT);
+      if (client == null) {
+        throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
+      }
+      return client;
+    } catch (ResponseStatusException e) {
+      // Rethrow the exception from the service
+      throw e;
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, 
+          "Registration failed: " + e.getMessage(), e);  // Added 'e' as cause parameter
     }
-    return client;
   }
 
   /**
@@ -104,18 +144,23 @@ public class AuthController {
    */
   @PostMapping("/login")
   public AuthenticatedUser login(@RequestBody Credentials credentials) {
-    if (isInvalidCredentials(credentials)) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+    validateCredentials(credentials);
+
+    try {
+      AuthenticatedUser client = clientService.login(credentials.getEmail(),
+              credentials.getPassword());
+
+      if (client == null) {
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+      }
+
+      return client;
+    } catch (ResponseStatusException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+          "Login failed: " + e.getMessage(), e);  // Added 'e' as cause parameter
     }
-
-    AuthenticatedUser client = clientService.login(credentials.getEmail(),
-            credentials.getPassword());
-
-    if (client == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-    }
-
-    return client;
   }
 
   /**
@@ -129,18 +174,23 @@ public class AuthController {
    */
   @PostMapping("/me")
   public AuthenticatedUser refreshToken(@RequestBody TokenRequest request) {
-    String email = clientService.verifyJwtToken(request.getToken());
-
-    if (email == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+    if (request == null || request.getToken() == null || request.getToken().isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token is required");
     }
 
-    AuthenticatedUser client = clientService.createJwtToken(email);
+    try {
+      String email = clientService.verifyJwtToken(request.getToken());
 
-    if (client == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+      if (email == null) {
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
+      }
+
+      return clientService.createJwtToken(email);  // Directly return without temporary variable
+    } catch (ResponseStatusException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, 
+          "Token refresh failed: " + e.getMessage(), e);  // Added 'e' as cause parameter
     }
-
-    return client;
   }
 }
