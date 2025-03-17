@@ -38,7 +38,7 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault()
-
+    /*
     const passwordRegex =
       /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
 
@@ -50,7 +50,7 @@ const RegisterPage = () => {
       )
       return
     }
-
+      */
     if (formData.password !== formData.confirmPassword) {
       setErrorEmail(null)
       setErrorConfirmPasword('Les mots de passe ne correspondent pas.')

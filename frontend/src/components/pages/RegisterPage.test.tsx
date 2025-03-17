@@ -244,7 +244,7 @@ describe('RegisterPage', () => {
     fireEvent.change(countryInput, { target: { value: 'Country' } })
     fireEvent.change(phoneNumberInput, { target: { value: '1234567890' } })
     fireEvent.change(emailInput, { target: { value: 'test@example.com' } })
-    fireEvent.change(passwordInput, { target: { value: 'password_12' } })
+    fireEvent.change(passwordInput, { target: { value: 'password123' } })
     fireEvent.change(confirmPasswordInput, {
       target: { value: 'differentPassword' },
     })
