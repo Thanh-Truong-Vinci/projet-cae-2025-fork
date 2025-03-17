@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { vi, describe, test, expect, beforeEach } from 'vitest'
 import Header from './index'
@@ -45,5 +45,32 @@ describe('Header', () => {
     // Check for title text
     const titleElement = screen.getByText(testTitle)
     expect(titleElement).toBeDefined()
+  })
+
+  test('navigates to home when title is clicked', () => {
+    const testTitle = 'Click Me'
+
+    const mockContextValue = {
+      authenticatedUser: undefined,
+      authsMe: vi.fn(),
+      registerUser: vi.fn(),
+      loginUser: vi.fn(),
+      clearUser: vi.fn(),
+    }
+
+    render(
+      <MemoryRouter>
+        <UserContext.Provider value={mockContextValue}>
+          <Header title={testTitle} />
+        </UserContext.Provider>
+      </MemoryRouter>
+    )
+
+    // Find and click the title
+    const titleElement = screen.getByText(testTitle)
+    fireEvent.click(titleElement)
+
+    // Check that navigation was called with '/'
+    expect(navigateMock).toHaveBeenCalledWith('/')
   })
 })
