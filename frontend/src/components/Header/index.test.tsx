@@ -73,4 +73,26 @@ describe('Header', () => {
     // Check that navigation was called with '/'
     expect(navigateMock).toHaveBeenCalledWith('/')
   })
+
+  test('renders the NavBar component', () => {
+    const mockContextValue = {
+      authenticatedUser: undefined,
+      authsMe: vi.fn(),
+      registerUser: vi.fn(),
+      loginUser: vi.fn(),
+      clearUser: vi.fn(),
+    }
+
+    render(
+      <MemoryRouter>
+        <UserContext.Provider value={mockContextValue}>
+          <Header title="Test" />
+        </UserContext.Provider>
+      </MemoryRouter>
+    )
+
+    // Check for the NavBar component
+    const navbar = screen.getByTestId('navbar-component')
+    expect(navbar).toBeDefined()
+  })
 })
