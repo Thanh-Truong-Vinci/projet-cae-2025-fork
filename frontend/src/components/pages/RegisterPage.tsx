@@ -25,9 +25,10 @@ const RegisterPage = () => {
     confirmPassword: '',
   })
 
-  const [errorPasword, setErrorPassword] = useState<string | null>(null)
-
   const [errorEmail, setErrorEmail] = useState<string | null>(null)
+  const [errorPasword, setErrorPasword] = useState<string | null>(null)
+  const [errorConfirmPasword, setErrorConfirmPasword] = useState<string | null>(null)
+
 
   const handleChange = (e: SyntheticEvent) => {
     const target = e.target as HTMLInputElement
@@ -37,9 +38,19 @@ const RegisterPage = () => {
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault()
 
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+
+    if (!passwordRegex.test(formData.password)) {
+      setErrorEmail(null)
+      setErrorConfirmPasword(null)
+      setErrorPasword('Le mot de passe doit contenir au moins 8 caractères, une lettre, un chiffre et un caractère spécial.')
+      return
+    }
+
     if (formData.password !== formData.confirmPassword) {
       setErrorEmail(null)
-      setErrorPassword('Les mots de passe ne correspondent pas.')
+      setErrorConfirmPasword('Les mots de passe ne correspondent pas.')
+      setErrorPasword(null)
       return
     }
 
@@ -61,7 +72,8 @@ const RegisterPage = () => {
     } catch (err) {
       console.error('RegisterPage::error: ', err)
       setErrorEmail('Cette adresse email est déjà utilisée.')
-      setErrorPassword(null)
+      setErrorPasword(null)
+      setErrorConfirmPasword(null)
     }
   }
 
@@ -74,7 +86,7 @@ const RegisterPage = () => {
       <form
         onSubmit={handleSubmit}
         style={{
-          backgroundColor: 'rgba(0, 255, 0, 0.1)', // Light green background with low opacity
+          backgroundColor: 'rgba(0, 255, 0, 0.1)',
           padding: '16px',
           borderRadius: '8px',
         }}
@@ -144,7 +156,6 @@ const RegisterPage = () => {
           }}
         />
 
-        {/* Boîte & Code postal */}
         <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
           <TextField
             fullWidth
@@ -265,6 +276,8 @@ const RegisterPage = () => {
             input: { color: theme.palette.secondary.contrastText },
             mb: 1,
           }}
+          error={!!errorPasword}
+          helperText={errorPasword}
         />
         <TextField
           fullWidth
@@ -279,8 +292,8 @@ const RegisterPage = () => {
           color="primary"
           data-testid="confirmPassword-input"
           sx={{ input: { color: theme.palette.secondary.contrastText }, mb: 1 }}
-          error={!!errorPasword}
-          helperText={errorPasword}
+          error={!!errorConfirmPasword}
+          helperText={errorConfirmPasword}
         />
 
         <Button
