@@ -1,7 +1,6 @@
 package be.vinci.ipl.cae.demo.models.entities;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
