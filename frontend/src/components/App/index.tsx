@@ -36,7 +36,7 @@ const App = () => {
         backgroundSize: 'cover',
       }}
     >
-      <Header title="Terroire & Cie" />
+      <Header title="Terroir & Cie" />
       <Container component="main" sx={{ flex: '1' }}>
         <Outlet />
       </Container>
