@@ -12,18 +12,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "producers")
 @Data
 @NoArgsConstructor
-public class Producer {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id_producer")
-  private Long id;
-
-  @Column(nullable = false)
-  private String firstName;
-
-  @Column(nullable = false)
-  private String name;
+public class Producer extends User {
 
   @Column(nullable = false)
   private String company;
@@ -46,16 +35,4 @@ public class Producer {
   private String country;
 
   private String phoneNumber;
-
-  @Column(nullable = false, unique = true)
-  private String email;
-
-  @Column(nullable = false, unique = true)
-  private String login;
-
-  @Column(nullable = false)
-  private String password;
-
-  @Column(name = "date_inscription", nullable = false)
-  private LocalDate dateInscription;
 }
