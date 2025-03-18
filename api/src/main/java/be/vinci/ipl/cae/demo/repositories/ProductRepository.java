@@ -1,0 +1,12 @@
+package be.vinci.ipl.cae.demo.repositories;
+
+import be.vinci.ipl.cae.demo.models.entities.Product;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+
+/**
+ * Product repository.
+ */
+@Repository
+public interface ProductRepository extends CrudRepository<Product, Long> {
+}
