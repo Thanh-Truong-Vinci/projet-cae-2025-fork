@@ -83,7 +83,7 @@ describe('App Component', () => {
     )
 
     // Check the header title
-    expect(screen.getByText('Terroire & Cie')).toBeDefined()
+    expect(screen.getByText('Terroir & Cie')).toBeDefined()
   })
 
   test('calls authsMe when token exists in cookies', () => {
