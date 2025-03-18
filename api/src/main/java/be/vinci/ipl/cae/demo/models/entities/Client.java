@@ -12,23 +12,4 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class Client extends User {
-
-  @Column(nullable = false)
-  private String street;
-
-  @Column(name = "number", nullable = false)
-  private String number;
-
-  private String box;
-
-  @Column(name = "postal_code", nullable = false)
-  private String postalCode;
-
-  @Column(nullable = false)
-  private String city;
-
-  @Column(nullable = false)
-  private String country;
-
-  private String phoneNumber;
 }
