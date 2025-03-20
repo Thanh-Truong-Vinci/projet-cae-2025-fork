@@ -10,11 +10,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ClientRepository extends CrudRepository<Client, Long> {
 
-  /**
-   * Find a client by its email.
-   *
-   * @param email the email
-   * @return the client
-   */
-  Client findByEmail(String email);
 }
