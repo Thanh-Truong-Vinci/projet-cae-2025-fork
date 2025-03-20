@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @Table(name = "clients")
 @Data
 @NoArgsConstructor
-public class Client extends User {
+public class Client extends UserWithAddress {
 }

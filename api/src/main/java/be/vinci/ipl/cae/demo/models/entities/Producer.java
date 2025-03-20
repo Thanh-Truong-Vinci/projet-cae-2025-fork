@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "producers")
 @Data
 @NoArgsConstructor
-public class Producer extends User {
+public class Producer extends UserWithAddress {
 
   @Column(nullable = false)
   private String company;
