@@ -1,6 +1,7 @@
 package be.vinci.ipl.cae.demo.models.entities;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

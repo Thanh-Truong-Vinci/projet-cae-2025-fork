@@ -4,8 +4,7 @@ import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedUser;
 import be.vinci.ipl.cae.demo.models.entities.Client;
 import be.vinci.ipl.cae.demo.repositories.ClientRepository;
 import java.time.LocalDate;
-import java.util.Date;
-import org.springframework.http.HttpStatus;
+import java.util.Objects;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,11 +22,12 @@ public class ClientService {
   /**
    * Constructor.
    *
-   * @param passwordEncoder the password encoder
-   * @param clientRepository  the client repository
-   * @param authsService the auths service
+   * @param passwordEncoder  the password encoder
+   * @param clientRepository the client repository
+   * @param authsService     the auths service
    */
-  public ClientService(BCryptPasswordEncoder passwordEncoder, ClientRepository clientRepository, AuthsService authsService) {
+  public ClientService(BCryptPasswordEncoder passwordEncoder, ClientRepository clientRepository,
+      AuthsService authsService) {
     this.passwordEncoder = passwordEncoder;
     this.clientRepository = clientRepository;
     this.authsService = authsService;
@@ -36,18 +36,18 @@ public class ClientService {
   /**
    * Login a client.
    *
-   * @param email the email
+   * @param email    the email
    * @param password the password
    * @return the authenticated client if the login is successful, null otherwise
    */
   public AuthenticatedUser login(String email, String password) {
-    
+
     Client client = clientRepository.findByEmail(email);
     if (client == null) {
       return null;
     }
 
-    if (password != client.getPassword()) {
+    if (!Objects.equals(password, client.getPassword())) {
       return null;
     }
 
@@ -57,37 +57,38 @@ public class ClientService {
   /**
    * Register a new client.
    *
-   * @param name the last name
-   * @param firstname the first name
-   * @param email the email
-   * @param password the password
-   * @param street the street
-   * @param number the street number
-   * @param postalCode the postal code
-   * @param city the city
-   * @param country the country
+   * @param name        the last name
+   * @param firstname   the first name
+   * @param email       the email
+   * @param password    the password
+   * @param street      the street
+   * @param number      the street number
+   * @param postalCode  the postal code
+   * @param city        the city
+   * @param country     the country
    * @param phoneNumber the phone number (optional)
-   * @return the authenticated client if the registration is successful, null otherwise
+   * @return the authenticated client if the registration is successful, null
+   *         otherwise
    * @throws ResponseStatusException if validation fails
    */
   public AuthenticatedUser register(
-          String name,
-          String firstname,
-          String email,
-          String password,
-          String street,
-          String number,
-          String postalCode,
-          String city,
-          String country,
-          String phoneNumber) {
+      String name,
+      String firstname,
+      String email,
+      String password,
+      String street,
+      String number,
+      String postalCode,
+      String city,
+      String country,
+      String phoneNumber) {
 
     if (clientRepository.findByEmail(email) != null) {
       return null;
     }
 
     createOne(name, firstname, email, password, street,
-            number, postalCode, city, country, phoneNumber);
+        number, postalCode, city, country, phoneNumber);
 
     return authsService.createJwtToken(email);
   }
@@ -95,28 +96,28 @@ public class ClientService {
   /**
    * Create a new client.
    *
-   * @param name the last name
-   * @param firstname the first name
-   * @param email the email
-   * @param password the password
-   * @param street the street
-   * @param number the street number
-   * @param postalCode the postal code
-   * @param city the city
-   * @param country the country
+   * @param name        the last name
+   * @param firstname   the first name
+   * @param email       the email
+   * @param password    the password
+   * @param street      the street
+   * @param number      the street number
+   * @param postalCode  the postal code
+   * @param city        the city
+   * @param country     the country
    * @param phoneNumber the phone number (optional)
    */
   public void createOne(
-          String name,
-          String firstname,
-          String email,
-          String password,
-          String street,
-          String number,
-          String postalCode,
-          String city,
-          String country,
-          String phoneNumber) {
+      String name,
+      String firstname,
+      String email,
+      String password,
+      String street,
+      String number,
+      String postalCode,
+      String city,
+      String country,
+      String phoneNumber) {
 
     String hashedPassword = passwordEncoder.encode(password);
 
