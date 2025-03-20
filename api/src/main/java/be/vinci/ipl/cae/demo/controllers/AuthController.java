@@ -4,8 +4,8 @@ import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedUser;
 import be.vinci.ipl.cae.demo.models.dtos.Credentials;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsRegister;
 import be.vinci.ipl.cae.demo.models.dtos.TokenRequest;
+import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.ClientService;
-import be.vinci.ipl.cae.demo.utils.ValidationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,25 +21,17 @@ import org.springframework.web.server.ResponseStatusException;
 public class AuthController {
 
   private final ClientService clientService;
+  private final AuthsService authsService;
 
   /**
    * Constructor for AuthController.
    *
    * @param clientService the injected ClientService.
+   * @param authsService  the injected AuthsService.
    */
-  public AuthController(ClientService clientService) {
+  public AuthController(ClientService clientService, AuthsService authsService) {
     this.clientService = clientService;
-  }
-
-  /**
-   * Validates common credential fields (email and password).
-   *
-   * @param email the email to validate
-   * @param password the password to validate
-   * @throws ResponseStatusException with specific message if validation fails
-   */
-  private void validateCommonCredentials(String email, String password) {
-    ValidationUtils.validateCredentials(email, password);
+    this.authsService = authsService;
   }
 
   /**
@@ -58,10 +50,6 @@ public class AuthController {
     if (credentials.getFirstname() == null || credentials.getFirstname().isBlank()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Firstname is required");
     }
-
-    // Validate common fields
-    validateCommonCredentials(credentials.getEmail(), credentials.getPassword());
-
     if (credentials.getStreet() == null || credentials.getStreet().isBlank()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Street is required");
     }
@@ -88,13 +76,16 @@ public class AuthController {
    * @param credentials the login credentials to check
    * @throws ResponseStatusException with specific message if validation fails
    */
-  private void validateCredentials(Credentials credentials) {
+  private void validateCredentialsLogin(Credentials credentials) {
     if (credentials == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Credentials cannot be null");
     }
-    
-    // Validate common fields
-    validateCommonCredentials(credentials.getEmail(), credentials.getPassword());
+    if (credentials.getEmail() == null || credentials.getEmail().isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required");
+    }
+    if (credentials.getPassword() == null || credentials.getPassword().isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is required");
+    }
   }
 
   /**
@@ -102,7 +93,8 @@ public class AuthController {
    *
    * @param credentials the client credentials from the request body.
    * @return the authenticated client.
-   * @throws ResponseStatusException if the credentials are invalid or the email is already in use.
+   * @throws ResponseStatusException if the credentials are invalid or the email
+   *                                 is already in use.
    */
   @PostMapping("/register")
   public AuthenticatedUser register(@RequestBody CredentialsRegister credentials) {
@@ -110,17 +102,16 @@ public class AuthController {
 
     try {
       AuthenticatedUser client = clientService.register(
-              credentials.getName(),
-              credentials.getFirstname(),
-              credentials.getEmail(),
-              credentials.getPassword(),
-              credentials.getStreet(),
-              credentials.getNumber(),
-              credentials.getPostalCode(),
-              credentials.getCity(),
-              credentials.getCountry(),
-              credentials.getPhoneNumber()
-      );
+          credentials.getName(),
+          credentials.getFirstname(),
+          credentials.getEmail(),
+          credentials.getPassword(),
+          credentials.getStreet(),
+          credentials.getNumber(),
+          credentials.getPostalCode(),
+          credentials.getCity(),
+          credentials.getCountry(),
+          credentials.getPhoneNumber());
 
       if (client == null) {
         throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
@@ -130,8 +121,8 @@ public class AuthController {
       // Rethrow the exception from the service
       throw e;
     } catch (Exception e) {
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, 
-          "Registration failed: " + e.getMessage(), e);  // Added 'e' as cause parameter
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+          "Registration failed: " + e.getMessage(), e); // Added 'e' as cause parameter
     }
   }
 
@@ -140,15 +131,16 @@ public class AuthController {
    *
    * @param credentials the client credentials from the request body.
    * @return the authenticated client.
-   * @throws ResponseStatusException if the credentials are invalid or the login fails.
+   * @throws ResponseStatusException if the credentials are invalid or the login
+   *                                 fails.
    */
   @PostMapping("/login")
   public AuthenticatedUser login(@RequestBody Credentials credentials) {
-    validateCredentials(credentials);
+    validateCredentialsLogin(credentials);
 
     try {
       AuthenticatedUser client = clientService.login(credentials.getEmail(),
-              credentials.getPassword());
+          credentials.getPassword());
 
       if (client == null) {
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
@@ -159,7 +151,7 @@ public class AuthController {
       throw e;
     } catch (Exception e) {
       throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-          "Login failed: " + e.getMessage(), e);  // Added 'e' as cause parameter
+          "Login failed: " + e.getMessage(), e); // Added 'e' as cause parameter
     }
   }
 
@@ -170,7 +162,8 @@ public class AuthController {
    *
    * @param request the token request containing the token to verify.
    * @return a new token if verification is successful.
-   * @throws ResponseStatusException if the token is invalid or the verification fails.
+   * @throws ResponseStatusException if the token is invalid or the verification
+   *                                 fails.
    */
   @PostMapping("/me")
   public AuthenticatedUser refreshToken(@RequestBody TokenRequest request) {
@@ -179,18 +172,18 @@ public class AuthController {
     }
 
     try {
-      String email = clientService.verifyJwtToken(request.getToken());
+      String email = authsService.verifyJwtToken(request.getToken());
 
       if (email == null) {
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
       }
 
-      return clientService.createJwtToken(email);  // Directly return without temporary variable
+      return authsService.createJwtToken(email); // Directly return without temporary variable
     } catch (ResponseStatusException e) {
       throw e;
     } catch (Exception e) {
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, 
-          "Token refresh failed: " + e.getMessage(), e);  // Added 'e' as cause parameter
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+          "Token refresh failed: " + e.getMessage(), e); // Added 'e' as cause parameter
     }
   }
 }

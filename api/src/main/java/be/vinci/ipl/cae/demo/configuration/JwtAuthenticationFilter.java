@@ -1,7 +1,8 @@
 package be.vinci.ipl.cae.demo.configuration;
 
 import be.vinci.ipl.cae.demo.models.entities.Client;
-import be.vinci.ipl.cae.demo.services.ClientService;
+import be.vinci.ipl.cae.demo.repositories.ClientRepository;
+import be.vinci.ipl.cae.demo.services.AuthsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,15 +25,23 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Configuration
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-  private final ClientService clientService;
+  private static final String AUTHORIZATION_HEADER = "Authorization";
+  private static final String ROLE_ADMIN = "ROLE_ADMIN";
+  private static final String ADMIN_EMAIL = "admin";
+  // TODO replace "admin" with the email of the admin user
+
+  private final AuthsService authsService;
+  private final ClientRepository clientRepository;
 
   /**
    * Constructor for JwtAuthenticationFilter.
    *
-   * @param clientService the injected UserService.
+   * @param authsService     the injected AuthsService.
+   * @param clientRepository the injected ClientRepository.
    */
-  public JwtAuthenticationFilter(ClientService clientService) {
-    this.clientService = clientService;
+  public JwtAuthenticationFilter(AuthsService authsService, ClientRepository clientRepository) {
+    this.authsService = authsService;
+    this.clientRepository = clientRepository;
   }
 
   /**
@@ -46,22 +55,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
    */
   @Override
   protected void doFilterInternal(@NonNull HttpServletRequest request,
-                                  @NonNull HttpServletResponse response,
-                                  @NonNull FilterChain filterChain)
-          throws ServletException, IOException {
-    String token = request.getHeader("Authorization");
+      @NonNull HttpServletResponse response,
+      @NonNull FilterChain filterChain)
+      throws ServletException, IOException {
+    String token = request.getHeader(AUTHORIZATION_HEADER);
     if (token != null) {
-      String email = clientService.verifyJwtToken(token);
+      String email = authsService.verifyJwtToken(token);
       if (email != null) {
-        Client user = clientService.readOneFromEmail(email);
+        Client user = clientRepository.findByEmail(email);
         if (user != null) {
           List<GrantedAuthority> authorities = new ArrayList<>();
-          if ("admin".equals(email)) { // TODO replace "admin" with the email of the admin user
-            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+          if (ADMIN_EMAIL.equals(email)) {
+            authorities.add(new SimpleGrantedAuthority(ROLE_ADMIN));
           }
-          UsernamePasswordAuthenticationToken authentication =
-                  new UsernamePasswordAuthenticationToken(
-                          user, null, authorities);
+          UsernamePasswordAuthenticationToken authentication = 
+              new UsernamePasswordAuthenticationToken(
+                user,
+                null,
+                authorities);
           authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
           SecurityContextHolder.getContext().setAuthentication(authentication);
         }
