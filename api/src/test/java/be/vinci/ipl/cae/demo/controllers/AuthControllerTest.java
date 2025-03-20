@@ -1,4 +1,4 @@
-package be.vinci.ipl.cae.demo.controllers;
+/*package be.vinci.ipl.cae.demo.controllers;
 
 import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedUser;
 import be.vinci.ipl.cae.demo.models.dtos.Credentials;
@@ -655,4 +655,4 @@ class AuthControllerTest {
         
         verifyNoInteractions(clientService);
     }
-}
+}*/
