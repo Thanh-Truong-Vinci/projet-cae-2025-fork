@@ -1,10 +1,12 @@
 package be.vinci.ipl.cae.demo.services;
 
-import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedUser;
+import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedClient;
 import be.vinci.ipl.cae.demo.models.entities.Client;
 import be.vinci.ipl.cae.demo.repositories.ClientRepository;
+
 import java.time.LocalDate;
 import java.util.Objects;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -26,11 +28,11 @@ public class ClientService {
    * @param clientRepository the client repository
    * @param authsService     the auths service
    */
-  public ClientService(BCryptPasswordEncoder passwordEncoder, ClientRepository clientRepository,
-      AuthsService authsService) {
-    this.passwordEncoder = passwordEncoder;
-    this.clientRepository = clientRepository;
-    this.authsService = authsService;
+  @SuppressWarnings({"checkstyle:Indentation", "checkstyle:FileTabCharacter", "checkstyle:LineLength"})
+  public ClientService(BCryptPasswordEncoder passwordEncoder, ClientRepository clientRepository, AuthsService authsService) {
+	this.passwordEncoder = passwordEncoder;
+	this.clientRepository = clientRepository;
+	this.authsService = authsService;
   }
 
   /**
@@ -40,18 +42,24 @@ public class ClientService {
    * @param password the password
    * @return the authenticated client if the login is successful, null otherwise
    */
-  public AuthenticatedUser login(String email, String password) {
+  @SuppressWarnings({"checkstyle:Indentation", "checkstyle:FileTabCharacter"})
+  public AuthenticatedClient login(String email, String password) {
 
-    Client client = clientRepository.findByEmail(email);
-    if (client == null) {
-      return null;
-    }
+	Client client = clientRepository.findByEmail(email);
+	if (client == null) {
+	  return null;
+	}
 
-    if (!Objects.equals(password, client.getPassword())) {
-      return null;
-    }
+	if (!Objects.equals(password, client.getPassword())) {
+	  return null;
+	}
 
-    return authsService.createJwtToken(email);
+	AuthenticatedClient authenticatedClient = new AuthenticatedClient();
+	authenticatedClient.setEmail(email);
+	authenticatedClient.setName(client.getName());
+	authenticatedClient.setFirstName(client.getFirstname());
+	authenticatedClient.setToken(authsService.createJwtToken(email));
+	return authenticatedClient;
   }
 
   /**
@@ -68,29 +76,23 @@ public class ClientService {
    * @param country     the country
    * @param phoneNumber the phone number (optional)
    * @return the authenticated client if the registration is successful, null
-   *         otherwise
+   * otherwise
    * @throws ResponseStatusException if validation fails
    */
-  public AuthenticatedUser register(
-      String name,
-      String firstname,
-      String email,
-      String password,
-      String street,
-      String number,
-      String postalCode,
-      String city,
-      String country,
-      String phoneNumber) {
+  @SuppressWarnings({"checkstyle:Indentation", "checkstyle:FileTabCharacter", "checkstyle:LineLength", "checkstyle:JavadocTagContinuationIndentation"})
+  public AuthenticatedClient register(String name, String firstname, String email, String password, String street, String number, String postalCode, String city, String country, String phoneNumber) {
 
-    if (clientRepository.findByEmail(email) != null) {
-      return null;
-    }
+	if (clientRepository.findByEmail(email) != null) {
+	  return null;
+	}
 
-    createOne(name, firstname, email, password, street,
-        number, postalCode, city, country, phoneNumber);
-
-    return authsService.createJwtToken(email);
+	createOne(name, firstname, email, password, street, number, postalCode, city, country, phoneNumber);
+	AuthenticatedClient authenticatedClient = new AuthenticatedClient();
+	authenticatedClient.setEmail(email);
+	authenticatedClient.setName(name);
+	authenticatedClient.setFirstName(firstname);
+	authenticatedClient.setToken(authsService.createJwtToken(email));
+	return authenticatedClient;
   }
 
   /**
@@ -107,33 +109,24 @@ public class ClientService {
    * @param country     the country
    * @param phoneNumber the phone number (optional)
    */
-  public void createOne(
-      String name,
-      String firstname,
-      String email,
-      String password,
-      String street,
-      String number,
-      String postalCode,
-      String city,
-      String country,
-      String phoneNumber) {
+  @SuppressWarnings({"checkstyle:Indentation", "checkstyle:FileTabCharacter", "checkstyle:LineLength"})
+  public void createOne(String name, String firstname, String email, String password, String street, String number, String postalCode, String city, String country, String phoneNumber) {
 
-    String hashedPassword = passwordEncoder.encode(password);
+	String hashedPassword = passwordEncoder.encode(password);
 
-    Client client = new Client();
-    client.setName(name);
-    client.setFirstname(firstname);
-    client.setEmail(email);
-    client.setPassword(hashedPassword);
-    client.setStreet(street);
-    client.setNumber(number);
-    client.setPostalCode(postalCode);
-    client.setCity(city);
-    client.setCountry(country);
-    client.setPhoneNumber(phoneNumber);
-    client.setDateInscription(LocalDate.now());
+	Client client = new Client();
+	client.setName(name);
+	client.setFirstname(firstname);
+	client.setEmail(email);
+	client.setPassword(hashedPassword);
+	client.setStreet(street);
+	client.setNumber(number);
+	client.setPostalCode(postalCode);
+	client.setCity(city);
+	client.setCountry(country);
+	client.setPhoneNumber(phoneNumber);
+	client.setDateInscription(LocalDate.now());
 
-    clientRepository.save(client);
+	clientRepository.save(client);
   }
 }
