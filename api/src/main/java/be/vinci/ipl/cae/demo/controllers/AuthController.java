@@ -102,6 +102,7 @@ public class AuthController {
         credentials.getFirstname(),
         credentials.getEmail(),
         credentials.getPassword(),
+        credentials.getCivility(),
         credentials.getStreet(),
         credentials.getNumber(),
         credentials.getPostalCode(),

@@ -1,6 +1,13 @@
 import { useState, SyntheticEvent, useContext } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Box, Button, TextField, Typography, useTheme } from '@mui/material'
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  useTheme,
+  MenuItem,
+} from '@mui/material'
 import { UserContextType } from '../../types'
 import { UserContext } from '../../contexts/UserContext'
 import './index.css'
@@ -13,6 +20,7 @@ const RegisterPage = () => {
   const [formData, setFormData] = useState({
     name: '',
     firstname: '',
+    civility: '',
     street: '',
     number: '',
     box: '',
@@ -62,6 +70,7 @@ const RegisterPage = () => {
       await registerUser({
         name: formData.name,
         firstname: formData.firstname,
+        civility: formData.civility,
         street: formData.street,
         number: formData.number,
         box: formData.box,
@@ -127,6 +136,26 @@ const RegisterPage = () => {
             mb: 1,
           }}
         />
+        <TextField
+          select
+          fullWidth
+          id="civility"
+          name="civility"
+          label="Civility"
+          variant="outlined"
+          value={formData.civility}
+          onChange={handleChange}
+          required
+          color="primary"
+          data-testid="civility-input"
+          sx={{
+            input: { color: theme.palette.secondary.contrastText },
+            mb: 1,
+          }}
+        >
+          <MenuItem value="Monsieur">Monsieur</MenuItem>
+          <MenuItem value="Madame">Madame</MenuItem>
+        </TextField>
         <TextField
           fullWidth
           id="street"

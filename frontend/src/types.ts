@@ -9,6 +9,7 @@ interface UserContextType {
 interface User {
   name: string
   firstname: string
+  civility: string
   street: string
   number: string
   box?: string
