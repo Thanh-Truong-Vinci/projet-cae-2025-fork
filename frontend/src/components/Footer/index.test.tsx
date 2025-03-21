@@ -48,20 +48,22 @@ describe('Footer', () => {
   test('displays opening hours correctly', () => {
     renderWithTheme(<Footer />)
     expect(screen.getByText("Heure d'ouverture du magasin :")).toBeDefined()
-    expect(screen.getByText("Mardi de 16 h à 20 h")).toBeDefined()
-    expect(screen.getByText("Jeudi de 18 h à 21 h")).toBeDefined()
+    expect(screen.getByText('Mardi de 16 h à 20 h')).toBeDefined()
+    expect(screen.getByText('Jeudi de 18 h à 21 h')).toBeDefined()
   })
 
   test('displays contact information correctly', () => {
     renderWithTheme(<Footer />)
-    expect(screen.getByText("Contact :")).toBeDefined()
-    expect(screen.getByText("Téléphone : +32 84 987 654")).toBeDefined()
-    expect(screen.getByText("Email : contact@terroiretcie.be")).toBeDefined()
+    expect(screen.getByText('Contact :')).toBeDefined()
+    expect(screen.getByText('Téléphone : +32 84 987 654')).toBeDefined()
+    expect(screen.getByText('Email : contact@terroiretcie.be')).toBeDefined()
   })
 
   test('displays address information correctly', () => {
     renderWithTheme(<Footer />)
-    expect(screen.getByText(/Veuillez nous retrouver à cette adresse :/)).toBeDefined()
+    expect(
+      screen.getByText(/Veuillez nous retrouver à cette adresse :/)
+    ).toBeDefined()
     expect(screen.getByText(/Rue du Bon Terroir, 7/)).toBeDefined()
     expect(screen.getByText(/6980 Vafontaine/)).toBeDefined()
     expect(screen.getByText(/Belgique/)).toBeDefined()
@@ -79,7 +81,7 @@ describe('Footer', () => {
     // Check for Container and Box components
     const containerElement = container.querySelector('.MuiContainer-root')
     expect(containerElement).toBeDefined()
-    
+
     // Should have 4 flex boxes for the 4 sections
     const boxElements = container.querySelectorAll('.MuiBox-root')
     expect(boxElements.length).toBeGreaterThan(4) // At least 5 boxes (4 content + 1 parent)
@@ -99,8 +101,7 @@ describe('Footer', () => {
     renderWithTheme(<Footer />)
     expect(screen.getByTestId('marker')).toBeDefined()
   })
-  
- 
+
   test('uses the correct theme color for background', () => {
     // Create a custom theme to test theming
     const customTheme = createTheme({
@@ -128,5 +129,4 @@ describe('Footer', () => {
     // Check that it has styles applied (we can't check computed styles directly)
     expect(footerElement.tagName.toLowerCase()).toBe('footer')
   })
-  
 })
