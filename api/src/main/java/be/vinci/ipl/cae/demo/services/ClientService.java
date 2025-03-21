@@ -61,6 +61,7 @@ public class ClientService {
    * @param firstname   the first name
    * @param email       the email
    * @param password    the password
+   * @param civility    the civility
    * @param street      the street
    * @param number      the street number
    * @param postalCode  the postal code
@@ -75,6 +76,7 @@ public class ClientService {
       String firstname,
       String email,
       String password,
+      String civility,
       String street,
       String number,
       String postalCode,
@@ -89,6 +91,7 @@ public class ClientService {
         firstname,
         email,
         password,
+        civility,
         street,
         number,
         postalCode,
@@ -105,6 +108,7 @@ public class ClientService {
    * @param firstname   the first name
    * @param email       the email
    * @param password    the password
+   * @param civility    the civility
    * @param street      the street
    * @param number      the street number
    * @param postalCode  the postal code
@@ -116,6 +120,7 @@ public class ClientService {
                         String firstname,
                         String email,
                         String password,
+                        String civility,
                         String street,
                         String number,
                         String postalCode,
@@ -128,6 +133,7 @@ public class ClientService {
     client.setFirstname(firstname);
     client.setEmail(email);
     client.setPassword(password);
+    client.setCivility(civility);
     client.setStreet(street);
     client.setNumber(number);
     client.setPostalCode(postalCode);

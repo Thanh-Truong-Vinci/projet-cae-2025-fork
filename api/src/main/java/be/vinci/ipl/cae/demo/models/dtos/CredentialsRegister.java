@@ -14,6 +14,7 @@ public class CredentialsRegister {
   private String firstname;
   private String email;
   private String password;
+  private String civility;
   private String street;
   private String number;
   private String box;

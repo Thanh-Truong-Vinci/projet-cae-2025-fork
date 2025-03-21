@@ -13,4 +13,5 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class Client extends UserWithAddress {
+    private String civility;
 }
