@@ -80,19 +80,14 @@ public class ClientService {
    * @throws ResponseStatusException if validation fails
    */
   @SuppressWarnings({"checkstyle:Indentation", "checkstyle:FileTabCharacter", "checkstyle:LineLength", "checkstyle:JavadocTagContinuationIndentation"})
-  public AuthenticatedClient register(String name, String firstname, String email, String password, String street, String number, String postalCode, String city, String country, String phoneNumber) {
+  public boolean register(String name, String firstname, String email, String password, String street, String number, String postalCode, String city, String country, String phoneNumber) {
 
 	if (clientRepository.findByEmail(email) != null) {
-	  return null;
+	  return false;
 	}
 
 	createOne(name, firstname, email, password, street, number, postalCode, city, country, phoneNumber);
-	AuthenticatedClient authenticatedClient = new AuthenticatedClient();
-	authenticatedClient.setEmail(email);
-	authenticatedClient.setName(name);
-	authenticatedClient.setFirstName(firstname);
-	authenticatedClient.setToken(authsService.createJwtToken(email));
-	return authenticatedClient;
+	return true;
   }
 
   /**

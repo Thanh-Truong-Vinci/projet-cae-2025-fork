@@ -96,11 +96,11 @@ public class AuthController {
    *                                 is already in use.
    */
   @PostMapping("/register")
-  public AuthenticatedClient register(@RequestBody CredentialsRegister credentials) {
+  public boolean register(@RequestBody CredentialsRegister credentials) {
     validateCredentialsRegister(credentials);
 
     try {
-      AuthenticatedClient client = clientService.register(
+      boolean success = clientService.register(
           credentials.getName(),
           credentials.getFirstname(),
           credentials.getEmail(),
@@ -112,16 +112,12 @@ public class AuthController {
           credentials.getCountry(),
           credentials.getPhoneNumber());
 
-      if (client == null) {
+      if (!success) {
         throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
       }
-      return client;
+      return true;
     } catch (ResponseStatusException e) {
-      // Rethrow the exception from the service
       throw e;
-    } catch (Exception e) {
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-          "Registration failed: " + e.getMessage(), e); // Added 'e' as cause parameter
     }
   }
 
