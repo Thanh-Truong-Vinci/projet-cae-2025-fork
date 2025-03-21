@@ -96,7 +96,7 @@ public class AuthController {
    *                                 is already in use.
    */
   @PostMapping("/register")
-  public boolean register(@RequestBody CredentialsRegister credentials) {
+  public void register(@RequestBody CredentialsRegister credentials) {
     validateCredentialsRegister(credentials);
 
     try {
@@ -115,7 +115,6 @@ public class AuthController {
       if (!success) {
         throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
       }
-      return true;
     } catch (ResponseStatusException e) {
       throw e;
     }
@@ -144,9 +143,6 @@ public class AuthController {
       return client;
     } catch (ResponseStatusException e) {
       throw e;
-    } catch (Exception e) {
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-          "Login failed: " + e.getMessage(), e); // Added 'e' as cause parameter
     }
   }
 

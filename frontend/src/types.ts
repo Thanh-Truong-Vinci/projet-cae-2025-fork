@@ -22,6 +22,8 @@ interface User {
 
 interface AuthenticatedUser {
   email: string
+  name: string
+  firstname: string
   token: string
 }
 

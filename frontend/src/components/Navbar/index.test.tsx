@@ -56,6 +56,8 @@ describe('NavBar', () => {
     const mockContextValue = {
       authenticatedUser: {
         email: 'test@example.com',
+        name: 'TestName',
+        firstname: 'TestFirstname',
         token: 'fake-token',
         // Add other required fields for authenticatedUser
       },
@@ -141,6 +143,8 @@ describe('NavBar', () => {
     const mockContextValue = {
       authenticatedUser: {
         email: 'test@example.com',
+        name: 'TestName',
+        firstname: 'TestFirstname',
         token: 'fake-token',
         // Add other required fields for authenticatedUser
       },
