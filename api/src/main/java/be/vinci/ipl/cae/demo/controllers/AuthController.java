@@ -91,32 +91,26 @@ public class AuthController {
    * Register a new client.
    *
    * @param credentials the client credentials from the request body.
-   * @return the authenticated client.
    * @throws ResponseStatusException if the credentials are invalid or the email
    *                                 is already in use.
    */
   @PostMapping("/register")
   public void register(@RequestBody CredentialsRegister credentials) {
     validateCredentialsRegister(credentials);
+    boolean success = clientService.register(
+        credentials.getName(),
+        credentials.getFirstname(),
+        credentials.getEmail(),
+        credentials.getPassword(),
+        credentials.getStreet(),
+        credentials.getNumber(),
+        credentials.getPostalCode(),
+        credentials.getCity(),
+        credentials.getCountry(),
+        credentials.getPhoneNumber());
 
-    try {
-      boolean success = clientService.register(
-          credentials.getName(),
-          credentials.getFirstname(),
-          credentials.getEmail(),
-          credentials.getPassword(),
-          credentials.getStreet(),
-          credentials.getNumber(),
-          credentials.getPostalCode(),
-          credentials.getCity(),
-          credentials.getCountry(),
-          credentials.getPhoneNumber());
-
-      if (!success) {
-        throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
-      }
-    } catch (ResponseStatusException e) {
-      throw e;
+    if (!success) {
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
     }
   }
 
@@ -132,18 +126,14 @@ public class AuthController {
   public AuthenticatedClient login(@RequestBody Credentials credentials) {
     validateCredentialsLogin(credentials);
 
-    try {
-      AuthenticatedClient client = clientService.login(credentials.getEmail(),
-          credentials.getPassword());
+    AuthenticatedClient client = clientService.login(credentials.getEmail(),
+        credentials.getPassword());
 
-      if (client == null) {
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
-      }
-
-      return client;
-    } catch (ResponseStatusException e) {
-      throw e;
+    if (client == null) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
     }
+
+    return client;
   }
 
   /**
@@ -162,19 +152,13 @@ public class AuthController {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token is required");
     }
 
-    try {
-      String email = authsService.verifyJwtToken(request);
+    String email = authsService.verifyJwtToken(request);
 
-      if (email == null) {
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
-      }
-
-      return authsService.createJwtToken(email); // Directly return without temporary variable
-    } catch (ResponseStatusException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-          "Token refresh failed: " + e.getMessage(), e); // Added 'e' as cause parameter
+    if (email == null) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
     }
+
+    return authsService.createJwtToken(email); // Directly return without temporary variable
+
   }
 }
