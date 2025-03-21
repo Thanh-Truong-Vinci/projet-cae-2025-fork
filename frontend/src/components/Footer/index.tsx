@@ -14,7 +14,7 @@ const AddressMarker = ({ position }: { position: [number, number] }) => {
         )
         const data = await response.json()
         setAddress(data.display_name || 'Adresse non trouvée')
-      } catch (error) {
+      } catch (_error) {
         setAddress("Impossible de charger l'adresse")
       }
     }
