@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 public class AuthenticatedClient {
   private String email;
   private  String name;
-  private String firstName;
+  private String firstname;
   private String token;
 }

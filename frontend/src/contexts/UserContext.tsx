@@ -68,9 +68,8 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
         throw new Error(
           `fetch error : ${response.status} : ${response.statusText}`
         )
-
-      const createdUser: AuthenticatedUser = await response.json()
-      console.log('createdUser: ', createdUser)
+      
+      
     } catch (err) {
       console.error('registerUser::error: ', err)
       throw err
@@ -97,7 +96,6 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
 
         const authenticatedUser: AuthenticatedUser = await response.json()
 
-        // Set token with timestamp
         document.cookie = `token=${authenticatedUser.token}; timestamp=${Date.now()}`
 
         setAuthenticatedUser(authenticatedUser)

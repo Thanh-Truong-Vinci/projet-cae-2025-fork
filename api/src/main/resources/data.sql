@@ -5,5 +5,5 @@ INSERT INTO clients(
 )
 VALUES (
     'Admin', 'Admin', 'admin@gmail.com', '123', '2023-10-01',
-    'Fake Street', '123', '', '00000', 'Fake City', 'Fake Country', '0000000000'
+    'Admin Street', '123', '', '00000', 'Admin City', 'Admin Country', '0000000000'
 );

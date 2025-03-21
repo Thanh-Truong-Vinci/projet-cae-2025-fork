@@ -22,7 +22,7 @@ const HomePage = () => {
           }}
         >
           <Typography variant="h5" component="h2" gutterBottom>
-            Hello dear {authenticatedUser.email}
+            Bonjour {authenticatedUser.name} {authenticatedUser.firstname}
           </Typography>
         </Box>
       )}

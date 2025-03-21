@@ -7,6 +7,7 @@ import be.vinci.ipl.cae.demo.repositories.ClientRepository;
 import java.time.LocalDate;
 import java.util.Objects;
 
+import org.apache.logging.log4j.util.InternalException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -57,7 +58,7 @@ public class ClientService {
 	AuthenticatedClient authenticatedClient = new AuthenticatedClient();
 	authenticatedClient.setEmail(email);
 	authenticatedClient.setName(client.getName());
-	authenticatedClient.setFirstName(client.getFirstname());
+	authenticatedClient.setFirstname(client.getFirstname());
 	authenticatedClient.setToken(authsService.createJwtToken(email));
 	return authenticatedClient;
   }
@@ -83,7 +84,7 @@ public class ClientService {
   public boolean register(String name, String firstname, String email, String password, String street, String number, String postalCode, String city, String country, String phoneNumber) {
 
 	if (clientRepository.findByEmail(email) != null) {
-	  return false;
+		return false;
 	}
 
 	createOne(name, firstname, email, password, street, number, postalCode, city, country, phoneNumber);
@@ -107,13 +108,11 @@ public class ClientService {
   @SuppressWarnings({"checkstyle:Indentation", "checkstyle:FileTabCharacter", "checkstyle:LineLength"})
   public void createOne(String name, String firstname, String email, String password, String street, String number, String postalCode, String city, String country, String phoneNumber) {
 
-	String hashedPassword = passwordEncoder.encode(password);
-
 	Client client = new Client();
 	client.setName(name);
 	client.setFirstname(firstname);
 	client.setEmail(email);
-	client.setPassword(hashedPassword);
+	client.setPassword(password);
 	client.setStreet(street);
 	client.setNumber(number);
 	client.setPostalCode(postalCode);
