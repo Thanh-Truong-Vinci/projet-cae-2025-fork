@@ -1,7 +1,29 @@
 import { render, screen, cleanup } from '@testing-library/react'
-import { describe, test, expect, afterEach } from 'vitest'
+import { describe, test, expect, afterEach, vi } from 'vitest'
 import Footer from './index'
 import { ThemeProvider, createTheme } from '@mui/material'
+
+// Mock react-leaflet components
+vi.mock('react-leaflet', () => ({
+  MapContainer: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="map-container">{children}</div>
+  ),
+  TileLayer: () => <div data-testid="tile-layer" />,
+  Marker: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="marker">{children}</div>
+  ),
+  Popup: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="popup">{children}</div>
+  ),
+  Tooltip: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="tooltip">{children}</div>
+  ),
+}))
+
+// Mock fetch for testing AddressMarker
+globalThis.fetch = vi.fn().mockResolvedValue({
+  json: vi.fn().mockResolvedValue({ display_name: 'Test Address' }),
+})
 
 // Create theme once for all tests
 const theme = createTheme()
@@ -14,6 +36,7 @@ const renderWithTheme = (component: JSX.Element) => {
 describe('Footer', () => {
   afterEach(() => {
     cleanup()
+    vi.clearAllMocks()
   })
 
   test('renders the footer', () => {
@@ -22,32 +45,62 @@ describe('Footer', () => {
     expect(footerElement).toBeDefined()
   })
 
-  test('displays the correct text content', () => {
+  test('displays opening hours correctly', () => {
     renderWithTheme(<Footer />)
-    const jsLoveText = screen.getByText(
-      'Une application développée par le groupe09'
-    )
-    expect(jsLoveText).toBeDefined()
-    const brandText = screen.getByText(/Terroirs Unis/i)
-    expect(brandText).toBeDefined()
+    expect(screen.getByText("Heure d'ouverture du magasin :")).toBeDefined()
+    expect(screen.getByText("Mardi de 16 h à 20 h")).toBeDefined()
+    expect(screen.getByText("Jeudi de 18 h à 21 h")).toBeDefined()
   })
-  test('displays the logo image', () => {
-    renderWithTheme(<Footer />)
 
-    // Find image by its tag since it has empty alt text
-    const logoImage = document.querySelector('img')
-    expect(logoImage).toBeDefined()
-    // Check width attribute
-    expect(logoImage?.getAttribute('width')).toBe('50')
-  })
-  test('renders with copyright icon', () => {
+  test('displays contact information correctly', () => {
     renderWithTheme(<Footer />)
-
-    // We can't directly test for the MUI Copyright icon,
-    // but we can test if the container has the expected text
-    const copyrightContainer = screen.getByText(/Terroirs Unis/i)
-    expect(copyrightContainer).toBeDefined()
+    expect(screen.getByText("Contact :")).toBeDefined()
+    expect(screen.getByText("Téléphone : +32 84 987 654")).toBeDefined()
+    expect(screen.getByText("Email : contact@terroiretcie.be")).toBeDefined()
   })
+
+  test('displays address information correctly', () => {
+    renderWithTheme(<Footer />)
+    expect(screen.getByText(/Veuillez nous retrouver à cette adresse :/)).toBeDefined()
+    expect(screen.getByText(/Rue du Bon Terroir, 7/)).toBeDefined()
+    expect(screen.getByText(/6980 Vafontaine/)).toBeDefined()
+    expect(screen.getByText(/Belgique/)).toBeDefined()
+  })
+
+  test('renders map container', () => {
+    renderWithTheme(<Footer />)
+    expect(screen.getByTestId('map-container')).toBeDefined()
+    expect(screen.getByTestId('tile-layer')).toBeDefined()
+    expect(screen.getByTestId('marker')).toBeDefined()
+  })
+
+  test('has correct layout structure with container and flex boxes', () => {
+    const { container } = renderWithTheme(<Footer />)
+    // Check for Container and Box components
+    const containerElement = container.querySelector('.MuiContainer-root')
+    expect(containerElement).toBeDefined()
+    
+    // Should have 4 flex boxes for the 4 sections
+    const boxElements = container.querySelectorAll('.MuiBox-root')
+    expect(boxElements.length).toBeGreaterThan(4) // At least 5 boxes (4 content + 1 parent)
+  })
+
+  test('renders marker with tooltip', () => {
+    renderWithTheme(<Footer />)
+    expect(screen.getByTestId('tooltip')).toBeDefined()
+    expect(screen.getByText('Rue du Bon Terroir')).toBeDefined()
+  })
+  test('renders marker with popup', () => {
+    renderWithTheme(<Footer />)
+    expect(screen.getByTestId('popup')).toBeDefined()
+    expect(screen.getByText('Rue du Bon Terroir')).toBeDefined()
+  })
+  test('renders marker with icon', () => {
+    renderWithTheme(<Footer />)
+    expect(screen.getByTestId('marker')).toBeDefined()
+  })
+  
+ 
   test('uses the correct theme color for background', () => {
     // Create a custom theme to test theming
     const customTheme = createTheme({
@@ -75,13 +128,5 @@ describe('Footer', () => {
     // Check that it has styles applied (we can't check computed styles directly)
     expect(footerElement.tagName.toLowerCase()).toBe('footer')
   })
-  test('renders content in a container', () => {
-    renderWithTheme(<Footer />)
-
-    // Check for Container component
-    const container = screen
-      .getByText('Une application développée par le groupe09')
-      .closest('div')
-    expect(container).toBeDefined()
-  })
+  
 })
