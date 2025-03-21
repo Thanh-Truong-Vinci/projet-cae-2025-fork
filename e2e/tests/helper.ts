@@ -9,6 +9,7 @@ const goFromHomePageToRegisterPage = async (page: Page) => {
 const registerWith = async (page: Page, formData: { 
   name: string;
   firstname: string;
+  civility: string;
   street: string;
   number: string;
   box: string;
@@ -22,6 +23,8 @@ const registerWith = async (page: Page, formData: {
 }) => {
   await page.locator('[data-testid="name-input"] input').fill(formData.name);
   await page.locator('[data-testid="firstname-input"] input').fill(formData.firstname);
+  await page.locator('[data-testid="civility-input"]').click();
+  await page.getByRole("option", { name: formData.civility }).click();
   await page.locator('[data-testid="street-input"] input').fill(formData.street);
   await page.locator('[data-testid="number-input"] input').fill(formData.number);
   await page.locator('[data-testid="box-input"] input').fill(formData.box);

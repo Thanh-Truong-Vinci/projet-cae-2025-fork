@@ -10,6 +10,7 @@ import {
 const testUser = {
     name: faker.person.lastName(),
     firstname: faker.person.firstName(),
+    civility: "Monsieur",
     street: faker.location.streetAddress(),
     number: faker.location.buildingNumber(),
     box: faker.location.secondaryAddress(),
@@ -80,7 +81,7 @@ test.describe("Authentication", () => {
 
       await expect(page).toHaveURL("http://localhost:5173/");
 
-      const welcomeMessage = await page.getByText(`Hello dear ${testUser.email}`);
+      const welcomeMessage = await page.getByText(`Bonjour ${testUser.name} ${testUser.firstname}`);
       await expect(welcomeMessage).toBeVisible();
     });
 
@@ -95,7 +96,7 @@ test.describe("Authentication", () => {
   
         await expect(page).toHaveURL("http://localhost:5173/");
   
-        const welcomeMessage = await page.getByText(`Hello dear ${testUser.email}`);
+        const welcomeMessage = await page.getByText(`Bonjour ${testUser.name} ${testUser.firstname}`);
         await expect(welcomeMessage).toBeVisible();
 
         await expect(page.getByText("Se déconnecter")).toBeVisible();
