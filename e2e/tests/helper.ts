@@ -53,6 +53,7 @@ const loginWith = async (page: Page, formData: {
   await page.getByRole("textbox", { name: "Password" }).fill(formData.password);
   if (formData.rememberMe) {
     await page.getByRole("checkbox", { name: "Se souvenir de moi" }).check();
+    await page.getByRole("checkbox", { name: "Se souvenir de moi" }).isChecked();
   }
   await page.getByRole("button", { name: "S'authentifier" }).click();
 };

@@ -19,8 +19,8 @@ const testUser = {
     country: faker.location.country(),
     phoneNumber: faker.phone.number(),
     email: faker.internet.email(),
-    password: "test123",
-    confirmPassword: "test123"
+    password: "test1234",
+    confirmPassword: "test1234"
   };
 
 test.describe("Authentication", () => {
