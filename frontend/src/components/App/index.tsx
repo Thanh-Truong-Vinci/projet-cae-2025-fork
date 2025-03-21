@@ -2,7 +2,6 @@ import { Outlet } from 'react-router-dom'
 import Footer from '../Footer'
 import Header from '../Header'
 import Box from '@mui/material/Box'
-import pizza from '../../assets/images/pizza.jpg'
 import { Container } from '@mui/material'
 import { useContext, useEffect } from 'react'
 import { UserContextType } from '../../types'
@@ -32,8 +31,7 @@ const App = () => {
         display: 'flex',
         flexDirection: 'column',
         minHeight: '100vh',
-        backgroundImage: `url(${pizza})`,
-        backgroundSize: 'cover',
+        backgroundColor: '#f5f5f5', // Optional: added a light background color instead
       }}
     >
       <Header title="Terroir & Cie" />

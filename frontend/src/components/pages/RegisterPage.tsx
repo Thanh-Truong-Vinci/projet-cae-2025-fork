@@ -8,6 +8,14 @@ import {
   useTheme,
   MenuItem,
 } from '@mui/material'
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  useTheme,
+  MenuItem,
+} from '@mui/material'
 import { UserContextType } from '../../types'
 import { UserContext } from '../../contexts/UserContext'
 import './index.css'
@@ -20,6 +28,7 @@ const RegisterPage = () => {
   const [formData, setFormData] = useState({
     name: '',
     firstname: '',
+    civility: '',
     civility: '',
     street: '',
     number: '',
@@ -135,6 +144,7 @@ const RegisterPage = () => {
       await registerUser({
         name: formData.name,
         firstname: formData.firstname,
+        civility: formData.civility,
         civility: formData.civility,
         street: formData.street,
         number: formData.number,
