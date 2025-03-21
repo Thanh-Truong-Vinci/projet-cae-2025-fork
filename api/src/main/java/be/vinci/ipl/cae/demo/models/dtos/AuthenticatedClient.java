@@ -4,10 +4,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * DTO for receiving the token.
+ * AuthenticatedUser DTO.
  */
 @Data
 @NoArgsConstructor
-public class TokenRequest {
+public class AuthenticatedClient {
+  private String email;
+  private  String name;
+  private String firstName;
   private String token;
 }

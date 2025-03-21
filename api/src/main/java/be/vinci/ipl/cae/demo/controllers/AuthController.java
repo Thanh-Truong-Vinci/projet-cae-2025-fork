@@ -1,9 +1,8 @@
 package be.vinci.ipl.cae.demo.controllers;
 
-import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedUser;
+import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedClient;
 import be.vinci.ipl.cae.demo.models.dtos.Credentials;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsRegister;
-import be.vinci.ipl.cae.demo.models.dtos.TokenRequest;
 import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.ClientService;
 import org.springframework.http.HttpStatus;
@@ -97,11 +96,11 @@ public class AuthController {
    *                                 is already in use.
    */
   @PostMapping("/register")
-  public AuthenticatedUser register(@RequestBody CredentialsRegister credentials) {
+  public AuthenticatedClient register(@RequestBody CredentialsRegister credentials) {
     validateCredentialsRegister(credentials);
 
     try {
-      AuthenticatedUser client = clientService.register(
+      AuthenticatedClient client = clientService.register(
           credentials.getName(),
           credentials.getFirstname(),
           credentials.getEmail(),
@@ -135,11 +134,11 @@ public class AuthController {
    *                                 fails.
    */
   @PostMapping("/login")
-  public AuthenticatedUser login(@RequestBody Credentials credentials) {
+  public AuthenticatedClient login(@RequestBody Credentials credentials) {
     validateCredentialsLogin(credentials);
 
     try {
-      AuthenticatedUser client = clientService.login(credentials.getEmail(),
+      AuthenticatedClient client = clientService.login(credentials.getEmail(),
           credentials.getPassword());
 
       if (client == null) {
@@ -166,13 +165,13 @@ public class AuthController {
    *                                 fails.
    */
   @PostMapping("/me")
-  public AuthenticatedUser refreshToken(@RequestBody TokenRequest request) {
-    if (request == null || request.getToken() == null || request.getToken().isBlank()) {
+  public String refreshToken(@RequestBody String request) {
+    if (request == null || request.isBlank()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token is required");
     }
 
     try {
-      String email = authsService.verifyJwtToken(request.getToken());
+      String email = authsService.verifyJwtToken(request);
 
       if (email == null) {
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
