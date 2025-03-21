@@ -1,4 +1,4 @@
-import { useState, SyntheticEvent, useContext } from 'react'
+import { useState, SyntheticEvent, useContext, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import {
   Box,
@@ -38,34 +38,99 @@ const RegisterPage = () => {
   const [errorConfirmPasword, setErrorConfirmPasword] = useState<string | null>(
     null
   )
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    console.log('fieldErrors state changed:', fieldErrors)
+  }, [fieldErrors])
 
   const handleChange = (e: SyntheticEvent) => {
     const target = e.target as HTMLInputElement
-    setFormData({ ...formData, [target.name]: target.value })
+    const { name, value } = target
+
+    // Clear the error for this field when user starts typing
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => ({ ...prev, [name]: '' }))
+    }
+
+    setFormData({ ...formData, [name]: value })
+  }
+
+  const validateForm = () => {
+    const errors: Record<string, string> = {}
+    const requiredFields: (keyof typeof formData)[] = [
+      'name',
+      'firstname',
+      'civility',
+      'street',
+      'number',
+      'postalCode',
+      'city',
+      'country',
+      'phoneNumber',
+      'email',
+      'password',
+      'confirmPassword',
+    ]
+
+    // Check each required field more strictly
+    requiredFields.forEach((field) => {
+      if (!formData[field] || formData[field].trim() === '') {
+        errors[field] = 'Ce champ est requis'
+        console.log(`Field ${field} is empty: ${formData[field]}`)
+      }
+    })
+
+    return errors
   }
 
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault()
-    /*
-    const passwordRegex =
-      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+    console.log('Form submitted')
 
-    if (!passwordRegex.test(formData.password)) {
-      setErrorEmail(null)
-      setErrorConfirmPasword(null)
-      setErrorPasword(
-        'Le mot de passe doit contenir au moins 8 caractères, une lettre, un chiffre et un caractère spécial.'
-      )
-      return
+    // Validate all fields first
+    const errors = validateForm()
+    console.log('Validation errors:', errors)
+
+    // Step 1: Check for empty required fields
+    if (Object.keys(errors).length > 0) {
+      console.log('Setting field errors:', errors)
+      setFieldErrors(errors)
+      return // Stop form submission here
     }
-      */
+
+    // Step 2: Check password match
     if (formData.password !== formData.confirmPassword) {
       setErrorEmail(null)
       setErrorConfirmPasword('Les mots de passe ne correspondent pas.')
       setErrorPasword(null)
-      return
+      return // Stop form submission here
     }
 
+    // Step 3: Check password strength (optional enhancement)
+    if (formData.password.length < 8) {
+      setErrorPasword('Le mot de passe doit contenir au moins 8 caractères.')
+      setErrorConfirmPasword(null)
+      setErrorEmail(null)
+      return // Stop form submission here
+    }
+
+    // Additional email format validation (optional)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(formData.email)) {
+      setErrorEmail("Format d'email invalide.")
+      setErrorPasword(null)
+      setErrorConfirmPasword(null)
+      return // Stop form submission here
+    }
+
+    // Clear all errors before submitting
+    setFieldErrors({})
+    setErrorEmail(null)
+    setErrorPasword(null)
+    setErrorConfirmPasword(null)
+
+    // Only if all validations pass, proceed with submission
     try {
       await registerUser({
         name: formData.name,
@@ -85,8 +150,6 @@ const RegisterPage = () => {
     } catch (err) {
       console.error('RegisterPage::error: ', err)
       setErrorEmail('Cette adresse email est déjà utilisée.')
-      setErrorPasword(null)
-      setErrorConfirmPasword(null)
     }
   }
 
@@ -104,6 +167,13 @@ const RegisterPage = () => {
           borderRadius: '8px',
         }}
       >
+        {Object.keys(fieldErrors).length > 0 && (
+          <Box sx={{ mb: 2, p: 2, bgcolor: 'error.light', borderRadius: 1 }}>
+            <Typography color="black" variant="subtitle2" align="center">
+              Veuillez remplir tous les champs obligatoires.
+            </Typography>
+          </Box>
+        )}
         <TextField
           fullWidth
           id="name"
@@ -112,13 +182,14 @@ const RegisterPage = () => {
           variant="outlined"
           value={formData.name}
           onChange={handleChange}
-          required
           color="primary"
           data-testid="name-input"
           sx={{
             input: { color: theme.palette.secondary.contrastText },
             mb: 1,
           }}
+          error={Boolean(fieldErrors.name)}
+          helperText={fieldErrors.name || ''}
         />
         <TextField
           fullWidth
@@ -128,13 +199,14 @@ const RegisterPage = () => {
           variant="outlined"
           value={formData.firstname}
           onChange={handleChange}
-          required
           color="primary"
           data-testid="firstname-input"
           sx={{
             input: { color: theme.palette.secondary.contrastText },
             mb: 1,
           }}
+          error={Boolean(fieldErrors.firstname)}
+          helperText={fieldErrors.firstname || ''}
         />
         <TextField
           select
@@ -145,13 +217,14 @@ const RegisterPage = () => {
           variant="outlined"
           value={formData.civility}
           onChange={handleChange}
-          required
           color="primary"
           data-testid="civility-input"
           sx={{
             input: { color: theme.palette.secondary.contrastText },
             mb: 1,
           }}
+          error={Boolean(fieldErrors.civility)}
+          helperText={fieldErrors.civility || ''}
         >
           <MenuItem value="Monsieur">Monsieur</MenuItem>
           <MenuItem value="Madame">Madame</MenuItem>
@@ -164,13 +237,14 @@ const RegisterPage = () => {
           variant="outlined"
           value={formData.street}
           onChange={handleChange}
-          required
           color="primary"
           data-testid="street-input"
           sx={{
             input: { color: theme.palette.secondary.contrastText },
             mb: 1,
           }}
+          error={Boolean(fieldErrors.street)}
+          helperText={fieldErrors.street || ''}
         />
         <TextField
           fullWidth
@@ -180,13 +254,14 @@ const RegisterPage = () => {
           variant="outlined"
           value={formData.number}
           onChange={handleChange}
-          required
           color="primary"
           data-testid="number-input"
           sx={{
             input: { color: theme.palette.secondary.contrastText },
             mb: 1,
           }}
+          error={Boolean(fieldErrors.number)}
+          helperText={fieldErrors.number || ''}
         />
 
         <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
@@ -213,13 +288,14 @@ const RegisterPage = () => {
             variant="outlined"
             value={formData.postalCode}
             onChange={handleChange}
-            required
             color="primary"
             data-testid="postalCode-input"
             sx={{
               input: { color: theme.palette.secondary.contrastText },
               mb: 1,
             }}
+            error={Boolean(fieldErrors.postalCode)}
+            helperText={fieldErrors.postalCode || ''}
           />
         </Box>
 
@@ -232,13 +308,14 @@ const RegisterPage = () => {
             variant="outlined"
             value={formData.city}
             onChange={handleChange}
-            required
             color="primary"
             data-testid="city-input"
             sx={{
               input: { color: theme.palette.secondary.contrastText },
               mb: 1,
             }}
+            error={Boolean(fieldErrors.city)}
+            helperText={fieldErrors.city || ''}
           />
           <TextField
             fullWidth
@@ -248,13 +325,14 @@ const RegisterPage = () => {
             variant="outlined"
             value={formData.country}
             onChange={handleChange}
-            required
             color="primary"
             data-testid="country-input"
             sx={{
               input: { color: theme.palette.secondary.contrastText },
               mb: 1,
             }}
+            error={Boolean(fieldErrors.country)}
+            helperText={fieldErrors.country || ''}
           />
         </Box>
 
@@ -266,13 +344,14 @@ const RegisterPage = () => {
           variant="outlined"
           value={formData.phoneNumber}
           onChange={handleChange}
-          required
           color="primary"
           data-testid="phoneNumber-input"
           sx={{
             input: { color: theme.palette.secondary.contrastText },
             mb: 1,
           }}
+          error={Boolean(fieldErrors.phoneNumber)}
+          helperText={fieldErrors.phoneNumber || ''}
         />
         <TextField
           fullWidth
@@ -283,15 +362,14 @@ const RegisterPage = () => {
           variant="outlined"
           value={formData.email}
           onChange={handleChange}
-          required
           color="primary"
           data-testid="email-input"
           sx={{
             input: { color: theme.palette.secondary.contrastText },
             mb: 1,
           }}
-          error={!!errorEmail}
-          helperText={errorEmail}
+          error={!!errorEmail || Boolean(fieldErrors.email)}
+          helperText={errorEmail || fieldErrors.email || ''}
         />
         <TextField
           fullWidth
@@ -302,16 +380,16 @@ const RegisterPage = () => {
           variant="outlined"
           value={formData.password}
           onChange={handleChange}
-          required
           color="primary"
           data-testid="password-input"
           sx={{
             input: { color: theme.palette.secondary.contrastText },
             mb: 1,
           }}
-          error={!!errorPasword}
-          helperText={errorPasword}
+          error={!!errorPasword || Boolean(fieldErrors.password)}
+          helperText={errorPasword || fieldErrors.password || ''}
         />
+
         <TextField
           fullWidth
           id="confirmPassword"
@@ -321,12 +399,11 @@ const RegisterPage = () => {
           variant="outlined"
           value={formData.confirmPassword}
           onChange={handleChange}
-          required
           color="primary"
           data-testid="confirmPassword-input"
           sx={{ input: { color: theme.palette.secondary.contrastText }, mb: 1 }}
-          error={!!errorConfirmPasword}
-          helperText={errorConfirmPasword}
+          error={!!errorConfirmPasword || Boolean(fieldErrors.confirmPassword)}
+          helperText={errorConfirmPasword || fieldErrors.confirmPassword || ''}
         />
 
         <Button
