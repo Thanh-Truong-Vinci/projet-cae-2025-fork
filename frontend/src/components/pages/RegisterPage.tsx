@@ -39,6 +39,7 @@ const RegisterPage = () => {
   const [errorConfirmPasword, setErrorConfirmPasword] = useState<string | null>(
     null
   )
+  const [errorPhoneNumber, setErrorPhoneNumber] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   useEffect(() => {
@@ -85,6 +86,15 @@ const RegisterPage = () => {
     return errors
   }
 
+  const clearAllErrors = () => {
+    setErrorNumber(null)
+    setErrorPhoneNumber(null)
+    setErrorEmail(null)
+    setErrorPasword(null)
+    setErrorConfirmPasword(null)
+    setFieldErrors({})
+  }
+
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault()
     console.log('Form submitted')
@@ -93,8 +103,9 @@ const RegisterPage = () => {
     const errors = validateForm()
     console.log('Validation errors:', errors)
 
-    // Step 1: Check for empty required fields
+    // Check for empty required fields
     if (Object.keys(errors).length > 0) {
+      clearAllErrors()
       console.log('Setting field errors:', errors)
       setFieldErrors(errors)
       return // Stop form submission here
@@ -102,41 +113,47 @@ const RegisterPage = () => {
 
     // Add specific validation for number field - digits only
     if (formData.number && !/^\d+$/.test(formData.number)) {
+      clearAllErrors()
       setErrorNumber('Le numéro doit contenir uniquement des chiffres')
       return
     }
 
-    // Step 2: Check password match
+    // Add phone number validation with improved regex
+    if (
+      formData.phoneNumber &&
+      !/^(\+|0)\d{6,14}$/.test(formData.phoneNumber)
+    ) {
+      clearAllErrors()
+      setErrorPhoneNumber(
+        'Le numéro de téléphone doit commencer par + ou 0 et avoir 6-14 chiffres en plus'
+      )
+      return
+    }
+
+    // Check password match
     if (formData.password !== formData.confirmPassword) {
-      setErrorEmail(null)
+      clearAllErrors()
       setErrorConfirmPasword('Les mots de passe ne correspondent pas.')
-      setErrorPasword(null)
-      return // Stop form submission here
+      return
     }
 
-    // Step 3: Check password strength (optional enhancement)
+    // Check password strength
     if (formData.password.length < 8) {
+      clearAllErrors()
       setErrorPasword('Le mot de passe doit contenir au moins 8 caractères.')
-      setErrorConfirmPasword(null)
-      setErrorEmail(null)
-      return // Stop form submission here
+      return
     }
 
-    // Additional email format validation (optional)
+    // Additional email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(formData.email)) {
+      clearAllErrors()
       setErrorEmail("Format d'email invalide.")
-      setErrorPasword(null)
-      setErrorConfirmPasword(null)
-      return // Stop form submission here
+      return
     }
 
     // Clear all errors before submitting
-    setErrorNumber(null)
-    setFieldErrors({})
-    setErrorEmail(null)
-    setErrorPasword(null)
-    setErrorConfirmPasword(null)
+    clearAllErrors()
 
     // Only if all validations pass, proceed with submission
     try {
@@ -358,8 +375,8 @@ const RegisterPage = () => {
             input: { color: theme.palette.secondary.contrastText },
             mb: 1,
           }}
-          error={Boolean(fieldErrors.phoneNumber)}
-          helperText={fieldErrors.phoneNumber || ''}
+          error={!!errorPhoneNumber || Boolean(fieldErrors.phoneNumber)}
+          helperText={errorPhoneNumber || fieldErrors.phoneNumber || ''}
         />
         <TextField
           fullWidth
