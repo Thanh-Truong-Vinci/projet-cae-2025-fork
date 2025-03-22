@@ -184,11 +184,10 @@ const RegisterPage = () => {
   }
 
   return (
-    <Box className="register-form" sx={{ maxWidth: 1000, margin: 'auto' }}>
-      <Typography variant="h4" align="center" color="primary" gutterBottom>
-        S'inscrire
-      </Typography>
-
+    <Box
+      className="register-form"
+      sx={{ maxWidth: 1000, margin: 'auto', mt: 1, mb: 1 }}
+    >
       <form
         onSubmit={handleSubmit}
         style={{
@@ -197,6 +196,9 @@ const RegisterPage = () => {
           borderRadius: '8px',
         }}
       >
+        <Typography variant="h4" align="center" color="primary" gutterBottom>
+          S'inscrire
+        </Typography>
         {Object.keys(fieldErrors).length > 0 && (
           <Box sx={{ mb: 2, p: 2, bgcolor: 'error.light', borderRadius: 1 }}>
             <Typography color="black" variant="subtitle2" align="center">
@@ -204,40 +206,42 @@ const RegisterPage = () => {
             </Typography>
           </Box>
         )}
-        <TextField
-          fullWidth
-          id="name"
-          name="name"
-          label="Name"
-          variant="outlined"
-          value={formData.name}
-          onChange={handleChange}
-          color="primary"
-          data-testid="name-input"
-          sx={{
-            input: { color: theme.palette.secondary.contrastText },
-            mb: 1,
-          }}
-          error={Boolean(fieldErrors.name)}
-          helperText={fieldErrors.name || ''}
-        />
-        <TextField
-          fullWidth
-          id="firstname"
-          name="firstname"
-          label="First name"
-          variant="outlined"
-          value={formData.firstname}
-          onChange={handleChange}
-          color="primary"
-          data-testid="firstname-input"
-          sx={{
-            input: { color: theme.palette.secondary.contrastText },
-            mb: 1,
-          }}
-          error={Boolean(fieldErrors.firstname)}
-          helperText={fieldErrors.firstname || ''}
-        />
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <TextField
+            fullWidth
+            id="name"
+            name="name"
+            label="Name"
+            variant="outlined"
+            value={formData.name}
+            onChange={handleChange}
+            color="primary"
+            data-testid="name-input"
+            sx={{
+              input: { color: theme.palette.secondary.contrastText },
+              mb: 1,
+            }}
+            error={Boolean(fieldErrors.name)}
+            helperText={fieldErrors.name || ''}
+          />
+          <TextField
+            fullWidth
+            id="firstname"
+            name="firstname"
+            label="First name"
+            variant="outlined"
+            value={formData.firstname}
+            onChange={handleChange}
+            color="primary"
+            data-testid="firstname-input"
+            sx={{
+              input: { color: theme.palette.secondary.contrastText },
+              mb: 1,
+            }}
+            error={Boolean(fieldErrors.firstname)}
+            helperText={fieldErrors.firstname || ''}
+          />
+        </Box>
         <TextField
           select
           fullWidth
@@ -259,42 +263,43 @@ const RegisterPage = () => {
           <MenuItem value="Monsieur">Monsieur</MenuItem>
           <MenuItem value="Madame">Madame</MenuItem>
         </TextField>
-        <TextField
-          fullWidth
-          id="street"
-          name="street"
-          label="Street"
-          variant="outlined"
-          value={formData.street}
-          onChange={handleChange}
-          color="primary"
-          data-testid="street-input"
-          sx={{
-            input: { color: theme.palette.secondary.contrastText },
-            mb: 1,
-          }}
-          error={Boolean(fieldErrors.street)}
-          helperText={fieldErrors.street || ''}
-        />
-        <TextField
-          fullWidth
-          id="number"
-          name="number"
-          label="Number"
-          variant="outlined"
-          value={formData.number}
-          onChange={handleChange}
-          color="primary"
-          data-testid="number-input"
-          sx={{
-            input: { color: theme.palette.secondary.contrastText },
-            mb: 1,
-          }}
-          error={!!errorNumber || Boolean(fieldErrors.number)}
-          helperText={errorNumber || fieldErrors.number || ''}
-        />
-
-        <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <TextField
+            fullWidth
+            id="street"
+            name="street"
+            label="Street"
+            variant="outlined"
+            value={formData.street}
+            onChange={handleChange}
+            color="primary"
+            data-testid="street-input"
+            sx={{
+              input: { color: theme.palette.secondary.contrastText },
+              mb: 1,
+            }}
+            error={Boolean(fieldErrors.street)}
+            helperText={fieldErrors.street || ''}
+          />
+          <TextField
+            fullWidth
+            id="number"
+            name="number"
+            label="Number"
+            variant="outlined"
+            value={formData.number}
+            onChange={handleChange}
+            color="primary"
+            data-testid="number-input"
+            sx={{
+              input: { color: theme.palette.secondary.contrastText },
+              mb: 1,
+            }}
+            error={!!errorNumber || Boolean(fieldErrors.number)}
+            helperText={errorNumber || fieldErrors.number || ''}
+          />
+        </Box>
+        <Box sx={{ display: 'flex', gap: 1 }}>
           <TextField
             fullWidth
             id="box"
@@ -329,7 +334,7 @@ const RegisterPage = () => {
           />
         </Box>
 
-        <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
+        <Box sx={{ display: 'flex', gap: 1 }}>
           <TextField
             fullWidth
             id="city"
@@ -430,7 +435,7 @@ const RegisterPage = () => {
           onChange={handleChange}
           color="primary"
           data-testid="confirmPassword-input"
-          sx={{ input: { color: theme.palette.secondary.contrastText }, mb: 1 }}
+          sx={{ input: { color: theme.palette.secondary.contrastText }, mb: 2 }}
           error={!!errorConfirmPasword || Boolean(fieldErrors.confirmPassword)}
           helperText={errorConfirmPasword || fieldErrors.confirmPassword || ''}
         />
