@@ -138,9 +138,14 @@ const RegisterPage = () => {
     }
 
     // Check password strength
-    if (formData.password.length < 8) {
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9])[a-zA-Z0-9\S]{8,}$/
+
+    if (!passwordRegex.test(formData.password)) {
       clearAllErrors()
-      setErrorPasword('Le mot de passe doit contenir au moins 8 caractères.')
+      setErrorPasword(
+        'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.'
+      )
       return
     }
 
