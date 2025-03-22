@@ -1,5 +1,5 @@
 import { useState, SyntheticEvent, useContext } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import {
   Box,
   Button,
@@ -8,7 +8,6 @@ import {
   FormControlLabel,
   useTheme,
   Typography,
-  Alert,
 } from '@mui/material'
 import { UserContextType, LoginUser, AuthenticatedUser } from '../../types'
 import { UserContext } from '../../contexts/UserContext'
@@ -56,72 +55,105 @@ const LoginPage = () => {
 
   return (
     <Box
+      className="login-form"
       sx={{
-        margin: 2,
-        padding: 3,
-        backgroundColor: 'rgba(0, 255, 0, 0.1)',
-        borderRadius: 4,
-        boxShadow: 2,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '80vh', // Use most of the viewport height
+        maxWidth: 600,
+        margin: 'auto',
+        mt: 1,
+        mb: 1,
       }}
     >
-      <Typography variant="h4" align="center" color="primary" gutterBottom>
-        Se connecter
-      </Typography>
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={handleSubmit}
+        style={{
+          backgroundColor: 'rgba(0, 255, 0, 0.1)',
+          padding: '16px',
+          borderRadius: '8px',
+          width: '100%', // Make the form take the full box width
+        }}
+      >
+        <Typography variant="h4" align="center" color="primary" gutterBottom>
+          Se connecter
+        </Typography>
+
         {errorMessage && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {errorMessage}
-          </Alert>
+          <Box sx={{ mb: 2, p: 2, bgcolor: 'error.light', borderRadius: 1 }}>
+            <Typography color="error" variant="subtitle2" align="center">
+              {errorMessage}
+            </Typography>
+          </Box>
         )}
-        <Box sx={{ marginBottom: 2 }}>
-          <TextField
-            fullWidth
-            id="email"
-            name="email"
-            label="Email ou Login"
-            variant="outlined"
-            value={email}
-            onChange={handleLoginChange}
-            required
-            color="primary"
-            sx={{
-              input: { color: theme.palette.secondary.contrastText },
-            }}
-            error={!!errorMessage}
-          />
-        </Box>
-        <Box sx={{ marginBottom: 2 }}>
-          <TextField
-            fullWidth
-            id="password"
-            name="password"
-            label="Password"
-            type="password"
-            variant="outlined"
-            value={password}
-            onChange={handlePasswordChange}
-            required
-            color="primary"
-            sx={{
-              input: { color: theme.palette.secondary.contrastText },
-            }}
-            error={!!errorMessage}
-          />
-        </Box>
-        <Box sx={{ marginBottom: 2 }}>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={rememberMe}
-                onChange={handleRememberMeChange}
-                color="primary"
-              />
-            }
-            label="Se souvenir de moi"
-          />
-        </Box>
-        <Button type="submit" variant="contained" color="primary" fullWidth>
+
+        <TextField
+          fullWidth
+          id="email"
+          name="email"
+          label="Email ou Login"
+          variant="outlined"
+          value={email}
+          onChange={handleLoginChange}
+          required
+          color="primary"
+          sx={{
+            input: { color: theme.palette.secondary.contrastText },
+            mb: 2,
+          }}
+          error={!!errorMessage}
+        />
+
+        <TextField
+          fullWidth
+          id="password"
+          name="password"
+          label="Password"
+          type="password"
+          variant="outlined"
+          value={password}
+          onChange={handlePasswordChange}
+          required
+          color="primary"
+          sx={{
+            input: { color: theme.palette.secondary.contrastText },
+            mb: 2,
+          }}
+          error={!!errorMessage}
+        />
+
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={rememberMe}
+              onChange={handleRememberMeChange}
+              color="primary"
+            />
+          }
+          label="Se souvenir de moi"
+          sx={{ mb: 2 }}
+        />
+
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          fullWidth
+          sx={{ mb: 2 }}
+        >
           S'authentifier
+        </Button>
+
+        <Button
+          component={Link}
+          to="/register"
+          variant="contained"
+          color="primary"
+          fullWidth
+        >
+          Pas de compte ? Inscrivez-vous
         </Button>
       </form>
     </Box>
