@@ -61,11 +61,11 @@ const LoginPage = () => {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        minHeight: '80vh', // Use most of the viewport height
+        minHeight: '65vh',
         maxWidth: 600,
         margin: 'auto',
-        mt: 1,
-        mb: 1,
+        mt: 3,
+        mb: 3,
       }}
     >
       <form
@@ -74,7 +74,7 @@ const LoginPage = () => {
           backgroundColor: 'rgba(0, 255, 0, 0.1)',
           padding: '16px',
           borderRadius: '8px',
-          width: '100%', // Make the form take the full box width
+          width: '100%',
         }}
       >
         <Typography variant="h4" align="center" color="primary" gutterBottom>
