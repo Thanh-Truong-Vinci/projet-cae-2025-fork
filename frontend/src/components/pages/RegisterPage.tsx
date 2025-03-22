@@ -33,6 +33,7 @@ const RegisterPage = () => {
     confirmPassword: '',
   })
 
+  const [errorNumber, setErrorNumber] = useState<string | null>(null)
   const [errorEmail, setErrorEmail] = useState<string | null>(null)
   const [errorPasword, setErrorPasword] = useState<string | null>(null)
   const [errorConfirmPasword, setErrorConfirmPasword] = useState<string | null>(
@@ -99,6 +100,12 @@ const RegisterPage = () => {
       return // Stop form submission here
     }
 
+    // Add specific validation for number field - digits only
+    if (formData.number && !/^\d+$/.test(formData.number)) {
+      setErrorNumber('Le numéro doit contenir uniquement des chiffres')
+      return
+    }
+
     // Step 2: Check password match
     if (formData.password !== formData.confirmPassword) {
       setErrorEmail(null)
@@ -125,6 +132,7 @@ const RegisterPage = () => {
     }
 
     // Clear all errors before submitting
+    setErrorNumber(null)
     setFieldErrors({})
     setErrorEmail(null)
     setErrorPasword(null)
@@ -260,8 +268,8 @@ const RegisterPage = () => {
             input: { color: theme.palette.secondary.contrastText },
             mb: 1,
           }}
-          error={Boolean(fieldErrors.number)}
-          helperText={fieldErrors.number || ''}
+          error={!!errorNumber || Boolean(fieldErrors.number)}
+          helperText={errorNumber || fieldErrors.number || ''}
         />
 
         <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
@@ -358,7 +366,6 @@ const RegisterPage = () => {
           id="email"
           name="email"
           label="Email"
-          type="email"
           variant="outlined"
           value={formData.email}
           onChange={handleChange}
