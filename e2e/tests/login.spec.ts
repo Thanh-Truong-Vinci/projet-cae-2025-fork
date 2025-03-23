@@ -8,20 +8,20 @@ import {
 } from "./helper";
 
 const testUser = {
-    name: faker.person.lastName(),
-    firstname: faker.person.firstName(),
-    civility: "Monsieur",
-    street: faker.location.streetAddress(),
-    number: faker.location.buildingNumber(),
-    box: faker.location.secondaryAddress(),
-    postalCode: faker.location.zipCode(),
-    city: faker.location.city(),
-    country: faker.location.country(),
-    phoneNumber: faker.phone.number(),
-    email: faker.internet.email(),
-    password: "test1234",
-    confirmPassword: "test1234"
-  };
+  name: faker.person.lastName(),
+  firstname: faker.person.firstName(),
+  civility: "Monsieur",
+  street: faker.location.streetAddress(),
+  number: faker.location.buildingNumber(),
+  box: faker.location.secondaryAddress(),
+  postalCode: faker.location.zipCode(),
+  city: faker.location.city(),
+  country: faker.location.country(),
+  phoneNumber: "+32496385684",
+  email: faker.internet.email(),
+  password: "Test1234!",
+  confirmPassword: "Test1234!"
+};
 
 // Tests de connexion
 test.describe("Login", () => {

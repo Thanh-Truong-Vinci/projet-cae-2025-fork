@@ -15,10 +15,10 @@ const testUser = {
     postalCode: faker.location.zipCode(),
     city: faker.location.city(),
     country: faker.location.country(),
-    phoneNumber: faker.phone.number(),
+    phoneNumber: "+32496385684",
     email: faker.internet.email(),
-    password: "test1234",
-    confirmPassword: "test1234"
+    password: "Test1234!",
+    confirmPassword: "Test1234!"
   };
 
 // Tests d'inscription
@@ -196,5 +196,95 @@ test.describe("Register", () => {
     await expect(page).toHaveURL("http://localhost:5173/login");
     
     await expect(page.getByText("Se connecter")).toBeVisible();
+  });
+
+  test("TC1.7: should show error when number field contains non-digits characters", async ({ page }) => {
+    const userWithInvalidNumber = {
+      ...testUser,
+      number: "123AB"
+    };
+    
+    await registerWith(page, userWithInvalidNumber);
+    
+    await expect(page).toHaveURL("http://localhost:5173/register");
+    
+    await expect(page.getByText("Le numéro doit contenir uniquement des chiffres")).toBeVisible();
+  });
+
+  test("TC1.8: should show error when phone number has invalid format", async ({ page }) => {
+    const userWithInvalidPhone = {
+      ...testUser,
+      phoneNumber: "invalid-phone" + faker.phone.number(),
+    };
+    
+    await registerWith(page, userWithInvalidPhone);
+    
+    await expect(page).toHaveURL("http://localhost:5173/register");
+    
+    await expect(page.getByText("Le numéro de téléphone doit commencer par + ou 0 et avoir 6-14 chiffres en plus")).toBeVisible();
+  });
+
+  test("TC1.9: should show error when email format is invalid", async ({ page }) => {
+    const userWithInvalidEmail = {
+      ...testUser,
+      email: "invalid-email"
+    };
+    
+    await registerWith(page, userWithInvalidEmail);
+    
+    await expect(page).toHaveURL("http://localhost:5173/register");
+    
+    await expect(page.getByText("Format d'email invalide.")).toBeVisible();
+  });
+
+  test("TC1.10: should show error when password doesn't meet complexity requirements", async ({ page }) => {
+    const userWithWeakPassword = {
+      ...testUser,
+      password: "weakpassword", 
+      confirmPassword: "weakpassword"
+    };
+    
+    await registerWith(page, userWithWeakPassword);
+    
+    await expect(page).toHaveURL("http://localhost:5173/register");
+    
+    await expect(page.getByText("Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.")).toBeVisible();
+  });
+
+  test("TC1.11: should validate a strong password successfully", async ({ page }) => {
+    const userWithStrongPassword = {
+      ...testUser,
+      email: "1" + faker.internet.email(), // On génère un nouveau email pour être sure qu'il n'est pas utilisé
+      password: "StrongP@ssw0rd!", 
+      confirmPassword: "StrongP@ssw0rd!"
+    };
+    
+    await registerWith(page, userWithStrongPassword);
+    
+    await expect(page).toHaveURL("http://localhost:5173/login");
+  });
+
+  test("TC1.12: should validate a correct phone number format successfully", async ({ page }) => {
+    const userWithValidPhone = {
+      ...testUser,
+      email: "2" + faker.internet.email(), // On génère un nouveau email pour être sure qu'il n'est pas utilisé
+      phoneNumber: "+32496123456" 
+    };
+    
+    await registerWith(page, userWithValidPhone);
+    
+    await expect(page).toHaveURL("http://localhost:5173/login");
+  });
+
+  test("TC1.13: should validate a phone number starting with 0 successfully", async ({ page }) => {
+    const userWithZeroPhone = {
+      ...testUser,
+      email: "3" + faker.internet.email(), // On génère un nouveau email pour être sure qu'il n'est pas utilisé
+      phoneNumber: "0496123456" 
+    };
+    
+    await registerWith(page, userWithZeroPhone);
+    
+    await expect(page).toHaveURL("http://localhost:5173/login");
   });
 });
