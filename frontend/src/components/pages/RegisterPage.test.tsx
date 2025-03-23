@@ -67,43 +67,79 @@ describe('RegisterPage', () => {
       </MemoryRouter>
     )
 
-    // Get input fields
-    const nameInput = screen.getByLabelText(/Name/)
-    const firstnameInput = screen.getByLabelText(/First name/)
-    const streetInput = screen.getByLabelText(/Street/)
-    const numberInput = screen.getByLabelText(/Number/)
-    const boxInput = screen.getByLabelText(/Box/)
-    const postalCodeInput = screen.getByLabelText(/Postal code/)
-    const cityInput = screen.getByLabelText(/City/)
-    const countryInput = screen.getByLabelText(/Country/)
-    const phoneNumberInput = screen.getByLabelText(/Phone number/)
-    const emailInput = screen.getByLabelText(/Email/)
-    const passwordInput = screen.getByLabelText(/Password/)
-    const confirmPasswordInput = screen.getByLabelText(/Confirm password/)
+    // Récupérer les inputs à l'intérieur des TextField avec querySelector
+    const nameInput = screen.getByTestId('name-input').querySelector('input')
+    const firstnameInput = screen
+      .getByTestId('firstname-input')
+      .querySelector('input')
+    const streetInput = screen
+      .getByTestId('street-input')
+      .querySelector('input')
+    const numberInput = screen
+      .getByTestId('number-input')
+      .querySelector('input')
+    const boxInput = screen.getByTestId('box-input').querySelector('input')
+    const postalCodeInput = screen
+      .getByTestId('postalCode-input')
+      .querySelector('input')
+    const cityInput = screen.getByTestId('city-input').querySelector('input')
+    const countryInput = screen
+      .getByTestId('country-input')
+      .querySelector('input')
+    const phoneNumberInput = screen
+      .getByTestId('phoneNumber-input')
+      .querySelector('input')
+    const emailInput = screen.getByTestId('email-input').querySelector('input')
+    const passwordInput = screen
+      .getByTestId('password-input')
+      .querySelector('input')
+    const confirmPasswordInput = screen
+      .getByTestId('confirmPassword-input')
+      .querySelector('input')
 
-    // Fill in the form with different passwords
-    fireEvent.change(nameInput, { target: { value: 'John' } })
-    fireEvent.change(firstnameInput, { target: { value: 'Doe' } })
-    fireEvent.change(streetInput, { target: { value: 'Main St' } })
-    fireEvent.change(numberInput, { target: { value: '123' } })
-    fireEvent.change(boxInput, { target: { value: 'A' } })
-    fireEvent.change(postalCodeInput, { target: { value: '12345' } })
-    fireEvent.change(cityInput, { target: { value: 'City' } })
-    fireEvent.change(countryInput, { target: { value: 'Country' } })
-    fireEvent.change(phoneNumberInput, { target: { value: '1234567890' } })
-    fireEvent.change(emailInput, { target: { value: 'test@example.com' } })
-    fireEvent.change(passwordInput, { target: { value: 'password123' } })
-    fireEvent.change(confirmPasswordInput, {
-      target: { value: 'differentPassword' },
-    })
+    // Vérifier que tous les éléments d'entrée ont été trouvés
+    if (
+      nameInput &&
+      firstnameInput &&
+      streetInput &&
+      numberInput &&
+      boxInput &&
+      postalCodeInput &&
+      cityInput &&
+      countryInput &&
+      phoneNumberInput &&
+      emailInput &&
+      passwordInput &&
+      confirmPasswordInput
+    ) {
+      // Fill in the form with different passwords
+      fireEvent.change(nameInput, { target: { value: 'John' } })
+      fireEvent.change(firstnameInput, { target: { value: 'Doe' } })
+      fireEvent.change(streetInput, { target: { value: 'Main St' } })
+      fireEvent.change(numberInput, { target: { value: '123' } })
+      fireEvent.change(boxInput, { target: { value: 'A' } })
+      fireEvent.change(postalCodeInput, { target: { value: '12345' } })
+      fireEvent.change(cityInput, { target: { value: 'City' } })
+      fireEvent.change(countryInput, { target: { value: 'Country' } })
+      fireEvent.change(phoneNumberInput, { target: { value: '1234567890' } })
+      fireEvent.change(emailInput, { target: { value: 'test@example.com' } })
+      fireEvent.change(passwordInput, { target: { value: 'password123' } })
+      fireEvent.change(confirmPasswordInput, {
+        target: { value: 'differentPassword' },
+      })
 
-    const submitButton = screen.getByRole('button', { name: /s'inscrire/i })
-    fireEvent.click(submitButton)
+      const submitButton = screen.getByRole('button', { name: /s'inscrire/i })
+      fireEvent.click(submitButton)
 
-    // Verify that registerUser was not called
-    expect(registerUserMock).not.toHaveBeenCalled()
+      // Verify that registerUser was not called
+      expect(registerUserMock).not.toHaveBeenCalled()
 
-    // Verify that navigation did not occur
-    expect(navigateMock).not.toHaveBeenCalled()
+      // Verify that navigation did not occur
+      expect(navigateMock).not.toHaveBeenCalled()
+    } else {
+      throw new Error(
+        "Un ou plusieurs champs d'entrée n'ont pas été trouvés correctement"
+      )
+    }
   })
 })

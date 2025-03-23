@@ -99,6 +99,7 @@ const LoginPage = () => {
           onChange={handleLoginChange}
           required
           color="primary"
+          data-testid="email-input"
           sx={{
             input: { color: theme.palette.secondary.contrastText },
             mb: 2,
@@ -110,13 +111,14 @@ const LoginPage = () => {
           fullWidth
           id="password"
           name="password"
-          label="Password"
+          label="Mot de passe"
           type="password"
           variant="outlined"
           value={password}
           onChange={handlePasswordChange}
           required
           color="primary"
+          data-testid="password-input"
           sx={{
             input: { color: theme.palette.secondary.contrastText },
             mb: 2,
