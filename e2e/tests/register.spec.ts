@@ -89,7 +89,6 @@ test.describe("Register", () => {
       "number-input",
       "postalCode-input",
       "city-input", 
-      "country-input",
       "phoneNumber-input",
       "email-input",
       "password-input",
@@ -101,6 +100,14 @@ test.describe("Register", () => {
       const fieldContainer = page.locator(`[data-testid="${fieldId}"]`);
       await expect(fieldContainer).toContainText("Ce champ est requis");
     }
+    
+    // Vérifier que le champ pays n'affiche pas d'erreur
+    const countryField = page.locator('[data-testid="country-input"]');
+    await expect(countryField).not.toContainText("Ce champ est requis");
+    
+    // Vérifier que le champ pays contient bien "Belgique"
+    const countryInput = await page.locator('[data-testid="country-input"] input');
+    await expect(countryInput).toHaveValue("Belgique");
   });
 
   test("TC1.5: should show validation errors for empty fields even when some fields are filled", async ({ page }) => {
@@ -121,7 +128,6 @@ test.describe("Register", () => {
       "number-input",
       "postalCode-input",
       "city-input", 
-      "country-input",
       "phoneNumber-input",
       "email-input",
       "password-input",
@@ -136,13 +142,18 @@ test.describe("Register", () => {
     const filledFields = [
       "name-input",
       "firstname-input",
-      "civility-input"
+      "civility-input",
+      "country-input"
     ];
     
     for (const fieldId of filledFields) {
       const fieldContainer = page.locator(`[data-testid="${fieldId}"]`);
       await expect(fieldContainer).not.toContainText("Ce champ est requis");
     }
+    
+    // Vérifier que le champ pays contient bien "Belgique"
+    const countryInput = await page.locator('[data-testid="country-input"] input');
+    await expect(countryInput).toHaveValue("Belgique");
   });
 
   test("TC1.6: should show error for a single missing field and succeed when filled", async ({ page }) => {
@@ -152,7 +163,6 @@ test.describe("Register", () => {
       email: "",
     };
     
-    // Remplir le formulaire avec tous les champs sauf l'email
     await page.locator('[data-testid="name-input"] input').fill(userWithMissingEmail.name);
     await page.locator('[data-testid="firstname-input"] input').fill(userWithMissingEmail.firstname);
     await page.locator('[data-testid="civility-input"]').click();
@@ -162,7 +172,6 @@ test.describe("Register", () => {
     await page.locator('[data-testid="box-input"] input').fill(userWithMissingEmail.box);
     await page.locator('[data-testid="postalCode-input"] input').fill(userWithMissingEmail.postalCode);
     await page.locator('[data-testid="city-input"] input').fill(userWithMissingEmail.city);
-    await page.locator('[data-testid="country-input"] input').fill(userWithMissingEmail.country);
     await page.locator('[data-testid="phoneNumber-input"] input').fill(userWithMissingEmail.phoneNumber);
     await page.locator('[data-testid="password-input"] input').fill(userWithMissingEmail.password);
     await page.locator('[data-testid="confirmPassword-input"] input').fill(userWithMissingEmail.confirmPassword);
@@ -331,6 +340,41 @@ test.describe("Register", () => {
     await expect(page.getByText("Vous allez être redirigé vers la page de connexion dans quelques instants...")).toBeVisible();
     
     // Vérifier que le cercle s'est bien affiché
+    await expect(page.locator("circle")).toBeVisible();
+    
+    await expect(page).toHaveURL("http://localhost:5173/login", { timeout: 4000 });
+  });
+
+  test("TC1.15: should register successfully with default country value (Belgique)", async ({ page }) => {
+    const userWithDefaultCountry = {
+      ...testUser,
+      email: "default-country-" + faker.internet.email(),
+      country: "", // On le met vide pour que Belgique reste dans le champ
+    };
+    
+    await page.locator('[data-testid="name-input"] input').fill(userWithDefaultCountry.name);
+    await page.locator('[data-testid="firstname-input"] input').fill(userWithDefaultCountry.firstname);
+    await page.locator('[data-testid="civility-input"]').click();
+    await page.getByRole("option", { name: userWithDefaultCountry.civility }).click();
+    await page.locator('[data-testid="street-input"] input').fill(userWithDefaultCountry.street);
+    await page.locator('[data-testid="number-input"] input').fill(userWithDefaultCountry.number);
+    await page.locator('[data-testid="box-input"] input').fill(userWithDefaultCountry.box);
+    await page.locator('[data-testid="postalCode-input"] input').fill(userWithDefaultCountry.postalCode);
+    await page.locator('[data-testid="city-input"] input').fill(userWithDefaultCountry.city);
+    await page.locator('[data-testid="phoneNumber-input"] input').fill(userWithDefaultCountry.phoneNumber);
+    await page.locator('[data-testid="email-input"] input').fill(userWithDefaultCountry.email);
+    await page.locator('[data-testid="password-input"] input').fill(userWithDefaultCountry.password);
+    await page.locator('[data-testid="confirmPassword-input"] input').fill(userWithDefaultCountry.confirmPassword);
+
+    const countryInput = await page.locator('[data-testid="country-input"] input');
+    await expect(countryInput).toHaveValue("Belgique");
+    
+    await page.getByRole("button", { name: "S'inscrire" }).click();
+    
+    await expect(page.getByText("Inscription réussie !")).toBeVisible();
+    await expect(page.getByText("Votre compte a été créé avec succès.")).toBeVisible();
+    await expect(page.getByText("Vous allez être redirigé vers la page de connexion dans quelques instants...")).toBeVisible();
+    
     await expect(page.locator("circle")).toBeVisible();
     
     await expect(page).toHaveURL("http://localhost:5173/login", { timeout: 4000 });
