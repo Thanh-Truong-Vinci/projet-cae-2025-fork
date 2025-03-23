@@ -47,7 +47,15 @@ test.describe("Register", () => {
     // Première inscription avec testUser
     await registerWith(page, testUser);
     
-    await expect(page).toHaveURL("http://localhost:5173/login");
+    // Vérifier que le message de succès est affiché
+    await expect(page.getByText("Inscription réussie !")).toBeVisible();
+    await expect(page.getByText("Votre compte a été créé avec succès.")).toBeVisible();
+    await expect(page.getByText("Vous allez être redirigé vers la page de connexion dans quelques instants...")).toBeVisible();
+    
+    // Vérifier que le cercle s'est bien affiché
+    await expect(page.locator("circle")).toBeVisible();
+    
+    await expect(page).toHaveURL("http://localhost:5173/login", { timeout: 4000 });
     
     await goFromHomePageToRegisterPage(page);
     
