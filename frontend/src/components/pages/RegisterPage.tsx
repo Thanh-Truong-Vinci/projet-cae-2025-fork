@@ -405,41 +405,49 @@ const RegisterPage = () => {
           error={!!errorEmail || Boolean(fieldErrors.email)}
           helperText={errorEmail || fieldErrors.email || ''}
         />
-        <TextField
-          fullWidth
-          id="password"
-          name="password"
-          label="Password"
-          type="password"
-          variant="outlined"
-          value={formData.password}
-          onChange={handleChange}
-          color="primary"
-          data-testid="password-input"
-          sx={{
-            input: { color: theme.palette.secondary.contrastText },
-            mb: 1,
-          }}
-          error={!!errorPasword || Boolean(fieldErrors.password)}
-          helperText={errorPasword || fieldErrors.password || ''}
-        />
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <TextField
+            fullWidth
+            id="password"
+            name="password"
+            label="Password"
+            type="password"
+            variant="outlined"
+            value={formData.password}
+            onChange={handleChange}
+            color="primary"
+            data-testid="password-input"
+            sx={{
+              input: { color: theme.palette.secondary.contrastText },
+              mb: 1,
+            }}
+            error={!!errorPasword || Boolean(fieldErrors.password)}
+            helperText={errorPasword || fieldErrors.password || ''}
+          />
 
-        <TextField
-          fullWidth
-          id="confirmPassword"
-          name="confirmPassword"
-          label="Confirm password"
-          type="password"
-          variant="outlined"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          color="primary"
-          data-testid="confirmPassword-input"
-          sx={{ input: { color: theme.palette.secondary.contrastText }, mb: 2 }}
-          error={!!errorConfirmPasword || Boolean(fieldErrors.confirmPassword)}
-          helperText={errorConfirmPasword || fieldErrors.confirmPassword || ''}
-        />
-
+          <TextField
+            fullWidth
+            id="confirmPassword"
+            name="confirmPassword"
+            label="Confirm password"
+            type="password"
+            variant="outlined"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            color="primary"
+            data-testid="confirmPassword-input"
+            sx={{
+              input: { color: theme.palette.secondary.contrastText },
+              mb: 2,
+            }}
+            error={
+              !!errorConfirmPasword || Boolean(fieldErrors.confirmPassword)
+            }
+            helperText={
+              errorConfirmPasword || fieldErrors.confirmPassword || ''
+            }
+          />
+        </Box>
         <Button
           type="submit"
           variant="contained"
