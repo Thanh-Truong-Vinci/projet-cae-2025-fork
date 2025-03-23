@@ -186,7 +186,7 @@ const RegisterPage = () => {
   return (
     <Box
       className="register-form"
-      sx={{ maxWidth: 1000, margin: 'auto', mt: 1, mb: 1 }}
+      sx={{ maxWidth: 1000, margin: 'auto', marginTop: 4 }}
     >
       <form
         onSubmit={handleSubmit}
