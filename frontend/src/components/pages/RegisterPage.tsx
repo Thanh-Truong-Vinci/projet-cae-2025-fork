@@ -262,7 +262,7 @@ const RegisterPage = () => {
               fullWidth
               id="name"
               name="name"
-              label="Name"
+              label="Nom"
               variant="outlined"
               value={formData.name}
               onChange={handleChange}
@@ -279,7 +279,7 @@ const RegisterPage = () => {
               fullWidth
               id="firstname"
               name="firstname"
-              label="First name"
+              label="Prénom"
               variant="outlined"
               value={formData.firstname}
               onChange={handleChange}
@@ -298,7 +298,7 @@ const RegisterPage = () => {
             fullWidth
             id="civility"
             name="civility"
-            label="Civility"
+            label="Civilité"
             variant="outlined"
             value={formData.civility}
             onChange={handleChange}
@@ -319,7 +319,7 @@ const RegisterPage = () => {
               fullWidth
               id="street"
               name="street"
-              label="Street"
+              label="Rue"
               variant="outlined"
               value={formData.street}
               onChange={handleChange}
@@ -336,7 +336,7 @@ const RegisterPage = () => {
               fullWidth
               id="number"
               name="number"
-              label="Number"
+              label="Numéro"
               variant="outlined"
               value={formData.number}
               onChange={handleChange}
@@ -355,7 +355,7 @@ const RegisterPage = () => {
               fullWidth
               id="box"
               name="box"
-              label="Box"
+              label="Boîte"
               variant="outlined"
               value={formData.box}
               onChange={handleChange}
@@ -370,7 +370,7 @@ const RegisterPage = () => {
               fullWidth
               id="postalCode"
               name="postalCode"
-              label="Postal code"
+              label="Code postal"
               variant="outlined"
               value={formData.postalCode}
               onChange={handleChange}
@@ -390,7 +390,7 @@ const RegisterPage = () => {
               fullWidth
               id="city"
               name="city"
-              label="City"
+              label="Ville"
               variant="outlined"
               value={formData.city}
               onChange={handleChange}
@@ -407,7 +407,7 @@ const RegisterPage = () => {
               fullWidth
               id="country"
               name="country"
-              label="Country"
+              label="Pays"
               variant="outlined"
               value={formData.country}
               onChange={handleChange}
@@ -426,7 +426,7 @@ const RegisterPage = () => {
             fullWidth
             id="phoneNumber"
             name="phoneNumber"
-            label="Phone number"
+            label="Numéro de téléphone"
             variant="outlined"
             value={formData.phoneNumber}
             onChange={handleChange}
@@ -461,7 +461,7 @@ const RegisterPage = () => {
               fullWidth
               id="password"
               name="password"
-              label="Password"
+              label="Mot de passe"
               type="password"
               variant="outlined"
               value={formData.password}
@@ -480,7 +480,7 @@ const RegisterPage = () => {
               fullWidth
               id="confirmPassword"
               name="confirmPassword"
-              label="Confirm password"
+              label="Confirmer le mot de passe"
               type="password"
               variant="outlined"
               value={formData.confirmPassword}

@@ -19,6 +19,7 @@ describe('LoginPage', () => {
         <LoginPage />
       </MemoryRouter>
     )
+
     const emailInput = screen.getByTestId('email-input')
     const passwordInput = screen.getByTestId('password-input')
 
