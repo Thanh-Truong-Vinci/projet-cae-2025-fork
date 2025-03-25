@@ -15,7 +15,9 @@ import {
   AccordionSummary,
   AccordionDetails,
   Chip,
-  Divider
+  Divider,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { UserContext } from '../../contexts/UserContext';
@@ -41,11 +43,17 @@ const ReservationsPage = () => {
   const { authenticatedUser } = useContext(UserContext);
   const navigate = useNavigate();
   const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
     if (!authenticatedUser) {
-      navigate('/login');
+      setMessage("Vous devez vous connecter pour accéder à vos réservations");
+      setOpenSnackbar(true);
+      setTimeout(() => {
+        navigate('/login', { state: { returnTo: '/reservations' } });
+      }, 2000);
       return;
     }
     
@@ -90,6 +98,10 @@ const ReservationsPage = () => {
       month: 'long',
       day: 'numeric'
     }).format(new Date(dateStr));
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   return (
@@ -182,6 +194,16 @@ const ReservationsPage = () => {
           ))}
         </Box>
       )}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={4000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity="info" sx={{ width: '100%' }}>
+          {message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

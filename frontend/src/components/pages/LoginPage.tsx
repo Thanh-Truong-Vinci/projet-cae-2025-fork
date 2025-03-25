@@ -1,5 +1,5 @@
 import { useState, SyntheticEvent, useContext } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useLocation } from 'react-router-dom'
 import {
   Box,
   Button,
@@ -16,11 +16,21 @@ import './index.css'
 const LoginPage = () => {
   const { loginUser } = useContext<UserContextType>(UserContext)
   const navigate = useNavigate()
+  const location = useLocation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const theme = useTheme()
+
+  // Extract returnTo path from location state if it exists
+  const returnTo = location.state?.returnTo || '/'
+
+  // When login is successful
+  const handleLoginSuccess = () => {
+    // Redirect the user back to where they came from
+    navigate(returnTo)
+  }
 
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault()
@@ -31,7 +41,7 @@ const LoginPage = () => {
       if (rememberMe && authenticatedUser) {
         document.cookie = `token=${authenticatedUser.token}; path=/; max-age=31536000` // 1 year
       }
-      navigate('/')
+      handleLoginSuccess()
     } catch (err) {
       console.error('LoginPage::error: ', err)
       setErrorMessage('Email ou mot de passe incorrect.')

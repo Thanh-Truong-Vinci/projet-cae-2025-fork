@@ -18,7 +18,9 @@ import {
   DialogContentText,
   DialogTitle,
   FormControl,
-  FormHelperText
+  FormHelperText,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
@@ -34,6 +36,8 @@ const CartPage = () => {
   const [openCalendar, setOpenCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [isDateValid, setIsDateValid] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [message, setMessage] = useState('');
 
   // Calcul de la date minimale (demain)
   const getTomorrowFormatted = () => {
@@ -66,8 +70,13 @@ const CartPage = () => {
 
   const handleOpenCalendar = () => {
     if (!authenticatedUser) {
-      // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
-      navigate('/login');
+      // Display a clear message when user isn't logged in
+      setMessage("Vous devez vous connecter pour faire une réservation");
+      setOpenSnackbar(true);
+      // Redirect to login after a short delay
+      setTimeout(() => {
+        navigate('/login', { state: { returnTo: '/cart' } });
+      }, 2000);
       return;
     }
     setOpenCalendar(true);
@@ -97,7 +106,7 @@ const CartPage = () => {
       // Création d'une nouvelle réservation
       const selectedDateObj = new Date(selectedDate);
       const reservation = {
-        id: Date.now(), // ID temporaire basé sur le timestamp
+        id: Date.now(),
         date: selectedDateObj,
         items: [...cartItems],
         total: calculateTotal(),
@@ -113,10 +122,6 @@ const CartPage = () => {
       // Sauvegarde dans le localStorage
       localStorage.setItem('userReservations', JSON.stringify(updatedReservations));
       
-      // Fermeture du calendrier et vidage du panier
-      setOpenCalendar(false);
-      clearCart();
-      
       // Format de date pour l'affichage
       const formattedDate = new Intl.DateTimeFormat('fr-FR', {
         day: 'numeric',
@@ -124,9 +129,24 @@ const CartPage = () => {
         year: 'numeric'
       }).format(selectedDateObj);
       
-      // Redirection vers la page d'accueil avec un message
-      navigate('/', { state: { message: 'Réservation confirmée avec succès pour le ' + formattedDate } });
+      // Message de confirmation amélioré
+      const confirmationMessage = `Votre réservation pour le ${formattedDate} a été enregistrée avec succès! Vous pouvez la consulter dans "Mes réservations".`;
+      
+      // Fermeture du calendrier et vidage du panier
+      setOpenCalendar(false);
+      clearCart();
+      
+      // Redirection vers la page d'accueil avec le message de confirmation
+      navigate('/', { 
+        state: { 
+          message: confirmationMessage
+        } 
+      });
     }
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   return (
@@ -292,6 +312,16 @@ const CartPage = () => {
           </Dialog>
         </>
       )}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={4000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity="info" sx={{ width: '100%' }}>
+          {message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
