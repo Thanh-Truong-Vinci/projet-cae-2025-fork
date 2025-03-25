@@ -12,6 +12,7 @@ import {
 import { UserContextType } from '../../types'
 import { UserContext } from '../../contexts/UserContext'
 import './index.css'
+import './RegisterPage.css'
 
 const RegisterPage = () => {
   const { registerUser }: UserContextType = useContext(UserContext)
@@ -210,7 +211,7 @@ const RegisterPage = () => {
   return (
     <Box
       className="register-form"
-      sx={{ maxWidth: 1000, margin: 'auto', marginTop: 4 }}
+      sx={{ maxWidth: 1400, margin: 'auto', marginTop: 4 }}
     >
       {registrationSuccess ? (
         <Box
@@ -241,10 +242,12 @@ const RegisterPage = () => {
       ) : (
         <form
           onSubmit={handleSubmit}
+          className="register-page-form"
           style={{
             backgroundColor: 'rgba(0, 255, 0, 0.1)',
             padding: '16px',
             borderRadius: '8px',
+            width: '100%',  // Make the form take full width
           }}
         >
           <Typography variant="h4" align="center" color="primary" gutterBottom>

@@ -35,7 +35,7 @@ const App = () => {
       }}
     >
       <Header title="Terroir & Cie" />
-      <Box component="main" sx={{ flex: '1', display: 'flex' }}>
+      <Box component="main" sx={{ flex: '1', display: 'flex', width: '100%' }}>
         <Outlet />
       </Box>
       <Footer />

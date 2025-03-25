@@ -1,0 +1,21 @@
+/* Styles spécifiques pour le formulaire d'inscription */
+.register-page-form {
+  width: 100% !important;  /* Force la largeur à 100% */
+  max-width: none !important;  /* Supprime la largeur maximale */
+}
+
+/* Assure que ces styles ne s'appliquent qu'au formulaire d'inscription */
+.register-form {
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Conserve les boutons comme ils étaient */
+.register-page-form .MuiButton-root {
+  width: 100%;
+  max-width: none;
+}
+
+/* Garde les autres styles de formulaire intacts */
