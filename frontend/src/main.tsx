@@ -43,7 +43,7 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-      <CssBaseline /> {/* Global CSS reset from Material-UI */}
+      <CssBaseline />
       <UserContextProvider>
         <CartProvider>
           <RouterProvider router={router} />

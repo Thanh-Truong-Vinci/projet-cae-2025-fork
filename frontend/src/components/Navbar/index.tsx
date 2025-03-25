@@ -4,10 +4,12 @@ import { Button, Box, IconButton, Badge } from '@mui/material'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import { UserContext } from '../../contexts/UserContext'
 import { UserContextType } from '../../types'
+import { CartContext } from '../../contexts/CartContext'
 
 const NavBar = () => {
   const { authenticatedUser, clearUser } =
     useContext<UserContextType>(UserContext)
+  const { getCartCount } = useContext(CartContext)
   const navigate = useNavigate()
 
   const handleLogout = async () => {
@@ -22,7 +24,7 @@ const NavBar = () => {
         sx={{ mr: 1 }}
         aria-label="panier"
       >
-        <Badge badgeContent={0} color="error">
+        <Badge badgeContent={getCartCount()} color="error">
           <ShoppingCartIcon sx={{ color: 'green' }} />
         </Badge>
       </IconButton>

@@ -1,5 +1,19 @@
 import { useState, useEffect, useContext } from 'react';
-import { Typography, Box, TextField, Select, MenuItem, Button } from '@mui/material';
+import { 
+  Typography, 
+  Box, 
+  TextField, 
+  Select, 
+  MenuItem, 
+  Button, 
+  IconButton,
+  Card, 
+  CardMedia, 
+  CardContent, 
+  CardActions 
+} from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import { CartContext } from '../../contexts/CartContext';
 
@@ -8,6 +22,7 @@ const HomePage = () => {
   const [productName, setProductName] = useState('');
   const [currentProductIndex, setCurrentProductIndex] = useState(0);
   const [visibleProducts, setVisibleProducts] = useState(10);
+  const [quantities, setQuantities] = useState<{[key: number]: number}>({});
   const { addToCart } = useContext(CartContext);
   const productsPerRow = 5;
   const productsPerLoad = productsPerRow * 2;
@@ -24,6 +39,18 @@ const HomePage = () => {
     price: `${10 + i}€`,
     image: "https://via.placeholder.com/300"
   }));
+
+  // Initialize quantities state for all products
+  useEffect(() => {
+    const initialQuantities: {[key: number]: number} = {};
+    products.forEach(product => {
+      initialQuantities[product.id] = 1;
+    });
+    topProducts.forEach(product => {
+      initialQuantities[product.id] = 1;
+    });
+    setQuantities(initialQuantities);
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -43,13 +70,20 @@ const HomePage = () => {
     image: string;
   }
 
+  const handleQuantityChange = (productId: number, value: number) => {
+    setQuantities(prev => ({
+      ...prev,
+      [productId]: Math.max(1, (prev[productId] || 1) + value)
+    }));
+  };
+
   const handleAddToCart = (product: Product) => {
     addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
       image: product.image,
-      quantity: 1
+      quantity: quantities[product.id] || 1
     });
   };
 
@@ -78,6 +112,25 @@ const HomePage = () => {
           }}>
             <Typography variant="h6" sx={{ mb: 1 }}>{topProducts[currentProductIndex].name}</Typography>
             <Typography variant="body1" sx={{ mb: 2 }}>Prix: {topProducts[currentProductIndex].price}</Typography>
+            
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <IconButton 
+                onClick={() => handleQuantityChange(topProducts[currentProductIndex].id, -1)}
+                size="small"
+              >
+                <RemoveIcon />
+              </IconButton>
+              <Typography sx={{ mx: 1 }}>
+                {quantities[topProducts[currentProductIndex].id] || 1}
+              </Typography>
+              <IconButton 
+                onClick={() => handleQuantityChange(topProducts[currentProductIndex].id, 1)}
+                size="small"
+              >
+                <AddIcon />
+              </IconButton>
+            </Box>
+            
             <Button 
               variant="contained" 
               color="success" 
@@ -136,22 +189,52 @@ const HomePage = () => {
 
         {/* Liste des produits */}
         <Box sx={{ flex: 1, display: 'flex', flexWrap: 'wrap', gap: 2, p: 2, justifyContent: 'center' }}>
-          {products.slice(0, visibleProducts).map((product, index) => (
-            <Box key={index} sx={{ width: 250, height: 350, textAlign: 'center', p: 2, border: '1px solid #ddd', borderRadius: 2, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-              <img src={product.image} alt={product.name} style={{ width: '100%', height: '60%', objectFit: 'cover', borderRadius: 4 }} />
-              <Typography variant="h6">{product.name}</Typography>
-              <Typography variant="body1">Prix: {product.price}</Typography>
-              <Button
-                variant="contained"
-                color="success"
-                startIcon={<AddShoppingCartIcon />}
-                fullWidth
-                onClick={() => handleAddToCart(product)}
-                sx={{ mt: 1 }}
-              >
-                Ajouter au panier
-              </Button>
-            </Box>
+          {products.slice(0, visibleProducts).map((product) => (
+            <Card key={product.id} sx={{ width: 250, height: 'auto', mb: 2 }}>
+              <CardMedia
+                component="img"
+                height="140"
+                image={product.image}
+                alt={product.name}
+              />
+              <CardContent>
+                <Typography gutterBottom variant="h6" component="div">
+                  {product.name}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Prix: {product.price}
+                </Typography>
+              </CardContent>
+              <CardActions>
+                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <IconButton 
+                      onClick={() => handleQuantityChange(product.id, -1)}
+                      size="small"
+                    >
+                      <RemoveIcon />
+                    </IconButton>
+                    <Typography sx={{ mx: 1 }}>
+                      {quantities[product.id] || 1}
+                    </Typography>
+                    <IconButton 
+                      onClick={() => handleQuantityChange(product.id, 1)}
+                      size="small"
+                    >
+                      <AddIcon />
+                    </IconButton>
+                  </Box>
+                  <Button 
+                    size="small" 
+                    variant="contained" 
+                    color="success"
+                    onClick={() => handleAddToCart(product)}
+                  >
+                    <AddShoppingCartIcon />
+                  </Button>
+                </Box>
+              </CardActions>
+            </Card>
           ))}
         </Box>
       </Box>
