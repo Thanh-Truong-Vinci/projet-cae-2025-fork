@@ -1,6 +1,8 @@
 stages:
   - test
+  - build
   - e2e
+
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
 
@@ -24,7 +26,7 @@ api test:
 
 frontend test:
   stage: test
-  image: node:20
+  image: node:20-alpine
   cache:
     key:
       files:
@@ -33,47 +35,41 @@ frontend test:
       - frontend/node_modules
   script:
     - cd frontend
-    - npm install
+    - npm ci
     - npm run lint
     - npm run coverage
   artifacts:
     paths:
       - frontend/coverage/
 
+build:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:20-dind
+  script:
+    - docker-compose build
+
 e2e tests:
   stage: e2e
-  image: mcr.microsoft.com/playwright:v1.51.0-jammy
+  image: docker:latest
   services:
-    - docker:dind
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-  cache:
-    key:
-      files:
-        - api/pom.xml
-        - frontend/package-lock.json
-    paths:
-      - $CI_PROJECT_DIR/.m2/repository
-      - frontend/node_modules
-      - e2e/node_modules
+    - docker:20-dind
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
   before_script:
-    - apt update -y
-    - wget https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.deb
-    - apt install ./jdk-21_linux-x64_bin.deb
-    - apt install -y maven docker-compose-v2
-    - docker compose -f api/docker-compose.yaml up --build -d
-    - sleep 5
-    - cd api
-    - mvn clean spring-boot:run -Dspring-boot.run.profiles=test &
-    - sleep 30
-    - cd ../frontend
-    - npm install
-    - npm run dev &
-    - sleep 30
-    - cd ../e2e
-    - npm install
+    - docker-compose up -d
   script:
-    - npx playwright test
+    - EXIT_CODE=$(docker wait e2e-prod)
+    - docker-compose logs e2e
+    - docker cp e2e-prod:/app/playwright-report ./e2e/playwright-report
+    - docker cp e2e-prod:/app/test-results ./e2e/test-results
+    - if [ "$EXIT_CODE" -ne 0 ]; then echo "E2E tests failed"; exit 1; fi
+    - docker-compose down
+  after_script:
+    - docker-compose down
   artifacts:
     paths:
       - e2e/playwright-report/

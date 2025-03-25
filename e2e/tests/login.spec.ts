@@ -49,7 +49,7 @@ test.describe("Login", () => {
 
     await loginWith(page, formData);
 
-    await expect(page).toHaveURL("http://localhost:5173/");
+    await expect(page).toHaveURL("/");
 
     const welcomeMessage = await page.getByText(`Bonjour ${testUser.name} ${testUser.firstname}`);
     await expect(welcomeMessage).toBeVisible();
@@ -64,7 +64,7 @@ test.describe("Login", () => {
 
       await loginWith(page, formData);
 
-      await expect(page).toHaveURL("http://localhost:5173/");
+      await expect(page).toHaveURL("/");
 
       const welcomeMessage = await page.getByText(`Bonjour ${testUser.name} ${testUser.firstname}`);
       await expect(welcomeMessage).toBeVisible();
@@ -72,7 +72,7 @@ test.describe("Login", () => {
       await expect(page.getByText("Se déconnecter")).toBeVisible();
       await page.getByText("Se déconnecter").click();
 
-      await expect(page).toHaveURL("http://localhost:5173/")
+      await expect(page).toHaveURL("/")
       await expect(page.getByText("Inscription")).toBeVisible();
     });
 

@@ -31,7 +31,7 @@ test.describe("Register", () => {
 
     await registerWith(page, testUser);
 
-    await expect(page).toHaveURL("http://localhost:5173/login");
+    await expect(page).toHaveURL("/login");
     await expect(page.getByText("Se connecter")).toBeVisible();
   });
 
@@ -39,7 +39,7 @@ test.describe("Register", () => {
     // Première inscription avec testUser
     await registerWith(page, testUser);
     
-    await expect(page).toHaveURL("http://localhost:5173/login");
+    await expect(page).toHaveURL("/login");
     
     await goFromHomePageToRegisterPage(page);
     
@@ -58,7 +58,7 @@ test.describe("Register", () => {
     
     await registerWith(page, userWithMismatchedPasswords);
     
-    await expect(page).toHaveURL("http://localhost:5173/register");
+    await expect(page).toHaveURL("/register");
     
     await expect(page.getByText("Les mots de passe ne correspondent pas")).toBeVisible();
   });
@@ -68,7 +68,7 @@ test.describe("Register", () => {
     await page.getByRole("button", { name: "S'inscrire" }).click();
     
     
-    await expect(page).toHaveURL("http://localhost:5173/register");
+    await expect(page).toHaveURL("/register");
     
    
     await expect(page.getByText("Veuillez remplir tous les champs obligatoires.")).toBeVisible();
@@ -104,7 +104,7 @@ test.describe("Register", () => {
     
     await page.getByRole("button", { name: "S'inscrire" }).click();
     
-    await expect(page).toHaveURL("http://localhost:5173/register");
+    await expect(page).toHaveURL("/register");
     
     await expect(page.getByText("Veuillez remplir tous les champs obligatoires.")).toBeVisible();
     
@@ -161,7 +161,7 @@ test.describe("Register", () => {
     
     await page.getByRole("button", { name: "S'inscrire" }).click();
     
-    await expect(page).toHaveURL("http://localhost:5173/register");
+    await expect(page).toHaveURL("/register");
     
     await expect(page.getByText("Veuillez remplir tous les champs obligatoires.")).toBeVisible();
     
@@ -193,7 +193,7 @@ test.describe("Register", () => {
     
     await page.getByRole("button", { name: "S'inscrire" }).click();
     
-    await expect(page).toHaveURL("http://localhost:5173/login");
+    await expect(page).toHaveURL("/login");
     
     await expect(page.getByText("Se connecter")).toBeVisible();
   });
@@ -206,7 +206,7 @@ test.describe("Register", () => {
     
     await registerWith(page, userWithInvalidNumber);
     
-    await expect(page).toHaveURL("http://localhost:5173/register");
+    await expect(page).toHaveURL("/register");
     
     await expect(page.getByText("Le numéro doit contenir uniquement des chiffres")).toBeVisible();
   });
@@ -219,7 +219,7 @@ test.describe("Register", () => {
     
     await registerWith(page, userWithInvalidPhone);
     
-    await expect(page).toHaveURL("http://localhost:5173/register");
+    await expect(page).toHaveURL("/register");
     
     await expect(page.getByText("Le numéro de téléphone doit commencer par + ou 0 et avoir 6-14 chiffres en plus")).toBeVisible();
   });
@@ -232,7 +232,7 @@ test.describe("Register", () => {
     
     await registerWith(page, userWithInvalidEmail);
     
-    await expect(page).toHaveURL("http://localhost:5173/register");
+    await expect(page).toHaveURL("/register");
     
     await expect(page.getByText("Format d'email invalide.")).toBeVisible();
   });
@@ -246,7 +246,7 @@ test.describe("Register", () => {
     
     await registerWith(page, userWithWeakPassword);
     
-    await expect(page).toHaveURL("http://localhost:5173/register");
+    await expect(page).toHaveURL("/register");
     
     await expect(page.getByText("Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.")).toBeVisible();
   });
@@ -261,7 +261,7 @@ test.describe("Register", () => {
     
     await registerWith(page, userWithStrongPassword);
     
-    await expect(page).toHaveURL("http://localhost:5173/login");
+    await expect(page).toHaveURL("/login");
   });
 
   test("TC1.12: should validate a correct phone number format successfully", async ({ page }) => {
@@ -273,7 +273,7 @@ test.describe("Register", () => {
     
     await registerWith(page, userWithValidPhone);
     
-    await expect(page).toHaveURL("http://localhost:5173/login");
+    await expect(page).toHaveURL("/login");
   });
 
   test("TC1.13: should validate a phone number starting with 0 successfully", async ({ page }) => {
@@ -285,6 +285,6 @@ test.describe("Register", () => {
     
     await registerWith(page, userWithZeroPhone);
     
-    await expect(page).toHaveURL("http://localhost:5173/login");
+    await expect(page).toHaveURL("/login");
   });
 });
