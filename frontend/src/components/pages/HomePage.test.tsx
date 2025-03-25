@@ -1,33 +1,55 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { describe, test, expect } from 'vitest'; // Import explicite des fonctions de Vitest
+import { describe, test, expect } from 'vitest';
 import HomePage from './HomePage';
 import { MemoryRouter } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { CartContext } from '../../contexts/CartContext';
 
 // Helper pour rendre le composant avec les providers nécessaires
 const renderWithProviders = (component: React.ReactNode) => {
   const theme = createTheme();
+  
+  // Mock du contexte du panier avec getCartCount ajouté
+  const cartContextValue = {
+    cartItems: [],
+    addToCart: () => {},
+    removeFromCart: () => {},
+    clearCart: () => {},
+    updateQuantity: () => {},
+    getCartCount: () => 0, // Ajout de cette fonction manquante
+  };
+  
   return render(
     <ThemeProvider theme={theme}>
-      <MemoryRouter>
-        {component}
-      </MemoryRouter>
+      <CartContext.Provider value={cartContextValue}>
+        <MemoryRouter>
+          {component}
+        </MemoryRouter>
+      </CartContext.Provider>
     </ThemeProvider>
   );
 };
 
 describe('HomePage', () => {
-  test('renders the homepage with correct title and subtitle', () => {
+  test('renders the homepage with correct title', () => {
     renderWithProviders(<HomePage />);
     
-    // Vérification du titre qui est actuellement sur la page
-    expect(screen.getByText(/Produits les plus vendus/i)).toBeTruthy();
+    // Vérification du titre qui est unique sur la page
+    const titleElements = screen.getAllByText(/Produits les plus vendus/i);
+    expect(titleElements.length).toBeGreaterThan(0);
+  });
+  
+  test('renders product carousel section', () => {
+    renderWithProviders(<HomePage />);
     
-    // Si le sous-titre "Livraison à domicile" n'est pas présent non plus, 
-    // nous devons vérifier ce qui est réellement présent
-    // Par exemple, on peut vérifier qu'un produit est affiché
-    expect(screen.getByText(/Produit 1/i)).toBeTruthy();
+    // Vérifier la présence du texte "Prix:" qui est dans le carousel
+    const priceLabels = screen.getAllByText(/Prix:/i);
+    expect(priceLabels.length).toBeGreaterThan(0);
+    
+    // Vérifier la présence du bouton "Ajouter au panier"
+    const addToCartButton = screen.getAllByText(/Ajouter au panier/i);
+    expect(addToCartButton.length).toBeGreaterThan(0);
   });
 
   test('uses correct Material-UI components', () => {
@@ -38,18 +60,32 @@ describe('HomePage', () => {
     expect(buttons.length).toBeGreaterThan(0);
   });
 
-  // Alternative plus flexible
-  test('renders the homepage with product content', () => {
+  test('renders the filter sidebar', () => {
     renderWithProviders(<HomePage />);
     
-    // Cherche un titre qui contient "Produit" - plus flexible
-    const titleElement = screen.queryByText(/Produits/i);
-    expect(titleElement).toBeTruthy();
+    // Vérifier la présence du titre "Filtrer" - utiliser getAllByText au lieu de getByText
+    const filterElements = screen.getAllByText(/Filtrer/i);
+    expect(filterElements.length).toBeGreaterThan(0);
+    
+    // Vérifier la présence du bouton "CONFIRMER"
+    const confirmButton = screen.getAllByText(/CONFIRMER/i);
+    expect(confirmButton.length).toBeGreaterThan(0);
+  });
+
+  test('renders product cards', () => {
+    renderWithProviders(<HomePage />);
     
     // Vérifie qu'au moins un élément avec le texte "Produit" est présent
-    const productElements = screen.queryAllByText(/Produit/i);
+    // en utilisant getAllByText qui accepte plusieurs correspondances
+    const productElements = screen.getAllByText(/Produit \d+/i);
     expect(productElements.length).toBeGreaterThan(0);
   });
 
-  // Ajoutez d'autres tests selon vos besoins
+  test('renders the "Voir plus" button when there are more products', () => {
+    renderWithProviders(<HomePage />);
+    
+    // Vérifier la présence du bouton "Voir plus"
+    const voirPlusButton = screen.getAllByText(/Voir plus/i);
+    expect(voirPlusButton.length).toBeGreaterThan(0);
+  });
 });
