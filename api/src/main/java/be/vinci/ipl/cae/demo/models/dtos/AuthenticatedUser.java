@@ -8,9 +8,18 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class AuthenticatedClient {
+public class AuthenticatedUser { 
   private String email;
-  private  String name;
+  private String name;
   private String firstname;
   private String token;
+  private String role;
+
+  public String getRole() {
+    return role;
+  }
+
+  public void setRole(String role) {
+    this.role = role;
+  }
 }

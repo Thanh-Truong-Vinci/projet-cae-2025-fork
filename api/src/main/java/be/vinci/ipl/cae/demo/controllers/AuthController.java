@@ -1,6 +1,6 @@
 package be.vinci.ipl.cae.demo.controllers;
 
-import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedClient;
+import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedUser;
 import be.vinci.ipl.cae.demo.models.dtos.Credentials;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsRegister;
 import be.vinci.ipl.cae.demo.services.AuthsService;
@@ -119,22 +119,22 @@ public class AuthController {
    * Login a client.
    *
    * @param credentials the client credentials from the request body.
-   * @return the authenticated client.
+   * @return the authenticated user.
    * @throws ResponseStatusException if the credentials are invalid or the login
    *                                 fails.
    */
   @PostMapping("/login")
-  public AuthenticatedClient login(@RequestBody Credentials credentials) {
+  public AuthenticatedUser login(@RequestBody Credentials credentials) {
     validateCredentialsLogin(credentials);
 
-    AuthenticatedClient client = clientService.login(credentials.getEmail(),
+    AuthenticatedUser user = authsService.login(credentials.getEmail(),
         credentials.getPassword());
 
-    if (client == null) {
+    if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
     }
 
-    return client;
+    return user;
   }
 
   /**
@@ -159,7 +159,7 @@ public class AuthController {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
     }
 
-    return authsService.createJwtToken(email); // Directly return without temporary variable
+    return authsService.createJwtToken(email);
 
   }
 }

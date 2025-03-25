@@ -36,6 +36,4 @@ public abstract class User {
 
   @Column(name = "date_inscription", nullable = false)
   private LocalDate dateInscription;
-
-  // Removed address-related fields
 }

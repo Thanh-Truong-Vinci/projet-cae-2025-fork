@@ -9,4 +9,12 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
+
+   /**
+   * Find a user by its email.
+   *
+   * @param email the email
+   * @return the user
+   */
+  User findByEmail(String email);
 }

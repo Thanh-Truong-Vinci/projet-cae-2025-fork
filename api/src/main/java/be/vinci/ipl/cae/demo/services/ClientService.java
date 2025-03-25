@@ -1,10 +1,9 @@
 package be.vinci.ipl.cae.demo.services;
 
-import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedClient;
 import be.vinci.ipl.cae.demo.models.entities.Client;
 import be.vinci.ipl.cae.demo.repositories.ClientRepository;
+
 import java.time.LocalDate;
-import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -15,43 +14,15 @@ import org.springframework.web.server.ResponseStatusException;
 public class ClientService {
 
   private final ClientRepository clientRepository;
-  private final AuthsService authsService;
 
   /**
    * Constructor.
    *
-   * @param clientRepository the client repository
+   * @param userRepository the client repository
    * @param authsService     the auths service
    */
-  public ClientService(ClientRepository clientRepository, AuthsService authsService) {
+  public ClientService(ClientRepository clientRepository) {
     this.clientRepository = clientRepository;
-    this.authsService = authsService;
-  }
-
-  /**
-   * Login a client.
-   *
-   * @param email    the email
-   * @param password the password
-   * @return the authenticated client if the login is successful, null otherwise
-   */
-  public AuthenticatedClient login(String email, String password) {
-
-    Client client = clientRepository.findByEmail(email);
-    if (client == null) {
-      return null;
-    }
-
-    if (!Objects.equals(password, client.getPassword())) {
-      return null;
-    }
-
-    AuthenticatedClient authenticatedClient = new AuthenticatedClient();
-    authenticatedClient.setEmail(email);
-    authenticatedClient.setName(client.getName());
-    authenticatedClient.setFirstname(client.getFirstname());
-    authenticatedClient.setToken(authsService.createJwtToken(email));
-    return authenticatedClient;
   }
 
   /**

@@ -9,4 +9,12 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ProducerRepository extends CrudRepository<Producer, Long> {
+
+  /**
+   * Find a producer by its email.
+   *
+   * @param email the email
+   * @return the producer
+   */
+  Producer findByEmail(String email);
 }

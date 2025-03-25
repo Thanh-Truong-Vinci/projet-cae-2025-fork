@@ -9,4 +9,12 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ManagerRepository extends CrudRepository<Manager, Long> {
+
+  /**
+   * Find a manager by its email.
+   *
+   * @param email the email
+   * @return the manager
+   */
+  Manager findByEmail(String email);
 }
