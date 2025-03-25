@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext, useMemo } from 'react'
 import {
   Typography,
   Box,
@@ -34,33 +34,41 @@ const HomePage = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false)
   const [message, setMessage] = useState('')
 
-  const topProducts = [
-    {
-      id: 1,
-      name: 'Produit 1',
-      price: '10€',
-      image: 'https://via.placeholder.com/300x200',
-    },
-    {
-      id: 2,
-      name: 'Produit 2',
-      price: '20€',
-      image: 'https://via.placeholder.com/300x200',
-    },
-    {
-      id: 3,
-      name: 'Produit 3',
-      price: '30€',
-      image: 'https://via.placeholder.com/300x200',
-    },
-  ]
+  // Wrap topProducts in useMemo to maintain stable reference
+  const topProducts = useMemo(
+    () => [
+      {
+        id: 1,
+        name: 'Produit 1',
+        price: '10€',
+        image: 'https://via.placeholder.com/300x200',
+      },
+      {
+        id: 2,
+        name: 'Produit 2',
+        price: '20€',
+        image: 'https://via.placeholder.com/300x200',
+      },
+      {
+        id: 3,
+        name: 'Produit 3',
+        price: '30€',
+        image: 'https://via.placeholder.com/300x200',
+      },
+    ],
+    []
+  ) // Empty dependency array means this only runs once
 
-  const products = Array.from({ length: 30 }, (_, i) => ({
-    id: i + 1,
-    name: `Produit ${i + 1}`,
-    price: `${10 + i}€`,
-    image: 'https://via.placeholder.com/300',
-  }))
+  const products = useMemo(
+    () =>
+      Array.from({ length: 30 }, (_, i) => ({
+        id: i + 1,
+        name: `Produit ${i + 1}`,
+        price: `${10 + i}€`,
+        image: 'https://via.placeholder.com/300',
+      })),
+    []
+  ) // Also wrapping products in useMemo for consistency
 
   // Initialize quantities state for all products
   useEffect(() => {
@@ -72,7 +80,7 @@ const HomePage = () => {
       initialQuantities[product.id] = 1
     })
     setQuantities(initialQuantities)
-  }, [])
+  }, [products, topProducts]) // Add the missing dependencies here
 
   useEffect(() => {
     const interval = setInterval(() => {
