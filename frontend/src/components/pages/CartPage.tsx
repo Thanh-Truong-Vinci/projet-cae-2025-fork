@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { 
   Box, 
   Typography, 
@@ -11,17 +11,36 @@ import {
   TableHead, 
   TableRow, 
   Paper,
-  TextField
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  FormControl,
+  FormHelperText
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { CartContext } from '../../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../../contexts/UserContext';
 
 const CartPage = () => {
   const { cartItems, removeFromCart, updateQuantity, clearCart } = useContext(CartContext);
+  const { authenticatedUser } = useContext(UserContext);
   const navigate = useNavigate();
+  const [openCalendar, setOpenCalendar] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [isDateValid, setIsDateValid] = useState(false);
+
+  // Calcul de la date minimale (demain)
+  const getTomorrowFormatted = () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0]; // Format YYYY-MM-DD
+  };
 
   const calculateTotal = () => {
     return cartItems.reduce(
@@ -42,6 +61,71 @@ const CartPage = () => {
     const quantity = parseInt(value);
     if (quantity > 0) {
       updateQuantity(id, quantity);
+    }
+  };
+
+  const handleOpenCalendar = () => {
+    if (!authenticatedUser) {
+      // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
+      navigate('/login');
+      return;
+    }
+    setOpenCalendar(true);
+    setSelectedDate(getTomorrowFormatted());
+    setIsDateValid(true);
+  };
+
+  const handleCloseCalendar = () => {
+    setOpenCalendar(false);
+  };
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const dateValue = e.target.value;
+    setSelectedDate(dateValue);
+    
+    // Vérification que la date est valide (au moins demain)
+    const selectedDateObj = new Date(dateValue);
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    
+    setIsDateValid(selectedDateObj >= tomorrow);
+  };
+
+  const handleConfirmReservation = () => {
+    if (selectedDate && cartItems.length > 0 && isDateValid) {
+      // Création d'une nouvelle réservation
+      const selectedDateObj = new Date(selectedDate);
+      const reservation = {
+        id: Date.now(), // ID temporaire basé sur le timestamp
+        date: selectedDateObj,
+        items: [...cartItems],
+        total: calculateTotal(),
+        status: 'En attente'
+      };
+      
+      // Récupération des réservations existantes
+      const existingReservations = JSON.parse(localStorage.getItem('userReservations') || '[]');
+      
+      // Ajout de la nouvelle réservation
+      const updatedReservations = [...existingReservations, reservation];
+      
+      // Sauvegarde dans le localStorage
+      localStorage.setItem('userReservations', JSON.stringify(updatedReservations));
+      
+      // Fermeture du calendrier et vidage du panier
+      setOpenCalendar(false);
+      clearCart();
+      
+      // Format de date pour l'affichage
+      const formattedDate = new Intl.DateTimeFormat('fr-FR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      }).format(selectedDateObj);
+      
+      // Redirection vers la page d'accueil avec un message
+      navigate('/', { state: { message: 'Réservation confirmée avec succès pour le ' + formattedDate } });
     }
   };
 
@@ -150,11 +234,62 @@ const CartPage = () => {
                 variant="contained" 
                 color="success" 
                 sx={{ mt: 2 }}
+                onClick={handleOpenCalendar}
               >
                 Réserver
               </Button>
             </Box>
           </Box>
+
+          {/* Dialogue pour la sélection de date */}
+          <Dialog open={openCalendar} onClose={handleCloseCalendar}>
+            <DialogTitle>Choisissez une date de retrait</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Sélectionnez une date pour venir chercher votre commande.
+                Nous préparons votre panier pour qu'il soit prêt le jour choisi.
+              </DialogContentText>
+              <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <FormControl fullWidth error={!isDateValid && selectedDate !== ''}>
+                  <TextField
+                    id="date"
+                    label="Date de retrait"
+                    type="date"
+                    value={selectedDate}
+                    onChange={handleDateChange}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    inputProps={{
+                      min: getTomorrowFormatted()
+                    }}
+                    fullWidth
+                    margin="normal"
+                  />
+                  {!isDateValid && selectedDate !== '' && (
+                    <FormHelperText>Veuillez choisir une date à partir de demain.</FormHelperText>
+                  )}
+                </FormControl>
+
+                {selectedDate && isDateValid && (
+                  <Typography align="center" sx={{ mt: 2 }}>
+                    Date sélectionnée: {new Date(selectedDate).toLocaleDateString('fr-FR')}
+                  </Typography>
+                )}
+              </Box>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseCalendar}>Annuler</Button>
+              <Button 
+                onClick={handleConfirmReservation} 
+                variant="contained" 
+                color="success"
+                disabled={!isDateValid || !selectedDate}
+              >
+                Confirmer la réservation
+              </Button>
+            </DialogActions>
+          </Dialog>
         </>
       )}
     </Box>

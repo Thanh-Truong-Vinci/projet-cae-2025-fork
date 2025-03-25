@@ -10,13 +10,15 @@ import {
   Card, 
   CardMedia, 
   CardContent, 
-  CardActions 
+  CardActions,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import { CartContext } from '../../contexts/CartContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const HomePage = () => {
   const [type, setType] = useState('');
@@ -28,6 +30,9 @@ const HomePage = () => {
   const productsPerRow = 5;
   const productsPerLoad = productsPerRow * 2;
   const navigate = useNavigate();
+  const location = useLocation();
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [message, setMessage] = useState('');
 
   const topProducts = [
     { id: 1, name: "Produit 1", price: "10€", image: "https://via.placeholder.com/300x200" },
@@ -61,6 +66,17 @@ const HomePage = () => {
     return () => clearInterval(interval);
   }, [topProducts.length]);
 
+  useEffect(() => {
+    // Vérifier s'il y a un message de confirmation de réservation
+    if (location.state && location.state.message) {
+      setMessage(location.state.message);
+      setOpenSnackbar(true);
+      
+      // Nettoyer l'état de la route pour éviter d'afficher le message à nouveau lors des rafraîchissements
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
+
   const handleFilter = () => {
     console.log("Filtrage avec:", type, productName);
   };
@@ -91,6 +107,10 @@ const HomePage = () => {
 
   const handleProductClick = (productId: number) => {
     navigate(`/products/${productId}`);
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   return (
@@ -275,6 +295,17 @@ const HomePage = () => {
           Il n'y a plus de produits à afficher.
         </Typography>
       )}
+
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+          {message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

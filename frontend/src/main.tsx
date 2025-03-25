@@ -9,6 +9,7 @@ import RegisterPage from './components/pages/RegisterPage.tsx'
 import LoginPage from './components/pages/LoginPage.tsx'
 import CartPage from './components/pages/CartPage.tsx'
 import ProductDetailPage from './components/pages/ProductDetailPage'
+import ReservationsPage from './components/pages/ReservationsPage';
 import { UserContextProvider } from './contexts/UserContext.tsx'
 import { CartProvider } from './contexts/CartContext.tsx'
 import '@fontsource/roboto/700.css'
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
       {
         path: 'products/:productId',
         element: <ProductDetailPage />,
+      },
+      {
+        path: 'reservations',
+        element: <ReservationsPage />,
       },
     ],
   },
