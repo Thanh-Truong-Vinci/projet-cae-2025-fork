@@ -247,7 +247,7 @@ const RegisterPage = () => {
             backgroundColor: 'rgba(0, 255, 0, 0.1)',
             padding: '16px',
             borderRadius: '8px',
-            width: '100%',  // Make the form take full width
+            width: '100%', // Make the form take full width
           }}
         >
           <Typography variant="h4" align="center" color="primary" gutterBottom>
