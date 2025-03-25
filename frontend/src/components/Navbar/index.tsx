@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useContext } from 'react'
-import { Button, Box } from '@mui/material'
+import { Button, Box, IconButton, Badge } from '@mui/material'
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import { UserContext } from '../../contexts/UserContext'
 import { UserContextType } from '../../types'
 
@@ -15,7 +16,17 @@ const NavBar = () => {
   }
 
   return (
-    <Box sx={{ display: 'flex', gap: 1 }} data-testid="navbar-component">
+    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }} data-testid="navbar-component">
+      <IconButton 
+        onClick={() => navigate('/cart')}
+        sx={{ mr: 1 }}
+        aria-label="panier"
+      >
+        <Badge badgeContent={0} color="error">
+          <ShoppingCartIcon sx={{ color: 'green' }} />
+        </Badge>
+      </IconButton>
+
       {authenticatedUser ? (
         <>
           <Button variant="outlined" color="inherit" onClick={handleLogout}>

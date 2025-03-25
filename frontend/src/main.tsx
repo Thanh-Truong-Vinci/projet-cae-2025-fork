@@ -7,7 +7,9 @@ import App from './components/App/index.tsx'
 import HomePage from './components/pages/HomePage.tsx'
 import RegisterPage from './components/pages/RegisterPage.tsx'
 import LoginPage from './components/pages/LoginPage.tsx'
+import CartPage from './components/pages/CartPage.tsx'
 import { UserContextProvider } from './contexts/UserContext.tsx'
+import { CartProvider } from './contexts/CartContext.tsx'
 import '@fontsource/roboto/700.css'
 import CssBaseline from '@mui/material/CssBaseline'
 import { ThemeProvider } from '@mui/material/styles'
@@ -30,6 +32,10 @@ const router = createBrowserRouter([
         path: 'login',
         element: <LoginPage />,
       },
+      {
+        path: 'cart',
+        element: <CartPage />,
+      },
     ],
   },
 ])
@@ -39,7 +45,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <ThemeProvider theme={theme}>
       <CssBaseline /> {/* Global CSS reset from Material-UI */}
       <UserContextProvider>
-        <RouterProvider router={router} />
+        <CartProvider>
+          <RouterProvider router={router} />
+        </CartProvider>
       </UserContextProvider>
     </ThemeProvider>
   </React.StrictMode>

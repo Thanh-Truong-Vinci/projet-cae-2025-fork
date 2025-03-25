@@ -1,8 +1,8 @@
+// Modifiez App/index.tsx
 import { Outlet } from 'react-router-dom'
 import Footer from '../Footer'
 import Header from '../Header'
 import Box from '@mui/material/Box'
-import { Container } from '@mui/material'
 import { useContext, useEffect } from 'react'
 import { UserContextType } from '../../types'
 import { UserContext } from '../../contexts/UserContext'
@@ -31,13 +31,13 @@ const App = () => {
         display: 'flex',
         flexDirection: 'column',
         minHeight: '100vh',
-        backgroundColor: '#f5f5f5', // Optional: added a light background color instead
+        backgroundColor: '#f5f5f5',
       }}
     >
       <Header title="Terroir & Cie" />
-      <Container component="main" sx={{ flex: '1' }}>
+      <Box component="main" sx={{ flex: '1', display: 'flex' }}>
         <Outlet />
-      </Container>
+      </Box>
       <Footer />
     </Box>
   )
