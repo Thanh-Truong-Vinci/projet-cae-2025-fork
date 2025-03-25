@@ -26,6 +26,7 @@ interface AuthenticatedUser {
   name: string
   firstname: string
   token: string
+  role: string
 }
 
 interface LoginUser {
