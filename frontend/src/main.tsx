@@ -8,6 +8,7 @@ import HomePage from './components/pages/HomePage.tsx'
 import RegisterPage from './components/pages/RegisterPage.tsx'
 import LoginPage from './components/pages/LoginPage.tsx'
 import CartPage from './components/pages/CartPage.tsx'
+import ProductDetailPage from './components/pages/ProductDetailPage'
 import { UserContextProvider } from './contexts/UserContext.tsx'
 import { CartProvider } from './contexts/CartContext.tsx'
 import '@fontsource/roboto/700.css'
@@ -21,7 +22,7 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        path: '',
+        index: true,
         element: <HomePage />,
       },
       {
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
       {
         path: 'cart',
         element: <CartPage />,
+      },
+      {
+        path: 'products/:productId',
+        element: <ProductDetailPage />,
       },
     ],
   },

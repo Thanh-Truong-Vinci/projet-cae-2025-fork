@@ -16,6 +16,7 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import { CartContext } from '../../contexts/CartContext';
+import { useNavigate } from 'react-router-dom';
 
 const HomePage = () => {
   const [type, setType] = useState('');
@@ -26,6 +27,7 @@ const HomePage = () => {
   const { addToCart } = useContext(CartContext);
   const productsPerRow = 5;
   const productsPerLoad = productsPerRow * 2;
+  const navigate = useNavigate();
 
   const topProducts = [
     { id: 1, name: "Produit 1", price: "10€", image: "https://via.placeholder.com/300x200" },
@@ -87,6 +89,10 @@ const HomePage = () => {
     });
   };
 
+  const handleProductClick = (productId: number) => {
+    navigate(`/products/${productId}`);
+  };
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
       {/* Carrousel des produits les plus vendus */}
@@ -108,8 +114,11 @@ const HomePage = () => {
             alignItems: 'flex-start',
             justifyContent: 'center',
             pr: 4,
-            textAlign: 'left'
-          }}>
+            textAlign: 'left',
+            cursor: 'pointer'   // Ajout du curseur pointer
+          }}
+          onClick={() => handleProductClick(topProducts[currentProductIndex].id)}
+          >
             <Typography variant="h6" sx={{ mb: 1 }}>{topProducts[currentProductIndex].name}</Typography>
             <Typography variant="body1" sx={{ mb: 2 }}>Prix: {topProducts[currentProductIndex].price}</Typography>
             
@@ -151,8 +160,10 @@ const HomePage = () => {
                 height: 200, 
                 objectFit: 'cover',
                 borderRadius: '8px',
-                boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+                boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                cursor: 'pointer'  // Ajout du curseur pointer
               }} 
+              onClick={() => handleProductClick(topProducts[currentProductIndex].id)}
             />
           </Box>
         </Box>
@@ -190,7 +201,11 @@ const HomePage = () => {
         {/* Liste des produits */}
         <Box sx={{ flex: 1, display: 'flex', flexWrap: 'wrap', gap: 2, p: 2, justifyContent: 'center' }}>
           {products.slice(0, visibleProducts).map((product) => (
-            <Card key={product.id} sx={{ width: 250, height: 'auto', mb: 2 }}>
+            <Card 
+              key={product.id} 
+              sx={{ width: 250, height: 'auto', mb: 2, cursor: 'pointer' }}  // Ajout du curseur pointer
+              onClick={() => handleProductClick(product.id)}
+            >
               <CardMedia
                 component="img"
                 height="140"
@@ -209,7 +224,10 @@ const HomePage = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <IconButton 
-                      onClick={() => handleQuantityChange(product.id, -1)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleQuantityChange(product.id, -1);
+                      }}
                       size="small"
                     >
                       <RemoveIcon />
@@ -218,7 +236,10 @@ const HomePage = () => {
                       {quantities[product.id] || 1}
                     </Typography>
                     <IconButton 
-                      onClick={() => handleQuantityChange(product.id, 1)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleQuantityChange(product.id, 1);
+                      }}
                       size="small"
                     >
                       <AddIcon />
@@ -228,7 +249,10 @@ const HomePage = () => {
                     size="small" 
                     variant="contained" 
                     color="success"
-                    onClick={() => handleAddToCart(product)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddToCart(product);
+                    }}
                   >
                     <AddShoppingCartIcon />
                   </Button>
