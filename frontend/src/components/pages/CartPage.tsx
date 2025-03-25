@@ -1,15 +1,15 @@
-import { useContext, useState } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Button, 
-  IconButton, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow, 
+import { useContext, useState } from 'react'
+import {
+  Box,
+  Typography,
+  Button,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Paper,
   TextField,
   Dialog,
@@ -20,145 +20,156 @@ import {
   FormControl,
   FormHelperText,
   Snackbar,
-  Alert
-} from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { CartContext } from '../../contexts/CartContext';
-import { useNavigate } from 'react-router-dom';
-import { UserContext } from '../../contexts/UserContext';
+  Alert,
+} from '@mui/material'
+import AddIcon from '@mui/icons-material/Add'
+import RemoveIcon from '@mui/icons-material/Remove'
+import DeleteIcon from '@mui/icons-material/Delete'
+import { CartContext } from '../../contexts/CartContext'
+import { useNavigate } from 'react-router-dom'
+import { UserContext } from '../../contexts/UserContext'
 
 const CartPage = () => {
-  const { cartItems, removeFromCart, updateQuantity, clearCart } = useContext(CartContext);
-  const { authenticatedUser } = useContext(UserContext);
-  const navigate = useNavigate();
-  const [openCalendar, setOpenCalendar] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<string>('');
-  const [isDateValid, setIsDateValid] = useState(false);
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [message, setMessage] = useState('');
+  const { cartItems, removeFromCart, updateQuantity, clearCart } =
+    useContext(CartContext)
+  const { authenticatedUser } = useContext(UserContext)
+  const navigate = useNavigate()
+  const [openCalendar, setOpenCalendar] = useState(false)
+  const [selectedDate, setSelectedDate] = useState<string>('')
+  const [isDateValid, setIsDateValid] = useState(false)
+  const [openSnackbar, setOpenSnackbar] = useState(false)
+  const [message, setMessage] = useState('')
 
   // Calcul de la date minimale (demain)
   const getTomorrowFormatted = () => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toISOString().split('T')[0]; // Format YYYY-MM-DD
-  };
+    const tomorrow = new Date()
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    return tomorrow.toISOString().split('T')[0] // Format YYYY-MM-DD
+  }
 
   const calculateTotal = () => {
     return cartItems.reduce(
-      (total, item) => total + Number(item.price.replace('€', '')) * item.quantity,
+      (total, item) =>
+        total + Number(item.price.replace('€', '')) * item.quantity,
       0
-    );
-  };
+    )
+  }
 
   const handleQuantityChange = (id: number, change: number) => {
-    const item = cartItems.find(item => item.id === id);
+    const item = cartItems.find((item) => item.id === id)
     if (item) {
-      const newQuantity = Math.max(1, item.quantity + change);
-      updateQuantity(id, newQuantity);
+      const newQuantity = Math.max(1, item.quantity + change)
+      updateQuantity(id, newQuantity)
     }
-  };
+  }
 
   const handleDirectQuantityChange = (id: number, value: string) => {
-    const quantity = parseInt(value);
+    const quantity = parseInt(value)
     if (quantity > 0) {
-      updateQuantity(id, quantity);
+      updateQuantity(id, quantity)
     }
-  };
+  }
 
   const handleOpenCalendar = () => {
     if (!authenticatedUser) {
       // Display a clear message when user isn't logged in
-      setMessage("Vous devez vous connecter pour faire une réservation");
-      setOpenSnackbar(true);
+      setMessage('Vous devez vous connecter pour faire une réservation')
+      setOpenSnackbar(true)
       // Redirect to login after a short delay
       setTimeout(() => {
-        navigate('/login', { state: { returnTo: '/cart' } });
-      }, 2000);
-      return;
+        navigate('/login', { state: { returnTo: '/cart' } })
+      }, 2000)
+      return
     }
-    setOpenCalendar(true);
-    setSelectedDate(getTomorrowFormatted());
-    setIsDateValid(true);
-  };
+    setOpenCalendar(true)
+    setSelectedDate(getTomorrowFormatted())
+    setIsDateValid(true)
+  }
 
   const handleCloseCalendar = () => {
-    setOpenCalendar(false);
-  };
+    setOpenCalendar(false)
+  }
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const dateValue = e.target.value;
-    setSelectedDate(dateValue);
-    
+    const dateValue = e.target.value
+    setSelectedDate(dateValue)
+
     // Vérification que la date est valide (au moins demain)
-    const selectedDateObj = new Date(dateValue);
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-    
-    setIsDateValid(selectedDateObj >= tomorrow);
-  };
+    const selectedDateObj = new Date(dateValue)
+    const tomorrow = new Date()
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    tomorrow.setHours(0, 0, 0, 0)
+
+    setIsDateValid(selectedDateObj >= tomorrow)
+  }
 
   const handleConfirmReservation = () => {
     if (selectedDate && cartItems.length > 0 && isDateValid) {
       // Création d'une nouvelle réservation
-      const selectedDateObj = new Date(selectedDate);
+      const selectedDateObj = new Date(selectedDate)
       const reservation = {
         id: Date.now(),
         date: selectedDateObj,
         items: [...cartItems],
         total: calculateTotal(),
-        status: 'En attente'
-      };
-      
+        status: 'En attente',
+      }
+
       // Récupération des réservations existantes
-      const existingReservations = JSON.parse(localStorage.getItem('userReservations') || '[]');
-      
+      const existingReservations = JSON.parse(
+        localStorage.getItem('userReservations') || '[]'
+      )
+
       // Ajout de la nouvelle réservation
-      const updatedReservations = [...existingReservations, reservation];
-      
+      const updatedReservations = [...existingReservations, reservation]
+
       // Sauvegarde dans le localStorage
-      localStorage.setItem('userReservations', JSON.stringify(updatedReservations));
-      
+      localStorage.setItem(
+        'userReservations',
+        JSON.stringify(updatedReservations)
+      )
+
       // Format de date pour l'affichage
       const formattedDate = new Intl.DateTimeFormat('fr-FR', {
         day: 'numeric',
         month: 'long',
-        year: 'numeric'
-      }).format(selectedDateObj);
-      
+        year: 'numeric',
+      }).format(selectedDateObj)
+
       // Message de confirmation amélioré
-      const confirmationMessage = `Votre réservation pour le ${formattedDate} a été enregistrée avec succès! Vous pouvez la consulter dans "Mes réservations".`;
-      
+      const confirmationMessage = `Votre réservation pour le ${formattedDate} a été enregistrée avec succès! Vous pouvez la consulter dans "Mes réservations".`
+
       // Fermeture du calendrier et vidage du panier
-      setOpenCalendar(false);
-      clearCart();
-      
+      setOpenCalendar(false)
+      clearCart()
+
       // Redirection vers la page d'accueil avec le message de confirmation
-      navigate('/', { 
-        state: { 
-          message: confirmationMessage
-        } 
-      });
+      navigate('/', {
+        state: {
+          message: confirmationMessage,
+        },
+      })
     }
-  };
+  }
 
   const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
-  };
+    setOpenSnackbar(false)
+  }
 
   return (
     <Box sx={{ width: '100%', p: 3 }}>
-      <Typography variant="h4" sx={{ mb: 3 }}>Mon Panier</Typography>
+      <Typography variant="h4" sx={{ mb: 3 }}>
+        Mon Panier
+      </Typography>
 
       {cartItems.length === 0 ? (
         <Box sx={{ textAlign: 'center', py: 5 }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>Votre panier est vide</Typography>
-          <Button 
-            variant="contained" 
-            color="success" 
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Votre panier est vide
+          </Typography>
+          <Button
+            variant="contained"
+            color="success"
             onClick={() => navigate('/')}
           >
             Continuer vos achats
@@ -182,18 +193,24 @@ const CartPage = () => {
                 {cartItems.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell>
-                      <img 
-                        src={item.image} 
-                        alt={item.name} 
-                        style={{ width: 60, height: 60, objectFit: 'cover' }} 
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        style={{ width: 60, height: 60, objectFit: 'cover' }}
                       />
                     </TableCell>
                     <TableCell>{item.name}</TableCell>
                     <TableCell align="right">{item.price}</TableCell>
                     <TableCell align="center">
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <IconButton 
-                          size="small" 
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <IconButton
+                          size="small"
                           onClick={() => handleQuantityChange(item.id, -1)}
                         >
                           <RemoveIcon />
@@ -201,13 +218,18 @@ const CartPage = () => {
                         <TextField
                           type="number"
                           value={item.quantity}
-                          onChange={(e) => handleDirectQuantityChange(item.id, e.target.value)}
-                          inputProps={{ min: 1, style: { textAlign: 'center' } }}
+                          onChange={(e) =>
+                            handleDirectQuantityChange(item.id, e.target.value)
+                          }
+                          inputProps={{
+                            min: 1,
+                            style: { textAlign: 'center' },
+                          }}
                           sx={{ width: 60, mx: 1 }}
                           size="small"
                         />
-                        <IconButton 
-                          size="small" 
+                        <IconButton
+                          size="small"
                           onClick={() => handleQuantityChange(item.id, 1)}
                         >
                           <AddIcon />
@@ -218,7 +240,10 @@ const CartPage = () => {
                       {`${(Number(item.price.replace('€', '')) * item.quantity).toFixed(2)}€`}
                     </TableCell>
                     <TableCell align="center">
-                      <IconButton color="error" onClick={() => removeFromCart(item.id)}>
+                      <IconButton
+                        color="error"
+                        onClick={() => removeFromCart(item.id)}
+                      >
                         <DeleteIcon />
                       </IconButton>
                     </TableCell>
@@ -228,19 +253,26 @@ const CartPage = () => {
             </Table>
           </TableContainer>
 
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3, alignItems: 'center' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              mt: 3,
+              alignItems: 'center',
+            }}
+          >
             <Box>
-              <Button 
-                variant="outlined" 
-                color="error" 
+              <Button
+                variant="outlined"
+                color="error"
                 onClick={clearCart}
                 sx={{ mr: 2 }}
               >
                 Vider le panier
               </Button>
-              <Button 
-                variant="outlined" 
-                color="primary" 
+              <Button
+                variant="outlined"
+                color="primary"
                 onClick={() => navigate('/')}
               >
                 Continuer vos achats
@@ -250,9 +282,9 @@ const CartPage = () => {
               <Typography variant="h6">
                 Total: {calculateTotal().toFixed(2)}€
               </Typography>
-              <Button 
-                variant="contained" 
-                color="success" 
+              <Button
+                variant="contained"
+                color="success"
                 sx={{ mt: 2 }}
                 onClick={handleOpenCalendar}
               >
@@ -266,11 +298,21 @@ const CartPage = () => {
             <DialogTitle>Choisissez une date de retrait</DialogTitle>
             <DialogContent>
               <DialogContentText>
-                Sélectionnez une date pour venir chercher votre commande.
-                Nous préparons votre panier pour qu'il soit prêt le jour choisi.
+                Sélectionnez une date pour venir chercher votre commande. Nous
+                préparons votre panier pour qu'il soit prêt le jour choisi.
               </DialogContentText>
-              <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <FormControl fullWidth error={!isDateValid && selectedDate !== ''}>
+              <Box
+                sx={{
+                  mt: 3,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                }}
+              >
+                <FormControl
+                  fullWidth
+                  error={!isDateValid && selectedDate !== ''}
+                >
                   <TextField
                     id="date"
                     label="Date de retrait"
@@ -281,28 +323,31 @@ const CartPage = () => {
                       shrink: true,
                     }}
                     inputProps={{
-                      min: getTomorrowFormatted()
+                      min: getTomorrowFormatted(),
                     }}
                     fullWidth
                     margin="normal"
                   />
                   {!isDateValid && selectedDate !== '' && (
-                    <FormHelperText>Veuillez choisir une date à partir de demain.</FormHelperText>
+                    <FormHelperText>
+                      Veuillez choisir une date à partir de demain.
+                    </FormHelperText>
                   )}
                 </FormControl>
 
                 {selectedDate && isDateValid && (
                   <Typography align="center" sx={{ mt: 2 }}>
-                    Date sélectionnée: {new Date(selectedDate).toLocaleDateString('fr-FR')}
+                    Date sélectionnée:{' '}
+                    {new Date(selectedDate).toLocaleDateString('fr-FR')}
                   </Typography>
                 )}
               </Box>
             </DialogContent>
             <DialogActions>
               <Button onClick={handleCloseCalendar}>Annuler</Button>
-              <Button 
-                onClick={handleConfirmReservation} 
-                variant="contained" 
+              <Button
+                onClick={handleConfirmReservation}
+                variant="contained"
                 color="success"
                 disabled={!isDateValid || !selectedDate}
               >
@@ -318,12 +363,16 @@ const CartPage = () => {
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-        <Alert onClose={handleCloseSnackbar} severity="info" sx={{ width: '100%' }}>
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="info"
+          sx={{ width: '100%' }}
+        >
           {message}
         </Alert>
       </Snackbar>
     </Box>
-  );
-};
+  )
+}
 
-export default CartPage;
+export default CartPage

@@ -19,8 +19,11 @@ const NavBar = () => {
   }
 
   return (
-    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }} data-testid="navbar-component">
-      <IconButton 
+    <Box
+      sx={{ display: 'flex', gap: 1, alignItems: 'center' }}
+      data-testid="navbar-component"
+    >
+      <IconButton
         onClick={() => navigate('/cart')}
         sx={{ mr: 1 }}
         aria-label="panier"
