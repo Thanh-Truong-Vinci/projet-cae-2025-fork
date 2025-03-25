@@ -2,7 +2,6 @@ package be.vinci.ipl.cae.demo.services;
 
 import be.vinci.ipl.cae.demo.models.entities.Client;
 import be.vinci.ipl.cae.demo.repositories.ClientRepository;
-
 import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,8 +17,7 @@ public class ClientService {
   /**
    * Constructor.
    *
-   * @param userRepository the client repository
-   * @param authsService     the auths service
+   * @param clientRepository the client repository
    */
   public ClientService(ClientRepository clientRepository) {
     this.clientRepository = clientRepository;

@@ -1,5 +1,11 @@
 package be.vinci.ipl.cae.demo.services;
 
+import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedUser;
+import be.vinci.ipl.cae.demo.models.entities.User;
+import be.vinci.ipl.cae.demo.repositories.ClientRepository;
+import be.vinci.ipl.cae.demo.repositories.ManagerRepository;
+import be.vinci.ipl.cae.demo.repositories.ProducerRepository;
+import be.vinci.ipl.cae.demo.repositories.UserRepository;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
@@ -9,12 +15,6 @@ import java.util.Objects;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedUser;
-import be.vinci.ipl.cae.demo.models.entities.User;
-import be.vinci.ipl.cae.demo.repositories.UserRepository;
-import be.vinci.ipl.cae.demo.repositories.ClientRepository;
-import be.vinci.ipl.cae.demo.repositories.ManagerRepository;
-import be.vinci.ipl.cae.demo.repositories.ProducerRepository;
 
 /**
  * Service for handling authentication-related operations.
@@ -30,6 +30,9 @@ public class AuthsService {
   private final ManagerRepository managerRepository;
   private final ProducerRepository producerRepository;
 
+  /**
+   * Service for handling authentication-related operations.
+   */
   public AuthsService(UserRepository userRepository, ClientRepository clientRepository,
                       ManagerRepository managerRepository, ProducerRepository producerRepository) {
     this.userRepository = userRepository;
@@ -38,6 +41,13 @@ public class AuthsService {
     this.producerRepository = producerRepository;
   }
 
+  /**
+   * Create a JWT token for the given email.
+   *
+   * @param email the email to include in the token
+   * @return the generated JWT token
+   * @throws ResponseStatusException if token generation fails
+   */
   @SuppressWarnings({"checkstyle:FileTabCharacter", "checkstyle:Indentation", "checkstyle:LineLength",
 	  "checkstyle:MissingJavadocMethod"})
   public String createJwtToken(String email) {
@@ -57,21 +67,27 @@ public class AuthsService {
 	}
   }
 
+  /**
+   * Verify a JWT token and extract the email claim.
+   *
+   * @param token the JWT token to verify
+   * @return the email if the token is valid, null otherwise
+   */
   @SuppressWarnings({"checkstyle:FileTabCharacter", "checkstyle:Indentation", "checkstyle:LineLength",
 	  "checkstyle:MissingJavadocMethod"})
   public String verifyJwtToken(String token) {
-	if (token == null || token.isBlank()) {
-	  return null;
-	}
-	try {
-	  return JWT.require(algorithm).withIssuer("auth0").build().verify(token).getClaim("email").asString();
-	} catch (JWTVerificationException e) {
-	  // Handle verification exceptions including token expiration
-	  return null;
-	}
+    if (token == null || token.isBlank()) {
+      return null;
+    }
+    try {
+      return JWT.require(algorithm).withIssuer("auth0").build().verify(token).getClaim("email").asString();
+    } catch (JWTVerificationException e) {
+      // Handle verification exceptions including token expiration
+      return null;
+    }
   }
 
-    /**
+  /**
    * Login a client.
    *
    * @param email    the email
