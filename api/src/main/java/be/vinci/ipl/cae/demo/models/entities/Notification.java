@@ -12,10 +12,10 @@ public class Notification {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id_proposition")
+  @Column(name = "id_notification")
   private Long id;
 
-  @Column(name = "est_lu", nullable = false)
+  @Column(name = "is_read", nullable = false)
   private Boolean isRead;
 
   @Column(nullable = true)
