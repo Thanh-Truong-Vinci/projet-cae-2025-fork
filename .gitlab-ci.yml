@@ -2,6 +2,8 @@ stages:
   - test
   - build
   - staging
+  - e2e
+
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
   VERSION: $CI_PIPELINE_IID
@@ -9,7 +11,8 @@ variables:
   REGISTRY_IMAGE_BASE_PATH: $REGISTRY/$CI_PROJECT_PATH
   AZURE_WEBAPP_NAME: cae-group-09-staging-app # Remplacer par le nom de votre Web App Azure
   AZURE_WEBAPP_RESOURCE_GROUP: caeGroupe09 # Remplacer par le nom de votre Resource Group Azure
-  
+  BASE_URL: https://cae-group-09-staging-app-fhg0g0e3bzgudubp.centralus-01.azurewebsites.net/
+  NODE_ENV: staging
 
 api test:
   stage: test
@@ -56,20 +59,50 @@ build:
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
     - docker-compose -f docker-compose.staging.yml build
     - for service in frontend-prod api-prod reverse-proxy-prod; do
-        docker tag $service $REGISTRY_IMAGE_BASE_PATH/$service:latest;
-        docker tag $service $REGISTRY_IMAGE_BASE_PATH/$service:$VERSION;
-        docker push $REGISTRY_IMAGE_BASE_PATH/$service:latest;
-        docker push $REGISTRY_IMAGE_BASE_PATH/$service:$VERSION;
+      docker tag $service $REGISTRY_IMAGE_BASE_PATH/$service:latest;
+      docker tag $service $REGISTRY_IMAGE_BASE_PATH/$service:$VERSION;
+      docker push $REGISTRY_IMAGE_BASE_PATH/$service:latest;
+      docker push $REGISTRY_IMAGE_BASE_PATH/$service:$VERSION;
       done
-  rules:       
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop")
 
 deploy:
   stage: staging
   image: mcr.microsoft.com/azure-cli
-  rules:       
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop")
   script:
     - az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
     - az webapp config container set --name $AZURE_WEBAPP_NAME --resource-group $AZURE_WEBAPP_RESOURCE_GROUP --multicontainer-config-type compose --multicontainer-config-file docker-compose.deploy.yml --container-registry-user $PULL_IMAGE_TOKEN_USERNAME --container-registry-password $PULL_IMAGE_TOKEN_PASSWORD
     - az webapp start --name $AZURE_WEBAPP_NAME --resource-group $AZURE_WEBAPP_RESOURCE_GROUP
+    - |
+      for i in {1..30}; do
+        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $BASE_URL/login);
+        if [ "$HTTP_STATUS" -eq 200 ]; then
+          echo "Azure Web App is functional."
+          break
+        fi
+        echo "Azure Web App is not ready yet. Waiting for 10 seconds..."
+        sleep 10
+      done
+      if [ "$HTTP_STATUS" -ne 200 ]; then
+        echo "Azure Web App failed to become functional."
+        exit 1
+      fi
+  
+
+e2e tests:
+  stage: e2e
+  image: mcr.microsoft.com/playwright:v1.50.1-jammy
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop")
+  script:
+    - cd ./e2e
+    - npm ci
+    - npx playwright test
+    - if [ $? -ne 0 ]; then echo "E2E tests failed"; exit 1; fi
+  artifacts:
+    paths:
+      - e2e/playwright-report/
+      - e2e/test-results/

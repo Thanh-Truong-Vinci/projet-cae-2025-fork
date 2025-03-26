@@ -21,7 +21,9 @@ export default defineConfig({
       process.env.NODE_ENV === undefined ||
       process.env.NODE_ENV === "development"
         ? "http://localhost:5173"
-        : "http://reverse-proxy:80",
+        : process.env.BASE_URL === undefined
+        ? "http://reverse-proxy:80"
+        : process.env.BASE_URL,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
