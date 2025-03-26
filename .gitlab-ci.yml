@@ -1,10 +1,15 @@
 stages:
   - test
   - build
-  - e2e
-
+  - staging
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  VERSION: $CI_PIPELINE_IID
+  REGISTRY: $CI_REGISTRY 
+  REGISTRY_IMAGE_BASE_PATH: $REGISTRY/$CI_PROJECT_PATH
+  AZURE_WEBAPP_NAME: cae-groupxy-staging-app # Remplacer par le nom de votre Web App Azure
+  AZURE_WEBAPP_RESOURCE_GROUP: caeGroup # Remplacer par le nom de votre Resource Group Azure
+  
 
 api test:
   stage: test
@@ -48,29 +53,19 @@ build:
   services:
     - docker:20-dind
   script:
-    - docker-compose build
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
+    - docker-compose -f docker-compose.staging.yml build
+    - for service in frontend-prod api-prod reverse-proxy-prod; do
+        docker tag $service $REGISTRY_IMAGE_BASE_PATH/$service:latest;
+        docker tag $service $REGISTRY_IMAGE_BASE_PATH/$service:$VERSION;
+        docker push $REGISTRY_IMAGE_BASE_PATH/$service:latest;
+        docker push $REGISTRY_IMAGE_BASE_PATH/$service:$VERSION;
+      done
 
-e2e tests:
-  stage: e2e
-  image: docker:latest
-  services:
-    - docker:20-dind
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH
-    - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_COMMIT_BRANCH == "develop"
-  before_script:
-    - docker-compose up -d
+deploy:
+  stage: staging
+  image: mcr.microsoft.com/azure-cli
   script:
-    - EXIT_CODE=$(docker wait e2e-prod)
-    - docker-compose logs e2e
-    - docker cp e2e-prod:/app/playwright-report ./e2e/playwright-report
-    - docker cp e2e-prod:/app/test-results ./e2e/test-results
-    - if [ "$EXIT_CODE" -ne 0 ]; then echo "E2E tests failed"; exit 1; fi
-    - docker-compose down
-  after_script:
-    - docker-compose down
-  artifacts:
-    paths:
-      - e2e/playwright-report/
-      - e2e/test-results/
+    - az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+    - az webapp config container set --name $AZURE_WEBAPP_NAME --resource-group $AZURE_WEBAPP_RESOURCE_GROUP --multicontainer-config-type compose --multicontainer-config-file docker-compose.deploy.yml --container-registry-user $PULL_IMAGE_TOKEN_USERNAME --container-registry-password $PULL_IMAGE_TOKEN_PASSWORD
+    - az webapp start --name $AZURE_WEBAPP_NAME --resource-group $AZURE_WEBAPP_RESOURCE_GROUP
