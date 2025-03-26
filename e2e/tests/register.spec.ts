@@ -38,7 +38,7 @@ test.describe("Register", () => {
     // Vérifier que le cercle s'est bien affiché
     await expect(page.locator("circle")).toBeVisible();
     
-    await expect(page).toHaveURL("/login", { timeout: 4000 });
+    await expect(page).toHaveURL("/login");
     
     await expect(page.getByText("Se connecter")).toBeVisible();
   });
@@ -55,7 +55,7 @@ test.describe("Register", () => {
     // Vérifier que le cercle s'est bien affiché
     await expect(page.locator("circle")).toBeVisible();
     
-    await expect(page).toHaveURL("/login", { timeout: 4000 });
+    await expect(page).toHaveURL("/login");
     
     await goFromHomePageToRegisterPage(page);
     
@@ -293,7 +293,7 @@ test.describe("Register", () => {
     // Vérifier que le cercle s'est bien affiché
     await expect(page.locator("circle")).toBeVisible();
     
-    await expect(page).toHaveURL("/login", { timeout: 4000 });
+    await expect(page).toHaveURL("/login");
   });
 
   test("TC1.12: should validate a correct phone number format successfully", async ({ page }) => {
@@ -313,7 +313,7 @@ test.describe("Register", () => {
     // Vérifier que le cercle s'est bien affiché
     await expect(page.locator("circle")).toBeVisible();
     
-    await expect(page).toHaveURL("/login", { timeout: 4000 });
+    await expect(page).toHaveURL("/login");
   });
 
   test("TC1.13: should validate a phone number starting with 0 successfully", async ({ page }) => {
@@ -332,7 +332,7 @@ test.describe("Register", () => {
     // Vérifier que le cercle s'est bien affiché
     await expect(page.locator("circle")).toBeVisible();
     
-    await expect(page).toHaveURL("/login", { timeout: 4000 });
+    await expect(page).toHaveURL("/login");
   });
   
   test("TC1.14: should show success message before redirecting to login page", async ({ page }) => {
@@ -350,7 +350,7 @@ test.describe("Register", () => {
     // Vérifier que le cercle s'est bien affiché
     await expect(page.locator("circle")).toBeVisible();
     
-    await expect(page).toHaveURL("/login", { timeout: 4000 });
+    await expect(page).toHaveURL("/login");
   });
 
   test("TC1.15: should register successfully with default country value (Belgique)", async ({ page }) => {
@@ -385,6 +385,6 @@ test.describe("Register", () => {
     
     await expect(page.locator("circle")).toBeVisible();
     
-    await expect(page).toHaveURL("/login", { timeout: 4000 });
+    await expect(page).toHaveURL("/login");
   });
 });

@@ -41,7 +41,6 @@ test.describe("Login", () => {
   });
 
   test("TC2.1: should login a user when valid data is provided", async ({ page }) => {
-    test.setTimeout(30000);
 
     const formData = {
       email: testUser.email,
@@ -51,7 +50,7 @@ test.describe("Login", () => {
 
     await loginWith(page, formData);
 
-    await expect(page).toHaveURL("/", {timeout: 10000})
+    await expect(page).toHaveURL("/")
 
     const welcomeMessage = await page.getByText(`Bonjour ${testUser.name} ${testUser.firstname}`);
     await expect(welcomeMessage).toBeVisible();
