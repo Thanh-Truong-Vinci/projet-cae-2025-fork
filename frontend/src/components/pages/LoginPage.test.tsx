@@ -19,8 +19,9 @@ describe('LoginPage', () => {
         <LoginPage />
       </MemoryRouter>
     )
-    const emailInput = screen.getByLabelText(/email/i)
-    const passwordInput = screen.getByLabelText(/password/i)
+
+    const emailInput = screen.getByTestId('email-input')
+    const passwordInput = screen.getByTestId('password-input')
 
     expect(emailInput).toBeTruthy()
     expect(passwordInput).toBeTruthy()
@@ -47,24 +48,32 @@ describe('LoginPage', () => {
       </MemoryRouter>
     )
 
-    const emailInput = screen.getByLabelText(/email/i)
-    const passwordInput = screen.getByLabelText(/password/i)
+    // Utiliser querySelector pour obtenir l'élément input à l'intérieur du TextField
+    const emailInput = screen.getByTestId('email-input').querySelector('input')
+    const passwordInput = screen
+      .getByTestId('password-input')
+      .querySelector('input')
     const submitButton = screen.getByRole('button', {
       name: /s'authentifier/i,
     })
 
-    fireEvent.change(emailInput, { target: { value: 'testuser' } })
-    fireEvent.change(passwordInput, { target: { value: 'password' } })
-    fireEvent.click(submitButton)
+    // Vérifier que les éléments ont été trouvés
+    if (emailInput && passwordInput) {
+      fireEvent.change(emailInput, { target: { value: 'testuser' } })
+      fireEvent.change(passwordInput, { target: { value: 'password' } })
+      fireEvent.click(submitButton)
 
-    expect(loginUserMock).toHaveBeenCalledWith({
-      email: 'testuser',
-      password: 'password',
-    })
+      expect(loginUserMock).toHaveBeenCalledWith({
+        email: 'testuser',
+        password: 'password',
+      })
 
-    await waitFor(() => {
-      expect(navigateMock).toHaveBeenCalledWith('/')
-    })
+      await waitFor(() => {
+        expect(navigateMock).toHaveBeenCalledWith('/')
+      })
+    } else {
+      throw new Error("Les champs d'entrée n'ont pas été trouvés correctement")
+    }
   })
 
   test('calls console.error when loginUser throws an error', async () => {
@@ -90,29 +99,37 @@ describe('LoginPage', () => {
       </MemoryRouter>
     )
 
-    const emailInput = screen.getByLabelText(/email/i)
-    const passwordInput = screen.getByLabelText(/password/i)
+    // Utiliser querySelector pour obtenir l'élément input à l'intérieur du TextField
+    const emailInput = screen.getByTestId('email-input').querySelector('input')
+    const passwordInput = screen
+      .getByTestId('password-input')
+      .querySelector('input')
     const submitButton = screen.getByRole('button', {
       name: /s'authentifier/i,
     })
 
-    fireEvent.change(emailInput, { target: { value: 'testuser' } })
-    fireEvent.change(passwordInput, { target: { value: 'password' } })
-    fireEvent.click(submitButton)
+    // Vérifier que les éléments ont été trouvés
+    if (emailInput && passwordInput) {
+      fireEvent.change(emailInput, { target: { value: 'testuser' } })
+      fireEvent.change(passwordInput, { target: { value: 'password' } })
+      fireEvent.click(submitButton)
 
-    expect(loginUserMock).toHaveBeenCalledWith({
-      email: 'testuser',
-      password: 'password',
-    })
+      expect(loginUserMock).toHaveBeenCalledWith({
+        email: 'testuser',
+        password: 'password',
+      })
 
-    // Verify that console.error was called
-    await waitFor(() => {
-      expect(consoleErrorMock).toHaveBeenCalledWith(
-        'LoginPage::error: ',
-        expect.any(Error)
-      )
-    })
+      // Verify that console.error was called
+      await waitFor(() => {
+        expect(consoleErrorMock).toHaveBeenCalledWith(
+          'LoginPage::error: ',
+          expect.any(Error)
+        )
+      })
 
-    consoleErrorMock.mockRestore()
+      consoleErrorMock.mockRestore()
+    } else {
+      throw new Error("Les champs d'entrée n'ont pas été trouvés correctement")
+    }
   })
 })

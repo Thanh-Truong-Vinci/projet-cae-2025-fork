@@ -7,6 +7,7 @@ import {
   Typography,
   useTheme,
   MenuItem,
+  CircularProgress,
 } from '@mui/material'
 import { UserContextType } from '../../types'
 import { UserContext } from '../../contexts/UserContext'
@@ -17,6 +18,9 @@ const RegisterPage = () => {
   const navigate = useNavigate()
   const theme = useTheme()
 
+  // Ajout d'un état pour le message de succès
+  const [registrationSuccess, setRegistrationSuccess] = useState<boolean>(false)
+
   const [formData, setFormData] = useState({
     name: '',
     firstname: '',
@@ -26,7 +30,7 @@ const RegisterPage = () => {
     box: '',
     postalCode: '',
     city: '',
-    country: '',
+    country: 'Belgique', // Valeur par défaut "Belgique"
     phoneNumber: '',
     email: '',
     password: '',
@@ -55,6 +59,19 @@ const RegisterPage = () => {
       setFieldErrors((prev) => ({ ...prev, [name]: '' }))
     }
 
+    if (name === 'country') {
+      // Si le champ contenait "Belgique" et que l'utilisateur commence à taper
+      if (formData.country === 'Belgique' && value !== 'Belgique') {
+        // On va remplacer Belgique par le premier charactère qu'on écrira
+        // puis vu que Belgique ne sera plus afficher,
+        // on pourra y écrire ce qu'on le veut sans passer par cette condition.
+        const newChar = value.replace('Belgique', '')
+        setFormData({ ...formData, [name]: newChar })
+        return
+      }
+    }
+
+    // Comportement normal pour les autres champs
     setFormData({ ...formData, [name]: value })
   }
 
@@ -176,7 +193,14 @@ const RegisterPage = () => {
         email: formData.email,
         password: formData.password,
       })
-      navigate('/login')
+
+      // Afficher le message de succès
+      setRegistrationSuccess(true)
+
+      // Rediriger après un délai
+      setTimeout(() => {
+        navigate('/login')
+      }, 3000) // Redirection après 3 secondes
     } catch (err) {
       console.error('RegisterPage::error: ', err)
       setErrorEmail('Cette adresse email est déjà utilisée.')
@@ -186,287 +210,315 @@ const RegisterPage = () => {
   return (
     <Box
       className="register-form"
-      sx={{ maxWidth: 1000, margin: 'auto', mt: 1, mb: 1 }}
+      sx={{ maxWidth: 1000, margin: 'auto', marginTop: 4 }}
     >
-      <form
-        onSubmit={handleSubmit}
-        style={{
-          backgroundColor: 'rgba(0, 255, 0, 0.1)',
-          padding: '16px',
-          borderRadius: '8px',
-        }}
-      >
-        <Typography variant="h4" align="center" color="primary" gutterBottom>
-          S'inscrire
-        </Typography>
-        {Object.keys(fieldErrors).length > 0 && (
-          <Box sx={{ mb: 2, p: 2, bgcolor: 'error.light', borderRadius: 1 }}>
-            <Typography color="black" variant="subtitle2" align="center">
-              Veuillez remplir tous les champs obligatoires.
-            </Typography>
+      {registrationSuccess ? (
+        <Box
+          sx={{
+            p: 4,
+            bgcolor: 'success.light',
+            borderRadius: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            minHeight: '300px',
+          }}
+        >
+          <Typography variant="h4" color="success.dark" gutterBottom>
+            Inscription réussie !
+          </Typography>
+          <Typography variant="body1" paragraph color="text.primary">
+            Votre compte a été créé avec succès.
+          </Typography>
+          <Typography variant="body2" color="text.secondary" gutterBottom>
+            Vous allez être redirigé vers la page de connexion dans quelques
+            instants...
+          </Typography>
+          <CircularProgress sx={{ mt: 4 }} color="success" size={40} />
+        </Box>
+      ) : (
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            backgroundColor: 'rgba(0, 255, 0, 0.1)',
+            padding: '16px',
+            borderRadius: '8px',
+          }}
+        >
+          <Typography variant="h4" align="center" color="primary" gutterBottom>
+            S'inscrire
+          </Typography>
+          {Object.keys(fieldErrors).length > 0 && (
+            <Box sx={{ mb: 2, p: 2, bgcolor: 'error.light', borderRadius: 1 }}>
+              <Typography color="black" variant="subtitle2" align="center">
+                Veuillez remplir tous les champs obligatoires.
+              </Typography>
+            </Box>
+          )}
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <TextField
+              fullWidth
+              id="name"
+              name="name"
+              label="Nom"
+              variant="outlined"
+              value={formData.name}
+              onChange={handleChange}
+              color="primary"
+              data-testid="name-input"
+              sx={{
+                input: { color: theme.palette.secondary.contrastText },
+                mb: 1,
+              }}
+              error={Boolean(fieldErrors.name)}
+              helperText={fieldErrors.name || ''}
+            />
+            <TextField
+              fullWidth
+              id="firstname"
+              name="firstname"
+              label="Prénom"
+              variant="outlined"
+              value={formData.firstname}
+              onChange={handleChange}
+              color="primary"
+              data-testid="firstname-input"
+              sx={{
+                input: { color: theme.palette.secondary.contrastText },
+                mb: 1,
+              }}
+              error={Boolean(fieldErrors.firstname)}
+              helperText={fieldErrors.firstname || ''}
+            />
           </Box>
-        )}
-        <Box sx={{ display: 'flex', gap: 1 }}>
           <TextField
+            select
             fullWidth
-            id="name"
-            name="name"
-            label="Name"
+            id="civility"
+            name="civility"
+            label="Civilité"
             variant="outlined"
-            value={formData.name}
+            value={formData.civility}
             onChange={handleChange}
             color="primary"
-            data-testid="name-input"
+            data-testid="civility-input"
             sx={{
               input: { color: theme.palette.secondary.contrastText },
               mb: 1,
             }}
-            error={Boolean(fieldErrors.name)}
-            helperText={fieldErrors.name || ''}
-          />
-          <TextField
-            fullWidth
-            id="firstname"
-            name="firstname"
-            label="First name"
-            variant="outlined"
-            value={formData.firstname}
-            onChange={handleChange}
-            color="primary"
-            data-testid="firstname-input"
-            sx={{
-              input: { color: theme.palette.secondary.contrastText },
-              mb: 1,
-            }}
-            error={Boolean(fieldErrors.firstname)}
-            helperText={fieldErrors.firstname || ''}
-          />
-        </Box>
-        <TextField
-          select
-          fullWidth
-          id="civility"
-          name="civility"
-          label="Civility"
-          variant="outlined"
-          value={formData.civility}
-          onChange={handleChange}
-          color="primary"
-          data-testid="civility-input"
-          sx={{
-            input: { color: theme.palette.secondary.contrastText },
-            mb: 1,
-          }}
-          error={Boolean(fieldErrors.civility)}
-          helperText={fieldErrors.civility || ''}
-        >
-          <MenuItem value="Monsieur">Monsieur</MenuItem>
-          <MenuItem value="Madame">Madame</MenuItem>
-        </TextField>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <TextField
-            fullWidth
-            id="street"
-            name="street"
-            label="Street"
-            variant="outlined"
-            value={formData.street}
-            onChange={handleChange}
-            color="primary"
-            data-testid="street-input"
-            sx={{
-              input: { color: theme.palette.secondary.contrastText },
-              mb: 1,
-            }}
-            error={Boolean(fieldErrors.street)}
-            helperText={fieldErrors.street || ''}
-          />
-          <TextField
-            fullWidth
-            id="number"
-            name="number"
-            label="Number"
-            variant="outlined"
-            value={formData.number}
-            onChange={handleChange}
-            color="primary"
-            data-testid="number-input"
-            sx={{
-              input: { color: theme.palette.secondary.contrastText },
-              mb: 1,
-            }}
-            error={!!errorNumber || Boolean(fieldErrors.number)}
-            helperText={errorNumber || fieldErrors.number || ''}
-          />
-        </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <TextField
-            fullWidth
-            id="box"
-            name="box"
-            label="Box"
-            variant="outlined"
-            value={formData.box}
-            onChange={handleChange}
-            color="primary"
-            data-testid="box-input"
-            sx={{
-              input: { color: theme.palette.secondary.contrastText },
-              mb: 1,
-            }}
-          />
-          <TextField
-            fullWidth
-            id="postalCode"
-            name="postalCode"
-            label="Postal code"
-            variant="outlined"
-            value={formData.postalCode}
-            onChange={handleChange}
-            color="primary"
-            data-testid="postalCode-input"
-            sx={{
-              input: { color: theme.palette.secondary.contrastText },
-              mb: 1,
-            }}
-            error={Boolean(fieldErrors.postalCode)}
-            helperText={fieldErrors.postalCode || ''}
-          />
-        </Box>
+            error={Boolean(fieldErrors.civility)}
+            helperText={fieldErrors.civility || ''}
+          >
+            <MenuItem value="Monsieur">Monsieur</MenuItem>
+            <MenuItem value="Madame">Madame</MenuItem>
+          </TextField>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <TextField
+              fullWidth
+              id="street"
+              name="street"
+              label="Rue"
+              variant="outlined"
+              value={formData.street}
+              onChange={handleChange}
+              color="primary"
+              data-testid="street-input"
+              sx={{
+                input: { color: theme.palette.secondary.contrastText },
+                mb: 1,
+              }}
+              error={Boolean(fieldErrors.street)}
+              helperText={fieldErrors.street || ''}
+            />
+            <TextField
+              fullWidth
+              id="number"
+              name="number"
+              label="Numéro"
+              variant="outlined"
+              value={formData.number}
+              onChange={handleChange}
+              color="primary"
+              data-testid="number-input"
+              sx={{
+                input: { color: theme.palette.secondary.contrastText },
+                mb: 1,
+              }}
+              error={!!errorNumber || Boolean(fieldErrors.number)}
+              helperText={errorNumber || fieldErrors.number || ''}
+            />
+          </Box>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <TextField
+              fullWidth
+              id="box"
+              name="box"
+              label="Boîte"
+              variant="outlined"
+              value={formData.box}
+              onChange={handleChange}
+              color="primary"
+              data-testid="box-input"
+              sx={{
+                input: { color: theme.palette.secondary.contrastText },
+                mb: 1,
+              }}
+            />
+            <TextField
+              fullWidth
+              id="postalCode"
+              name="postalCode"
+              label="Code postal"
+              variant="outlined"
+              value={formData.postalCode}
+              onChange={handleChange}
+              color="primary"
+              data-testid="postalCode-input"
+              sx={{
+                input: { color: theme.palette.secondary.contrastText },
+                mb: 1,
+              }}
+              error={Boolean(fieldErrors.postalCode)}
+              helperText={fieldErrors.postalCode || ''}
+            />
+          </Box>
 
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <TextField
-            fullWidth
-            id="city"
-            name="city"
-            label="City"
-            variant="outlined"
-            value={formData.city}
-            onChange={handleChange}
-            color="primary"
-            data-testid="city-input"
-            sx={{
-              input: { color: theme.palette.secondary.contrastText },
-              mb: 1,
-            }}
-            error={Boolean(fieldErrors.city)}
-            helperText={fieldErrors.city || ''}
-          />
-          <TextField
-            fullWidth
-            id="country"
-            name="country"
-            label="Country"
-            variant="outlined"
-            value={formData.country}
-            onChange={handleChange}
-            color="primary"
-            data-testid="country-input"
-            sx={{
-              input: { color: theme.palette.secondary.contrastText },
-              mb: 1,
-            }}
-            error={Boolean(fieldErrors.country)}
-            helperText={fieldErrors.country || ''}
-          />
-        </Box>
-
-        <TextField
-          fullWidth
-          id="phoneNumber"
-          name="phoneNumber"
-          label="Phone number"
-          variant="outlined"
-          value={formData.phoneNumber}
-          onChange={handleChange}
-          color="primary"
-          data-testid="phoneNumber-input"
-          sx={{
-            input: { color: theme.palette.secondary.contrastText },
-            mb: 1,
-          }}
-          error={!!errorPhoneNumber || Boolean(fieldErrors.phoneNumber)}
-          helperText={errorPhoneNumber || fieldErrors.phoneNumber || ''}
-        />
-        <TextField
-          fullWidth
-          id="email"
-          name="email"
-          label="Email"
-          variant="outlined"
-          value={formData.email}
-          onChange={handleChange}
-          color="primary"
-          data-testid="email-input"
-          sx={{
-            input: { color: theme.palette.secondary.contrastText },
-            mb: 1,
-          }}
-          error={!!errorEmail || Boolean(fieldErrors.email)}
-          helperText={errorEmail || fieldErrors.email || ''}
-        />
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <TextField
-            fullWidth
-            id="password"
-            name="password"
-            label="Password"
-            type="password"
-            variant="outlined"
-            value={formData.password}
-            onChange={handleChange}
-            color="primary"
-            data-testid="password-input"
-            sx={{
-              input: { color: theme.palette.secondary.contrastText },
-              mb: 1,
-            }}
-            error={!!errorPasword || Boolean(fieldErrors.password)}
-            helperText={errorPasword || fieldErrors.password || ''}
-          />
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <TextField
+              fullWidth
+              id="city"
+              name="city"
+              label="Ville"
+              variant="outlined"
+              value={formData.city}
+              onChange={handleChange}
+              color="primary"
+              data-testid="city-input"
+              sx={{
+                input: { color: theme.palette.secondary.contrastText },
+                mb: 1,
+              }}
+              error={Boolean(fieldErrors.city)}
+              helperText={fieldErrors.city || ''}
+            />
+            <TextField
+              fullWidth
+              id="country"
+              name="country"
+              label="Pays"
+              variant="outlined"
+              value={formData.country}
+              onChange={handleChange}
+              color="primary"
+              data-testid="country-input"
+              sx={{
+                input: { color: theme.palette.secondary.contrastText },
+                mb: 1,
+              }}
+              error={Boolean(fieldErrors.country)}
+              helperText={fieldErrors.country || ''}
+            />
+          </Box>
 
           <TextField
             fullWidth
-            id="confirmPassword"
-            name="confirmPassword"
-            label="Confirm password"
-            type="password"
+            id="phoneNumber"
+            name="phoneNumber"
+            label="Numéro de téléphone"
             variant="outlined"
-            value={formData.confirmPassword}
+            value={formData.phoneNumber}
             onChange={handleChange}
             color="primary"
-            data-testid="confirmPassword-input"
+            data-testid="phoneNumber-input"
             sx={{
               input: { color: theme.palette.secondary.contrastText },
-              mb: 2,
+              mb: 1,
             }}
-            error={
-              !!errorConfirmPasword || Boolean(fieldErrors.confirmPassword)
-            }
-            helperText={
-              errorConfirmPasword || fieldErrors.confirmPassword || ''
-            }
+            error={!!errorPhoneNumber || Boolean(fieldErrors.phoneNumber)}
+            helperText={errorPhoneNumber || fieldErrors.phoneNumber || ''}
           />
-        </Box>
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          fullWidth
-          sx={{ mb: 2 }}
-        >
-          S'inscrire
-        </Button>
-        <Button
-          component={Link}
-          to="/login"
-          variant="contained"
-          color="primary"
-          fullWidth
-        >
-          Vous avez un compte ? Connectez vous
-        </Button>
-      </form>
+          <TextField
+            fullWidth
+            id="email"
+            name="email"
+            label="Email"
+            variant="outlined"
+            value={formData.email}
+            onChange={handleChange}
+            color="primary"
+            data-testid="email-input"
+            sx={{
+              input: { color: theme.palette.secondary.contrastText },
+              mb: 1,
+            }}
+            error={!!errorEmail || Boolean(fieldErrors.email)}
+            helperText={errorEmail || fieldErrors.email || ''}
+          />
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <TextField
+              fullWidth
+              id="password"
+              name="password"
+              label="Mot de passe"
+              type="password"
+              variant="outlined"
+              value={formData.password}
+              onChange={handleChange}
+              color="primary"
+              data-testid="password-input"
+              sx={{
+                input: { color: theme.palette.secondary.contrastText },
+                mb: 1,
+              }}
+              error={!!errorPasword || Boolean(fieldErrors.password)}
+              helperText={errorPasword || fieldErrors.password || ''}
+            />
+
+            <TextField
+              fullWidth
+              id="confirmPassword"
+              name="confirmPassword"
+              label="Confirmer le mot de passe"
+              type="password"
+              variant="outlined"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              color="primary"
+              data-testid="confirmPassword-input"
+              sx={{
+                input: { color: theme.palette.secondary.contrastText },
+                mb: 2,
+              }}
+              error={
+                !!errorConfirmPasword || Boolean(fieldErrors.confirmPassword)
+              }
+              helperText={
+                errorConfirmPasword || fieldErrors.confirmPassword || ''
+              }
+            />
+          </Box>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{ mb: 2 }}
+          >
+            S'inscrire
+          </Button>
+          <Button
+            component={Link}
+            to="/login"
+            variant="contained"
+            color="primary"
+            fullWidth
+          >
+            Vous avez un compte ? Connectez vous
+          </Button>
+        </form>
+      )}
     </Box>
   )
 }
