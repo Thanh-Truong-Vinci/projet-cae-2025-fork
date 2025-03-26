@@ -94,7 +94,7 @@ deploy:
 
 e2e tests:
   stage: e2e
-  image: mcr.microsoft.com/playwright:v1.50.1-jammy
+  image: mcr.microsoft.com/playwright:v1.51.0-jammy
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop")
   script:
