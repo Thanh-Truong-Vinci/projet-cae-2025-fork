@@ -7,8 +7,8 @@ variables:
   VERSION: $CI_PIPELINE_IID
   REGISTRY: $CI_REGISTRY 
   REGISTRY_IMAGE_BASE_PATH: $REGISTRY/$CI_PROJECT_PATH
-  AZURE_WEBAPP_NAME: cae-group09-staging-app # Remplacer par le nom de votre Web App Azure
-  AZURE_WEBAPP_RESOURCE_GROUP: caeGroup09 # Remplacer par le nom de votre Resource Group Azure
+  AZURE_WEBAPP_NAME: cae-group-09-staging-app # Remplacer par le nom de votre Web App Azure
+  AZURE_WEBAPP_RESOURCE_GROUP: caeGroupe09 # Remplacer par le nom de votre Resource Group Azure
   
 
 api test:
