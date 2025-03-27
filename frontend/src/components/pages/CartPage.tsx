@@ -329,9 +329,7 @@ const CartPage = () => {
                     margin="normal"
                   />
                   {!isDateValid && selectedDate !== '' && (
-                    <FormHelperText>
-                      Veuillez choisir une date.
-                    </FormHelperText>
+                    <FormHelperText>Veuillez choisir une date.</FormHelperText>
                   )}
                 </FormControl>
 
