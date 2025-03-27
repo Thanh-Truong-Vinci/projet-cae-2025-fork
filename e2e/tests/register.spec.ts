@@ -44,8 +44,16 @@ test.describe("Register", () => {
   });
 
   test("TC1.2: should not register a new user when existing email is used", async ({ page }) => {
+
+    const uniqueEmail = `tc12-${Date.now()}@gmail.com`;
+
+    const uniqueEmailForTest = {
+      ...testUser,
+      email: uniqueEmail
+    };
+
     // Première inscription avec testUser
-    await registerWith(page, testUser);
+    await registerWith(page, uniqueEmailForTest);
     
     // Vérifier que le message de succès est affiché
     await expect(page.getByText("Inscription réussie !")).toBeVisible();
@@ -60,7 +68,7 @@ test.describe("Register", () => {
     await goFromHomePageToRegisterPage(page);
     
     // Tenter de s'inscrire à nouveau avec le même email
-    await registerWith(page, testUser);
+    await registerWith(page, uniqueEmailForTest);
     
     await expect(page.getByText("Cette adresse email est déjà utilisée.")).toBeVisible();
   });
