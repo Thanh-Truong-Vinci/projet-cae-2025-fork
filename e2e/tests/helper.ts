@@ -1,9 +1,9 @@
 import { Page, expect } from "@playwright/test";
 
 const goFromHomePageToRegisterPage = async (page: Page) => {
-  await page.goto("http://localhost:5173/");
+  await page.goto("/");
   await page.getByText("Inscription").click();
-  await expect(page).toHaveURL("http://localhost:5173/register");
+  await expect(page).toHaveURL("/register");
 };
 
 const registerWith = async (page: Page, formData: { 
@@ -39,9 +39,9 @@ const registerWith = async (page: Page, formData: {
 };
 
 const goFromHomePageToLoginPage = async (page: Page) => {
-  await page.goto("http://localhost:5173/");
+  await page.goto("/");
   await page.getByText("Connexion").click();
-  await expect(page).toHaveURL("http://localhost:5173/login");
+  await expect(page).toHaveURL("/login");
 };
 
 const loginWith = async (page: Page, formData: {

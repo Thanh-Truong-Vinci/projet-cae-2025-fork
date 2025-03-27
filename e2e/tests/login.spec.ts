@@ -41,6 +41,7 @@ test.describe("Login", () => {
   });
 
   test("TC2.1: should login a user when valid data is provided", async ({ page }) => {
+
     const formData = {
       email: testUser.email,
       password: testUser.password,
@@ -49,7 +50,7 @@ test.describe("Login", () => {
 
     await loginWith(page, formData);
 
-    await expect(page).toHaveURL("http://localhost:5173/");
+    await expect(page).toHaveURL("/")
 
     const welcomeMessage = await page.getByText(`Bonjour ${testUser.name} ${testUser.firstname}`);
     await expect(welcomeMessage).toBeVisible();
@@ -64,7 +65,7 @@ test.describe("Login", () => {
 
       await loginWith(page, formData);
 
-      await expect(page).toHaveURL("http://localhost:5173/");
+      await expect(page).toHaveURL("/");
 
       const welcomeMessage = await page.getByText(`Bonjour ${testUser.name} ${testUser.firstname}`);
       await expect(welcomeMessage).toBeVisible();
@@ -72,8 +73,8 @@ test.describe("Login", () => {
       await expect(page.getByText("Se déconnecter")).toBeVisible();
       await page.getByText("Se déconnecter").click();
 
-      await expect(page).toHaveURL("http://localhost:5173/")
-      await expect(page.getByText("Connexion")).toBeVisible();
+      await expect(page).toHaveURL("/")
+      await expect(page.getByText("Inscription")).toBeVisible();
     });
 
   test("TC2.3: should not login a user when the password is incorrect", async ({ page }) => {
