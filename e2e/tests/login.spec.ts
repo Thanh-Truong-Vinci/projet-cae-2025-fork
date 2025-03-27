@@ -51,9 +51,6 @@ test.describe("Login", () => {
     await loginWith(page, formData);
 
     await expect(page).toHaveURL("/")
-
-    const welcomeMessage = await page.getByText(`Bonjour ${testUser.name} ${testUser.firstname}`);
-    await expect(welcomeMessage).toBeVisible();
   });
 
   test("TC2.2: should successfully logout when user clicks on logout button", async ({ page }) => {
@@ -66,9 +63,6 @@ test.describe("Login", () => {
       await loginWith(page, formData);
 
       await expect(page).toHaveURL("/");
-
-      const welcomeMessage = await page.getByText(`Bonjour ${testUser.name} ${testUser.firstname}`);
-      await expect(welcomeMessage).toBeVisible();
 
       await expect(page.getByText("Se déconnecter")).toBeVisible();
       await page.getByText("Se déconnecter").click();

@@ -112,7 +112,6 @@ const LoginPage = () => {
           id="password"
           name="password"
           label="Mot de passe"
-          type="password"
           variant="outlined"
           value={password}
           onChange={handlePasswordChange}
