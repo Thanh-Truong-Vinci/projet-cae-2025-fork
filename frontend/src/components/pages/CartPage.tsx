@@ -330,7 +330,7 @@ const CartPage = () => {
                   />
                   {!isDateValid && selectedDate !== '' && (
                     <FormHelperText>
-                      Veuillez choisir une date à partir de demain.
+                      Veuillez choisir une date.
                     </FormHelperText>
                   )}
                 </FormControl>
