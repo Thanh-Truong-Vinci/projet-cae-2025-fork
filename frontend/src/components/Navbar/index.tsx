@@ -45,7 +45,7 @@ const NavBar = () => {
       )}
 
       {/* Ajouter les boutons d'inscription pour les gestionnaires */}
-      {authenticatedUser && authenticatedUser.role === 'manager' && (
+      {authenticatedUser && authenticatedUser.role === 'Manager' && (
         <>
           <Button
             variant="outlined"
