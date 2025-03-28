@@ -40,6 +40,6 @@ public class Reservation {
 
   @ManyToOne
   @JoinColumn(name = "client_id", nullable = false)
-  private Long client;
+  private Client client;
 }
 
