@@ -1,6 +1,7 @@
 package be.vinci.ipl.cae.demo.models.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import jakarta.persistence.Column;
@@ -14,6 +15,7 @@ import jakarta.persistence.ManyToOne;
  * Manager entity.
  */
 @Entity
+@Table(name = "managers")
 @Data
 @NoArgsConstructor
 public class Manager extends User {
