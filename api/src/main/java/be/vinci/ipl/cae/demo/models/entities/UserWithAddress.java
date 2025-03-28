@@ -2,7 +2,6 @@ package be.vinci.ipl.cae.demo.models.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +9,6 @@ import lombok.NoArgsConstructor;
  * UserWithAddress entity.
  */
 @Entity
-@Table(name = "user_with_address")
 @Data
 @NoArgsConstructor
 public abstract class UserWithAddress extends User {
