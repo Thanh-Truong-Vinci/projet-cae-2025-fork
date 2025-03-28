@@ -16,8 +16,8 @@ public class ProducerService {
    *
    * @param producerRepository the manager repository
    */
-    public ProducerService(ProducerRepository producerRegister) {
-        this.producerRepository = producerRegister;
+    public ProducerService(ProducerRepository producerRepository) {
+        this.producerRepository = producerRepository;
     }
 
   /**
@@ -87,6 +87,6 @@ public class ProducerService {
    * @param email the email of the producer
    */
   public Producer getProducerId(String email) {
-    return producerRepository.findByEmail(email).getProducer();
+    return producerRepository.findByEmail(email);
   }
 }
