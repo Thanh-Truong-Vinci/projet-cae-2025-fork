@@ -10,7 +10,11 @@ import be.vinci.ipl.cae.demo.services.ClientService;
 import be.vinci.ipl.cae.demo.services.ManagerService;
 import be.vinci.ipl.cae.demo.services.ProducerService;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 /** AuthController to handle client authentication. */
@@ -32,7 +36,8 @@ public class AuthController {
    * @param authsService the injected AuthsService.
    */
   public AuthController(
-      ClientService clientService, ManagerService managerService, ProducerService producerService, AuthsService authsService) {
+      ClientService clientService, ManagerService managerService,
+      ProducerService producerService, AuthsService authsService) {
     this.clientService = clientService;
     this.managerService = managerService;
     this.producerService = producerService;
@@ -128,7 +133,8 @@ public class AuthController {
    * @throws ResponseStatusException if the credentials are invalid or the email is already in use.
    */
   @PostMapping("/registermanager")
-  public void register(@RequestBody CredentialsManager credentials, @RequestHeader("Authorization") String token) {
+  public void register(@RequestBody CredentialsManager credentials,
+      @RequestHeader("Authorization") String token) {
     boolean success =
         managerService.register(
             credentials.getName(),
