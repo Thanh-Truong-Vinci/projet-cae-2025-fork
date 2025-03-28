@@ -44,7 +44,7 @@ Content-Type: application/json
   "postalCode": "1251",
   "city": "LaVille",
   "country": "LePays",
-  "phoneNumber": "+324794586718", 
+  "phoneNumber": "+324794586718",
 }
 
 ### Create with invalid email

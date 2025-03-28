@@ -36,8 +36,10 @@ public class AuthController {
    * @param authsService the injected AuthsService.
    */
   public AuthController(
-      ClientService clientService, ManagerService managerService,
-      ProducerService producerService, AuthsService authsService) {
+      ClientService clientService,
+      ManagerService managerService,
+      ProducerService producerService,
+      AuthsService authsService) {
     this.clientService = clientService;
     this.managerService = managerService;
     this.producerService = producerService;
@@ -133,8 +135,8 @@ public class AuthController {
    * @throws ResponseStatusException if the credentials are invalid or the email is already in use.
    */
   @PostMapping("/registermanager")
-  public void register(@RequestBody CredentialsManager credentials,
-      @RequestHeader("Authorization") String token) {
+  public void register(
+      @RequestBody CredentialsManager credentials, @RequestHeader("Authorization") String token) {
     boolean success =
         managerService.register(
             credentials.getName(),
@@ -154,21 +156,19 @@ public class AuthController {
    */
   @PostMapping("/registerproducer")
   public void registerProducer(@RequestBody CredentialsProducer credentials) {
-    boolean success =
         producerService.registerProducer(
-          credentials.getName(),
-          credentials.getFirstname(),
-          credentials.getCompany(),
-          credentials.getEmail(),
-          credentials.getPassword(),
-          credentials.getStreet(),
-          credentials.getNumber(),
-          credentials.getBox(),
-          credentials.getPostalCode(),
-          credentials.getCity(),
-          credentials.getCountry(),
-          credentials.getPhoneNumber()
-        );
+            credentials.getName(),
+            credentials.getFirstname(),
+            credentials.getCompany(),
+            credentials.getEmail(),
+            credentials.getPassword(),
+            credentials.getStreet(),
+            credentials.getNumber(),
+            credentials.getBox(),
+            credentials.getPostalCode(),
+            credentials.getCity(),
+            credentials.getCountry(),
+            credentials.getPhoneNumber());
   }
 
   /**

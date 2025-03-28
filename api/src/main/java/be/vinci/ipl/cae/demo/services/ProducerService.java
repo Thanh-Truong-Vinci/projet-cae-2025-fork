@@ -8,17 +8,17 @@ import org.springframework.stereotype.Service;
 /** Producer Service. */
 @Service
 public class ProducerService {
-    
-    private final ProducerRepository producerRepository;
+
+  private final ProducerRepository producerRepository;
 
   /**
    * Constructor.
    *
    * @param producerRepository the manager repository
    */
-    public ProducerService(ProducerRepository producerRepository) {
-        this.producerRepository = producerRepository;
-    }
+  public ProducerService(ProducerRepository producerRepository) {
+    this.producerRepository = producerRepository;
+  }
 
   /**
    * Register a new producer.
@@ -37,13 +37,37 @@ public class ProducerService {
    * @param phoneNumber the phoneNumber
    * @return true if the registration is successful, false otherwise
    */
-    public boolean registerProducer(String name, String firstname, String company, String email, String password, String street, String number, String box, String postalCode, String city, String country, String phoneNumber) {
-        if (producerRepository.findByEmail(email) != null) {
-            return false;
-        }
-        createProducer(name, firstname, company, email, password, street, number, box, postalCode, city, country, phoneNumber);
-        return true;
+  public boolean registerProducer(
+      String name,
+      String firstname,
+      String company,
+      String email,
+      String password,
+      String street,
+      String number,
+      String box,
+      String postalCode,
+      String city,
+      String country,
+      String phoneNumber) {
+    if (producerRepository.findByEmail(email) != null) {
+      return false;
     }
+    createProducer(
+        name,
+        firstname,
+        company,
+        email,
+        password,
+        street,
+        number,
+        box,
+        postalCode,
+        city,
+        country,
+        phoneNumber);
+    return true;
+  }
 
   /**
    * Create a new Producer.
@@ -61,25 +85,37 @@ public class ProducerService {
    * @param country the country
    * @param phoneNumber the phoneNumber
    */
-    public void createProducer(String name, String firstname, String company, String email, String password, String street, String number, String box, String postalCode, String city, String country, String phoneNumber) {
-        
-        Producer producer = new Producer();
-        producer.setName(name);
-        producer.setFirstname(firstname);
-        producer.setCompany(company);
-        producer.setEmail(email);
-        producer.setPassword(password);
-        producer.setStreet(street);
-        producer.setNumber(number);
-        producer.setBox(box);
-        producer.setPostalCode(postalCode);
-        producer.setCity(city);
-        producer.setCountry(country);
-        producer.setPhoneNumber(phoneNumber);
-        producer.setDateInscription(LocalDate.now());
+  public void createProducer(
+      String name,
+      String firstname,
+      String company,
+      String email,
+      String password,
+      String street,
+      String number,
+      String box,
+      String postalCode,
+      String city,
+      String country,
+      String phoneNumber) {
 
-        producerRepository.save(producer);      
-    }
+    Producer producer = new Producer();
+    producer.setName(name);
+    producer.setFirstname(firstname);
+    producer.setCompany(company);
+    producer.setEmail(email);
+    producer.setPassword(password);
+    producer.setStreet(street);
+    producer.setNumber(number);
+    producer.setBox(box);
+    producer.setPostalCode(postalCode);
+    producer.setCity(city);
+    producer.setCountry(country);
+    producer.setPhoneNumber(phoneNumber);
+    producer.setDateInscription(LocalDate.now());
+
+    producerRepository.save(producer);
+  }
 
   /**
    * Get the producer's ID.
