@@ -28,25 +28,6 @@ Content-Type: application/json
   "password": "adminpw"
 }
 
-### Create a Producer
-POST{{baseUrl}}/auths/registerProducer
-Content-Type: application/json
-
-{
-  "name": "Producer",
-  "firstname": "IDK",
-  "company": "ALEDink",
-  "email": "producer-test@example.com",
-  "password": "prod",
-  "street": "LaRue",
-  "number": "1234",
-  "box": "12",
-  "postalCode": "1251",
-  "city": "LaVille",
-  "country": "LePays",
-  "phoneNumber": "+324794586718",
-}
-
 ### Create with invalid email
 POST {{baseUrl}}/auths/register
 Content-Type: application/json
@@ -179,4 +160,24 @@ Content-Type: application/json
   "firstname": "Test",
   "email": "managerr@example.com",
   "password": "manager123"
+}
+
+### Create a Producer
+POST {{baseUrl}}/auths/registerproducer
+Content-Type: application/json
+Authorization: {{adminToken}}
+
+{
+  "name": "Producer",
+  "firstname": "IDK",
+  "company": "ALEDink",
+  "email": "producer-test@example.com",
+  "password": "prod",
+  "street": "LaRue",
+  "number": "1234",
+  "box": "12",
+  "postalCode": "1251",
+  "city": "LaVille",
+  "country": "LePays",
+  "phoneNumber": "+324794586718"
 }
