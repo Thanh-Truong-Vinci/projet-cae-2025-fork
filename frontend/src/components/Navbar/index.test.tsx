@@ -11,6 +11,8 @@ vi.mock('react-router-dom', async () => {
   return {
     ...actual,
     useNavigate: vi.fn(),
+    registerManager: vi.fn(),
+    registerProducer: vi.fn(),
   }
 })
 
@@ -30,6 +32,8 @@ describe('NavBar', () => {
       registerUser: vi.fn(),
       loginUser: vi.fn(),
       clearUser: vi.fn(),
+      registerManager: vi.fn(),
+      registerProducer: vi.fn(),
     }
 
     render(
@@ -65,6 +69,8 @@ describe('NavBar', () => {
       registerUser: vi.fn(),
       loginUser: vi.fn(),
       clearUser: vi.fn(),
+      registerManager: vi.fn(),
+      registerProducer: vi.fn(),
     }
 
     render(
@@ -93,6 +99,8 @@ describe('NavBar', () => {
       registerUser: vi.fn(),
       loginUser: vi.fn(),
       clearUser: vi.fn(),
+      registerManager: vi.fn(),
+      registerProducer: vi.fn(),
     }
 
     render(
@@ -119,6 +127,8 @@ describe('NavBar', () => {
       registerUser: vi.fn(),
       loginUser: vi.fn(),
       clearUser: vi.fn(),
+      registerManager: vi.fn(),
+      registerProducer: vi.fn(),
     }
 
     render(
@@ -151,6 +161,8 @@ describe('NavBar', () => {
       authsMe: vi.fn(),
       registerUser: vi.fn(),
       loginUser: vi.fn(),
+      registerManager: vi.fn(),
+      registerProducer: vi.fn(),
       clearUser: clearUserMock,
     }
 

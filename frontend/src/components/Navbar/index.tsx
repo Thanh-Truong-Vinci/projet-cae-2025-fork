@@ -44,6 +44,42 @@ const NavBar = () => {
         </IconButton>
       )}
 
+      {/* Ajouter les boutons d'inscription pour les gestionnaires */}
+      {authenticatedUser && authenticatedUser.role === 'manager' && (
+        <>
+          <Button
+            variant="outlined"
+            sx={{
+              color: 'green',
+              borderColor: 'green',
+              '&:hover': {
+                borderColor: 'darkgreen',
+                backgroundColor: 'rgba(0, 128, 0, 0.04)',
+              },
+              mr: 1,
+            }}
+            onClick={() => navigate('/register-manager')}
+          >
+            Nouveau Gestionnaire
+          </Button>
+          <Button
+            variant="outlined"
+            sx={{
+              color: 'green',
+              borderColor: 'green',
+              '&:hover': {
+                borderColor: 'darkgreen',
+                backgroundColor: 'rgba(0, 128, 0, 0.04)',
+              },
+              mr: 1,
+            }}
+            onClick={() => navigate('/register-producer')}
+          >
+            Nouveau Producteur
+          </Button>
+        </>
+      )}
+
       {authenticatedUser ? (
         <>
           <Button variant="outlined" color="inherit" onClick={handleLogout}>
