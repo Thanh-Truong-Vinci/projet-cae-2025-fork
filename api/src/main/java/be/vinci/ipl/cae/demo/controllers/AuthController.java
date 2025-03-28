@@ -136,6 +136,25 @@ public class AuthController {
     }
   }
 
+  @PostMapping("/registerproducer")
+  public void registerProducer(@RequestBody CredentialsProducer credentials) {
+    boolean success =
+        producerRegister.register(
+          credentials.getName(),
+          credentials.getFirstname(),
+          credentials.getCompany(),
+          credentials.getEmail(),
+          credentials.getPassword(),
+          credentials.getStreet(),
+          credentials.getNumber(),
+          credentials.getBox(),
+          credentials.getPostalCode(),
+          credentials.getCity(),
+          credentials.getCountry(),
+          credentials.getPhoneNumber(),
+        )
+  }
+
   /**
    * Login a client.
    *

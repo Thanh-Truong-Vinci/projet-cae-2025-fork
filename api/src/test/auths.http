@@ -19,6 +19,34 @@ Content-Type: application/json
   "phoneNumber": "123456789"
 }
 
+### Login admin
+POST {{baseUrl}}/auths/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "adminpw"
+}
+
+### Create a Producer
+POST{{baseUrl}}/auths/registerProducer
+Content-Type: application/json
+
+{
+  "name": "Producer",
+  "firstname": "IDK",
+  "company": "ALEDink",
+  "email": "producer-test@example.com",
+  "password": "prod",
+  "street": "LaRue",
+  "number": "1234",
+  "box": "12",
+  "postalCode": "1251",
+  "city": "LaVille",
+  "country": "LePays",
+  "phoneNumber": "+324794586718", 
+}
+
 ### Create with invalid email
 POST {{baseUrl}}/auths/register
 Content-Type: application/json
@@ -103,15 +131,6 @@ Content-Type: application/json
   "city": "User City",
   "country": "User Country",
   "phoneNumber": "222222222"
-}
-
-### Login admin
-POST {{baseUrl}}/auths/login
-Content-Type: application/json
-
-{
-  "email": "admin@example.com",
-  "password": "admin"
 }
 
 ### Login unknown user
