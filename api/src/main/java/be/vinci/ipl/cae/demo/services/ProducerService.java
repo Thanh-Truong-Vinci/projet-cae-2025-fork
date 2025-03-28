@@ -1,18 +1,23 @@
 package be.vinci.ipl.cae.demo.services;
 
+import be.vinci.ipl.cae.demo.models.entities.Producer;
+import be.vinci.ipl.cae.demo.repositories.ProducerRepository;
+import java.time.LocalDate;
+import org.springframework.stereotype.Service;
+
 /** Producer Service. */
 @Service
 public class ProducerService {
     
-    private final ProducerRegister producerRegister;
+    private final ProducerRepository producerRepository;
 
   /**
    * Constructor.
    *
    * @param producerRepository the manager repository
    */
-    public ProducerRegister(ProducerRegister producerRegister) {
-        this.producerRegister = producerRegister;
+    public ProducerService(ProducerRepository producerRegister) {
+        this.producerRepository = producerRegister;
     }
 
   /**
@@ -33,7 +38,7 @@ public class ProducerService {
    * @return true if the registration is successful, false otherwise
    */
     public boolean registerProducer(String name, String firstname, String company, String email, String password, String street, String number, String box, String postalCode, String city, String country, String phoneNumber) {
-        if (producerRegister.findByEmail(email) != null) {
+        if (producerRepository.findByEmail(email) != null) {
             return false;
         }
         createProducer(name, firstname, company, email, password, street, number, box, postalCode, city, country, phoneNumber);
