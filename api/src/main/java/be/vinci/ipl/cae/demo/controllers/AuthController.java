@@ -18,6 +18,7 @@ public class AuthController {
 
   private final ClientService clientService;
   private final ManagerService managerService;
+  private final ProducerService producerService;
   private final AuthsService authsService;
 
   /**
@@ -25,12 +26,14 @@ public class AuthController {
    *
    * @param clientService the injected ClientService.
    * @param managerService the injected ManagerService.
+   * @param producerService the injected ManagerService.
    * @param authsService the injected AuthsService.
    */
   public AuthController(
-      ClientService clientService, ManagerService managerService, AuthsService authsService) {
+      ClientService clientService, ManagerService managerService, ProducerService producerService, AuthsService authsService) {
     this.clientService = clientService;
     this.managerService = managerService;
+    this.producerService = producerService;
     this.authsService = authsService;
   }
 
@@ -136,6 +139,11 @@ public class AuthController {
     }
   }
 
+  /**
+   * Register a new producer.
+   *
+   * @param credentials the producer credentials from the request body.
+   */
   @PostMapping("/registerproducer")
   public void registerProducer(@RequestBody CredentialsProducer credentials) {
     boolean success =
