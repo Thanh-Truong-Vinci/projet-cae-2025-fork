@@ -26,7 +26,7 @@ public class AuthController {
   private final ManagerService managerService;
   private final ProducerService producerService;
   private final AuthsService authsService;
-
+  
   /**
    * Constructor for AuthController.
    *

@@ -5,6 +5,8 @@ import {
   User,
   AuthenticatedUser,
   LoginUser,
+  ManagerRegistrationData,
+  ProducerRegistrationData,
 } from '../types'
 
 import {
@@ -16,6 +18,8 @@ const defaultUserContext: UserContextType = {
   authenticatedUser: undefined,
   authsMe: async () => {},
   registerUser: async () => {},
+  registerManager: async () => {},
+  registerProducer: async () => {},
   loginUser: async () => {
     throw new Error('Context not initialized')
   },
@@ -73,6 +77,55 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
       throw err
     }
   }, [])
+  const registerManager = useCallback(
+    async (managerData: ManagerRegistrationData) => {
+      try {
+        const options = {
+          method: 'POST',
+          body: JSON.stringify(managerData),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+
+        const response = await fetch('/api/auths/register-manager', options)
+
+        if (!response.ok)
+          throw new Error(
+            `fetch error : ${response.status} : ${response.statusText}`
+          )
+      } catch (err) {
+        console.error('registerManager::error: ', err)
+        throw err
+      }
+    },
+    []
+  )
+
+  const registerProducer = useCallback(
+    async (producerData: ProducerRegistrationData) => {
+      try {
+        const options = {
+          method: 'POST',
+          body: JSON.stringify(producerData),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+
+        const response = await fetch('/api/auths/register-producer', options)
+
+        if (!response.ok)
+          throw new Error(
+            `fetch error : ${response.status} : ${response.statusText}`
+          )
+      } catch (err) {
+        console.error('registerProducer::error: ', err)
+        throw err
+      }
+    },
+    []
+  )
 
   const loginUser = useCallback(
     async (user: LoginUser): Promise<AuthenticatedUser> => {
@@ -115,6 +168,8 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
   const contextValue: UserContextType = {
     authenticatedUser,
     authsMe,
+    registerManager,
+    registerProducer,
     registerUser,
     loginUser,
     clearUser,

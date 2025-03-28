@@ -36,6 +36,8 @@ describe('LoginPage', () => {
       registerUser: vi.fn(),
       loginUser: loginUserMock,
       clearUser: vi.fn(),
+      registerManager: vi.fn(),
+      registerProducer: vi.fn(),
     }
 
     vi.mocked(useNavigate).mockReturnValue(navigateMock)
@@ -89,6 +91,8 @@ describe('LoginPage', () => {
       registerUser: vi.fn(),
       loginUser: loginUserMock,
       clearUser: vi.fn(),
+      registerManager: vi.fn(),
+      registerProducer: vi.fn(),
     }
 
     render(

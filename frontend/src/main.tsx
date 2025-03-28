@@ -16,6 +16,8 @@ import '@fontsource/roboto/700.css'
 import CssBaseline from '@mui/material/CssBaseline'
 import { ThemeProvider } from '@mui/material/styles'
 import theme from './themes.ts'
+import ManagerRegisterPage from './components/pages/ManagerRegisterPage.tsx'
+import ProducerRegisterPage from './components/pages/ProducerRegisterPage.tsx'
 
 const router = createBrowserRouter([
   {
@@ -33,6 +35,14 @@ const router = createBrowserRouter([
       {
         path: 'login',
         element: <LoginPage />,
+      },
+      {
+        path: 'register-manager',
+        element: <ManagerRegisterPage />,
+      },
+      {
+        path: 'register-producer',
+        element: <ProducerRegisterPage />,
       },
       {
         path: 'cart',

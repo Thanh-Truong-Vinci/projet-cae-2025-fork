@@ -14,14 +14,14 @@ import lombok.NoArgsConstructor;
 
 /** Lot entity representing a batch of products. */
 @Entity
-@Table(name = "lots")
+@Table(name = "batchs")
 @Data
 @NoArgsConstructor
-public class Lot {
+public class Batch {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id_lot")
+  @Column(name = "id_batch")
   private Long id;
 
   @ManyToOne
@@ -61,3 +61,4 @@ public class Lot {
   @Column(name = "date_depot", nullable = false)
   private LocalDate depositDate;
 }
+
