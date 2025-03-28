@@ -30,9 +30,9 @@ public class ReservationLine {
 
   @ManyToOne
   @JoinColumn(name = "reservation_id", nullable = false)
-  private Reservation reservation;
+  private Long reservation;
 
   @ManyToOne
   @JoinColumn(name = "lot_id", nullable = false)
-  private Lot lot;
+  private Long lot;
 }

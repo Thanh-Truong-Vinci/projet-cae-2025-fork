@@ -16,5 +16,5 @@ public class Manager extends User {
 
   @ManyToOne
   @JoinColumn(name = "manager_id", nullable = true)
-  private Manager manager;
+  private Long manager;
 }

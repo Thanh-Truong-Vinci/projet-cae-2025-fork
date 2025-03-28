@@ -1,5 +1,7 @@
 package be.vinci.ipl.cae.demo.models.entities;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -28,15 +29,15 @@ public class Lot {
 
   @ManyToOne
   @JoinColumn(name = "gestionnaire", nullable = false)
-  private Manager manager;
+  private Long manager;
 
   @ManyToOne
   @JoinColumn(name = "producteur", nullable = false)
-  private Producer producer;
+  private Long producer;
 
   @ManyToOne
   @JoinColumn(name = "produit", nullable = false)
-  private Product product;
+  private Long product;
 
   @Column(name = "photo", nullable = true)
   private String photo;
@@ -58,7 +59,7 @@ public class Lot {
 
   @ManyToOne
   @JoinColumn(name = "notification", nullable = true)
-  private Notification notification;
+  private Long notification;
 
   @Column(name = "date_depot", nullable = false)
   private LocalDate depositDate;
