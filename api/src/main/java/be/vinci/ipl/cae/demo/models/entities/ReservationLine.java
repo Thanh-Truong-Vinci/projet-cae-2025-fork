@@ -33,6 +33,6 @@ public class ReservationLine {
   private Long reservation;
 
   @ManyToOne
-  @JoinColumn(name = "lot_id", nullable = false)
-  private Long lot;
+  @JoinColumn(name = "batch_id", nullable = false)
+  private Long batch;
 }
