@@ -1,4 +1,5 @@
 @baseUrl = http://localhost:3000
+@adminToken = {{login_admin.response.body.token}}
 
 ### Create the default admin
 POST {{baseUrl}}/auths/register
@@ -7,7 +8,7 @@ Content-Type: application/json
 {
   "name": "Admin",
   "firstname": "User",
-  "email": "admin@example.com",
+  "email": "admin2@example.com",
   "password": "admin",
   "street": "Admin Street",
   "number": "1",
@@ -136,4 +137,27 @@ Content-Type: application/json
 
 {
   "email": "user@example.com"
+}
+
+### Register a new manager
+POST {{baseUrl}}/auths/registermanager
+Content-Type: application/json
+Authorization: {{adminToken}}
+
+{
+  "name": "Manager",
+  "firstname": "Test",
+  "email": "manager@example.com",
+  "password": "manager123"
+}
+
+### Register another new manager
+POST {{baseUrl}}/auths/registermanager
+Content-Type: application/json
+
+{
+  "name": "Manageer",
+  "firstname": "Test",
+  "email": "managerr@example.com",
+  "password": "manager123"
 }

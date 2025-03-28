@@ -8,10 +8,7 @@ import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.ClientService;
 import be.vinci.ipl.cae.demo.services.ManagerService;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 /** AuthController to handle client authentication. */
@@ -125,14 +122,15 @@ public class AuthController {
    * @param credentials the manager credentials from the request body.
    * @throws ResponseStatusException if the credentials are invalid or the email is already in use.
    */
-  @PostMapping("/register/manager")
-  public void register(@RequestBody CredentialsManager credentials) {
+  @PostMapping("/registermanager")
+  public void register(@RequestBody CredentialsManager credentials, @RequestHeader("Authorization") String token) {
     boolean success =
         managerService.register(
             credentials.getName(),
             credentials.getFirstname(),
             credentials.getEmail(),
-            credentials.getPassword());
+            credentials.getPassword(),
+            authsService.verifyJwtToken(token));
     if (!success) {
       throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
     }

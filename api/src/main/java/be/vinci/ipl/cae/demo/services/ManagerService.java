@@ -29,11 +29,11 @@ public class ManagerService {
    * @param password the password
    * @return true if the registration is successful, false otherwise
    */
-  public boolean register(String name, String firstname, String email, String password) {
+  public boolean register(String name, String firstname, String email, String password, String requesterEmail) {
     if (managerRepository.findByEmail(email) != null) {
       return false;
     }
-    createManager(name, firstname, email, password);
+    createManager(name, firstname, email, password, requesterEmail);
     return true;
   }
 
@@ -45,13 +45,14 @@ public class ManagerService {
    * @param email the email
    * @param password the password
    */
-  public void createManager(String name, String firstname, String email, String password) {
+  public void createManager(String name, String firstname, String email, String password, String requesterEmail) {
 
     Manager manager = new Manager();
     manager.setName(name);
     manager.setFirstname(firstname);
     manager.setEmail(email);
     manager.setPassword(password);
+    manager.setManager(managerRepository.findByEmail(requesterEmail));
     manager.setDateInscription(LocalDate.now());
 
     managerRepository.save(manager);
