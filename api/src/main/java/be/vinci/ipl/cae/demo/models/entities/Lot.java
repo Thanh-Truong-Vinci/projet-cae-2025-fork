@@ -12,9 +12,7 @@ import java.time.LocalDate;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Lot entity representing a batch of products.
- */
+/** Lot entity representing a batch of products. */
 @Entity
 @Table(name = "lots")
 @Data

@@ -6,9 +6,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Manager entity.
- */
+/** Manager entity. */
 @Entity
 @Data
 @NoArgsConstructor

@@ -15,9 +15,7 @@ import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Reservation entity representing client reservations.
- */
+/** Reservation entity representing client reservations. */
 @Entity
 @Table(name = "reservations")
 @Data

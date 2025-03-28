@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * AuthController to handle client authentication.
- */
+/** AuthController to handle client authentication. */
 @RestController
 @RequestMapping("/auths")
 public class AuthController {
@@ -30,9 +28,10 @@ public class AuthController {
    *
    * @param clientService the injected ClientService.
    * @param managerService the injected ManagerService.
-   * @param authsService  the injected AuthsService.
+   * @param authsService the injected AuthsService.
    */
-  public AuthController(ClientService clientService, ManagerService managerService, AuthsService authsService) {
+  public AuthController(
+      ClientService clientService, ManagerService managerService, AuthsService authsService) {
     this.clientService = clientService;
     this.managerService = managerService;
     this.authsService = authsService;
@@ -96,24 +95,24 @@ public class AuthController {
    * Register a new manager.
    *
    * @param credentials the manager credentials from the request body.
-   * @throws ResponseStatusException if the credentials are invalid or the email
-   *                                 is already in use.
+   * @throws ResponseStatusException if the credentials are invalid or the email is already in use.
    */
   @PostMapping("/register")
   public void register(@RequestBody CredentialsRegister credentials) {
     validateCredentialsRegister(credentials);
-    boolean success = clientService.register(
-        credentials.getName(),
-        credentials.getFirstname(),
-        credentials.getEmail(),
-        credentials.getPassword(),
-        credentials.getCivility(),
-        credentials.getStreet(),
-        credentials.getNumber(),
-        credentials.getPostalCode(),
-        credentials.getCity(),
-        credentials.getCountry(),
-        credentials.getPhoneNumber());
+    boolean success =
+        clientService.register(
+            credentials.getName(),
+            credentials.getFirstname(),
+            credentials.getEmail(),
+            credentials.getPassword(),
+            credentials.getCivility(),
+            credentials.getStreet(),
+            credentials.getNumber(),
+            credentials.getPostalCode(),
+            credentials.getCity(),
+            credentials.getCountry(),
+            credentials.getPhoneNumber());
 
     if (!success) {
       throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
@@ -124,17 +123,17 @@ public class AuthController {
    * Register a new manager.
    *
    * @param credentials the manager credentials from the request body.
-   * @throws ResponseStatusException if the credentials are invalid or the email
-   *                                 is already in use.
+   * @throws ResponseStatusException if the credentials are invalid or the email is already in use.
    */
   @PostMapping("/register/manager")
   public void register(@RequestBody CredentialsManager credentials) {
-    boolean success = managerService.register(
+    boolean success =
+        managerService.register(
             credentials.getName(),
             credentials.getFirstname(),
             credentials.getEmail(),
             credentials.getPassword());
-    if(!success){
+    if (!success) {
       throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
     }
   }
@@ -144,15 +143,13 @@ public class AuthController {
    *
    * @param credentials the client credentials from the request body.
    * @return the authenticated user.
-   * @throws ResponseStatusException if the credentials are invalid or the login
-   *                                 fails.
+   * @throws ResponseStatusException if the credentials are invalid or the login fails.
    */
   @PostMapping("/login")
   public AuthenticatedUser login(@RequestBody Credentials credentials) {
     validateCredentialsLogin(credentials);
 
-    AuthenticatedUser user = authsService.login(credentials.getEmail(),
-        credentials.getPassword());
+    AuthenticatedUser user = authsService.login(credentials.getEmail(), credentials.getPassword());
 
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
@@ -162,14 +159,12 @@ public class AuthController {
   }
 
   /**
-   * Refresh the token.
-   * This endpoint receives a token, verifies its validity (including expiration)
+   * Refresh the token. This endpoint receives a token, verifies its validity (including expiration)
    * and returns a new token with a new expiration date.
    *
    * @param request the token request containing the token to verify.
    * @return a new token if verification is successful.
-   * @throws ResponseStatusException if the token is invalid or the verification
-   *                                 fails.
+   * @throws ResponseStatusException if the token is invalid or the verification fails.
    */
   @PostMapping("/me")
   public String refreshToken(@RequestBody String request) {
@@ -184,6 +179,5 @@ public class AuthController {
     }
 
     return authsService.createJwtToken(email);
-
   }
 }
