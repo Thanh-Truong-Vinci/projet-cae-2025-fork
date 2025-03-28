@@ -28,15 +28,15 @@ public class Batch {
 
   @ManyToOne
   @JoinColumn(name = "gestionnaire", nullable = false)
-  private Long manager;
+  private Manager manager;
 
   @ManyToOne
   @JoinColumn(name = "producteur", nullable = false)
-  private Long producer;
+  private Producer producer;
 
   @ManyToOne
   @JoinColumn(name = "produit", nullable = false)
-  private Long product;
+  private Product product;
 
   @Column(name = "photo", nullable = true)
   private String photo;
@@ -58,7 +58,7 @@ public class Batch {
 
   @ManyToOne
   @JoinColumn(name = "notification", nullable = true)
-  private Long notification;
+  private Notification notification;
 
   @Column(name = "date_depot", nullable = false)
   private LocalDate depositDate;

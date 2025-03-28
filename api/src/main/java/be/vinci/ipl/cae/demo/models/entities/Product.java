@@ -28,7 +28,7 @@ public class Product {
 
   @ManyToOne
   @JoinColumn(name = "id_product_type", nullable = false)
-  private Long type;
+  private ProductType type;
 
   @Column(nullable = false)
   private String name;
@@ -38,5 +38,5 @@ public class Product {
 
   @OneToOne
   @JoinColumn(name = "photo_id", nullable = true)
-  private Long photo;
+  private Photo photo;
 }

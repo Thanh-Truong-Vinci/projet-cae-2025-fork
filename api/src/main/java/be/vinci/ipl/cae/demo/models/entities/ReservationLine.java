@@ -30,9 +30,9 @@ public class ReservationLine {
 
   @ManyToOne
   @JoinColumn(name = "reservation_id", nullable = false)
-  private Long reservation;
+  private Reservation reservation;
 
   @ManyToOne
   @JoinColumn(name = "batch_id", nullable = false)
-  private Long batch;
+  private Batch batch;
 }
