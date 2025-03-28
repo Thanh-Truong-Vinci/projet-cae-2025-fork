@@ -15,6 +15,6 @@ import lombok.NoArgsConstructor;
 public class Manager extends User {
 
   @ManyToOne
-  @JoinColumn(name = "manager_id", nullable = true)
+  @JoinColumn(name = "manager", nullable = true)
   private Manager manager;
 }

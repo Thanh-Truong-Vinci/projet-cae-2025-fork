@@ -2,9 +2,11 @@ package be.vinci.ipl.cae.demo.controllers;
 
 import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedUser;
 import be.vinci.ipl.cae.demo.models.dtos.Credentials;
+import be.vinci.ipl.cae.demo.models.dtos.CredentialsManager;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsRegister;
 import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.ClientService;
+import be.vinci.ipl.cae.demo.services.ManagerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,16 +22,19 @@ import org.springframework.web.server.ResponseStatusException;
 public class AuthController {
 
   private final ClientService clientService;
+  private final ManagerService managerService;
   private final AuthsService authsService;
 
   /**
    * Constructor for AuthController.
    *
    * @param clientService the injected ClientService.
+   * @param managerService the injected ManagerService.
    * @param authsService  the injected AuthsService.
    */
-  public AuthController(ClientService clientService, AuthsService authsService) {
+  public AuthController(ClientService clientService, ManagerService managerService, AuthsService authsService) {
     this.clientService = clientService;
+    this.managerService = managerService;
     this.authsService = authsService;
   }
 
@@ -88,9 +93,9 @@ public class AuthController {
   }
 
   /**
-   * Register a new client.
+   * Register a new manager.
    *
-   * @param credentials the client credentials from the request body.
+   * @param credentials the manager credentials from the request body.
    * @throws ResponseStatusException if the credentials are invalid or the email
    *                                 is already in use.
    */
@@ -111,6 +116,25 @@ public class AuthController {
         credentials.getPhoneNumber());
 
     if (!success) {
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
+    }
+  }
+
+  /**
+   * Register a new manager.
+   *
+   * @param credentials the manager credentials from the request body.
+   * @throws ResponseStatusException if the credentials are invalid or the email
+   *                                 is already in use.
+   */
+  @PostMapping("/register/manager")
+  public void register(@RequestBody CredentialsManager credentials) {
+    boolean success = managerService.register(
+            credentials.getName(),
+            credentials.getFirstname(),
+            credentials.getEmail(),
+            credentials.getPassword());
+    if(!success){
       throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
     }
   }
