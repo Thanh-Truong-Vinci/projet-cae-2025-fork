@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 public class CredentialsProducer {
   private String name;
   private String firstname;
+  private String company;
   private String email;
   private String password;
   private String street;

@@ -149,7 +149,7 @@ public class AuthController {
   @PostMapping("/registerproducer")
   public void registerProducer(@RequestBody CredentialsProducer credentials) {
     boolean success =
-        producerRegister.register(
+        producerService.registerProducer(
           credentials.getName(),
           credentials.getFirstname(),
           credentials.getCompany(),
@@ -161,8 +161,8 @@ public class AuthController {
           credentials.getPostalCode(),
           credentials.getCity(),
           credentials.getCountry(),
-          credentials.getPhoneNumber(),
-        )
+          credentials.getPhoneNumber()
+        );
   }
 
   /**
