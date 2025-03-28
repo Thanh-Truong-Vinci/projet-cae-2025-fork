@@ -1,7 +1,5 @@
 package be.vinci.ipl.cae.demo.models.entities;
 
-import java.time.LocalDate;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
