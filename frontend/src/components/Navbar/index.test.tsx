@@ -59,7 +59,7 @@ describe('NavBar', () => {
         name: 'TestName',
         firstname: 'TestFirstname',
         token: 'fake-token',
-        // Add other required fields for authenticatedUser
+        role: 'client', // Add the missing role property
       },
       authsMe: vi.fn(),
       registerUser: vi.fn(),
@@ -146,7 +146,7 @@ describe('NavBar', () => {
         name: 'TestName',
         firstname: 'TestFirstname',
         token: 'fake-token',
-        // Add other required fields for authenticatedUser
+        role: 'client',
       },
       authsMe: vi.fn(),
       registerUser: vi.fn(),
