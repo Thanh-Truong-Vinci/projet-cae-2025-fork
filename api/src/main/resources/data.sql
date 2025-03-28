@@ -1,4 +1,4 @@
-TRUNCATE TABLE users;
+TRUNCATE TABLE users CASCADE;
 
 INSERT INTO users(
     name, firstname, email, password, date_inscription
