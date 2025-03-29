@@ -51,7 +51,7 @@ public class ReservationLineService {
       }
 
       int batchQuantity = Math.min(batch.getAvailableQuantity(), remainingQuantity);
-      createOne(reservation, batch, batchQuantity);
+      createReservationLine(reservation, batch, batchQuantity);
       remainingQuantity -= batchQuantity;
       batch.setAvailableQuantity(batch.getAvailableQuantity() - batchQuantity);
       batchRepository.save(batch);
@@ -65,7 +65,7 @@ public class ReservationLineService {
    * @param batch the batch of the product
    * @param quantity the quantity of the product
    */
-  public void createOne(Reservation reservation, Batch batch, int quantity) {
+  public void createReservationLine(Reservation reservation, Batch batch, int quantity) {
     ReservationLine reservationLine = new ReservationLine();
     reservationLine.setReservation(reservation);
     reservationLine.setBatch(batch);

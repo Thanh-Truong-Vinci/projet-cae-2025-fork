@@ -30,7 +30,7 @@ public class ProductTypeService {
     if (productTypeRepository.findByTitle(title) != null) {
       throw new IllegalArgumentException("Product type already exists");
     }
-    createOne(title);
+    createProductType(title);
   }
 
   /**
@@ -50,7 +50,7 @@ public class ProductTypeService {
    *
    * @param title the title of the product type
    */
-  public void createOne(String title) {
+  public void createProductType(String title) {
     ProductType productType = new ProductType();
     productType.setTitle(title);
     productTypeRepository.save(productType);

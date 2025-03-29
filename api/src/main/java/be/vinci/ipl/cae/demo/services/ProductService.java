@@ -59,7 +59,7 @@ public class ProductService {
    * @param description the description of the product
    * @param photoId the ID of the photo associated with the product
    */
-  public void createOne(String name, String type, String description, Long photoId) {
+  public void createProduct(String name, String type, String description, Long photoId) {
     ProductType productType = productTypeRepository.findByTitle(type);
     Photo photo = photoId != null ? photoRepository.findById(photoId).orElse(null) : null;
     Product product = new Product();
@@ -77,7 +77,7 @@ public class ProductService {
    * @param description the description of the product
    * @param photo the photo associated with the product
    */
-  public void createOne(String name, String type, String description, Photo photo) {
+  public void createProduct(String name, String type, String description, Photo photo) {
     // TODO implement createOne Product with Photo
   }
 }

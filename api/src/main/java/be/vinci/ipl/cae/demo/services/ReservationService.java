@@ -45,7 +45,7 @@ public class ReservationService {
    */
   public void reserveProduct(Client client, Product product, int quantity) {
     Reservation reservation = reservationRepository.findByClientAndStatus(client, "pending")
-        .orElseGet(() -> createOne(client, product, quantity));
+        .orElseGet(() -> createReservation(client, product, quantity));
 
     reservationLineService.addProduct(reservation, product, quantity);
     reservationRepository.save(reservation);
@@ -95,7 +95,7 @@ public class ReservationService {
    * @param quantity the quantity of the product to reserve
    * @return the created reservation
    */
-  public Reservation createOne(Client client, Product product, int quantity) {
+  public Reservation createReservation(Client client, Product product, int quantity) {
     Reservation reservation = new Reservation();
     reservation.setClient(client);
     reservation.setPrice(0.0);

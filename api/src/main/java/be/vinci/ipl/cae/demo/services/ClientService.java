@@ -64,7 +64,7 @@ public class ClientService {
       return false;
     }
 
-    createOne(
+    createClient(
         name,
         firstname,
         email,
@@ -94,7 +94,7 @@ public class ClientService {
    * @param country the country
    * @param phoneNumber the phone number (optional)
    */
-  public void createOne(
+  public void createClient(
       String name,
       String firstname,
       String email,
