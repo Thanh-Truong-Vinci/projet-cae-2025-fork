@@ -183,7 +183,8 @@ public class AuthController {
    */
   @PostMapping("/changepassword")
   public void changePassword(@RequestBody CredentialsProfile credentials) {
-    profileService.changePassword(credentials.getEmail(), credentials.getPassword());
+    profileService.changePassword(
+        credentials.getEmail(), credentials.getCurrentPassword(), credentials.getNewPassword());
   }
 
   /**
