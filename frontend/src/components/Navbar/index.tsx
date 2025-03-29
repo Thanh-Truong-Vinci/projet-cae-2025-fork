@@ -4,6 +4,7 @@ import { Button, Box, IconButton, Badge } from '@mui/material'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import ReceiptIcon from '@mui/icons-material/Receipt'
 import PersonIcon from '@mui/icons-material/Person'
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import { UserContext } from '../../contexts/UserContext'
 import { UserContextType } from '../../types'
 import { CartContext } from '../../contexts/CartContext'
@@ -19,23 +20,33 @@ const NavBar = () => {
     clearUser()
   }
 
+  // Vérifier si l'utilisateur connecté est un producteur ou un manager
+  const isProducer = authenticatedUser && authenticatedUser.role === 'Producer'
+  const isManager = authenticatedUser && authenticatedUser.role === 'Manager'
+  
+  // Vérifier si l'utilisateur est un client (ni producteur ni manager)
+  const isClient = authenticatedUser && !isProducer && !isManager
+
   return (
     <Box
       sx={{ display: 'flex', gap: 1, alignItems: 'center' }}
       data-testid="navbar-component"
     >
-      <IconButton
-        onClick={() => navigate('/cart')}
-        sx={{ mr: 1 }}
-        aria-label="panier"
-      >
-        <Badge badgeContent={getCartCount()} color="error">
-          <ShoppingCartIcon sx={{ color: 'green' }} />
-        </Badge>
-      </IconButton>
+      {/* Afficher l'icône du panier uniquement pour les clients ou les utilisateurs non connectés */}
+      {!isProducer && !isManager && (
+        <IconButton
+          onClick={() => navigate('/cart')}
+          sx={{ mr: 1 }}
+          aria-label="panier"
+        >
+          <Badge badgeContent={getCartCount()} color="error">
+            <ShoppingCartIcon sx={{ color: 'green' }} />
+          </Badge>
+        </IconButton>
+      )}
 
-      {/* Ajouter le bouton de réservations uniquement pour les utilisateurs authentifiés */}
-      {authenticatedUser && (
+      {/* Ajouter le bouton de réservations uniquement pour les clients connectés */}
+      {isClient && (
         <IconButton
           onClick={() => navigate('/reservations')}
           sx={{ mr: 1 }}
@@ -56,8 +67,20 @@ const NavBar = () => {
         </IconButton>
       )}
 
+      {/* Ajouter un bouton d'ajout de produit pour les producteurs */}
+      {isProducer && (
+        <IconButton
+          onClick={() => navigate('/add-product')}
+          sx={{ mr: 1 }}
+          aria-label="ajouter un produit"
+          title="Ajouter un produit"
+        >
+          <AddCircleOutlineIcon sx={{ color: 'green' }} />
+        </IconButton>
+      )}
+
       {/* Ajouter les boutons d'inscription pour les gestionnaires */}
-      {authenticatedUser && authenticatedUser.role === 'Manager' && (
+      {isManager && (
         <>
           <Button
             variant="outlined"
