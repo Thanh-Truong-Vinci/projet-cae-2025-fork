@@ -19,6 +19,7 @@ import theme from './themes.ts'
 import ManagerRegisterPage from './components/pages/ManagerRegisterPage.tsx'
 import ProducerRegisterPage from './components/pages/ProducerRegisterPage.tsx'
 import ProfilePage from './components/pages/ProfilePage.tsx'
+import VolunteerHomePage from './components/pages/VolunteerHomePage.tsx'
 
 const router = createBrowserRouter([
   {
@@ -60,6 +61,10 @@ const router = createBrowserRouter([
       {
         path: 'profile',
         element: <ProfilePage />,
+      },
+      {
+        path: 'volunteer',
+        element: <VolunteerHomePage />,
       },
     ],
   },
