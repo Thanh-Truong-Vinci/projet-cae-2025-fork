@@ -47,10 +47,11 @@ public class ManagerController {
    * @throws ResponseStatusException if the credentials are invalid or the email is already in use.
    */
   @PostMapping("/registermanager")
-  public void register(
+  public void registerManager(
       @RequestBody CredentialsManager credentials, @RequestHeader("Authorization") String token) {
     if (authsService.isValidManagerToken(token) == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token not valide or expired"); 
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+          "Token not valide, expired or user is not Manager");
     }
 
     boolean success =

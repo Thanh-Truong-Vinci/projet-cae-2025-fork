@@ -9,7 +9,9 @@ import be.vinci.ipl.cae.demo.repositories.BatchRepository;
 import be.vinci.ipl.cae.demo.repositories.ReservationRepository;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Service class for managing reservations.
@@ -88,6 +90,23 @@ public class ReservationService {
   }
 
   /**
+   * Cancels a reservation for a client by reservation ID.
+   *
+   * @param client the client who made the reservation.
+   * @param reservationId the ID of the reservation to cancel.
+   */
+  public void cancelReservation(Client client, Long reservationId) {
+    Reservation reservation = reservationRepository.findById(reservationId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, 
+                                                       "Reservation not found"));
+    if (!reservation.getClient().equals(client)) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+          "Reservation does not belong to the client");
+    }
+    cancelReservation(reservation);
+  }
+
+  /**
    * Creates a new reservation for a client with the specified product and quantity.
    *
    * @param client the client making the reservation
@@ -106,3 +125,4 @@ public class ReservationService {
     return reservation;
   }
 }
+

@@ -3,9 +3,7 @@ package be.vinci.ipl.cae.demo.services;
 import be.vinci.ipl.cae.demo.models.entities.Producer;
 import be.vinci.ipl.cae.demo.repositories.NotificationRepository;
 
-/**
- * Service class for managing notifications.
- */
+/** Service class for managing notifications. */
 public class NotificationService {
 
   private final NotificationRepository notificationRepository;
