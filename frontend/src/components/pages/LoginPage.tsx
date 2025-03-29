@@ -42,7 +42,9 @@ const LoginPage = () => {
         document.cookie = `token=${authenticatedUser.token}; path=/; max-age=31536000` // 1 year
       }
       if (authenticatedUser?.role === 'Volunteer') navigate('/volunteer')
-      handleLoginSuccess()
+      else {
+        handleLoginSuccess()
+      }
     } catch (err) {
       console.error('LoginPage::error: ', err)
       setErrorMessage('Email ou mot de passe incorrect.')
