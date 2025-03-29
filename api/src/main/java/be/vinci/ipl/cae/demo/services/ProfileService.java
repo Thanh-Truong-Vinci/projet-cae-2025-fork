@@ -28,10 +28,7 @@ public class ProfileService {
    * @param password the password
    * @return true if the password changes, false otherwise
    */
-  public boolean changePassword(String email, String password) {
-    if (userRepository.updatePassword(passwordEncoder.encode(password), email) > 0) {
-      return true;
-    }
-    return false;
+  public int changePassword(String email, String password) {
+    return userRepository.updatePassword(passwordEncoder.encode(password), email);
   }
 }
