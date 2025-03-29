@@ -14,7 +14,8 @@ import { UserContext } from '../../contexts/UserContext'
 import './index.css'
 
 const LoginPage = () => {
-  const { loginUser } = useContext<UserContextType>(UserContext)
+  const { loginUser, authenticatedUser } =
+    useContext<UserContextType>(UserContext)
   const navigate = useNavigate()
   const location = useLocation()
   const [email, setEmail] = useState('')
@@ -29,7 +30,10 @@ const LoginPage = () => {
   // When login is successful
   const handleLoginSuccess = () => {
     // Redirect the user back to where they came from
-    navigate(returnTo)
+    if (authenticatedUser?.role === 'Volunteer') navigate('/volunteer')
+    else {
+      navigate(returnTo)
+    }
   }
 
   const handleSubmit = async (e: SyntheticEvent) => {
