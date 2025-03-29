@@ -7,7 +7,6 @@ import be.vinci.ipl.cae.demo.models.entities.ReservationLine;
 import be.vinci.ipl.cae.demo.repositories.BatchRepository;
 import be.vinci.ipl.cae.demo.repositories.ReservationLineRepository;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
@@ -17,16 +16,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class ReservationLineService {
 
-  @Autowired
-  private BatchRepository batchRepository;
-
-  @Autowired
-  private ReservationLineRepository reservationLineRepository;
+  private final BatchRepository batchRepository;
+  private final ReservationLineRepository reservationLineRepository;
 
   /**
    * Default constructor for ReservationLineService.
    */
-  public ReservationLineService() {
+  public ReservationLineService(BatchRepository batchRepository,
+      ReservationLineRepository reservationLineRepository) {
+    this.batchRepository = batchRepository;
+    this.reservationLineRepository = reservationLineRepository;
   }
 
   /**
