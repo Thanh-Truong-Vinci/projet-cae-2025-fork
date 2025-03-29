@@ -1,6 +1,9 @@
 package be.vinci.ipl.cae.demo.services;
 
 import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedUser;
+import be.vinci.ipl.cae.demo.models.entities.Client;
+import be.vinci.ipl.cae.demo.models.entities.Manager;
+import be.vinci.ipl.cae.demo.models.entities.Producer;
 import be.vinci.ipl.cae.demo.models.entities.User;
 import be.vinci.ipl.cae.demo.repositories.ClientRepository;
 import be.vinci.ipl.cae.demo.repositories.ManagerRepository;
@@ -85,6 +88,39 @@ public class AuthsService {
       // Handle verification exceptions including token expiration
       return null;
     }
+  }
+
+  /**
+   * Validate if the token is valid for a client.
+   *
+   * @param token the JWT token to verify
+   * @return the client if the token is valid, null otherwise
+   */
+  public Client isValidClientToken(String token) {
+    String email = verifyJwtToken(token);
+    return email != null ? clientRepository.findByEmail(email) : null;
+  }
+
+  /**
+   * Validate if the token is valid for a producer.
+   *
+   * @param token the JWT token to verify
+   * @return the producer if the token is valid, null otherwise
+   */
+  public Producer isValidProducerToken(String token) {
+    String email = verifyJwtToken(token);
+    return email != null ? producerRepository.findByEmail(email) : null;
+  }
+
+  /**
+   * Validate if the token is valid for a manager.
+   *
+   * @param token the JWT token to verify
+   * @return the manager if the token is valid, null otherwise
+   */
+  public Manager isValidManagerToken(String token) {
+    String email = verifyJwtToken(token);
+    return email != null ? managerRepository.findByEmail(email) : null;
   }
 
   /**
