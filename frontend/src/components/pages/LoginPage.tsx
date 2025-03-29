@@ -41,8 +41,9 @@ const LoginPage = () => {
       if (rememberMe && authenticatedUser) {
         document.cookie = `token=${authenticatedUser.token}; path=/; max-age=31536000` // 1 year
       }
-      if (authenticatedUser?.role === 'Volunteer') navigate('/volunteer')
-      else {
+      if (authenticatedUser?.role === 'Volunteer') {
+        navigate('/volunteer')
+      } else {
         handleLoginSuccess()
       }
     } catch (err) {

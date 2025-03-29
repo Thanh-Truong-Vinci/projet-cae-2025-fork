@@ -1,7 +1,7 @@
-import { TextField } from '@mui/material'
+import { Typography } from '@mui/material'
 
 const VolunteerHomePage = () => {
-  return <TextField>Vous êtes sur la page Bénévole</TextField>
+  return <Typography>Vous êtes sur la page Bénévole</Typography>
 }
 
 export default VolunteerHomePage
