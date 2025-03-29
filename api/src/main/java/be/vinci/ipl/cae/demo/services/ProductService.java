@@ -1,14 +1,16 @@
 package be.vinci.ipl.cae.demo.services;
 
+import be.vinci.ipl.cae.demo.models.entities.Photo;
 import be.vinci.ipl.cae.demo.models.entities.Product;
 import be.vinci.ipl.cae.demo.models.entities.ProductType;
-import be.vinci.ipl.cae.demo.models.entities.Photo;
 import be.vinci.ipl.cae.demo.repositories.ProductRepository;
 import be.vinci.ipl.cae.demo.repositories.ProductTypeRepository;
 import be.vinci.ipl.cae.demo.repositories.PhotoRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class ProductService {
@@ -23,27 +25,24 @@ public class ProductService {
     this.photoRepository = photoRepository;
   }
 
-  public Product createProduct(String name, String description, Long typeId, Long photoId) {
-    if (name == null || name.isBlank() || description == null || description.isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name and description cannot be null or empty");
-    }
+  public List<Product> getProducts(String search, String type) {
+    return StreamSupport.stream(productRepository.findAll().spliterator(), false)
+        .filter(product -> (search == null || product.getName().contains(search) || product.getDescription().contains(search)) &&
+                           (type == null || product.getType().getTitle().equalsIgnoreCase(type)))
+        .collect(Collectors.toList());
+  }
 
+  public void createOne(String name, String type, String description, Long photoId) {
+    ProductType productType = productTypeRepository.findByTitle(type);
+    Photo photo = photoId != null ? photoRepository.findById(photoId).orElse(null) : null;
     Product product = new Product();
     product.setName(name);
+    product.setType(productType);
     product.setDescription(description);
-    product.setType(fetchProductTypeById(typeId));
-    product.setPhoto(fetchPhotoById(photoId));
-
-    return productRepository.save(product);
+    product.setPhoto(photo);
   }
 
-  private ProductType fetchProductTypeById(Long typeId) {
-    return productTypeRepository.findById(typeId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ProductType not found"));
-  }
-
-  private Photo fetchPhotoById(Long photoId) {
-    return photoRepository.findById(photoId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Photo not found"));
+  public void createOne(String name, String type, String description, Photo photo) {
+    // TODO implement createOne Product with Photo
   }
 }
