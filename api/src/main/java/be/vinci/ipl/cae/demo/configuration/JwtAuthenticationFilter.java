@@ -25,8 +25,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private static final String AUTHORIZATION_HEADER = "Authorization";
   private static final String ROLE_ADMIN = "ROLE_ADMIN";
-  private static final String ADMIN_EMAIL = "admin";
-  // TODO replace "admin" with the email of the admin user
+  private static final String ADMIN_EMAIL = "admin@admin.com";
 
   private final AuthsService authsService;
   private final ClientRepository clientRepository;

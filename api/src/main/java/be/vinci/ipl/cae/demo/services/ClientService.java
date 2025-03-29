@@ -2,23 +2,33 @@ package be.vinci.ipl.cae.demo.services;
 
 import be.vinci.ipl.cae.demo.models.entities.Client;
 import be.vinci.ipl.cae.demo.repositories.ClientRepository;
+import be.vinci.ipl.cae.demo.repositories.UserRepository;
 import java.time.LocalDate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-/** Client service. */
+/**
+ * Client service.
+ */
 @Service
 public class ClientService {
 
   private final ClientRepository clientRepository;
+  private final UserRepository userRepository;
+  private final BCryptPasswordEncoder passwordEncoder;
 
   /**
    * Constructor.
    *
    * @param clientRepository the client repository
+   * @param userRepository   the user repository
    */
-  public ClientService(ClientRepository clientRepository) {
+  public ClientService(ClientRepository clientRepository, UserRepository userRepository, 
+                       BCryptPasswordEncoder passwordEncoder) {
     this.clientRepository = clientRepository;
+    this.userRepository = userRepository;
+    this.passwordEncoder = passwordEncoder;
   }
 
   /**
@@ -50,11 +60,11 @@ public class ClientService {
       String city,
       String country,
       String phoneNumber) {
-    if (clientRepository.findByEmail(email) != null) {
+    if (userRepository.findByEmail(email) != null) {
       return false;
     }
 
-    createOne(
+    createClient(
         name,
         firstname,
         email,
@@ -84,7 +94,7 @@ public class ClientService {
    * @param country the country
    * @param phoneNumber the phone number (optional)
    */
-  public void createOne(
+  public void createClient(
       String name,
       String firstname,
       String email,
@@ -101,7 +111,7 @@ public class ClientService {
     client.setName(name);
     client.setFirstname(firstname);
     client.setEmail(email);
-    client.setPassword(password);
+    client.setPassword(passwordEncoder.encode(password));
     client.setCivility(civility);
     client.setStreet(street);
     client.setNumber(number);
@@ -114,3 +124,4 @@ public class ClientService {
     clientRepository.save(client);
   }
 }
+

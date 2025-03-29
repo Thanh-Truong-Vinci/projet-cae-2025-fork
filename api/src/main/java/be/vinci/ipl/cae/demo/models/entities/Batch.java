@@ -12,7 +12,9 @@ import java.time.LocalDate;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** Lot entity representing a batch of products. */
+/**
+ * Batch entity representing a batch of products.
+ */
 @Entity
 @Table(name = "batchs")
 @Data
@@ -61,4 +63,3 @@ public class Batch {
   @Column(name = "date_depot", nullable = false)
   private LocalDate depositDate;
 }
-

@@ -2,7 +2,9 @@ package be.vinci.ipl.cae.demo.      services;
 
 import be.vinci.ipl.cae.demo.models.entities.Producer;
 import be.vinci.ipl.cae.demo.repositories.ProducerRepository;
+import be.vinci.ipl.cae.demo.repositories.UserRepository;
 import java.time.LocalDate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /** Producer Service. */
@@ -10,14 +12,20 @@ import org.springframework.stereotype.Service;
 public class ProducerService {
 
   private final ProducerRepository producerRepository;
+  private final BCryptPasswordEncoder passwordEncoder;
+  private final UserRepository userRepository;
 
   /**
    * Constructor.
    *
    * @param producerRepository the manager repository
    */
-  public ProducerService(ProducerRepository producerRepository) {
+  public ProducerService(
+      ProducerRepository producerRepository, BCryptPasswordEncoder passwordEncoder, 
+      UserRepository userRepository) {
     this.producerRepository = producerRepository;
+    this.passwordEncoder = passwordEncoder;
+    this.userRepository = userRepository;
   }
 
   /**
@@ -50,7 +58,7 @@ public class ProducerService {
       String city,
       String country,
       String phoneNumber) {
-    if (producerRepository.findByEmail(email) != null) {
+    if (userRepository.findByEmail(email) != null) {
       return false;
     }
     createProducer(
@@ -104,7 +112,7 @@ public class ProducerService {
     producer.setFirstname(firstname);
     producer.setCompany(company);
     producer.setEmail(email);
-    producer.setPassword(password);
+    producer.setPassword(passwordEncoder.encode(password));
     producer.setStreet(street);
     producer.setNumber(number);
     producer.setBox(box);
@@ -115,14 +123,5 @@ public class ProducerService {
     producer.setDateInscription(LocalDate.now());
 
     producerRepository.save(producer);
-  }
-
-  /**
-   * Get the producer's ID.
-   *
-   * @param email the email of the producer
-   */
-  public Producer getProducerId(String email) {
-    return producerRepository.findByEmail(email);
   }
 }

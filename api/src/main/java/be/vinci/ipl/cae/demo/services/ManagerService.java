@@ -2,22 +2,32 @@ package be.vinci.ipl.cae.demo.services;
 
 import be.vinci.ipl.cae.demo.models.entities.Manager;
 import be.vinci.ipl.cae.demo.repositories.ManagerRepository;
+import be.vinci.ipl.cae.demo.repositories.UserRepository;
 import java.time.LocalDate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-/** Manager Service. */
+/**
+ * Service class for managing managers.
+ */
 @Service
 public class ManagerService {
 
   private final ManagerRepository managerRepository;
+  private final BCryptPasswordEncoder passwordEncoder;
+  private final UserRepository userRepository;
 
   /**
    * Constructor.
    *
    * @param managerRepository the manager repository
    */
-  public ManagerService(ManagerRepository managerRepository) {
+  public ManagerService(
+      ManagerRepository managerRepository, BCryptPasswordEncoder passwordEncoder, 
+      UserRepository userRepository) {
     this.managerRepository = managerRepository;
+    this.passwordEncoder = passwordEncoder;
+    this.userRepository = userRepository;
   }
 
   /**
@@ -31,7 +41,7 @@ public class ManagerService {
    */
   public boolean register(
       String name, String firstname, String email, String password, String requesterEmail) {
-    if (managerRepository.findByEmail(email) != null) {
+    if (userRepository.findByEmail(email) != null) {
       return false;
     }
     createManager(name, firstname, email, password, requesterEmail);
@@ -53,19 +63,10 @@ public class ManagerService {
     manager.setName(name);
     manager.setFirstname(firstname);
     manager.setEmail(email);
-    manager.setPassword(password);
+    manager.setPassword(passwordEncoder.encode(password));
     manager.setManager(managerRepository.findByEmail(requesterEmail));
     manager.setDateInscription(LocalDate.now());
 
     managerRepository.save(manager);
-  }
-
-  /**
-   * Get the manager's ID.
-   *
-   * @param email the email of the manager
-   */
-  public Manager getManagerId(String email) {
-    return managerRepository.findByEmail(email).getManager();
   }
 }

@@ -140,7 +140,7 @@ const ManagerRegisterPage = () => {
 
       // Redirect after delay
       setTimeout(() => {
-        navigate('/login')
+        navigate('/')
       }, 3000)
     } catch (err) {
       console.error('ManagerRegisterPage::error: ', err)

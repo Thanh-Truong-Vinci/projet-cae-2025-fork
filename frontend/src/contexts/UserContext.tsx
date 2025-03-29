@@ -24,6 +24,7 @@ const defaultUserContext: UserContextType = {
     throw new Error('Context not initialized')
   },
   clearUser: () => {},
+  changePassword: async () => {},
 }
 
 const UserContext = createContext<UserContextType>(defaultUserContext)
@@ -79,16 +80,21 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
   }, [])
   const registerManager = useCallback(
     async (managerData: ManagerRegistrationData) => {
+      const token = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('token='))
+        ?.split('=')[1]
       try {
         const options = {
           method: 'POST',
           body: JSON.stringify(managerData),
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `${token}`,
           },
         }
 
-        const response = await fetch('/api/auths/register-manager', options)
+        const response = await fetch('/api/auths/registermanager', options)
 
         if (!response.ok)
           throw new Error(
@@ -104,16 +110,21 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
 
   const registerProducer = useCallback(
     async (producerData: ProducerRegistrationData) => {
+      const token = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('token='))
+        ?.split('=')[1]
       try {
         const options = {
           method: 'POST',
           body: JSON.stringify(producerData),
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `${token}`,
           },
         }
 
-        const response = await fetch('/api/auths/register-producer', options)
+        const response = await fetch('/api/auths/registerproducer', options)
 
         if (!response.ok)
           throw new Error(
@@ -165,6 +176,44 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
     setAuthenticatedUser(undefined)
   }
 
+  const changePassword = useCallback(
+    async (currentPassword: string, newPassword: string): Promise<void> => {
+      const token = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('token='))
+        ?.split('=')[1]
+      if (!token || !authenticatedUser) {
+        throw new Error('User not authenticated')
+      }
+
+      try {
+        const options = {
+          method: 'POST',
+          body: JSON.stringify({
+            email: authenticatedUser.email,
+            currentPassword,
+            newPassword,
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${token}`,
+          },
+        }
+
+        const response = await fetch('/api/auths/changepassword', options)
+
+        if (!response.ok)
+          throw new Error(
+            `fetch error : ${response.status} : ${response.statusText}`
+          )
+      } catch (err) {
+        console.error('changePassword::error: ', err)
+        throw err
+      }
+    },
+    [authenticatedUser] // Add authenticatedUser to dependencies
+  )
+
   const contextValue: UserContextType = {
     authenticatedUser,
     authsMe,
@@ -173,6 +222,7 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
     registerUser,
     loginUser,
     clearUser,
+    changePassword,
   }
 
   return (

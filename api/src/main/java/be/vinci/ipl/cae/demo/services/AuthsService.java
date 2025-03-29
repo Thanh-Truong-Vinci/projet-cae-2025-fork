@@ -1,6 +1,9 @@
 package be.vinci.ipl.cae.demo.services;
 
 import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedUser;
+import be.vinci.ipl.cae.demo.models.entities.Client;
+import be.vinci.ipl.cae.demo.models.entities.Manager;
+import be.vinci.ipl.cae.demo.models.entities.Producer;
 import be.vinci.ipl.cae.demo.models.entities.User;
 import be.vinci.ipl.cae.demo.repositories.ClientRepository;
 import be.vinci.ipl.cae.demo.repositories.ManagerRepository;
@@ -11,8 +14,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import java.util.Date;
-import java.util.Objects;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -27,17 +30,20 @@ public class AuthsService {
   private final ClientRepository clientRepository;
   private final ManagerRepository managerRepository;
   private final ProducerRepository producerRepository;
+  private final BCryptPasswordEncoder passwordEncoder;
 
   /** Service for handling authentication-related operations. */
   public AuthsService(
       UserRepository userRepository,
       ClientRepository clientRepository,
       ManagerRepository managerRepository,
-      ProducerRepository producerRepository) {
+      ProducerRepository producerRepository,
+      BCryptPasswordEncoder passwordEncoder) {
     this.userRepository = userRepository;
     this.clientRepository = clientRepository;
     this.managerRepository = managerRepository;
     this.producerRepository = producerRepository;
+    this.passwordEncoder = passwordEncoder;
   }
 
   /**
@@ -100,6 +106,39 @@ public class AuthsService {
   }
 
   /**
+   * Validate if the token is valid for a client.
+   *
+   * @param token the JWT token to verify
+   * @return the client if the token is valid, null otherwise
+   */
+  public Client isValidClientToken(String token) {
+    String email = verifyJwtToken(token);
+    return email != null ? clientRepository.findByEmail(email) : null;
+  }
+
+  /**
+   * Validate if the token is valid for a producer.
+   *
+   * @param token the JWT token to verify
+   * @return the producer if the token is valid, null otherwise
+   */
+  public Producer isValidProducerToken(String token) {
+    String email = verifyJwtToken(token);
+    return email != null ? producerRepository.findByEmail(email) : null;
+  }
+
+  /**
+   * Validate if the token is valid for a manager.
+   *
+   * @param token the JWT token to verify
+   * @return the manager if the token is valid, null otherwise
+   */
+  public Manager isValidManagerToken(String token) {
+    String email = verifyJwtToken(token);
+    return email != null ? managerRepository.findByEmail(email) : null;
+  }
+
+  /**
    * Login a client.
    *
    * @param email the email
@@ -113,7 +152,7 @@ public class AuthsService {
       return null;
     }
 
-    if (!Objects.equals(password, user.getPassword())) {
+    if (!passwordEncoder.matches(password, user.getPassword())) {
       return null;
     }
 
