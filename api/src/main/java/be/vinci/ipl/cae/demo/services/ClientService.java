@@ -2,6 +2,7 @@ package be.vinci.ipl.cae.demo.services;
 
 import be.vinci.ipl.cae.demo.models.entities.Client;
 import be.vinci.ipl.cae.demo.repositories.ClientRepository;
+import be.vinci.ipl.cae.demo.repositories.UserRepository;
 import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -13,14 +14,17 @@ import org.springframework.web.server.ResponseStatusException;
 public class ClientService {
 
   private final ClientRepository clientRepository;
+  private final UserRepository userRepository;
 
   /**
    * Constructor.
    *
    * @param clientRepository the client repository
+   * @param userRepository   the user repository
    */
-  public ClientService(ClientRepository clientRepository) {
+  public ClientService(ClientRepository clientRepository, UserRepository userRepository) {
     this.clientRepository = clientRepository;
+    this.userRepository = userRepository;
   }
 
   /**
@@ -37,7 +41,7 @@ public class ClientService {
    * @param city        the city
    * @param country     the country
    * @param phoneNumber the phone number (optional)
-   * @return the authenticated client if the registration is successful, null otherwise
+   * @return the authenticated client if the registration is successful
    * @throws ResponseStatusException if validation fails
    */
   public boolean register(
@@ -52,7 +56,7 @@ public class ClientService {
       String city,
       String country,
       String phoneNumber) {
-    if (clientRepository.findByEmail(email) != null) {
+    if (userRepository.findByEmail(email) != null) {
       return false;
     }
 
