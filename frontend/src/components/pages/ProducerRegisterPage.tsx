@@ -196,7 +196,7 @@ const ProducerRegisterPage = () => {
 
       // Redirect after delay
       setTimeout(() => {
-        navigate('/login')
+        navigate('/')
       }, 3000)
     } catch (err) {
       console.error('ProducerRegisterPage::error: ', err)

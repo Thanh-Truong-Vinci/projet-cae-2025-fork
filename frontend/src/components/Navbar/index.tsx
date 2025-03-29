@@ -3,6 +3,7 @@ import { useContext } from 'react'
 import { Button, Box, IconButton, Badge } from '@mui/material'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import ReceiptIcon from '@mui/icons-material/Receipt'
+import PersonIcon from '@mui/icons-material/Person'
 import { UserContext } from '../../contexts/UserContext'
 import { UserContextType } from '../../types'
 import { CartContext } from '../../contexts/CartContext'
@@ -41,6 +42,17 @@ const NavBar = () => {
           aria-label="réservations"
         >
           <ReceiptIcon />
+        </IconButton>
+      )}
+
+      {/* Add profile icon for authenticated users */}
+      {authenticatedUser && (
+        <IconButton
+          onClick={() => navigate('/profile')}
+          sx={{ mr: 1 }}
+          aria-label="profile"
+        >
+          <PersonIcon />
         </IconButton>
       )}
 

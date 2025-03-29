@@ -18,6 +18,7 @@ import { ThemeProvider } from '@mui/material/styles'
 import theme from './themes.ts'
 import ManagerRegisterPage from './components/pages/ManagerRegisterPage.tsx'
 import ProducerRegisterPage from './components/pages/ProducerRegisterPage.tsx'
+import ProfilePage from './components/pages/ProfilePage.tsx'
 
 const router = createBrowserRouter([
   {
@@ -55,6 +56,10 @@ const router = createBrowserRouter([
       {
         path: 'reservations',
         element: <ReservationsPage />,
+      },
+      {
+        path: 'profile',
+        element: <ProfilePage />,
       },
     ],
   },

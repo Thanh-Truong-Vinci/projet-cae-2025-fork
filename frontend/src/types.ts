@@ -6,6 +6,10 @@ interface UserContextType {
   registerProducer: (data: ProducerRegistrationData) => Promise<void>
   loginUser: (user: LoginUser) => Promise<AuthenticatedUser>
   clearUser: () => void
+  changePassword: (
+    currentPassword: string,
+    newPassword: string
+  ) => Promise<void>
 }
 
 interface User {

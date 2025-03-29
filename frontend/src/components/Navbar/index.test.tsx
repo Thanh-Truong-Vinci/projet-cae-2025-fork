@@ -34,6 +34,7 @@ describe('NavBar', () => {
       clearUser: vi.fn(),
       registerManager: vi.fn(),
       registerProducer: vi.fn(),
+      changePassword: vi.fn(),
     }
 
     render(
@@ -71,6 +72,7 @@ describe('NavBar', () => {
       clearUser: vi.fn(),
       registerManager: vi.fn(),
       registerProducer: vi.fn(),
+      changePassword: vi.fn(),
     }
 
     render(
@@ -101,6 +103,7 @@ describe('NavBar', () => {
       clearUser: vi.fn(),
       registerManager: vi.fn(),
       registerProducer: vi.fn(),
+      changePassword: vi.fn(),
     }
 
     render(
@@ -129,6 +132,7 @@ describe('NavBar', () => {
       clearUser: vi.fn(),
       registerManager: vi.fn(),
       registerProducer: vi.fn(),
+      changePassword: vi.fn(),
     }
 
     render(
@@ -163,6 +167,7 @@ describe('NavBar', () => {
       loginUser: vi.fn(),
       registerManager: vi.fn(),
       registerProducer: vi.fn(),
+      changePassword: vi.fn(),
       clearUser: clearUserMock,
     }
 
