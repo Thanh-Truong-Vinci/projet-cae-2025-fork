@@ -182,10 +182,15 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
         .split('; ')
         .find((row) => row.startsWith('token='))
         ?.split('=')[1]
+      if (!token || !authenticatedUser) {
+        throw new Error('User not authenticated')
+      }
+
       try {
         const options = {
-          method: 'PUT',
+          method: 'POST',
           body: JSON.stringify({
+            email: authenticatedUser.email,
             currentPassword,
             newPassword,
           }),
@@ -206,7 +211,7 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
         throw err
       }
     },
-    []
+    [authenticatedUser] // Add authenticatedUser to dependencies
   )
 
   const contextValue: UserContextType = {

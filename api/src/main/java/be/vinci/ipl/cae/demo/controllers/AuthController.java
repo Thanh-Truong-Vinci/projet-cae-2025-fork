@@ -181,7 +181,7 @@ public class AuthController {
    *
    * @param credentials the producer credentials from the request body.
    */
-  @PostMapping("/password")
+  @PostMapping("/changepassword")
   public void changePassword(@RequestBody CredentialsProfile credentials) {
     profileService.changePassword(credentials.getEmail(), credentials.getPassword());
   }
