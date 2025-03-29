@@ -1,48 +1,91 @@
 import { AuthenticatedUser, MaybeAuthenticatedUser } from '../types'
 
-const storeAuthenticatedUser = (authenticatedUser: AuthenticatedUser) => {
-  const expiryDate = new Date()
-  expiryDate.setDate(expiryDate.getDate() + 2)
+const storeAuthenticatedUser = (
+  authenticatedUser: AuthenticatedUser,
+  rememberMe = false
+) => {
+  console.log('Storing user data with rememberMe:', rememberMe)
 
-  // BINARY TO ASCII (btoa)
-  const encodedUser = btoa(JSON.stringify(authenticatedUser))
+  if (rememberMe) {
+    // For remembered sessions - long expiration (1 year)
+    const expiryDate = new Date()
+    expiryDate.setFullYear(expiryDate.getFullYear() + 1)
 
-  // Création du cookie avec le token et le user encodé
-  document.cookie = `authToken=${authenticatedUser.token}; path=/; expires=${expiryDate.toUTCString()}`
-  document.cookie = `authUser=${encodedUser}; path=/; expires=${expiryDate.toUTCString()}`
-}
+    // Store token in cookie with long expiration
+    document.cookie = `token=${authenticatedUser.token}; path=/; expires=${expiryDate.toUTCString()}; SameSite=Lax`
 
-// Récupère l'utilisateur authentifié depuis les cookies
-const getAuthenticatedUser = (): MaybeAuthenticatedUser => {
-  const cookies = document.cookie.split(';')
-  let token = null
-  let encodedUser = null
+    // Store full user data in localStorage (persists after browser close)
+    localStorage.setItem(
+      'user',
+      JSON.stringify({
+        email: authenticatedUser.email,
+        name: authenticatedUser.name,
+        firstname: authenticatedUser.firstname,
+        role: authenticatedUser.role,
+        token: authenticatedUser.token,
+      })
+    )
 
-  // Recherche les cookies appropriés
-  for (const cookie of cookies) {
-    const [name, value] = cookie.trim().split('=')
-    if (name === 'authToken') token = value
-    if (name === 'authUser') encodedUser = value
-  }
-
-  if (!token || !encodedUser) return undefined
-
-  try {
-    // ASCII TO BINARY (atob)
-    return JSON.parse(atob(encodedUser))
-  } catch (error) {
-    console.error('Erreur de décodage du cookie utilisateur:', error)
-
+    // Clean up any session storage to avoid conflicts
+    sessionStorage.removeItem('user')
+    console.log('User data stored in localStorage (persistent)')
+  } else {
+    // For non-remembered sessions, use memory only - clear any cookies/storage
+    // Do NOT set a token cookie at all
     clearAuthenticatedUser()
-    return undefined
+
+    // Store user data in sessionStorage only (for current session access)
+    sessionStorage.setItem(
+      'user',
+      JSON.stringify({
+        email: authenticatedUser.email,
+        name: authenticatedUser.name,
+        firstname: authenticatedUser.firstname,
+        role: authenticatedUser.role,
+        token: authenticatedUser.token,
+      })
+    )
+    console.log('User data stored in sessionStorage only (volatile)')
   }
 }
 
-// Supprime les cookies d'authentification
+const getAuthenticatedUser = (): MaybeAuthenticatedUser => {
+  // First check for persistent login (localStorage + cookie)
+  const cookies = document.cookie.split(';')
+  const tokenCookie = cookies.find((cookie) =>
+    cookie.trim().startsWith('token=')
+  )
+  const token = tokenCookie ? tokenCookie.trim().split('=')[1] : null
+
+  // If we have a token in cookies, use localStorage data
+  if (token) {
+    const userStr = localStorage.getItem('user')
+    if (userStr) {
+      try {
+        const userData = JSON.parse(userStr)
+        return {
+          ...userData,
+          token,
+        }
+      } catch (error) {
+        console.error('Error parsing localStorage user data:', error)
+        clearAuthenticatedUser()
+      }
+    }
+  }
+
+  // No persistent login found
+  return undefined
+}
+
 const clearAuthenticatedUser = () => {
-  // Défini une date d'expiration dans le passé pour supprimer les cookies
-  document.cookie = 'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
-  document.cookie = 'authUser=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
+  // Set token cookie to expire immediately
+  document.cookie =
+    'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=-1'
+
+  // Clear both storage types
+  localStorage.removeItem('user')
+  sessionStorage.removeItem('user')
 }
 
 export { storeAuthenticatedUser, getAuthenticatedUser, clearAuthenticatedUser }

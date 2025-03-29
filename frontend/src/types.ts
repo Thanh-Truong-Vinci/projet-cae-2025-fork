@@ -4,7 +4,10 @@ interface UserContextType {
   registerUser: (newUser: User) => Promise<void>
   registerManager: (data: ManagerRegistrationData) => Promise<void>
   registerProducer: (data: ProducerRegistrationData) => Promise<void>
-  loginUser: (user: LoginUser) => Promise<AuthenticatedUser>
+  loginUser: (
+    user: LoginUser,
+    rememberMe?: boolean
+  ) => Promise<AuthenticatedUser>
   clearUser: () => void
   changePassword: (
     currentPassword: string,

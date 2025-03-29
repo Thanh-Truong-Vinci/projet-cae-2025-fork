@@ -37,10 +37,10 @@ const LoginPage = () => {
     const user: LoginUser = { email, password }
     try {
       setErrorMessage(null)
-      const authenticatedUser: AuthenticatedUser = await loginUser(user)
-      if (rememberMe && authenticatedUser) {
-        document.cookie = `token=${authenticatedUser.token}; path=/; max-age=31536000` // 1 year
-      }
+      const authenticatedUser: AuthenticatedUser = await loginUser(
+        user,
+        rememberMe
+      )
       if (authenticatedUser?.role === 'Volunteer') {
         navigate('/volunteer')
       } else {

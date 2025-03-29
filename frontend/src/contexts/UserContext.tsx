@@ -1,4 +1,10 @@
-import { createContext, useState, ReactNode, useCallback } from 'react'
+import {
+  createContext,
+  useState,
+  ReactNode,
+  useCallback,
+  useEffect,
+} from 'react'
 import {
   MaybeAuthenticatedUser,
   UserContextType,
@@ -12,6 +18,7 @@ import {
 import {
   clearAuthenticatedUser,
   storeAuthenticatedUser,
+  getAuthenticatedUser,
 } from '../utils/session'
 
 const defaultUserContext: UserContextType = {
@@ -31,31 +38,66 @@ const UserContext = createContext<UserContextType>(defaultUserContext)
 
 const UserContextProvider = ({ children }: { children: ReactNode }) => {
   const [authenticatedUser, setAuthenticatedUser] =
-    useState<MaybeAuthenticatedUser>(undefined)
+    useState<MaybeAuthenticatedUser>(getAuthenticatedUser())
+
+  // Try to restore user from session on component mount
+  useEffect(() => {
+    const savedUser = getAuthenticatedUser()
+    if (savedUser) {
+      setAuthenticatedUser(savedUser)
+    }
+  }, [])
 
   const authsMe = useCallback(async (token: string): Promise<void> => {
     try {
+      console.log('Validating token with server...')
       const response = await fetch('/api/auths/me', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'text/plain',
         },
-        body: JSON.stringify({ token }),
+        body: token, // Send the raw token string as the API expects
       })
-      if (!response.ok)
-        throw new Error(
-          `fetch error : ${response.status} : ${response.statusText}`
+
+      if (!response.ok) {
+        console.error(
+          'Token validation API error:',
+          response.status,
+          response.statusText
         )
 
-      const authenticatedUser: AuthenticatedUser = await response.json()
+        if (response.status === 401 || response.status === 403) {
+          console.log('Clearing auth due to unauthorized response')
+          clearAuthenticatedUser()
+          setAuthenticatedUser(undefined)
+        }
 
-      setAuthenticatedUser(authenticatedUser)
-      storeAuthenticatedUser(authenticatedUser)
+        throw new Error(`Token validation failed: ${response.status}`)
+      }
+
+      // API returns a new token as plain text, not JSON
+      const newToken = await response.text()
+      console.log('Token validation successful, received new token')
+
+      // Update the stored user with the new token using functional update
+      // to avoid dependency on authenticatedUser
+      setAuthenticatedUser((prev) => {
+        if (!prev) return prev
+
+        const updatedUser = {
+          ...prev,
+          token: newToken,
+        }
+
+        // Update stored credentials with new token
+        storeAuthenticatedUser(updatedUser, true)
+        return updatedUser
+      })
     } catch (error) {
-      console.error('Token validation failed:', error)
+      console.error('Token validation error:', error)
       throw error
     }
-  }, [])
+  }, []) // Remove authenticatedUser from dependencies
 
   const registerUser = useCallback(async (newUser: User) => {
     try {
@@ -139,8 +181,14 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
   )
 
   const loginUser = useCallback(
-    async (user: LoginUser): Promise<AuthenticatedUser> => {
+    async (user: LoginUser, rememberMe = false): Promise<AuthenticatedUser> => {
       try {
+        console.log(
+          'Logging in user:',
+          user.email,
+          'with rememberMe:',
+          rememberMe
+        )
         const options = {
           method: 'POST',
           body: JSON.stringify(user),
@@ -151,20 +199,24 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
 
         const response = await fetch('/api/auths/login', options)
 
-        if (!response.ok)
-          throw new Error(
-            `fetch error : ${response.status} : ${response.statusText}`
-          )
+        if (!response.ok) {
+          console.error('Login failed:', response.status, response.statusText)
+          throw new Error(`fetch error : ${response.status}`)
+        }
 
         const authenticatedUser: AuthenticatedUser = await response.json()
+        console.log('Login successful, storing user data')
 
-        document.cookie = `token=${authenticatedUser.token}; timestamp=${Date.now()}`
+        if (!authenticatedUser || !authenticatedUser.token) {
+          console.error('Invalid authentication response')
+          throw new Error('Invalid authentication data')
+        }
 
         setAuthenticatedUser(authenticatedUser)
-        storeAuthenticatedUser(authenticatedUser)
+        storeAuthenticatedUser(authenticatedUser, rememberMe)
         return authenticatedUser
       } catch (err) {
-        console.error('loginUser::error: ', err)
+        console.error('Login error:', err)
         throw err
       }
     },
