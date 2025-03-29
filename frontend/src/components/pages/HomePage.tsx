@@ -13,14 +13,25 @@ import {
   CardActions,
   Snackbar,
   Alert,
+  CircularProgress,
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart'
 import { CartContext } from '../../contexts/CartContext'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { ProductContext } from '../../contexts/ProductContextDefinition'
 
 const HomePage = () => {
+  // Récupérer les données du ProductContext
+  const {
+    products,
+    getCategoryLabel,
+    getProductsByCategory,
+    isLoading,
+    error,
+  } = useContext(ProductContext)
+
   const [type, setType] = useState('')
   const [productName, setProductName] = useState('')
   const [currentProductIndex, setCurrentProductIndex] = useState(0)
@@ -33,6 +44,9 @@ const HomePage = () => {
   const location = useLocation()
   const [openSnackbar, setOpenSnackbar] = useState(false)
   const [message, setMessage] = useState('')
+
+  // Nouvel état pour les produits filtrés, initialisé avec les produits du contexte
+  const [filteredProducts, setFilteredProducts] = useState(products)
 
   // Wrap topProducts in useMemo to maintain stable reference
   const topProducts = useMemo(
@@ -59,16 +73,19 @@ const HomePage = () => {
     []
   ) // Empty dependency array means this only runs once
 
-  const products = useMemo(
-    () =>
-      Array.from({ length: 30 }, (_, i) => ({
-        id: i + 1,
-        name: `Produit ${i + 1}`,
-        price: `${10 + i}€`,
-        image: 'https://via.placeholder.com/300',
-      })),
+  // Définir les catégories de produits
+  const productCategories = useMemo(
+    () => [
+      { value: 'legumes', label: 'Légumes' },
+      { value: 'fruits', label: 'Fruits' },
+      { value: 'boulangerie', label: 'Boulangerie' },
+      { value: 'viande', label: 'Viande' },
+      { value: 'produits_laitiers', label: 'Produits laitiers' },
+      { value: 'boissons', label: 'Boissons' },
+      { value: 'autres', label: 'Autres' },
+    ],
     []
-  ) // Also wrapping products in useMemo for consistency
+  )
 
   // Initialize quantities state for all products
   useEffect(() => {
@@ -102,8 +119,28 @@ const HomePage = () => {
     }
   }, [location])
 
+  // Mettre à jour filteredProducts quand products change
+  useEffect(() => {
+    setFilteredProducts(products)
+  }, [products])
+
   const handleFilter = () => {
-    console.log('Filtrage avec:', type, productName)
+    let results = [...products]
+
+    if (type) {
+      // Utiliser la fonction du contexte
+      results = getProductsByCategory(type)
+    }
+
+    if (productName.trim()) {
+      const searchTerm = productName.toLowerCase().trim()
+      results = results.filter((product) =>
+        product.name.toLowerCase().includes(searchTerm)
+      )
+    }
+
+    setFilteredProducts(results)
+    setVisibleProducts(productsPerLoad)
   }
 
   interface Product {
@@ -111,6 +148,7 @@ const HomePage = () => {
     name: string
     price: string
     image: string
+    category?: string
   }
 
   const handleQuantityChange = (productId: number, value: number) => {
@@ -136,6 +174,36 @@ const HomePage = () => {
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false)
+  }
+
+  if (isLoading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '50vh',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    )
+  }
+
+  if (error) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '50vh',
+        }}
+      >
+        <Typography color="error">{error}</Typography>
+      </Box>
+    )
   }
 
   return (
@@ -249,8 +317,11 @@ const HomePage = () => {
             sx={{ my: 2, bgcolor: 'white' }}
           >
             <MenuItem value="">Filtrer par type</MenuItem>
-            <MenuItem value="type1">Type 1</MenuItem>
-            <MenuItem value="type2">Type 2</MenuItem>
+            {productCategories.map((category) => (
+              <MenuItem key={category.value} value={category.value}>
+                {category.label}
+              </MenuItem>
+            ))}
           </Select>
           <TextField
             placeholder="Nom du produit"
@@ -281,84 +352,93 @@ const HomePage = () => {
             justifyContent: 'center',
           }}
         >
-          {products.slice(0, visibleProducts).map((product) => (
-            <Card
-              key={product.id}
-              sx={{ width: 250, height: 'auto', mb: 2, cursor: 'pointer' }} // Ajout du curseur pointer
-              onClick={() => handleProductClick(product.id)}
-            >
-              <CardMedia
-                component="img"
-                height="140"
-                image={product.image}
-                alt={product.name}
-              />
-              <CardContent>
-                <Typography gutterBottom variant="h6" component="div">
-                  {product.name}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Prix: {product.price}
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    width: '100%',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <IconButton
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleQuantityChange(product.id, -1)
-                      }}
-                      size="small"
-                    >
-                      <RemoveIcon />
-                    </IconButton>
-                    <Typography sx={{ mx: 1 }}>
-                      {quantities[product.id] || 1}
-                    </Typography>
-                    <IconButton
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleQuantityChange(product.id, 1)
-                      }}
-                      size="small"
-                    >
-                      <AddIcon />
-                    </IconButton>
-                  </Box>
-                  <Button
-                    size="small"
-                    variant="contained"
-                    color="success"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleAddToCart(product)
+          {filteredProducts.length > 0 ? (
+            filteredProducts.slice(0, visibleProducts).map((product) => (
+              <Card
+                key={product.id}
+                sx={{ width: 250, height: 'auto', mb: 2, cursor: 'pointer' }} // Ajout du curseur pointer
+                onClick={() => handleProductClick(product.id)}
+              >
+                <CardMedia
+                  component="img"
+                  height="140"
+                  image={product.image}
+                  alt={product.name}
+                />
+                <CardContent>
+                  <Typography gutterBottom variant="h6" component="div">
+                    {product.name}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Prix: {product.price}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Catégorie: {getCategoryLabel(product.category || '')}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      width: '100%',
+                      justifyContent: 'space-between',
                     }}
                   >
-                    <AddShoppingCartIcon />
-                  </Button>
-                </Box>
-              </CardActions>
-            </Card>
-          ))}
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <IconButton
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleQuantityChange(product.id, -1)
+                        }}
+                        size="small"
+                      >
+                        <RemoveIcon />
+                      </IconButton>
+                      <Typography sx={{ mx: 1 }}>
+                        {quantities[product.id] || 1}
+                      </Typography>
+                      <IconButton
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleQuantityChange(product.id, 1)
+                        }}
+                        size="small"
+                      >
+                        <AddIcon />
+                      </IconButton>
+                    </Box>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      color="success"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleAddToCart(product)
+                      }}
+                    >
+                      <AddShoppingCartIcon />
+                    </Button>
+                  </Box>
+                </CardActions>
+              </Card>
+            ))
+          ) : (
+            <Typography variant="body1" sx={{ py: 5 }}>
+              Aucun produit ne correspond à vos critères de recherche.
+            </Typography>
+          )}
         </Box>
       </Box>
 
       {/* Bouton Voir Plus */}
-      {visibleProducts < products.length ? (
+      {visibleProducts < filteredProducts.length ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 3 }}>
           <Button
             variant="contained"
             onClick={() =>
               setVisibleProducts((prev) =>
-                Math.min(prev + productsPerLoad, products.length)
+                Math.min(prev + productsPerLoad, filteredProducts.length)
               )
             }
           >
@@ -367,7 +447,9 @@ const HomePage = () => {
         </Box>
       ) : (
         <Typography variant="body1" sx={{ textAlign: 'center', mt: 2, mb: 3 }}>
-          Il n'y a plus de produits à afficher.
+          {filteredProducts.length > 0
+            ? "Il n'y a plus de produits à afficher."
+            : ''}
         </Typography>
       )}
 

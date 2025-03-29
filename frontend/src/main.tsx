@@ -18,6 +18,7 @@ import { ThemeProvider } from '@mui/material/styles'
 import theme from './themes.ts'
 import ManagerRegisterPage from './components/pages/ManagerRegisterPage.tsx'
 import ProducerRegisterPage from './components/pages/ProducerRegisterPage.tsx'
+import { ProductProvider } from './contexts/ProductContext.tsx'
 
 const router = createBrowserRouter([
   {
@@ -65,9 +66,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <UserContextProvider>
-        <CartProvider>
-          <RouterProvider router={router} />
-        </CartProvider>
+        <ProductProvider>
+          <CartProvider>
+            <RouterProvider router={router} />
+          </CartProvider>
+        </ProductProvider>
       </UserContextProvider>
     </ThemeProvider>
   </React.StrictMode>

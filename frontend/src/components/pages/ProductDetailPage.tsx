@@ -40,32 +40,69 @@ const ProductDetailPage = () => {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Simuler une requête API pour obtenir les détails du produit
-    // À terme, ceci devrait être une vraie requête vers votre API
     const fetchProduct = async () => {
-      setLoading(true)
       try {
-        // Simuler un délai de chargement
-        await new Promise((resolve) => setTimeout(resolve, 300))
+        setLoading(true)
 
-        // Simuler des données de produit
-        const mockProduct: Product = {
-          id: Number(productId),
-          name: `Produit ${productId}`,
-          price: `${10 + Number(productId)}€`,
-          image: 'https://via.placeholder.com/600x400',
-          description:
-            "Ce produit de qualité supérieure est cultivé localement selon des méthodes respectueuses de l'environnement. Sa fraîcheur exceptionnelle et son goût incomparable en font un incontournable de votre cuisine. Idéal pour la préparation de plats savoureux et nutritifs, il saura satisfaire les palais les plus exigeants.",
-          details: {
-            Origine: 'Belgique',
-            Catégorie: 'Type 1',
-            Conditionnement: '500g',
-            Conservation: 'À conserver au frais',
-          },
+        // Au lieu d'avoir des données mockées fixes, récupérez les informations du produit
+        // en fonction de son ID depuis la même source que HomePage
+
+        // Génération temporaire de donnée mock qui correspond au format de HomePage
+        const products = Array.from({ length: 30 }, (_, i) => ({
+          id: i + 1,
+          name: `Produit ${i + 1}`,
+          price: `${10 + i}€`,
+          image: 'https://via.placeholder.com/300',
+          category: [
+            'legumes',
+            'fruits',
+            'boulangerie',
+            'viande',
+            'produits_laitiers',
+            'boissons',
+            'autres',
+          ][i % 7],
+        }))
+
+        // Trouver le produit avec l'ID correspondant
+        const foundProduct = products.find((p) => p.id === Number(productId))
+
+        if (foundProduct) {
+          // Mapper les catégories aux labels pour affichage
+          const categoryLabels = {
+            legumes: 'Légumes',
+            fruits: 'Fruits',
+            boulangerie: 'Boulangerie',
+            viande: 'Viande',
+            produits_laitiers: 'Produits laitiers',
+            boissons: 'Boissons',
+            autres: 'Autres',
+          }
+
+          // Utiliser le produit trouvé et maintenir ses informations de catégorie
+          const mockProduct = {
+            id: foundProduct.id,
+            name: foundProduct.name,
+            price: foundProduct.price,
+            image: foundProduct.image,
+            description:
+              "Ce produit de qualité supérieure est cultivé localement selon des méthodes respectueuses de l'environnement...",
+            details: {
+              Origine: 'Belgique',
+              Catégorie:
+                categoryLabels[
+                  foundProduct.category as keyof typeof categoryLabels
+                ] || foundProduct.category,
+              Conditionnement: '500g',
+              Conservation: 'À conserver au frais',
+            },
+          }
+
+          setProduct(mockProduct)
+          setError(null)
+        } else {
+          setError('Produit non trouvé')
         }
-
-        setProduct(mockProduct)
-        setError(null)
       } catch (err) {
         setError('Impossible de charger les détails du produit')
         console.error(err)
