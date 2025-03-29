@@ -95,7 +95,9 @@ const ProducerHomePage = () => {
               unitPrice: 3.5,
               unitType: 'kg',
               producerId:
-                'id' in authenticatedUser ? (authenticatedUser as any).id : 1,
+                'id' in authenticatedUser
+                  ? (authenticatedUser as Record<string, number>).id
+                  : 1,
               createdAt: new Date().toISOString(),
               status: 'approved',
             },
@@ -113,7 +115,9 @@ const ProducerHomePage = () => {
               unitPrice: 2.8,
               unitType: 'kg',
               producerId:
-                'id' in authenticatedUser ? (authenticatedUser as any).id : 1,
+                'id' in authenticatedUser
+                  ? (authenticatedUser as Record<string, number>).id
+                  : 1,
               createdAt: new Date().toISOString(),
               status: 'pending',
             },
@@ -131,7 +135,9 @@ const ProducerHomePage = () => {
               unitPrice: 4.2,
               unitType: 'pièce',
               producerId:
-                'id' in authenticatedUser ? (authenticatedUser as any).id : 1,
+                'id' in authenticatedUser
+                  ? (authenticatedUser as Record<string, number>).id
+                  : 1,
               createdAt: new Date().toISOString(),
               status: 'rejected',
               rejectionReason: 'Photos non conformes, description insuffisante',

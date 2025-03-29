@@ -86,11 +86,11 @@ const ManagerDashboardPage = () => {
         if (savedBatches) {
           // Si des lots ont été enregistrés, les utiliser et ajouter le statut
           const parsedBatches = JSON.parse(savedBatches)
-          batchData = parsedBatches.map((batch: any) => ({
+          batchData = parsedBatches.map((batch: Record<string, unknown>) => ({
             ...batch,
             // Ajouter un statut aléatoire pour la démo si non présent
             status:
-              batch.status ||
+              (batch.status as string) ||
               (Math.random() > 0.7
                 ? 'approved'
                 : Math.random() > 0.5
@@ -98,13 +98,13 @@ const ManagerDashboardPage = () => {
                   : 'pending'),
             // Ajouter un nom de producteur aléatoire si non présent
             producerName:
-              batch.producerName ||
+              (batch.producerName as string) ||
               `Producteur ${Math.floor(Math.random() * 5) + 1}`,
             // Ajouter une raison de rejet si le statut est rejeté et qu'il n'y a pas de raison
             rejectionReason:
-              batch.status === 'rejected' && !batch.rejectionReason
-                ? 'Non conforme aux standards de qualité'
-                : batch.rejectionReason,
+              (batch.status as string) === 'rejected'
+                ? (batch.rejectionReason as string) || 'Aucune raison spécifiée'
+                : undefined,
           }))
         } else {
           // Données simulées pour l'exemple (première visite)
@@ -229,7 +229,7 @@ const ManagerDashboardPage = () => {
     }
 
     fetchAllBatches()
-  }, [authenticatedUser])
+  }, [authenticatedUser, tabValue])
 
   // Filtrer les lots en fonction de l'onglet sélectionné
   const updateFilteredBatches = (batches: ProductBatch[], tab: number) => {

@@ -74,7 +74,7 @@ const ReservationsPage = () => {
         return
       }
 
-      let allReservations = JSON.parse(storedReservations)
+      const allReservations = JSON.parse(storedReservations)
 
       // Pour déboguer, affichez toutes les réservations dans la console
       console.log('Toutes les réservations chargées:', allReservations)

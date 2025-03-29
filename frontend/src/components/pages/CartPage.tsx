@@ -128,7 +128,10 @@ const CartPage = () => {
           typeof userId
         )
       } else if ('userId' in authenticatedUser) {
-        userId = (authenticatedUser as any).userId
+        // Remplacer (authenticatedUser as any).userId par une méthode plus typée
+        userId = (authenticatedUser as Record<string, unknown>).userId as
+          | number
+          | string
         console.log(
           'ID trouvé depuis la propriété "userId":',
           userId,
@@ -143,7 +146,10 @@ const CartPage = () => {
         // Chercher une propriété qui ressemble à un ID
         for (const key of keys) {
           if (key.toLowerCase().includes('id')) {
-            userId = (authenticatedUser as any)[key]
+            // Remplacer (authenticatedUser as any)[key] par une méthode plus typée
+            userId = (authenticatedUser as unknown as Record<string, unknown>)[
+              key
+            ] as number | string
             console.log(
               `ID potentiel trouvé dans la propriété "${key}":`,
               userId
