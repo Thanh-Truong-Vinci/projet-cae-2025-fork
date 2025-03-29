@@ -14,8 +14,7 @@ import { UserContext } from '../../contexts/UserContext'
 import './index.css'
 
 const LoginPage = () => {
-  const { loginUser, authenticatedUser } =
-    useContext<UserContextType>(UserContext)
+  const { loginUser } = useContext<UserContextType>(UserContext)
   const navigate = useNavigate()
   const location = useLocation()
   const [email, setEmail] = useState('')
@@ -28,12 +27,9 @@ const LoginPage = () => {
   const returnTo = location.state?.returnTo || '/'
 
   // When login is successful
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = async () => {
     // Redirect the user back to where they came from
-    if (authenticatedUser?.role === 'Volunteer') navigate('/volunteer')
-    else {
-      navigate(returnTo)
-    }
+    navigate(returnTo)
   }
 
   const handleSubmit = async (e: SyntheticEvent) => {
@@ -45,6 +41,7 @@ const LoginPage = () => {
       if (rememberMe && authenticatedUser) {
         document.cookie = `token=${authenticatedUser.token}; path=/; max-age=31536000` // 1 year
       }
+      if (authenticatedUser?.role === 'Volunteer') navigate('/volunteer')
       handleLoginSuccess()
     } catch (err) {
       console.error('LoginPage::error: ', err)
