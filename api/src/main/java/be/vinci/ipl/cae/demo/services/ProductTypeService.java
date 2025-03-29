@@ -50,9 +50,28 @@ public class ProductTypeService {
    *
    * @param title the title of the product type
    */
-  public void createProductType(String title) {
+  public ProductType createProductType(String title) {
     ProductType productType = new ProductType();
     productType.setTitle(title);
-    productTypeRepository.save(productType);
+    return productTypeRepository.save(productType);
+  }
+
+  /**
+   * Retrieves all product types.
+   *
+   * @return an iterable of all product types
+   */
+  public Iterable<ProductType> getAllProductTypes() {
+    return productTypeRepository.findAll();
+  }
+
+  /**
+   * Retrieves a product type by its ID.
+   *
+   * @param id the ID of the product type
+   * @return the product type with the specified ID, or null if not found
+   */
+  public ProductType getProductTypeById(long id) {
+    return productTypeRepository.findById(id).orElse(null);
   }
 }

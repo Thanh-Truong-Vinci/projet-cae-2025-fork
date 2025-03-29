@@ -1,26 +1,33 @@
 import { useState, ReactNode, useCallback, useMemo, useEffect } from 'react'
+import axios from 'axios' // Décommenter cette ligne
 import {
   ProductContext,
   Product,
   categoryLabels,
 } from './ProductContextDefinition'
-// import axios from 'axios'
 
-/* Interface pour typer la réponse de l'API
+// Interface pour typer la réponse de l'API
 interface ApiProduct {
-  id_product: number
+  id: number // id_product devient id
   name: string
-  batchs?: Array<{ prix_unitaire: number }>
-  photo?: { url: string }
-  id_product_type?: { title: string }
   description?: string
-}*/
+  type?: {
+    // type au lieu de id_product_type
+    id: number
+    title: string
+  }
+  photo?: {
+    // structure de photo
+    id: number
+    url?: string
+  }
+}
 
 // IMPORTANT: Uniquement le Provider est exporté par ce fichier
 export const ProductProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [error] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   // Données de secours en cas d'erreur API
   const mockProducts = useMemo<Product[]>(
@@ -63,33 +70,37 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     []
   )
 
-  // Commentez le code existant et remplacez-le par une version simplifiée
   useEffect(() => {
-    // Utiliser directement les données mockées sans appel API
-    setProducts(mockProducts)
-    setIsLoading(false)
-
-    // Code commenté à garder pour plus tard quand l'API sera prête
-    /*
     const fetchProducts = async () => {
       try {
         setIsLoading(true)
         const response = await axios.get<ApiProduct[]>('/api/products')
-        
-        // Transformer les données de l'API...
-        const formattedProducts = response.data.map(...);
-        
+
+        // Transformer les données de l'API pour correspondre à votre modèle Product
+        const formattedProducts = response.data.map((item) => ({
+          id: item.id,
+          name: item.name,
+          // Prix factice ou à calculer à partir des lots (à implémenter)
+          price: '10.00€',
+          // Image par défaut ou URL construite
+          image: item.photo?.url || 'https://via.placeholder.com/150',
+          // Catégorie à partir du type
+          category:
+            item.type?.title?.toLowerCase().replace(' ', '_') || 'autres',
+          description: item.description || '',
+        }))
+
         setProducts(formattedProducts)
       } catch (err) {
         console.error('Erreur détaillée:', err)
         setError('Impossible de charger les produits')
+        // Utiliser les mocks en cas d'erreur
         setProducts(mockProducts)
       } finally {
         setIsLoading(false)
       }
     }
     fetchProducts()
-    */
   }, [mockProducts])
 
   const getProductById = useCallback(

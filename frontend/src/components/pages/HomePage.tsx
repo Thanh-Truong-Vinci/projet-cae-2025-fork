@@ -20,24 +20,46 @@ import RemoveIcon from '@mui/icons-material/Remove'
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart'
 import { CartContext } from '../../contexts/CartContext'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { ProductContext } from '../../contexts/ProductContextDefinition'
+import {
+  Product,
+  ProductContext,
+} from '../../contexts/ProductContextDefinition'
 
 const HomePage = () => {
-  // Récupérer les données du ProductContext
+  // Utilisation sécurisée du ProductContext
+  const productContext = useContext(ProductContext)
+
+  if (!productContext) {
+    throw new Error(
+      'ProductContext doit être utilisé à l intérieur d un ProductProvider'
+    )
+  }
+
+  // Maintenant vous pouvez déstructurer sans risque d'erreur
   const {
     products,
     getCategoryLabel,
     getProductsByCategory,
     isLoading,
     error,
-  } = useContext(ProductContext)
+  } = productContext
+
+  // Même chose pour CartContext
+  const cartContext = useContext(CartContext)
+
+  if (!cartContext) {
+    throw new Error(
+      'CartContext doit être utilisé à l intérieur d un CartProvider'
+    )
+  }
+
+  const { addToCart } = cartContext
 
   const [type, setType] = useState('')
   const [productName, setProductName] = useState('')
   const [currentProductIndex, setCurrentProductIndex] = useState(0)
   const [visibleProducts, setVisibleProducts] = useState(10)
   const [quantities, setQuantities] = useState<{ [key: number]: number }>({})
-  const { addToCart } = useContext(CartContext)
   const productsPerRow = 5
   const productsPerLoad = productsPerRow * 2
   const navigate = useNavigate()
@@ -46,7 +68,7 @@ const HomePage = () => {
   const [message, setMessage] = useState('')
 
   // Nouvel état pour les produits filtrés, initialisé avec les produits du contexte
-  const [filteredProducts, setFilteredProducts] = useState(products)
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
 
   // Wrap topProducts in useMemo to maintain stable reference
   const topProducts = useMemo(
@@ -121,7 +143,9 @@ const HomePage = () => {
 
   // Mettre à jour filteredProducts quand products change
   useEffect(() => {
-    setFilteredProducts(products)
+    if (products) {
+      setFilteredProducts(products)
+    }
   }, [products])
 
   const handleFilter = () => {
@@ -141,14 +165,6 @@ const HomePage = () => {
 
     setFilteredProducts(results)
     setVisibleProducts(productsPerLoad)
-  }
-
-  interface Product {
-    id: number
-    name: string
-    price: string
-    image: string
-    category?: string
   }
 
   const handleQuantityChange = (productId: number, value: number) => {
