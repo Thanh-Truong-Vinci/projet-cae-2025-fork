@@ -64,6 +64,34 @@ interface LoginUser {
 
 type MaybeAuthenticatedUser = AuthenticatedUser | undefined
 
+export interface Product {
+  id: number
+  name: string
+  price: string
+  image: string
+  category?: string
+  description?: string
+}
+
+export const categoryLabels: { [key: string]: string } = {
+  legumes: 'Légumes',
+  fruits: 'Fruits',
+  boulangerie: 'Boulangerie',
+  viande: 'Viande',
+  produits_laitiers: 'Produits laitiers',
+  boissons: 'Boissons',
+  autres: 'Autres',
+}
+
+export interface ProductContextType {
+  products: Product[]
+  getProductById: (id: number) => Product | undefined
+  getProductsByCategory: (category: string) => Product[]
+  getCategoryLabel: (category: string) => string
+  isLoading: boolean
+  error: string | null
+}
+
 export type {
   User,
   ManagerRegistrationData,
