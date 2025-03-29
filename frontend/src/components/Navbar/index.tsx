@@ -5,6 +5,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import ReceiptIcon from '@mui/icons-material/Receipt'
 import AddBoxIcon from '@mui/icons-material/AddBox'
 import PersonIcon from '@mui/icons-material/Person'
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import { UserContext } from '../../contexts/UserContext'
 import { UserContextType } from '../../types'
 import { CartContext } from '../../contexts/CartContext'
@@ -86,6 +87,18 @@ const NavBar = () => {
             <ReceiptIcon />
           </IconButton>
         </>
+      )}
+
+      {/* Ajouter un bouton d'ajout de produit pour les producteurs */}
+      {isProducer && (
+        <IconButton
+          onClick={() => navigate('/add-product')}
+          sx={{ mr: 1 }}
+          aria-label="ajouter un produit"
+          title="Ajouter un produit"
+        >
+          <AddCircleOutlineIcon sx={{ color: 'green' }} />
+        </IconButton>
       )}
 
       {/* Manager: Boutons d'inscription */}

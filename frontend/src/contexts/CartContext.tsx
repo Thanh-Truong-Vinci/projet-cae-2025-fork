@@ -3,6 +3,8 @@ import { CartContext, CartItem } from './CartContextDefinition'
 
 export { CartContext, type CartItem } from './CartContextDefinition'
 
+// Removed local declaration of CartItem to avoid conflict with the imported one
+
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([])
 

@@ -2,19 +2,14 @@ package be.vinci.ipl.cae.demo.controllers;
 
 import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedUser;
 import be.vinci.ipl.cae.demo.models.dtos.Credentials;
-import be.vinci.ipl.cae.demo.models.dtos.CredentialsManager;
-import be.vinci.ipl.cae.demo.models.dtos.CredentialsProducer;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsProfile;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsRegister;
 import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.ClientService;
-import be.vinci.ipl.cae.demo.services.ManagerService;
-import be.vinci.ipl.cae.demo.services.ProducerService;
 import be.vinci.ipl.cae.demo.services.ProfileService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -26,28 +21,18 @@ public class AuthController {
 
   private final ProfileService profileService;
   private final ClientService clientService;
-  private final ManagerService managerService;
-  private final ProducerService producerService;
   private final AuthsService authsService;
 
   /**
    * Constructor for AuthController.
    *
    * @param clientService the injected ClientService.
-   * @param managerService the injected ManagerService.
-   * @param producerService the injected ManagerService.
    * @param authsService the injected AuthsService.
    */
   public AuthController(
-      ProfileService profileService,
-      ClientService clientService,
-      ManagerService managerService,
-      ProducerService producerService,
-      AuthsService authsService) {
+      ProfileService profileService, ClientService clientService, AuthsService authsService) {
     this.profileService = profileService;
     this.clientService = clientService;
-    this.managerService = managerService;
-    this.producerService = producerService;
     this.authsService = authsService;
   }
 
@@ -131,49 +116,6 @@ public class AuthController {
     if (!success) {
       throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
     }
-  }
-
-  /**
-   * Register a new manager.
-   *
-   * @param credentials the manager credentials from the request body.
-   * @throws ResponseStatusException if the credentials are invalid or the email is already in use.
-   */
-  @PostMapping("/registermanager")
-  public void register(
-      @RequestBody CredentialsManager credentials, @RequestHeader("Authorization") String token) {
-    boolean success =
-        managerService.register(
-            credentials.getName(),
-            credentials.getFirstname(),
-            credentials.getEmail(),
-            credentials.getPassword(),
-            authsService.verifyJwtToken(token));
-    if (!success) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
-    }
-  }
-
-  /**
-   * Register a new producer.
-   *
-   * @param credentials the producer credentials from the request body.
-   */
-  @PostMapping("/registerproducer")
-  public void registerProducer(@RequestBody CredentialsProducer credentials) {
-    producerService.registerProducer(
-        credentials.getName(),
-        credentials.getFirstname(),
-        credentials.getCompany(),
-        credentials.getEmail(),
-        credentials.getPassword(),
-        credentials.getStreet(),
-        credentials.getNumber(),
-        credentials.getBox(),
-        credentials.getPostalCode(),
-        credentials.getCity(),
-        credentials.getCountry(),
-        credentials.getPhoneNumber());
   }
 
   /**

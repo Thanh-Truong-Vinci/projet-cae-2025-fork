@@ -6,6 +6,7 @@ export interface CartItem {
   price: string
   image: string
   quantity: number
+  unitType: string // Ajoutez cette ligne pour inclure le type d'unité
 }
 
 interface CartContextType {
