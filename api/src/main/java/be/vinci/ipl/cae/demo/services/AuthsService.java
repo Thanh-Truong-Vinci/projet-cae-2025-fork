@@ -126,8 +126,10 @@ public class AuthsService {
     authenticatedUser.setFirstname(user.getFirstname());
     authenticatedUser.setToken(createJwtToken(email));
 
-    // Determine the role using specific repositories
-    if (clientRepository.findByEmail(email) != null) {
+// Determine the role using specific repositories
+    if ("volunteer@example.com".equals(email)) {
+      authenticatedUser.setRole("Volunteer");
+    } else if (clientRepository.findByEmail(email) != null) {
       authenticatedUser.setRole("Client");
     } else if (managerRepository.findByEmail(email) != null) {
       authenticatedUser.setRole("Manager");
