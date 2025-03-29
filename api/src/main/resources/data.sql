@@ -7,4 +7,6 @@ VALUES ('Admin', 'Admin', 'admin@example.com', 'adminpw', '2001-01-01');
 
 -- Récupérer l'ID généré et insérer dans la table manager
 INSERT INTO manager (id_user, manager)
-SELECT id_user, NULL FROM users WHERE email = 'admin@example.com';
+SELECT id_user, NULL
+FROM users
+WHERE email = 'admin@example.com';

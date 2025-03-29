@@ -61,4 +61,3 @@ public class Batch {
   @Column(name = "date_depot", nullable = false)
   private LocalDate depositDate;
 }
-

@@ -3,6 +3,7 @@ package be.vinci.ipl.cae.demo.services;
 import be.vinci.ipl.cae.demo.models.entities.Manager;
 import be.vinci.ipl.cae.demo.repositories.ManagerRepository;
 import java.time.LocalDate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /** Manager Service. */
@@ -10,14 +11,17 @@ import org.springframework.stereotype.Service;
 public class ManagerService {
 
   private final ManagerRepository managerRepository;
+  private final BCryptPasswordEncoder passwordEncoder;
 
   /**
    * Constructor.
    *
    * @param managerRepository the manager repository
    */
-  public ManagerService(ManagerRepository managerRepository) {
+  public ManagerService(
+      ManagerRepository managerRepository, BCryptPasswordEncoder passwordEncoder) {
     this.managerRepository = managerRepository;
+    this.passwordEncoder = passwordEncoder;
   }
 
   /**
@@ -53,7 +57,7 @@ public class ManagerService {
     manager.setName(name);
     manager.setFirstname(firstname);
     manager.setEmail(email);
-    manager.setPassword(password);
+    manager.setPassword(passwordEncoder.encode(password));
     manager.setManager(managerRepository.findByEmail(requesterEmail));
     manager.setDateInscription(LocalDate.now());
 

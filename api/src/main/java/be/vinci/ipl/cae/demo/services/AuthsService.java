@@ -11,8 +11,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import java.util.Date;
-import java.util.Objects;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -27,17 +27,20 @@ public class AuthsService {
   private final ClientRepository clientRepository;
   private final ManagerRepository managerRepository;
   private final ProducerRepository producerRepository;
+  private final BCryptPasswordEncoder passwordEncoder;
 
   /** Service for handling authentication-related operations. */
   public AuthsService(
       UserRepository userRepository,
       ClientRepository clientRepository,
       ManagerRepository managerRepository,
-      ProducerRepository producerRepository) {
+      ProducerRepository producerRepository,
+      BCryptPasswordEncoder passwordEncoder) {
     this.userRepository = userRepository;
     this.clientRepository = clientRepository;
     this.managerRepository = managerRepository;
     this.producerRepository = producerRepository;
+    this.passwordEncoder = passwordEncoder;
   }
 
   /**
@@ -113,7 +116,8 @@ public class AuthsService {
       return null;
     }
 
-    if (!Objects.equals(password, user.getPassword())) {
+    if (!passwordEncoder.matches(
+        passwordEncoder.encode(password), userRepository.findByEmail(email).getPassword())) {
       return null;
     }
 

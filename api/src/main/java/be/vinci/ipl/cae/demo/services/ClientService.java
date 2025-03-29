@@ -3,6 +3,7 @@ package be.vinci.ipl.cae.demo.services;
 import be.vinci.ipl.cae.demo.models.entities.Client;
 import be.vinci.ipl.cae.demo.repositories.ClientRepository;
 import java.time.LocalDate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -11,14 +12,16 @@ import org.springframework.web.server.ResponseStatusException;
 public class ClientService {
 
   private final ClientRepository clientRepository;
+  private final BCryptPasswordEncoder passwordEncoder;
 
   /**
    * Constructor.
    *
    * @param clientRepository the client repository
    */
-  public ClientService(ClientRepository clientRepository) {
+  public ClientService(ClientRepository clientRepository, BCryptPasswordEncoder passwordEncoder) {
     this.clientRepository = clientRepository;
+    this.passwordEncoder = passwordEncoder;
   }
 
   /**
@@ -101,7 +104,7 @@ public class ClientService {
     client.setName(name);
     client.setFirstname(firstname);
     client.setEmail(email);
-    client.setPassword(password);
+    client.setPassword(passwordEncoder.encode(password));
     client.setCivility(civility);
     client.setStreet(street);
     client.setNumber(number);

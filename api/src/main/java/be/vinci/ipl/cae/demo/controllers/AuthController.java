@@ -4,11 +4,13 @@ import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedUser;
 import be.vinci.ipl.cae.demo.models.dtos.Credentials;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsManager;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsProducer;
+import be.vinci.ipl.cae.demo.models.dtos.CredentialsProfile;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsRegister;
 import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.ClientService;
 import be.vinci.ipl.cae.demo.services.ManagerService;
 import be.vinci.ipl.cae.demo.services.ProducerService;
+import be.vinci.ipl.cae.demo.services.ProfileService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,11 +24,12 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/auths")
 public class AuthController {
 
+  private final ProfileService profileService;
   private final ClientService clientService;
   private final ManagerService managerService;
   private final ProducerService producerService;
   private final AuthsService authsService;
-  
+
   /**
    * Constructor for AuthController.
    *
@@ -36,10 +39,12 @@ public class AuthController {
    * @param authsService the injected AuthsService.
    */
   public AuthController(
+      ProfileService profileService,
       ClientService clientService,
       ManagerService managerService,
       ProducerService producerService,
       AuthsService authsService) {
+    this.profileService = profileService;
     this.clientService = clientService;
     this.managerService = managerService;
     this.producerService = producerService;
@@ -156,19 +161,29 @@ public class AuthController {
    */
   @PostMapping("/registerproducer")
   public void registerProducer(@RequestBody CredentialsProducer credentials) {
-        producerService.registerProducer(
-            credentials.getName(),
-            credentials.getFirstname(),
-            credentials.getCompany(),
-            credentials.getEmail(),
-            credentials.getPassword(),
-            credentials.getStreet(),
-            credentials.getNumber(),
-            credentials.getBox(),
-            credentials.getPostalCode(),
-            credentials.getCity(),
-            credentials.getCountry(),
-            credentials.getPhoneNumber());
+    producerService.registerProducer(
+        credentials.getName(),
+        credentials.getFirstname(),
+        credentials.getCompany(),
+        credentials.getEmail(),
+        credentials.getPassword(),
+        credentials.getStreet(),
+        credentials.getNumber(),
+        credentials.getBox(),
+        credentials.getPostalCode(),
+        credentials.getCity(),
+        credentials.getCountry(),
+        credentials.getPhoneNumber());
+  }
+
+  /**
+   * Sets a new password.
+   *
+   * @param credentials the producer credentials from the request body.
+   */
+  @PostMapping("/password")
+  public void changePassword(@RequestBody CredentialsProfile credentials) {
+    profileService.changePassword(credentials.getEmail(), credentials.getPassword());
   }
 
   /**
