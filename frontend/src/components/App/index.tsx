@@ -7,7 +7,8 @@ import { UserContextType } from '../../types'
 import { UserContext } from '../../contexts/UserContext'
 
 const App = () => {
-  const { authenticatedUser, authsMe } = useContext<UserContextType>(UserContext)
+  const { authenticatedUser, authsMe } =
+    useContext<UserContextType>(UserContext)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -29,8 +30,9 @@ const App = () => {
   useEffect(() => {
     if (authenticatedUser) {
       // Vérifier si nous sommes déjà sur la page d'accueil
-      const isHomePage = window.location.pathname === '/' || window.location.pathname === ''
-      
+      const isHomePage =
+        window.location.pathname === '/' || window.location.pathname === ''
+
       if (isHomePage) {
         if (authenticatedUser.role === 'Producer') {
           navigate('/producer-dashboard')

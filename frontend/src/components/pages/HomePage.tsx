@@ -63,56 +63,65 @@ const HomePage = () => {
       setLoading(true)
       try {
         // Récupérer les lots depuis localStorage
-        const savedBatches = localStorage.getItem('producerBatches');
-        
+        const savedBatches = localStorage.getItem('producerBatches')
+
         if (savedBatches) {
           // Filtrer uniquement les lots approuvés avec quantité disponible > 0
-          const allBatches = JSON.parse(savedBatches);
-          const approvedBatches = allBatches.filter((batch: ProductBatch) => 
-            batch.status === 'approved' && batch.availableQuantity > 0
-          );
-          
-          setProductBatches(approvedBatches);
-          
+          const allBatches = JSON.parse(savedBatches)
+          const approvedBatches = allBatches.filter(
+            (batch: ProductBatch) =>
+              batch.status === 'approved' && batch.availableQuantity > 0
+          )
+
+          setProductBatches(approvedBatches)
+
           // Extraire tous les types de produits uniques pour le filtre
-          const types = [...new Set(approvedBatches.map((batch: ProductBatch) => batch.productType))];
-          setProductTypes(types as string[]);
+          const types = [
+            ...new Set(
+              approvedBatches.map((batch: ProductBatch) => batch.productType)
+            ),
+          ]
+          setProductTypes(types as string[])
         } else {
-          setProductBatches([]);
+          setProductBatches([])
         }
       } catch (err) {
-        console.error('Erreur lors du chargement des produits:', err);
-        setError('Impossible de charger les produits. Veuillez réessayer plus tard.');
+        console.error('Erreur lors du chargement des produits:', err)
+        setError(
+          'Impossible de charger les produits. Veuillez réessayer plus tard.'
+        )
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    
-    fetchApprovedBatches();
-  }, []);
+    }
+
+    fetchApprovedBatches()
+  }, [])
 
   // Extraire les produits les plus vendus (ceux avec la plus grande différence entre quantité initiale et disponible)
   const topProducts = useMemo(() => {
-    if (productBatches.length === 0) return [];
-    
+    if (productBatches.length === 0) return []
+
     // Trier les lots par nombre d'unités vendues (initialQuantity - availableQuantity)
     return [...productBatches]
-      .sort((a, b) => 
-        ((b.initialQuantity - b.availableQuantity) / b.initialQuantity) - 
-        ((a.initialQuantity - a.availableQuantity) / a.initialQuantity)
+      .sort(
+        (a, b) =>
+          (b.initialQuantity - b.availableQuantity) / b.initialQuantity -
+          (a.initialQuantity - a.availableQuantity) / a.initialQuantity
       )
-      .slice(0, 3); // Prendre les 3 premiers
-  }, [productBatches]);
+      .slice(0, 3) // Prendre les 3 premiers
+  }, [productBatches])
 
   // Filtrer les produits en fonction des critères de recherche
   const filteredProducts = useMemo(() => {
-    return productBatches.filter(product => {
-      const matchesType = !type || product.productType === type;
-      const matchesName = !productName || 
-        product.productName.toLowerCase().includes(productName.toLowerCase());
-      return matchesType && matchesName;
-    });
-  }, [productBatches, type, productName]);
+    return productBatches.filter((product) => {
+      const matchesType = !type || product.productType === type
+      const matchesName =
+        !productName ||
+        product.productName.toLowerCase().includes(productName.toLowerCase())
+      return matchesType && matchesName
+    })
+  }, [productBatches, type, productName])
 
   // Initialize quantities state for all products
   useEffect(() => {
@@ -152,8 +161,8 @@ const HomePage = () => {
   }
 
   const handleResetFilter = () => {
-    setType('');
-    setProductName('');
+    setType('')
+    setProductName('')
   }
 
   const handleQuantityChange = (productId: number, value: number) => {
@@ -164,22 +173,24 @@ const HomePage = () => {
   }
 
   const handleAddToCart = (product: ProductBatch) => {
-    const quantity = quantities[product.id] || 1;
-    
+    const quantity = quantities[product.id] || 1
+
     // Vérifier que la quantité demandée n'excède pas la disponibilité
     if (quantity > product.availableQuantity) {
-      setMessage(`Désolé, il n'y a que ${product.availableQuantity} ${product.unitType} disponible(s)`);
-      setOpenSnackbar(true);
-      return;
+      setMessage(
+        `Désolé, il n'y a que ${product.availableQuantity} ${product.unitType} disponible(s)`
+      )
+      setOpenSnackbar(true)
+      return
     }
-    
+
     addToCart({
       id: product.id,
       name: product.productName,
       price: `${product.unitPrice}€`,
       image: product.imageUrl,
       quantity: quantity,
-      unitType: product.unitType || 'unité' // Ajoutez cette ligne
+      unitType: product.unitType || 'unité', // Ajoutez cette ligne
     })
   }
 
@@ -193,7 +204,7 @@ const HomePage = () => {
 
   // Formatter le prix avec le type d'unité
   const formatPrice = (price: number, unitType: string) => {
-    return `${price.toFixed(2)}€/${unitType}`;
+    return `${price.toFixed(2)}€/${unitType}`
   }
 
   return (
@@ -208,7 +219,9 @@ const HomePage = () => {
             textAlign: 'center',
           }}
         >
-          <Typography variant="h5" sx={{ mb: 3 }}>Nos produits vedettes</Typography>
+          <Typography variant="h5" sx={{ mb: 3 }}>
+            Nos produits vedettes
+          </Typography>
           <Box
             sx={{
               display: 'flex',
@@ -243,26 +256,31 @@ const HomePage = () => {
                 Type: {topProducts[currentProductIndex].productType}
               </Typography>
               <Typography variant="body1" sx={{ mb: 0.5 }}>
-                Prix: {formatPrice(
+                Prix:{' '}
+                {formatPrice(
                   topProducts[currentProductIndex].unitPrice,
                   topProducts[currentProductIndex].unitType
                 )}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {topProducts[currentProductIndex].availableQuantity} {topProducts[currentProductIndex].unitType} disponible(s)
+                {topProducts[currentProductIndex].availableQuantity}{' '}
+                {topProducts[currentProductIndex].unitType} disponible(s)
               </Typography>
 
-              <Box 
-                sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  mb: 2
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  mb: 2,
                 }}
                 onClick={(e) => e.stopPropagation()} // Empêcher le clic de remonter
               >
                 <IconButton
                   onClick={() =>
-                    handleQuantityChange(topProducts[currentProductIndex].id, -1)
+                    handleQuantityChange(
+                      topProducts[currentProductIndex].id,
+                      -1
+                    )
                   }
                   size="small"
                 >
@@ -286,8 +304,8 @@ const HomePage = () => {
                 color="success"
                 startIcon={<AddShoppingCartIcon />}
                 onClick={(e) => {
-                  e.stopPropagation();
-                  handleAddToCart(topProducts[currentProductIndex]);
+                  e.stopPropagation()
+                  handleAddToCart(topProducts[currentProductIndex])
                 }}
               >
                 Ajouter au panier
@@ -318,12 +336,20 @@ const HomePage = () => {
       )}
 
       {/* Sidebar */}
-      <Box sx={{ display: 'flex', width: '100%', flexDirection: { xs: 'column', md: 'row' } }}>
-        <Box sx={{ 
-          width: { xs: '100%', md: 350 }, 
-          backgroundColor: '#f0f0f0', 
-          p: 2 
-        }}>
+      <Box
+        sx={{
+          display: 'flex',
+          width: '100%',
+          flexDirection: { xs: 'column', md: 'row' },
+        }}
+      >
+        <Box
+          sx={{
+            width: { xs: '100%', md: 350 },
+            backgroundColor: '#f0f0f0',
+            p: 2,
+          }}
+        >
           <Typography variant="h6">Filtrer</Typography>
           <Select
             value={type}
@@ -335,7 +361,9 @@ const HomePage = () => {
           >
             <MenuItem value="">Tous les types</MenuItem>
             {productTypes.map((type) => (
-              <MenuItem key={type} value={type}>{type}</MenuItem>
+              <MenuItem key={type} value={type}>
+                {type}
+              </MenuItem>
             ))}
           </Select>
           <TextField
@@ -389,8 +417,8 @@ const HomePage = () => {
                 Aucun produit ne correspond à votre recherche.
               </Typography>
               {(type || productName) && (
-                <Button 
-                  variant="text" 
+                <Button
+                  variant="text"
                   color="primary"
                   onClick={handleResetFilter}
                   sx={{ mt: 1 }}
@@ -412,15 +440,15 @@ const HomePage = () => {
                 {filteredProducts.slice(0, visibleProducts).map((product) => (
                   <Card
                     key={product.id}
-                    sx={{ 
-                      width: 250, 
-                      height: 'auto', 
-                      mb: 2, 
+                    sx={{
+                      width: 250,
+                      height: 'auto',
+                      mb: 2,
                       cursor: 'pointer',
                       transition: 'transform 0.2s',
                       '&:hover': {
-                        transform: 'scale(1.02)'
-                      }
+                        transform: 'scale(1.02)',
+                      },
                     }}
                     onClick={() => handleProductClick(product.id)}
                   >
@@ -434,14 +462,19 @@ const HomePage = () => {
                       <Typography gutterBottom variant="h6" component="div">
                         {product.productName}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mb: 1 }}
+                      >
                         {product.productType}
                       </Typography>
                       <Typography variant="body1" color="primary.main">
                         {formatPrice(product.unitPrice, product.unitType)}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {product.availableQuantity} {product.unitType} disponible(s)
+                        {product.availableQuantity} {product.unitType}{' '}
+                        disponible(s)
                       </Typography>
                     </CardContent>
                     <CardActions>
@@ -487,22 +520,37 @@ const HomePage = () => {
 
               {/* Bouton Voir Plus */}
               {visibleProducts < filteredProducts.length ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 3 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    mt: 2,
+                    mb: 3,
+                  }}
+                >
                   <Button
                     variant="contained"
                     onClick={() =>
                       setVisibleProducts((prev) =>
-                        Math.min(prev + productsPerLoad, filteredProducts.length)
+                        Math.min(
+                          prev + productsPerLoad,
+                          filteredProducts.length
+                        )
                       )
                     }
                   >
                     Voir plus
                   </Button>
                 </Box>
-              ) : filteredProducts.length > 0 && (
-                <Typography variant="body1" sx={{ textAlign: 'center', mt: 2, mb: 3 }}>
-                  Il n'y a plus de produits à afficher.
-                </Typography>
+              ) : (
+                filteredProducts.length > 0 && (
+                  <Typography
+                    variant="body1"
+                    sx={{ textAlign: 'center', mt: 2, mb: 3 }}
+                  >
+                    Il n'y a plus de produits à afficher.
+                  </Typography>
+                )
               )}
             </>
           )}

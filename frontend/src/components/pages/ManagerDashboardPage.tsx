@@ -21,7 +21,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  TextField
+  TextField,
 } from '@mui/material'
 import { UserContext } from '../../contexts/UserContext'
 import { useNavigate } from 'react-router-dom'
@@ -79,23 +79,32 @@ const ManagerDashboardPage = () => {
       try {
         // Récupérer les lots stockés dans localStorage
         const savedBatches = localStorage.getItem('producerBatches')
-        
+
         // Données par défaut/simulées si aucun lot n'est enregistré
         let batchData: ProductBatch[] = []
-        
+
         if (savedBatches) {
           // Si des lots ont été enregistrés, les utiliser et ajouter le statut
           const parsedBatches = JSON.parse(savedBatches)
           batchData = parsedBatches.map((batch: any) => ({
             ...batch,
             // Ajouter un statut aléatoire pour la démo si non présent
-            status: batch.status || (Math.random() > 0.7 ? 'approved' : Math.random() > 0.5 ? 'rejected' : 'pending'),
+            status:
+              batch.status ||
+              (Math.random() > 0.7
+                ? 'approved'
+                : Math.random() > 0.5
+                  ? 'rejected'
+                  : 'pending'),
             // Ajouter un nom de producteur aléatoire si non présent
-            producerName: batch.producerName || `Producteur ${Math.floor(Math.random() * 5) + 1}`,
+            producerName:
+              batch.producerName ||
+              `Producteur ${Math.floor(Math.random() * 5) + 1}`,
             // Ajouter une raison de rejet si le statut est rejeté et qu'il n'y a pas de raison
-            rejectionReason: batch.status === 'rejected' && !batch.rejectionReason 
-              ? 'Non conforme aux standards de qualité' 
-              : batch.rejectionReason
+            rejectionReason:
+              batch.status === 'rejected' && !batch.rejectionReason
+                ? 'Non conforme aux standards de qualité'
+                : batch.rejectionReason,
           }))
         } else {
           // Données simulées pour l'exemple (première visite)
@@ -104,89 +113,116 @@ const ManagerDashboardPage = () => {
               id: 1,
               productName: 'Tomates biologiques',
               productType: 'Légume',
-              imageUrl: 'https://images.unsplash.com/photo-1546054454-aa26e2b734c7',
-              availabilityDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+              imageUrl:
+                'https://images.unsplash.com/photo-1546054454-aa26e2b734c7',
+              availabilityDate: new Date(
+                Date.now() + 3 * 24 * 60 * 60 * 1000
+              ).toISOString(),
               availableQuantity: 25,
               initialQuantity: 30,
               unitPrice: 3.5,
               unitType: 'kg',
               producerId: 101,
               producerName: 'Ferme des Oliviers',
-              createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-              status: 'pending'
+              createdAt: new Date(
+                Date.now() - 2 * 24 * 60 * 60 * 1000
+              ).toISOString(),
+              status: 'pending',
             },
             {
               id: 2,
               productName: 'Pommes Golden',
               productType: 'Fruit',
-              imageUrl: 'https://images.unsplash.com/photo-1567306226416-28f0efdc88ce',
-              availabilityDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+              imageUrl:
+                'https://images.unsplash.com/photo-1567306226416-28f0efdc88ce',
+              availabilityDate: new Date(
+                Date.now() + 5 * 24 * 60 * 60 * 1000
+              ).toISOString(),
               availableQuantity: 15,
               initialQuantity: 20,
               unitPrice: 2.8,
               unitType: 'kg',
               producerId: 102,
               producerName: 'Vergers du Sud',
-              createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
-              status: 'approved'
+              createdAt: new Date(
+                Date.now() - 4 * 24 * 60 * 60 * 1000
+              ).toISOString(),
+              status: 'approved',
             },
             {
               id: 3,
               productName: 'Pain au levain',
               productType: 'Boulangerie',
-              imageUrl: 'https://images.unsplash.com/photo-1586444248902-2f64eddc13df',
-              availabilityDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(),
+              imageUrl:
+                'https://images.unsplash.com/photo-1586444248902-2f64eddc13df',
+              availabilityDate: new Date(
+                Date.now() + 1 * 24 * 60 * 60 * 1000
+              ).toISOString(),
               availableQuantity: 8,
               initialQuantity: 10,
               unitPrice: 4.2,
               unitType: 'pièce',
               producerId: 103,
               producerName: 'Boulangerie Artisanale',
-              createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+              createdAt: new Date(
+                Date.now() - 1 * 24 * 60 * 60 * 1000
+              ).toISOString(),
               status: 'rejected',
-              rejectionReason: 'Photos non conformes, description insuffisante'
+              rejectionReason: 'Photos non conformes, description insuffisante',
             },
             {
               id: 4,
               productName: 'Fromage de chèvre',
               productType: 'Produit laitier',
-              imageUrl: 'https://images.unsplash.com/photo-1452195100486-9cc805987862',
-              availabilityDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+              imageUrl:
+                'https://images.unsplash.com/photo-1452195100486-9cc805987862',
+              availabilityDate: new Date(
+                Date.now() + 2 * 24 * 60 * 60 * 1000
+              ).toISOString(),
               availableQuantity: 12,
               initialQuantity: 12,
               unitPrice: 5.5,
               unitType: 'pièce',
               producerId: 104,
               producerName: 'Chèvrerie des Alpes',
-              createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-              status: 'pending'
+              createdAt: new Date(
+                Date.now() - 3 * 24 * 60 * 60 * 1000
+              ).toISOString(),
+              status: 'pending',
             },
             {
               id: 5,
               productName: 'Miel de lavande',
               productType: 'Autre',
-              imageUrl: 'https://images.unsplash.com/photo-1587049352851-8d4b89133611',
-              availabilityDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(),
+              imageUrl:
+                'https://images.unsplash.com/photo-1587049352851-8d4b89133611',
+              availabilityDate: new Date(
+                Date.now() + 1 * 24 * 60 * 60 * 1000
+              ).toISOString(),
               availableQuantity: 18,
               initialQuantity: 20,
               unitPrice: 8.9,
               unitType: 'pot',
               producerId: 105,
               producerName: 'Apiculteur Provençal',
-              createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-              status: 'approved'
-            }
+              createdAt: new Date(
+                Date.now() - 5 * 24 * 60 * 60 * 1000
+              ).toISOString(),
+              status: 'approved',
+            },
           ]
-          
+
           // Sauvegarder les données simulées dans localStorage pour les futures visites
           localStorage.setItem('producerBatches', JSON.stringify(batchData))
         }
-        
+
         setProductBatches(batchData)
         updateFilteredBatches(batchData, tabValue)
       } catch (err) {
         console.error('Erreur lors de la récupération des lots:', err)
-        setError('Impossible de récupérer les lots. Veuillez réessayer plus tard.')
+        setError(
+          'Impossible de récupérer les lots. Veuillez réessayer plus tard.'
+        )
       } finally {
         setLoading(false)
       }
@@ -202,13 +238,19 @@ const ManagerDashboardPage = () => {
         setFilteredBatches(batches)
         break
       case 1: // En attente
-        setFilteredBatches(batches.filter(batch => batch.status === 'pending'))
+        setFilteredBatches(
+          batches.filter((batch) => batch.status === 'pending')
+        )
         break
       case 2: // Approuvés
-        setFilteredBatches(batches.filter(batch => batch.status === 'approved'))
+        setFilteredBatches(
+          batches.filter((batch) => batch.status === 'approved')
+        )
         break
       case 3: // Refusés
-        setFilteredBatches(batches.filter(batch => batch.status === 'rejected'))
+        setFilteredBatches(
+          batches.filter((batch) => batch.status === 'rejected')
+        )
         break
       default:
         setFilteredBatches(batches)
@@ -221,7 +263,7 @@ const ManagerDashboardPage = () => {
   }
 
   const handleApprove = (batchId: number) => {
-    const updatedBatches = productBatches.map(batch => 
+    const updatedBatches = productBatches.map((batch) =>
       batch.id === batchId ? { ...batch, status: 'approved' as const } : batch
     )
     setProductBatches(updatedBatches)
@@ -238,9 +280,9 @@ const ManagerDashboardPage = () => {
   const handleRejectConfirm = () => {
     if (currentBatchId === null) return
 
-    const updatedBatches = productBatches.map(batch => 
-      batch.id === currentBatchId 
-        ? { ...batch, status: 'rejected' as const, rejectionReason } 
+    const updatedBatches = productBatches.map((batch) =>
+      batch.id === currentBatchId
+        ? { ...batch, status: 'rejected' as const, rejectionReason }
         : batch
     )
     setProductBatches(updatedBatches)
@@ -265,8 +307,8 @@ const ManagerDashboardPage = () => {
       </Typography>
 
       <Paper elevation={3} sx={{ mb: 4 }}>
-        <Tabs 
-          value={tabValue} 
+        <Tabs
+          value={tabValue}
           onChange={handleTabChange}
           variant="scrollable"
           scrollButtons="auto"
@@ -275,9 +317,15 @@ const ManagerDashboardPage = () => {
           aria-label="filtres de statut"
         >
           <Tab icon={<FilterListIcon />} label="Tous" />
-          <Tab label={`En attente (${productBatches.filter(b => b.status === 'pending').length})`} />
-          <Tab label={`Approuvés (${productBatches.filter(b => b.status === 'approved').length})`} />
-          <Tab label={`Refusés (${productBatches.filter(b => b.status === 'rejected').length})`} />
+          <Tab
+            label={`En attente (${productBatches.filter((b) => b.status === 'pending').length})`}
+          />
+          <Tab
+            label={`Approuvés (${productBatches.filter((b) => b.status === 'approved').length})`}
+          />
+          <Tab
+            label={`Refusés (${productBatches.filter((b) => b.status === 'rejected').length})`}
+          />
         </Tabs>
       </Paper>
 
@@ -301,27 +349,36 @@ const ManagerDashboardPage = () => {
         <Grid container spacing={3}>
           {filteredBatches.map((batch) => (
             <Grid item xs={12} md={6} key={batch.id}>
-              <Card 
+              <Card
                 elevation={3}
-                sx={{ 
-                  display: 'flex', 
+                sx={{
+                  display: 'flex',
                   flexDirection: { xs: 'column', sm: 'row' },
-                  height: '100%'
+                  height: '100%',
                 }}
               >
                 <CardMedia
                   component="img"
-                  sx={{ 
-                    width: { xs: '100%', sm: 200 }, 
+                  sx={{
+                    width: { xs: '100%', sm: 200 },
                     height: { xs: 200, sm: 'auto' },
-                    objectFit: 'cover'
+                    objectFit: 'cover',
                   }}
                   image={batch.imageUrl}
                   alt={batch.productName}
                 />
-                <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                <Box
+                  sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}
+                >
                   <CardContent sx={{ flexGrow: 1 }}>
-                    <Box sx={{ mb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <Box
+                      sx={{
+                        mb: 1,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
+                      }}
+                    >
                       <Typography variant="h6" component="h3" gutterBottom>
                         {batch.productName}
                       </Typography>
@@ -333,60 +390,82 @@ const ManagerDashboardPage = () => {
                         <Chip label="Refusé" color="error" size="small" />
                       )}
                     </Box>
-                    
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
+
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      gutterBottom
+                    >
                       <strong>Producteur:</strong> {batch.producerName}
                     </Typography>
-                    
+
                     <Box sx={{ mt: 1 }}>
-                      <Chip 
-                        label={batch.productType} 
-                        size="small" 
-                        variant="outlined" 
-                        sx={{ mr: 1, mb: 1 }} 
+                      <Chip
+                        label={batch.productType}
+                        size="small"
+                        variant="outlined"
+                        sx={{ mr: 1, mb: 1 }}
                       />
                       <Typography variant="body2" color="text.secondary">
-                        <strong>Prix:</strong> {batch.unitPrice.toFixed(2)}€/{batch.unitType}
+                        <strong>Prix:</strong> {batch.unitPrice.toFixed(2)}€/
+                        {batch.unitType}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        <strong>Quantité:</strong> {batch.availableQuantity}/{batch.initialQuantity} {batch.unitType}
+                        <strong>Quantité:</strong> {batch.availableQuantity}/
+                        {batch.initialQuantity} {batch.unitType}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        <strong>Disponible le:</strong> {format(new Date(batch.availabilityDate), 'dd MMMM yyyy', { locale: fr })}
+                        <strong>Disponible le:</strong>{' '}
+                        {format(
+                          new Date(batch.availabilityDate),
+                          'dd MMMM yyyy',
+                          { locale: fr }
+                        )}
                       </Typography>
                     </Box>
-                    
+
                     {batch.status === 'rejected' && batch.rejectionReason && (
-                      <Box sx={{ mt: 2, p: 1, bgcolor: 'error.light', borderRadius: 1 }}>
+                      <Box
+                        sx={{
+                          mt: 2,
+                          p: 1,
+                          bgcolor: 'error.light',
+                          borderRadius: 1,
+                        }}
+                      >
                         <Typography variant="caption" color="error.dark">
-                          <strong>Motif du refus:</strong> {batch.rejectionReason}
+                          <strong>Motif du refus:</strong>{' '}
+                          {batch.rejectionReason}
                         </Typography>
                       </Box>
                     )}
                   </CardContent>
-                  
+
                   <Box sx={{ mt: 'auto' }}>
                     <Divider />
-                    
+
                     <CardActions sx={{ justifyContent: 'space-between' }}>
                       <Typography variant="caption" color="text.secondary">
-                        Ajouté le {format(new Date(batch.createdAt), 'dd/MM/yyyy', { locale: fr })}
+                        Ajouté le{' '}
+                        {format(new Date(batch.createdAt), 'dd/MM/yyyy', {
+                          locale: fr,
+                        })}
                       </Typography>
-                      
+
                       {batch.status === 'pending' && (
                         <Box>
-                          <Button 
+                          <Button
                             size="small"
-                            color="success" 
+                            color="success"
                             startIcon={<CheckCircleIcon />}
                             onClick={() => handleApprove(batch.id)}
                             sx={{ mr: 1 }}
                           >
                             Approuver
                           </Button>
-                          <Button 
+                          <Button
                             size="small"
-                            color="error" 
+                            color="error"
                             startIcon={<CancelIcon />}
                             onClick={() => handleRejectClick(batch.id)}
                           >
@@ -408,7 +487,8 @@ const ManagerDashboardPage = () => {
         <DialogTitle>Motif du refus</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Veuillez indiquer la raison pour laquelle ce lot est refusé. Cette information sera visible par le producteur.
+            Veuillez indiquer la raison pour laquelle ce lot est refusé. Cette
+            information sera visible par le producteur.
           </DialogContentText>
           <TextField
             autoFocus
@@ -425,9 +505,11 @@ const ManagerDashboardPage = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} color="inherit">Annuler</Button>
-          <Button 
-            onClick={handleRejectConfirm} 
+          <Button onClick={handleCloseDialog} color="inherit">
+            Annuler
+          </Button>
+          <Button
+            onClick={handleRejectConfirm}
             color="error"
             disabled={!rejectionReason.trim()}
           >

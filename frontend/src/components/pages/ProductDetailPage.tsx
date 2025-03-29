@@ -93,7 +93,7 @@ const ProductDetailPage = () => {
         price: product.price,
         image: product.image,
         quantity: quantity,
-        unitType: product.unitType || 'unité' // Ajoutez cette ligne
+        unitType: product.unitType || 'unité', // Ajoutez cette ligne
       })
       // Vous pourriez aussi rediriger vers le panier ou afficher une notification
     }

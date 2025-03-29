@@ -23,7 +23,7 @@ const NavBar = () => {
   // Vérifier si l'utilisateur connecté est un producteur ou un manager
   const isProducer = authenticatedUser && authenticatedUser.role === 'Producer'
   const isManager = authenticatedUser && authenticatedUser.role === 'Manager'
-  
+
   // Vérifier si l'utilisateur est un client (ni producteur ni manager)
   const isClient = authenticatedUser && !isProducer && !isManager
 

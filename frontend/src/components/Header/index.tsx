@@ -39,10 +39,10 @@ const Header = ({ title }: HeaderProps) => {
           variant="h6"
           color="inherit"
           noWrap
-          sx={{ 
-            flexGrow: 1, 
+          sx={{
+            flexGrow: 1,
             cursor: 'pointer',
-            color: 'green'
+            color: 'green',
           }}
           onClick={handleTitleClick}
           data-testid="title"

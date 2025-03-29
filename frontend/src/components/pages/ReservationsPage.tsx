@@ -59,37 +59,39 @@ const ReservationsPage = () => {
       return
     }
 
-    console.log('Chargement des réservations pour l\'utilisateur:', authenticatedUser);
+    console.log(
+      "Chargement des réservations pour l'utilisateur:",
+      authenticatedUser
+    )
 
     try {
       // 1. Solution temporaire : montrer TOUTES les réservations
       // Cela nous permettra de voir si les réservations existent bien
-      const storedReservations = localStorage.getItem('userReservations');
+      const storedReservations = localStorage.getItem('userReservations')
       if (!storedReservations) {
-        console.log('Aucune réservation dans le localStorage');
-        setReservations([]);
-        return;
+        console.log('Aucune réservation dans le localStorage')
+        setReservations([])
+        return
       }
 
-      let allReservations = JSON.parse(storedReservations);
-      
+      let allReservations = JSON.parse(storedReservations)
+
       // Pour déboguer, affichez toutes les réservations dans la console
-      console.log('Toutes les réservations chargées:', allReservations);
+      console.log('Toutes les réservations chargées:', allReservations)
 
       // Aucun filtrage pour l'instant - montrer toutes les réservations
       const sortedReservations = [...allReservations].sort((a, b) => {
-        return new Date(b.date).getTime() - new Date(a.date).getTime();
-      });
+        return new Date(b.date).getTime() - new Date(a.date).getTime()
+      })
 
-      setReservations(sortedReservations);
-      
+      setReservations(sortedReservations)
+
       // Notez que nous affichons toutes les réservations sans filtre pour déboguer
-      console.log('Réservations affichées (toutes):', sortedReservations.length);
-      
+      console.log('Réservations affichées (toutes):', sortedReservations.length)
     } catch (error) {
-      console.error('Erreur lors du chargement des réservations:', error);
+      console.error('Erreur lors du chargement des réservations:', error)
     }
-  }, [authenticatedUser, navigate]);
+  }, [authenticatedUser, navigate])
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -200,7 +202,9 @@ const ReservationsPage = () => {
                           </TableCell>
                           <TableCell>{item.name}</TableCell>
                           <TableCell align="right">{item.price}</TableCell>
-                          <TableCell align="center">{item.quantity} {item.unitType || ''}</TableCell>
+                          <TableCell align="center">
+                            {item.quantity} {item.unitType || ''}
+                          </TableCell>
                           <TableCell align="right">
                             {`${(Number(item.price.replace('€', '')) * item.quantity).toFixed(2)}€`}
                           </TableCell>
