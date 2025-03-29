@@ -8,9 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * Client service.
- */
+/** Client service. */
 @Service
 public class ClientService {
 
@@ -22,10 +20,12 @@ public class ClientService {
    * Constructor.
    *
    * @param clientRepository the client repository
-   * @param userRepository   the user repository
+   * @param userRepository the user repository
    */
-  public ClientService(ClientRepository clientRepository, UserRepository userRepository, 
-                       BCryptPasswordEncoder passwordEncoder) {
+  public ClientService(
+      ClientRepository clientRepository,
+      UserRepository userRepository,
+      BCryptPasswordEncoder passwordEncoder) {
     this.clientRepository = clientRepository;
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
@@ -124,4 +124,3 @@ public class ClientService {
     clientRepository.save(client);
   }
 }
-

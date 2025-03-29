@@ -11,9 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.springframework.stereotype.Service;
 
-/**
- * Service class for managing products.
- */
+/** Service class for managing products. */
 @Service
 public class ProductService {
 
@@ -28,12 +26,23 @@ public class ProductService {
    * @param productTypeRepository the repository for product types
    * @param photoRepository the repository for photos
    */
-  public ProductService(ProductRepository productRepository,
-                        ProductTypeRepository productTypeRepository,
-                        PhotoRepository photoRepository) {
+  public ProductService(
+      ProductRepository productRepository,
+      ProductTypeRepository productTypeRepository,
+      PhotoRepository photoRepository) {
     this.productRepository = productRepository;
     this.productTypeRepository = productTypeRepository;
     this.photoRepository = photoRepository;
+  }
+
+  /**
+   * Finds a product by its ID.
+   *
+   * @param productId the ID of the product
+   * @return the product with the specified ID, or null if not found
+   */
+  public Product findProductById(Long productId) {
+    return productRepository.findById(productId).orElse(null);
   }
 
   /**
@@ -45,9 +54,12 @@ public class ProductService {
    */
   public List<Product> getProducts(String search, String type) {
     return StreamSupport.stream(productRepository.findAll().spliterator(), false)
-        .filter(product -> (search == null || product.getName().contains(search) 
-                            || product.getDescription().contains(search))
-                           && (type == null || product.getType().getTitle().equalsIgnoreCase(type)))
+        .filter(
+            product ->
+                (search == null
+                        || product.getName().contains(search)
+                        || product.getDescription().contains(search))
+                    && (type == null || product.getType().getTitle().equalsIgnoreCase(type)))
         .collect(Collectors.toList());
   }
 
