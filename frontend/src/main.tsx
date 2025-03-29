@@ -18,7 +18,7 @@ import { ThemeProvider } from '@mui/material/styles'
 import theme from './themes.ts'
 import ManagerRegisterPage from './components/pages/ManagerRegisterPage.tsx'
 import ProducerRegisterPage from './components/pages/ProducerRegisterPage.tsx'
-import { ProductProvider } from './contexts/ProductContext.tsx'
+import { ProductProvider } from './contexts/ProductProvider.tsx'
 import ProfilePage from './components/pages/ProfilePage.tsx'
 
 const router = createBrowserRouter([

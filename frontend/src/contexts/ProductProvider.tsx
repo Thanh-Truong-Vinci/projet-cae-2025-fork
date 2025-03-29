@@ -1,35 +1,14 @@
-import { useState, ReactNode, useCallback, useMemo, useEffect } from 'react'
-import axios from 'axios' // Décommenter cette ligne
-import {
-  ProductContext,
-  Product,
-  categoryLabels,
-} from './ProductContextDefinition'
+import { useState, useEffect, useMemo, useCallback, ReactNode } from 'react'
+import axios from 'axios'
+import { ProductContext } from './ProductContext'
+import { categoryLabels } from './categoryLabels'
+import { Product } from '../types'
 
-// Interface pour typer la réponse de l'API
-interface ApiProduct {
-  id: number // id_product devient id
-  name: string
-  description?: string
-  type?: {
-    // type au lieu de id_product_type
-    id: number
-    title: string
-  }
-  photo?: {
-    // structure de photo
-    id: number
-    url?: string
-  }
-}
-
-// IMPORTANT: Uniquement le Provider est exporté par ce fichier
 export const ProductProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Données de secours en cas d'erreur API
   const mockProducts = useMemo<Product[]>(
     () => [
       {
@@ -49,23 +28,6 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
         category: 'fruits',
         description: 'Pommes sucrées et croquantes, idéales comme collation.',
       },
-      {
-        id: 3,
-        name: 'Pain au levain',
-        price: '4.20€',
-        image: 'https://images.unsplash.com/photo-1549931319-a545dcf3bc73',
-        category: 'boulangerie',
-        description:
-          "Pain artisanal à l'ancienne préparé avec du levain naturel.",
-      },
-      {
-        id: 4,
-        name: 'Fromage fermier',
-        price: '7.50€',
-        image: 'https://images.unsplash.com/photo-1452195100486-9cc805987862',
-        category: 'produits_laitiers',
-        description: 'Fromage à pâte dure affiné pendant 6 mois.',
-      },
     ],
     []
   )
@@ -74,27 +36,30 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     const fetchProducts = async () => {
       try {
         setIsLoading(true)
-        const response = await axios.get<ApiProduct[]>('/api/products')
+        const response = await axios.get('/api/products')
 
-        // Transformer les données de l'API pour correspondre à votre modèle Product
-        const formattedProducts = response.data.map((item) => ({
-          id: item.id,
-          name: item.name,
-          // Prix factice ou à calculer à partir des lots (à implémenter)
-          price: '10.00€',
-          // Image par défaut ou URL construite
-          image: item.photo?.url || 'https://via.placeholder.com/150',
-          // Catégorie à partir du type
-          category:
-            item.type?.title?.toLowerCase().replace(' ', '_') || 'autres',
-          description: item.description || '',
-        }))
+        const formattedProducts = response.data.map(
+          (item: {
+            id: number
+            name: string
+            photo?: { url: string }
+            type?: { title: string }
+            description?: string
+          }) => ({
+            id: item.id,
+            name: item.name,
+            price: '10.00€',
+            image: item.photo?.url || 'https://via.placeholder.com/150',
+            category:
+              item.type?.title?.toLowerCase().replace(' ', '_') || 'autres',
+            description: item.description || '',
+          })
+        )
 
         setProducts(formattedProducts)
       } catch (err) {
         console.error('Erreur détaillée:', err)
         setError('Impossible de charger les produits')
-        // Utiliser les mocks en cas d'erreur
         setProducts(mockProducts)
       } finally {
         setIsLoading(false)

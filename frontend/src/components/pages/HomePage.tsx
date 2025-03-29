@@ -20,10 +20,8 @@ import RemoveIcon from '@mui/icons-material/Remove'
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart'
 import { CartContext } from '../../contexts/CartContext'
 import { useNavigate, useLocation } from 'react-router-dom'
-import {
-  Product,
-  ProductContext,
-} from '../../contexts/ProductContextDefinition'
+import { ProductContext } from '../../contexts/ProductContext'
+import { Product } from '../../types'
 
 const HomePage = () => {
   // Utilisation sécurisée du ProductContext
