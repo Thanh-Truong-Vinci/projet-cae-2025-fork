@@ -1,5 +1,4 @@
-// Modifiez App/index.tsx
-import { Outlet } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import Footer from '../Footer'
 import Header from '../Header'
 import Box from '@mui/material/Box'
@@ -8,7 +7,8 @@ import { UserContextType } from '../../types'
 import { UserContext } from '../../contexts/UserContext'
 
 const App = () => {
-  const { authsMe } = useContext<UserContextType>(UserContext)
+  const { authenticatedUser, authsMe } = useContext<UserContextType>(UserContext)
+  const navigate = useNavigate()
 
   useEffect(() => {
     console.log('UseEffect')
@@ -24,6 +24,22 @@ const App = () => {
 
     validateToken()
   }, [authsMe])
+
+  // Rediriger les producteurs et les managers vers leurs dashboards respectifs
+  useEffect(() => {
+    if (authenticatedUser) {
+      // Vérifier si nous sommes déjà sur la page d'accueil
+      const isHomePage = window.location.pathname === '/' || window.location.pathname === ''
+      
+      if (isHomePage) {
+        if (authenticatedUser.role === 'Producer') {
+          navigate('/producer-dashboard')
+        } else if (authenticatedUser.role === 'Manager') {
+          navigate('/manager-dashboard')
+        }
+      }
+    }
+  }, [authenticatedUser, navigate])
 
   return (
     <Box
