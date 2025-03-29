@@ -24,18 +24,20 @@ const NavBar = () => {
       sx={{ display: 'flex', gap: 1, alignItems: 'center' }}
       data-testid="navbar-component"
     >
-      <IconButton
-        onClick={() => navigate('/cart')}
-        sx={{ mr: 1 }}
-        aria-label="panier"
-      >
-        <Badge badgeContent={getCartCount()} color="error">
-          <ShoppingCartIcon sx={{ color: 'green' }} />
-        </Badge>
-      </IconButton>
+      {authenticatedUser && authenticatedUser.role === 'Client' && (
+        <IconButton
+          onClick={() => navigate('/cart')}
+          sx={{ mr: 1 }}
+          aria-label="panier"
+        >
+          <Badge badgeContent={getCartCount()} color="error">
+            <ShoppingCartIcon sx={{ color: 'green' }} />
+          </Badge>
+        </IconButton>
+      )}
 
       {/* Ajouter le bouton de réservations uniquement pour les utilisateurs authentifiés */}
-      {authenticatedUser && (
+      {authenticatedUser && authenticatedUser.role === 'Client' && (
         <IconButton
           onClick={() => navigate('/reservations')}
           sx={{ mr: 1 }}
