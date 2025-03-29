@@ -29,10 +29,12 @@ interface ReservationItem {
   price: string
   image: string
   quantity: number
+  unitType?: string
 }
 
 interface Reservation {
   id: number
+  userId: number
   date: string | Date
   items: ReservationItem[]
   total: number
@@ -46,8 +48,8 @@ const ReservationsPage = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false)
   const [message, setMessage] = useState('')
 
+  // Simplifier la logique de chargement des réservations
   useEffect(() => {
-    // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
     if (!authenticatedUser) {
       setMessage('Vous devez vous connecter pour accéder à vos réservations')
       setOpenSnackbar(true)
@@ -57,24 +59,37 @@ const ReservationsPage = () => {
       return
     }
 
-    // Charger les réservations depuis le localStorage
-    const storedReservations = localStorage.getItem('userReservations')
-    if (storedReservations) {
-      try {
-        const parsedReservations = JSON.parse(storedReservations)
-        // Trier les réservations par date (les plus récentes d'abord)
-        parsedReservations.sort((a: Reservation, b: Reservation) => {
-          const dateA = new Date(a.date)
-          const dateB = new Date(b.date)
-          return dateB.getTime() - dateA.getTime()
-        })
+    console.log('Chargement des réservations pour l\'utilisateur:', authenticatedUser);
 
-        setReservations(parsedReservations)
-      } catch (error) {
-        console.error('Erreur lors du chargement des réservations:', error)
+    try {
+      // 1. Solution temporaire : montrer TOUTES les réservations
+      // Cela nous permettra de voir si les réservations existent bien
+      const storedReservations = localStorage.getItem('userReservations');
+      if (!storedReservations) {
+        console.log('Aucune réservation dans le localStorage');
+        setReservations([]);
+        return;
       }
+
+      let allReservations = JSON.parse(storedReservations);
+      
+      // Pour déboguer, affichez toutes les réservations dans la console
+      console.log('Toutes les réservations chargées:', allReservations);
+
+      // Aucun filtrage pour l'instant - montrer toutes les réservations
+      const sortedReservations = [...allReservations].sort((a, b) => {
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      });
+
+      setReservations(sortedReservations);
+      
+      // Notez que nous affichons toutes les réservations sans filtre pour déboguer
+      console.log('Réservations affichées (toutes):', sortedReservations.length);
+      
+    } catch (error) {
+      console.error('Erreur lors du chargement des réservations:', error);
     }
-  }, [authenticatedUser, navigate])
+  }, [authenticatedUser, navigate]);
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -185,7 +200,7 @@ const ReservationsPage = () => {
                           </TableCell>
                           <TableCell>{item.name}</TableCell>
                           <TableCell align="right">{item.price}</TableCell>
-                          <TableCell align="center">{item.quantity}</TableCell>
+                          <TableCell align="center">{item.quantity} {item.unitType || ''}</TableCell>
                           <TableCell align="right">
                             {`${(Number(item.price.replace('€', '')) * item.quantity).toFixed(2)}€`}
                           </TableCell>
@@ -197,6 +212,10 @@ const ReservationsPage = () => {
                 <Box sx={{ mt: 2, textAlign: 'right' }}>
                   <Typography variant="body2" color="text.secondary">
                     Numéro de réservation: #{reservation.id}
+                  </Typography>
+                  {/* Pour le débogage, afficher également le userId */}
+                  <Typography variant="body2" color="text.secondary">
+                    User ID: {reservation.userId}
                   </Typography>
                 </Box>
               </AccordionDetails>

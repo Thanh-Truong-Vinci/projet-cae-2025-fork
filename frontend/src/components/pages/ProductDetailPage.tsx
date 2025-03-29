@@ -25,6 +25,7 @@ interface Product {
   price: string
   image: string
   description?: string
+  unitType: string // Ajoutez cette propriété
   details?: {
     [key: string]: string
   }
@@ -56,6 +57,7 @@ const ProductDetailPage = () => {
           image: 'https://via.placeholder.com/600x400',
           description:
             "Ce produit de qualité supérieure est cultivé localement selon des méthodes respectueuses de l'environnement. Sa fraîcheur exceptionnelle et son goût incomparable en font un incontournable de votre cuisine. Idéal pour la préparation de plats savoureux et nutritifs, il saura satisfaire les palais les plus exigeants.",
+          unitType: 'unité', // Ajout de la propriété manquante
           details: {
             Origine: 'Belgique',
             Catégorie: 'Type 1',
@@ -91,6 +93,7 @@ const ProductDetailPage = () => {
         price: product.price,
         image: product.image,
         quantity: quantity,
+        unitType: product.unitType || 'unité' // Ajoutez cette ligne
       })
       // Vous pourriez aussi rediriger vers le panier ou afficher une notification
     }
