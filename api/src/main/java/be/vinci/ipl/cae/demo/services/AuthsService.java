@@ -116,8 +116,7 @@ public class AuthsService {
       return null;
     }
 
-    if (!passwordEncoder.matches(
-        passwordEncoder.encode(password), userRepository.findByEmail(email).getPassword())) {
+    if (!passwordEncoder.matches(password, user.getPassword())) {
       return null;
     }
 
