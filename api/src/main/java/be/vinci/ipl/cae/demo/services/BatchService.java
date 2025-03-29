@@ -9,4 +9,5 @@ public class BatchService {
     // TODO: Implement modify batch photo (consider using PhotoService.java)
     // TODO: Implement accept batch
     // TODO: Implement reject batch (whit Notification) (consider using PhotoService.java)
+    // TODO: Implement createOne
 }
