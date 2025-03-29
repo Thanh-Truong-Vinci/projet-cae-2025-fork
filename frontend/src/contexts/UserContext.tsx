@@ -5,6 +5,8 @@ import {
   User,
   AuthenticatedUser,
   LoginUser,
+  ManagerRegistrationData,
+  ProducerRegistrationData,
 } from '../types'
 
 import {
@@ -16,10 +18,13 @@ const defaultUserContext: UserContextType = {
   authenticatedUser: undefined,
   authsMe: async () => {},
   registerUser: async () => {},
+  registerManager: async () => {},
+  registerProducer: async () => {},
   loginUser: async () => {
     throw new Error('Context not initialized')
   },
   clearUser: () => {},
+  changePassword: async () => {},
 }
 
 const UserContext = createContext<UserContextType>(defaultUserContext)
@@ -73,6 +78,65 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
       throw err
     }
   }, [])
+  const registerManager = useCallback(
+    async (managerData: ManagerRegistrationData) => {
+      const token = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('token='))
+        ?.split('=')[1]
+      try {
+        const options = {
+          method: 'POST',
+          body: JSON.stringify(managerData),
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${token}`,
+          },
+        }
+
+        const response = await fetch('/api/auths/registermanager', options)
+
+        if (!response.ok)
+          throw new Error(
+            `fetch error : ${response.status} : ${response.statusText}`
+          )
+      } catch (err) {
+        console.error('registerManager::error: ', err)
+        throw err
+      }
+    },
+    []
+  )
+
+  const registerProducer = useCallback(
+    async (producerData: ProducerRegistrationData) => {
+      const token = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('token='))
+        ?.split('=')[1]
+      try {
+        const options = {
+          method: 'POST',
+          body: JSON.stringify(producerData),
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${token}`,
+          },
+        }
+
+        const response = await fetch('/api/auths/registerproducer', options)
+
+        if (!response.ok)
+          throw new Error(
+            `fetch error : ${response.status} : ${response.statusText}`
+          )
+      } catch (err) {
+        console.error('registerProducer::error: ', err)
+        throw err
+      }
+    },
+    []
+  )
 
   const loginUser = useCallback(
     async (user: LoginUser): Promise<AuthenticatedUser> => {
@@ -112,12 +176,53 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
     setAuthenticatedUser(undefined)
   }
 
+  const changePassword = useCallback(
+    async (currentPassword: string, newPassword: string): Promise<void> => {
+      const token = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('token='))
+        ?.split('=')[1]
+      if (!token || !authenticatedUser) {
+        throw new Error('User not authenticated')
+      }
+
+      try {
+        const options = {
+          method: 'POST',
+          body: JSON.stringify({
+            email: authenticatedUser.email,
+            currentPassword,
+            newPassword,
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${token}`,
+          },
+        }
+
+        const response = await fetch('/api/auths/changepassword', options)
+
+        if (!response.ok)
+          throw new Error(
+            `fetch error : ${response.status} : ${response.statusText}`
+          )
+      } catch (err) {
+        console.error('changePassword::error: ', err)
+        throw err
+      }
+    },
+    [authenticatedUser] // Add authenticatedUser to dependencies
+  )
+
   const contextValue: UserContextType = {
     authenticatedUser,
     authsMe,
+    registerManager,
+    registerProducer,
     registerUser,
     loginUser,
     clearUser,
+    changePassword,
   }
 
   return (

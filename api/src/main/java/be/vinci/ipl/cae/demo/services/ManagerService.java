@@ -4,6 +4,7 @@ import be.vinci.ipl.cae.demo.models.entities.Manager;
 import be.vinci.ipl.cae.demo.repositories.ManagerRepository;
 import be.vinci.ipl.cae.demo.repositories.UserRepository;
 import java.time.LocalDate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -13,65 +14,59 @@ import org.springframework.stereotype.Service;
 public class ManagerService {
 
   private final ManagerRepository managerRepository;
+  private final BCryptPasswordEncoder passwordEncoder;
   private final UserRepository userRepository;
 
   /**
-   * Constructs a ManagerService with the specified repositories.
+   * Constructor.
    *
-   * @param managerRepository the repository for managing managers
-   * @param userRepository the repository for managing users
+   * @param managerRepository the manager repository
    */
-  public ManagerService(ManagerRepository managerRepository, UserRepository userRepository) {
+  public ManagerService(
+      ManagerRepository managerRepository, BCryptPasswordEncoder passwordEncoder, 
+      UserRepository userRepository) {
     this.managerRepository = managerRepository;
+    this.passwordEncoder = passwordEncoder;
     this.userRepository = userRepository;
   }
 
   /**
-   * Registers a new manager.
+   * Register a new manager.
    *
-   * @param name the name of the manager
-   * @param firstname the first name of the manager
-   * @param email the email of the manager
-   * @param password the password of the manager
-   * @return true if registration is successful, false otherwise
+   * @param name the last name
+   * @param firstname the first name
+   * @param email the email
+   * @param password the password
+   * @return true if the registration is successful, false otherwise
    */
   public boolean register(
-      String name,
-      String firstname,
-      String email,
-      String password) {
+      String name, String firstname, String email, String password, String requesterEmail) {
     if (userRepository.findByEmail(email) != null) {
       return false;
     }
-
-    createOne(name,
-        firstname,
-        email,
-        password);
+    createManager(name, firstname, email, password, requesterEmail);
     return true;
   }
 
   /**
-   * Creates a new manager.
+   * Create a new Manager.
    *
-   * @param name the name of the manager
-   * @param firstname the first name of the manager
-   * @param email the email of the manager
-   * @param password the password of the manager
+   * @param name the last name
+   * @param firstname the first name
+   * @param email the email
+   * @param password the password
    */
-  public void createOne(String name,
-                        String firstname,
-                        String email,
-                        String password) {
+  public void createManager(
+      String name, String firstname, String email, String password, String requesterEmail) {
 
     Manager manager = new Manager();
     manager.setName(name);
     manager.setFirstname(firstname);
     manager.setEmail(email);
-    manager.setPassword(password);
+    manager.setPassword(passwordEncoder.encode(password));
+    manager.setManager(managerRepository.findByEmail(requesterEmail));
     manager.setDateInscription(LocalDate.now());
 
     managerRepository.save(manager);
   }
 }
-

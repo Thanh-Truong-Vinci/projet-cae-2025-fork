@@ -14,14 +14,12 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import java.util.Date;
-import java.util.Objects;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * Service for handling authentication-related operations.
- */
+/** Service for handling authentication-related operations. */
 @Service
 public class AuthsService {
   private static final String JWT_SECRET = "JWT_SECRET";
@@ -32,16 +30,20 @@ public class AuthsService {
   private final ClientRepository clientRepository;
   private final ManagerRepository managerRepository;
   private final ProducerRepository producerRepository;
+  private final BCryptPasswordEncoder passwordEncoder;
 
-  /**
-   * Service for handling authentication-related operations.
-   */
-  public AuthsService(UserRepository userRepository, ClientRepository clientRepository,
-                      ManagerRepository managerRepository, ProducerRepository producerRepository) {
+  /** Service for handling authentication-related operations. */
+  public AuthsService(
+      UserRepository userRepository,
+      ClientRepository clientRepository,
+      ManagerRepository managerRepository,
+      ProducerRepository producerRepository,
+      BCryptPasswordEncoder passwordEncoder) {
     this.userRepository = userRepository;
     this.clientRepository = clientRepository;
     this.managerRepository = managerRepository;
     this.producerRepository = producerRepository;
+    this.passwordEncoder = passwordEncoder;
   }
 
   /**
@@ -51,23 +53,27 @@ public class AuthsService {
    * @return the generated JWT token
    * @throws ResponseStatusException if token generation fails
    */
-  @SuppressWarnings({"checkstyle:FileTabCharacter", "checkstyle:Indentation", "checkstyle:LineLength",
-	  "checkstyle:MissingJavadocMethod"})
+  @SuppressWarnings({
+    "checkstyle:FileTabCharacter",
+    "checkstyle:Indentation",
+    "checkstyle:LineLength",
+    "checkstyle:MissingJavadocMethod"
+  })
   public String createJwtToken(String email) {
-	if (email == null || email.isBlank()) {
-	  throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email cannot be null or empty");
-	}
-	try {
-	  return JWT.create()
-		  .withIssuer("auth0")
-		  .withClaim("email", email)
-		  .withIssuedAt(new Date())
-		  .withExpiresAt(new Date(System.currentTimeMillis() + LIFETIME_JWT))
-		  .sign(algorithm);
-	} catch (JWTCreationException e) {
-	  throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-		  "Token generation failed: " + e.getMessage(), e);
-	}
+    if (email == null || email.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email cannot be null or empty");
+    }
+    try {
+      return JWT.create()
+          .withIssuer("auth0")
+          .withClaim("email", email)
+          .withIssuedAt(new Date())
+          .withExpiresAt(new Date(System.currentTimeMillis() + LIFETIME_JWT))
+          .sign(algorithm);
+    } catch (JWTCreationException e) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Token generation failed: " + e.getMessage(), e);
+    }
   }
 
   /**
@@ -76,14 +82,23 @@ public class AuthsService {
    * @param token the JWT token to verify
    * @return the email if the token is valid, null otherwise
    */
-  @SuppressWarnings({"checkstyle:FileTabCharacter", "checkstyle:Indentation", "checkstyle:LineLength",
-	  "checkstyle:MissingJavadocMethod"})
+  @SuppressWarnings({
+    "checkstyle:FileTabCharacter",
+    "checkstyle:Indentation",
+    "checkstyle:LineLength",
+    "checkstyle:MissingJavadocMethod"
+  })
   public String verifyJwtToken(String token) {
     if (token == null || token.isBlank()) {
       return null;
     }
     try {
-      return JWT.require(algorithm).withIssuer("auth0").build().verify(token).getClaim("email").asString();
+      return JWT.require(algorithm)
+          .withIssuer("auth0")
+          .build()
+          .verify(token)
+          .getClaim("email")
+          .asString();
     } catch (JWTVerificationException e) {
       // Handle verification exceptions including token expiration
       return null;
@@ -126,7 +141,7 @@ public class AuthsService {
   /**
    * Login a client.
    *
-   * @param email    the email
+   * @param email the email
    * @param password the password
    * @return the authenticated user if the login is successful, null otherwise
    */
@@ -137,7 +152,7 @@ public class AuthsService {
       return null;
     }
 
-    if (!Objects.equals(password, user.getPassword())) {
+    if (!passwordEncoder.matches(password, user.getPassword())) {
       return null;
     }
 

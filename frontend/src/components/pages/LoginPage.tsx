@@ -120,6 +120,7 @@ const LoginPage = () => {
         <TextField
           fullWidth
           id="password"
+          type="password"
           name="password"
           label="Mot de passe"
           variant="outlined"

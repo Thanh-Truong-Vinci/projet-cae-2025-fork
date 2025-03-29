@@ -2,8 +2,14 @@ interface UserContextType {
   authenticatedUser: MaybeAuthenticatedUser
   authsMe: (token: string) => Promise<void>
   registerUser: (newUser: User) => Promise<void>
+  registerManager: (data: ManagerRegistrationData) => Promise<void>
+  registerProducer: (data: ProducerRegistrationData) => Promise<void>
   loginUser: (user: LoginUser) => Promise<AuthenticatedUser>
   clearUser: () => void
+  changePassword: (
+    currentPassword: string,
+    newPassword: string
+  ) => Promise<void>
 }
 
 interface User {
@@ -19,6 +25,28 @@ interface User {
   phoneNumber: string
   email: string
   password: string
+}
+
+interface ManagerRegistrationData {
+  name: string
+  firstname: string
+  email: string
+  password: string
+}
+
+interface ProducerRegistrationData {
+  name: string
+  firstname: string
+  company: string
+  email: string
+  password: string
+  street: string
+  number: string
+  box?: string
+  postalCode: string
+  city: string
+  country: string
+  phoneNumber: string
 }
 
 interface AuthenticatedUser {
@@ -38,6 +66,8 @@ type MaybeAuthenticatedUser = AuthenticatedUser | undefined
 
 export type {
   User,
+  ManagerRegistrationData,
+  ProducerRegistrationData,
   AuthenticatedUser,
   MaybeAuthenticatedUser,
   UserContextType,

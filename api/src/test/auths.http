@@ -1,4 +1,5 @@
 @baseUrl = http://localhost:3000
+@adminToken = {{login_admin.response.body.token}}
 
 ### Create the default admin
 POST {{baseUrl}}/auths/register
@@ -7,7 +8,7 @@ Content-Type: application/json
 {
   "name": "Admin",
   "firstname": "User",
-  "email": "admin@example.com",
+  "email": "admin2@example.com",
   "password": "admin",
   "street": "Admin Street",
   "number": "1",
@@ -16,6 +17,15 @@ Content-Type: application/json
   "city": "Admin City",
   "country": "Admin Country",
   "phoneNumber": "123456789"
+}
+
+### Login admin
+POST {{baseUrl}}/auths/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "adminpw"
 }
 
 ### Create with invalid email
@@ -104,15 +114,6 @@ Content-Type: application/json
   "phoneNumber": "222222222"
 }
 
-### Login admin
-POST {{baseUrl}}/auths/login
-Content-Type: application/json
-
-{
-  "email": "admin@example.com",
-  "password": "admin"
-}
-
 ### Login unknown user
 POST {{baseUrl}}/auths/login
 Content-Type: application/json
@@ -136,4 +137,47 @@ Content-Type: application/json
 
 {
   "email": "user@example.com"
+}
+
+### Register a new manager
+POST {{baseUrl}}/auths/registermanager
+Content-Type: application/json
+Authorization: {{adminToken}}
+
+{
+  "name": "Manager",
+  "firstname": "Test",
+  "email": "manager@example.com",
+  "password": "manager123"
+}
+
+### Register another new manager
+POST {{baseUrl}}/auths/registermanager
+Content-Type: application/json
+
+{
+  "name": "Manageer",
+  "firstname": "Test",
+  "email": "managerr@example.com",
+  "password": "manager123"
+}
+
+### Create a Producer
+POST {{baseUrl}}/auths/registerproducer
+Content-Type: application/json
+Authorization: {{adminToken}}
+
+{
+  "name": "Producer",
+  "firstname": "IDK",
+  "company": "ALEDink",
+  "email": "producer-test@example.com",
+  "password": "prod",
+  "street": "LaRue",
+  "number": "1234",
+  "box": "12",
+  "postalCode": "1251",
+  "city": "LaVille",
+  "country": "LePays",
+  "phoneNumber": "+324794586718"
 }

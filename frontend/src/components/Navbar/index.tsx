@@ -3,6 +3,7 @@ import { useContext } from 'react'
 import { Button, Box, IconButton, Badge } from '@mui/material'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import ReceiptIcon from '@mui/icons-material/Receipt'
+import PersonIcon from '@mui/icons-material/Person'
 import { UserContext } from '../../contexts/UserContext'
 import { UserContextType } from '../../types'
 import { CartContext } from '../../contexts/CartContext'
@@ -42,6 +43,53 @@ const NavBar = () => {
         >
           <ReceiptIcon />
         </IconButton>
+      )}
+
+      {/* Add profile icon for authenticated users */}
+      {authenticatedUser && (
+        <IconButton
+          onClick={() => navigate('/profile')}
+          sx={{ mr: 1 }}
+          aria-label="profile"
+        >
+          <PersonIcon />
+        </IconButton>
+      )}
+
+      {/* Ajouter les boutons d'inscription pour les gestionnaires */}
+      {authenticatedUser && authenticatedUser.role === 'Manager' && (
+        <>
+          <Button
+            variant="outlined"
+            sx={{
+              color: 'green',
+              borderColor: 'green',
+              '&:hover': {
+                borderColor: 'darkgreen',
+                backgroundColor: 'rgba(0, 128, 0, 0.04)',
+              },
+              mr: 1,
+            }}
+            onClick={() => navigate('/register-manager')}
+          >
+            Nouveau Gestionnaire
+          </Button>
+          <Button
+            variant="outlined"
+            sx={{
+              color: 'green',
+              borderColor: 'green',
+              '&:hover': {
+                borderColor: 'darkgreen',
+                backgroundColor: 'rgba(0, 128, 0, 0.04)',
+              },
+              mr: 1,
+            }}
+            onClick={() => navigate('/register-producer')}
+          >
+            Nouveau Producteur
+          </Button>
+        </>
       )}
 
       {authenticatedUser ? (

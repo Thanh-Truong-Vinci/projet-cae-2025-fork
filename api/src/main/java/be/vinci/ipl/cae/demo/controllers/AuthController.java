@@ -2,34 +2,52 @@ package be.vinci.ipl.cae.demo.controllers;
 
 import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedUser;
 import be.vinci.ipl.cae.demo.models.dtos.Credentials;
+import be.vinci.ipl.cae.demo.models.dtos.CredentialsManager;
+import be.vinci.ipl.cae.demo.models.dtos.CredentialsProducer;
+import be.vinci.ipl.cae.demo.models.dtos.CredentialsProfile;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsRegister;
 import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.ClientService;
+import be.vinci.ipl.cae.demo.services.ManagerService;
+import be.vinci.ipl.cae.demo.services.ProducerService;
+import be.vinci.ipl.cae.demo.services.ProfileService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * AuthController to handle client authentication.
- */
+/** AuthController to handle client authentication. */
 @RestController
 @RequestMapping("/auths")
 public class AuthController {
 
+  private final ProfileService profileService;
   private final ClientService clientService;
+  private final ManagerService managerService;
+  private final ProducerService producerService;
   private final AuthsService authsService;
 
   /**
    * Constructor for AuthController.
    *
    * @param clientService the injected ClientService.
-   * @param authsService  the injected AuthsService.
+   * @param managerService the injected ManagerService.
+   * @param producerService the injected ManagerService.
+   * @param authsService the injected AuthsService.
    */
-  public AuthController(ClientService clientService, AuthsService authsService) {
+  public AuthController(
+      ProfileService profileService,
+      ClientService clientService,
+      ManagerService managerService,
+      ProducerService producerService,
+      AuthsService authsService) {
+    this.profileService = profileService;
     this.clientService = clientService;
+    this.managerService = managerService;
+    this.producerService = producerService;
     this.authsService = authsService;
   }
 
@@ -88,27 +106,27 @@ public class AuthController {
   }
 
   /**
-   * Register a new client.
+   * Register a new manager.
    *
-   * @param credentials the client credentials from the request body.
-   * @throws ResponseStatusException if the credentials are invalid or the email
-   *                                 is already in use.
+   * @param credentials the manager credentials from the request body.
+   * @throws ResponseStatusException if the credentials are invalid or the email is already in use.
    */
   @PostMapping("/register")
   public void register(@RequestBody CredentialsRegister credentials) {
     validateCredentialsRegister(credentials);
-    boolean success = clientService.register(
-        credentials.getName(),
-        credentials.getFirstname(),
-        credentials.getEmail(),
-        credentials.getPassword(),
-        credentials.getCivility(),
-        credentials.getStreet(),
-        credentials.getNumber(),
-        credentials.getPostalCode(),
-        credentials.getCity(),
-        credentials.getCountry(),
-        credentials.getPhoneNumber());
+    boolean success =
+        clientService.register(
+            credentials.getName(),
+            credentials.getFirstname(),
+            credentials.getEmail(),
+            credentials.getPassword(),
+            credentials.getCivility(),
+            credentials.getStreet(),
+            credentials.getNumber(),
+            credentials.getPostalCode(),
+            credentials.getCity(),
+            credentials.getCountry(),
+            credentials.getPhoneNumber());
 
     if (!success) {
       throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
@@ -116,19 +134,71 @@ public class AuthController {
   }
 
   /**
+   * Register a new manager.
+   *
+   * @param credentials the manager credentials from the request body.
+   * @throws ResponseStatusException if the credentials are invalid or the email is already in use.
+   */
+  @PostMapping("/registermanager")
+  public void register(
+      @RequestBody CredentialsManager credentials, @RequestHeader("Authorization") String token) {
+    boolean success =
+        managerService.register(
+            credentials.getName(),
+            credentials.getFirstname(),
+            credentials.getEmail(),
+            credentials.getPassword(),
+            authsService.verifyJwtToken(token));
+    if (!success) {
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
+    }
+  }
+
+  /**
+   * Register a new producer.
+   *
+   * @param credentials the producer credentials from the request body.
+   */
+  @PostMapping("/registerproducer")
+  public void registerProducer(@RequestBody CredentialsProducer credentials) {
+    producerService.registerProducer(
+        credentials.getName(),
+        credentials.getFirstname(),
+        credentials.getCompany(),
+        credentials.getEmail(),
+        credentials.getPassword(),
+        credentials.getStreet(),
+        credentials.getNumber(),
+        credentials.getBox(),
+        credentials.getPostalCode(),
+        credentials.getCity(),
+        credentials.getCountry(),
+        credentials.getPhoneNumber());
+  }
+
+  /**
+   * Sets a new password.
+   *
+   * @param credentials the producer credentials from the request body.
+   */
+  @PostMapping("/changepassword")
+  public void changePassword(@RequestBody CredentialsProfile credentials) {
+    profileService.changePassword(
+        credentials.getEmail(), credentials.getCurrentPassword(), credentials.getNewPassword());
+  }
+
+  /**
    * Login a client.
    *
    * @param credentials the client credentials from the request body.
    * @return the authenticated user.
-   * @throws ResponseStatusException if the credentials are invalid or the login
-   *                                 fails.
+   * @throws ResponseStatusException if the credentials are invalid or the login fails.
    */
   @PostMapping("/login")
   public AuthenticatedUser login(@RequestBody Credentials credentials) {
     validateCredentialsLogin(credentials);
 
-    AuthenticatedUser user = authsService.login(credentials.getEmail(),
-        credentials.getPassword());
+    AuthenticatedUser user = authsService.login(credentials.getEmail(), credentials.getPassword());
 
     if (user == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
@@ -138,14 +208,12 @@ public class AuthController {
   }
 
   /**
-   * Refresh the token.
-   * This endpoint receives a token, verifies its validity (including expiration)
+   * Refresh the token. This endpoint receives a token, verifies its validity (including expiration)
    * and returns a new token with a new expiration date.
    *
    * @param request the token request containing the token to verify.
    * @return a new token if verification is successful.
-   * @throws ResponseStatusException if the token is invalid or the verification
-   *                                 fails.
+   * @throws ResponseStatusException if the token is invalid or the verification fails.
    */
   @PostMapping("/me")
   public String refreshToken(@RequestBody String request) {
@@ -160,6 +228,5 @@ public class AuthController {
     }
 
     return authsService.createJwtToken(email);
-
   }
 }

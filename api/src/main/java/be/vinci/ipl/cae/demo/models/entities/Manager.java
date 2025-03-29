@@ -6,15 +6,13 @@ import jakarta.persistence.ManyToOne;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Manager entity.
- */
+/** Manager entity. */
 @Entity
 @Data
 @NoArgsConstructor
 public class Manager extends User {
 
   @ManyToOne
-  @JoinColumn(name = "manager_id", nullable = true)
+  @JoinColumn(name = "manager", nullable = true)
   private Manager manager;
 }

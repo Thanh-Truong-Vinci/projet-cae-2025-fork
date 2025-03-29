@@ -5,9 +5,7 @@ import jakarta.persistence.Entity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Producer entity.
- */
+/** Producer entity. */
 @Entity
 @Data
 @NoArgsConstructor

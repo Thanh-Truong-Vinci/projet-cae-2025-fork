@@ -1,5 +1,6 @@
 package be.vinci.ipl.cae.demo.models.entities;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -44,7 +45,7 @@ public class Reservation {
   @JoinColumn(name = "client_id", nullable = false)
   private Client client;
 
-  @OneToMany(mappedBy = "reservation")
+  @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL)
   private List<ReservationLine> reservationLines;
 }
 

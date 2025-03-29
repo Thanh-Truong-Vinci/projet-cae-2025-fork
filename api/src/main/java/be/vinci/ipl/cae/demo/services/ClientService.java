@@ -4,6 +4,7 @@ import be.vinci.ipl.cae.demo.models.entities.Client;
 import be.vinci.ipl.cae.demo.repositories.ClientRepository;
 import be.vinci.ipl.cae.demo.repositories.UserRepository;
 import java.time.LocalDate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -15,6 +16,7 @@ public class ClientService {
 
   private final ClientRepository clientRepository;
   private final UserRepository userRepository;
+  private final BCryptPasswordEncoder passwordEncoder;
 
   /**
    * Constructor.
@@ -22,26 +24,28 @@ public class ClientService {
    * @param clientRepository the client repository
    * @param userRepository   the user repository
    */
-  public ClientService(ClientRepository clientRepository, UserRepository userRepository) {
+  public ClientService(ClientRepository clientRepository, UserRepository userRepository, 
+                       BCryptPasswordEncoder passwordEncoder) {
     this.clientRepository = clientRepository;
     this.userRepository = userRepository;
+    this.passwordEncoder = passwordEncoder;
   }
 
   /**
    * Register a new client.
    *
-   * @param name        the last name
-   * @param firstname   the first name
-   * @param email       the email
-   * @param password    the password
-   * @param civility    the civility
-   * @param street      the street
-   * @param number      the street number
-   * @param postalCode  the postal code
-   * @param city        the city
-   * @param country     the country
+   * @param name the last name
+   * @param firstname the first name
+   * @param email the email
+   * @param password the password
+   * @param civility the civility
+   * @param street the street
+   * @param number the street number
+   * @param postalCode the postal code
+   * @param city the city
+   * @param country the country
    * @param phoneNumber the phone number (optional)
-   * @return the authenticated client if the registration is successful
+   * @return true if the registration is successful, false otherwise
    * @throws ResponseStatusException if validation fails
    */
   public boolean register(
@@ -60,7 +64,8 @@ public class ClientService {
       return false;
     }
 
-    createOne(name,
+    createOne(
+        name,
         firstname,
         email,
         password,
@@ -77,35 +82,36 @@ public class ClientService {
   /**
    * Create a new client.
    *
-   * @param name        the last name
-   * @param firstname   the first name
-   * @param email       the email
-   * @param password    the password
-   * @param civility    the civility
-   * @param street      the street
-   * @param number      the street number
-   * @param postalCode  the postal code
-   * @param city        the city
-   * @param country     the country
+   * @param name the last name
+   * @param firstname the first name
+   * @param email the email
+   * @param password the password
+   * @param civility the civility
+   * @param street the street
+   * @param number the street number
+   * @param postalCode the postal code
+   * @param city the city
+   * @param country the country
    * @param phoneNumber the phone number (optional)
    */
-  public void createOne(String name,
-                        String firstname,
-                        String email,
-                        String password,
-                        String civility,
-                        String street,
-                        String number,
-                        String postalCode,
-                        String city,
-                        String country,
-                        String phoneNumber) {
+  public void createOne(
+      String name,
+      String firstname,
+      String email,
+      String password,
+      String civility,
+      String street,
+      String number,
+      String postalCode,
+      String city,
+      String country,
+      String phoneNumber) {
 
     Client client = new Client();
     client.setName(name);
     client.setFirstname(firstname);
     client.setEmail(email);
-    client.setPassword(password);
+    client.setPassword(passwordEncoder.encode(password));
     client.setCivility(civility);
     client.setStreet(street);
     client.setNumber(number);
@@ -118,3 +124,4 @@ public class ClientService {
     clientRepository.save(client);
   }
 }
+

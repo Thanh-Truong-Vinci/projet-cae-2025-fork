@@ -4,113 +4,122 @@ import be.vinci.ipl.cae.demo.models.entities.Producer;
 import be.vinci.ipl.cae.demo.repositories.ProducerRepository;
 import be.vinci.ipl.cae.demo.repositories.UserRepository;
 import java.time.LocalDate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-/**
- * Service class for managing producers.
- */
+/** Producer Service. */
 @Service
 public class ProducerService {
 
   private final ProducerRepository producerRepository;
+  private final BCryptPasswordEncoder passwordEncoder;
   private final UserRepository userRepository;
 
   /**
-   * Constructs a ProducerService with the specified repositories.
+   * Constructor.
    *
-   * @param producerRepository the repository for managing producers
-   * @param userRepository the repository for managing users
+   * @param producerRepository the manager repository
    */
-  public ProducerService(ProducerRepository producerRepository, UserRepository userRepository) {
+  public ProducerService(
+      ProducerRepository producerRepository, BCryptPasswordEncoder passwordEncoder, 
+      UserRepository userRepository) {
     this.producerRepository = producerRepository;
+    this.passwordEncoder = passwordEncoder;
     this.userRepository = userRepository;
   }
 
   /**
-   * Registers a new producer.
+   * Register a new producer.
    *
-   * @param name the name of the producer
-   * @param firstname the first name of the producer
-   * @param email the email of the producer
-   * @param password the password of the producer
-   * @param street the street address of the producer
-   * @param number the street number of the producer
-   * @param postalCode the postal code of the producer
-   * @param city the city of the producer
-   * @param country the country of the producer
-   * @param phoneNumber the phone number of the producer
-   * @param company the company of the producer
-   * @return true if registration is successful, false otherwise
+   * @param name the last name
+   * @param firstname the first name
+   * @param company the company
+   * @param email the email
+   * @param password the password
+   * @param street the street
+   * @param number the number
+   * @param box the box
+   * @param postalCode the postalCode
+   * @param city the city
+   * @param country the country
+   * @param phoneNumber the phoneNumber
+   * @return true if the registration is successful, false otherwise
    */
-  public boolean register(
+  public boolean registerProducer(
       String name,
       String firstname,
+      String company,
       String email,
       String password,
       String street,
       String number,
+      String box,
       String postalCode,
       String city,
       String country,
-      String phoneNumber,
-      String company) {
+      String phoneNumber) {
     if (userRepository.findByEmail(email) != null) {
       return false;
     }
-
-    createOne(name,
+    createProducer(
+        name,
         firstname,
+        company,
         email,
         password,
         street,
         number,
+        box,
         postalCode,
         city,
         country,
-        phoneNumber,
-        company);
+        phoneNumber);
     return true;
   }
 
   /**
-   * Creates a new producer.
+   * Create a new Producer.
    *
-   * @param name the name of the producer
-   * @param firstname the first name of the producer
-   * @param email the email of the producer
-   * @param password the password of the producer
-   * @param street the street address of the producer
-   * @param number the street number of the producer
-   * @param postalCode the postal code of the producer
-   * @param city the city of the producer
-   * @param country the country of the producer
-   * @param phoneNumber the phone number of the producer
-   * @param company the company of the producer
+   * @param name the last name
+   * @param firstname the first name
+   * @param company the company
+   * @param email the email
+   * @param password the password
+   * @param street the street
+   * @param number the number
+   * @param box the box
+   * @param postalCode the postalCode
+   * @param city the city
+   * @param country the country
+   * @param phoneNumber the phoneNumber
    */
-  public void createOne(String name,
-                        String firstname,
-                        String email,
-                        String password,
-                        String street,
-                        String number,
-                        String postalCode,
-                        String city,
-                        String country,
-                        String phoneNumber,
-                        String company) {
+  public void createProducer(
+      String name,
+      String firstname,
+      String company,
+      String email,
+      String password,
+      String street,
+      String number,
+      String box,
+      String postalCode,
+      String city,
+      String country,
+      String phoneNumber) {
 
     Producer producer = new Producer();
     producer.setName(name);
     producer.setFirstname(firstname);
+    producer.setCompany(company);
     producer.setEmail(email);
-    producer.setPassword(password);
+    producer.setPassword(passwordEncoder.encode(password));
     producer.setStreet(street);
     producer.setNumber(number);
+    producer.setBox(box);
     producer.setPostalCode(postalCode);
     producer.setCity(city);
     producer.setCountry(country);
     producer.setPhoneNumber(phoneNumber);
-    producer.setCompany(company);
     producer.setDateInscription(LocalDate.now());
 
     producerRepository.save(producer);
