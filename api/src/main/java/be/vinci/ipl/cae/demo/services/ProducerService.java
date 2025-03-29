@@ -2,6 +2,7 @@ package be.vinci.ipl.cae.demo.services;
 
 import be.vinci.ipl.cae.demo.models.entities.Producer;
 import be.vinci.ipl.cae.demo.repositories.ProducerRepository;
+import be.vinci.ipl.cae.demo.repositories.UserRepository;
 import java.time.LocalDate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ public class ProducerService {
 
   private final ProducerRepository producerRepository;
   private final BCryptPasswordEncoder passwordEncoder;
+  private final UserRepository userRepository;
 
   /**
    * Constructor.
@@ -19,9 +21,11 @@ public class ProducerService {
    * @param producerRepository the manager repository
    */
   public ProducerService(
-      ProducerRepository producerRepository, BCryptPasswordEncoder passwordEncoder) {
+      ProducerRepository producerRepository, BCryptPasswordEncoder passwordEncoder, 
+      UserRepository userRepository) {
     this.producerRepository = producerRepository;
     this.passwordEncoder = passwordEncoder;
+    this.userRepository = userRepository;
   }
 
   /**
@@ -54,7 +58,7 @@ public class ProducerService {
       String city,
       String country,
       String phoneNumber) {
-    if (producerRepository.findByEmail(email) != null) {
+    if (userRepository.findByEmail(email) != null) {
       return false;
     }
     createProducer(
@@ -119,14 +123,5 @@ public class ProducerService {
     producer.setDateInscription(LocalDate.now());
 
     producerRepository.save(producer);
-  }
-
-  /**
-   * Get the producer's ID.
-   *
-   * @param email the email of the producer
-   */
-  public Producer getProducerId(String email) {
-    return producerRepository.findByEmail(email);
   }
 }
