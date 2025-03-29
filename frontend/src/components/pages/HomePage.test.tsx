@@ -29,12 +29,10 @@ const renderWithProviders = (component: React.ReactNode) => {
   )
 }
 
+test('uses correct Material-UI components', () => {
+  renderWithProviders(<HomePage />)
 
-
-  test('uses correct Material-UI components', () => {
-    renderWithProviders(<HomePage />)
-
-    // Vérification de la présence des boutons
-    const buttons = screen.getAllByRole('button')
-    expect(buttons.length).toBeGreaterThan(0)
+  // Vérification de la présence des boutons
+  const buttons = screen.getAllByRole('button')
+  expect(buttons.length).toBeGreaterThan(0)
 })
