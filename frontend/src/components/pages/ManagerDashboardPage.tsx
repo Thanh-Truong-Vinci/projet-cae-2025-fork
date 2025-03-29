@@ -151,7 +151,7 @@ const ManagerDashboardPage = () => {
             },
             {
               id: 3,
-              productName: 'Pain au levain',
+              productName: 'Pain au levains',
               productType: 'Boulangerie',
               imageUrl:
                 'https://images.unsplash.com/photo-1586444248902-2f64eddc13df',
