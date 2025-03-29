@@ -34,6 +34,7 @@ describe('Header', () => {
       clearUser: vi.fn(),
       registerManager: vi.fn(),
       registerProducer: vi.fn(),
+      changePassword: vi.fn(),
     }
 
     render(
@@ -60,6 +61,7 @@ describe('Header', () => {
       clearUser: vi.fn(),
       registerManager: vi.fn(),
       registerProducer: vi.fn(),
+      changePassword: vi.fn(),
     }
 
     render(
@@ -87,6 +89,7 @@ describe('Header', () => {
       clearUser: vi.fn(),
       registerManager: vi.fn(),
       registerProducer: vi.fn(),
+      changePassword: vi.fn(),
     }
 
     render(

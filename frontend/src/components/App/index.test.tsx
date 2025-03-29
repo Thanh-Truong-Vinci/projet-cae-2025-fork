@@ -51,6 +51,7 @@ describe('App Component', () => {
       clearUser: vi.fn(),
       registerManager: vi.fn(),
       registerProducer: vi.fn(),
+      changePassword: vi.fn(),
     }
 
     render(
@@ -76,6 +77,7 @@ describe('App Component', () => {
       clearUser: vi.fn(),
       registerManager: vi.fn(),
       registerProducer: vi.fn(),
+      changePassword: vi.fn(),
     }
 
     render(
@@ -102,6 +104,7 @@ describe('App Component', () => {
       clearUser: vi.fn(),
       registerManager: vi.fn(),
       registerProducer: vi.fn(),
+      changePassword: vi.fn(),
     }
 
     render(
@@ -134,6 +137,7 @@ describe('App Component', () => {
       clearUser: vi.fn(),
       registerManager: vi.fn(),
       registerProducer: vi.fn(),
+      changePassword: vi.fn(),
     }
 
     render(
@@ -158,6 +162,7 @@ describe('App Component', () => {
       clearUser: vi.fn(),
       registerManager: vi.fn(),
       registerProducer: vi.fn(),
+      changePassword: vi.fn(),
     }
 
     render(
