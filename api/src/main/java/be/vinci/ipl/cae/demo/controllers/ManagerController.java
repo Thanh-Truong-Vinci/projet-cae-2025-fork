@@ -13,9 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * Controller for managing manager and producer registrations.
- */
+/** Controller for managing manager and producer registrations. */
 @RestController
 @RequestMapping("/manager")
 public class ManagerController {
@@ -31,9 +29,8 @@ public class ManagerController {
    * @param producerService the service for managing producers.
    * @param authsService the service for authentication.
    */
-  public ManagerController(ManagerService managerService,
-                           ProducerService producerService,
-                           AuthsService authsService) {
+  public ManagerController(
+      ManagerService managerService, ProducerService producerService, AuthsService authsService) {
     this.managerService = managerService;
     this.producerService = producerService;
     this.authsService = authsService;
@@ -50,8 +47,8 @@ public class ManagerController {
   public void registerManager(
       @RequestBody CredentialsManager credentials, @RequestHeader("Authorization") String token) {
     if (authsService.isValidManagerToken(token) == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-          "Token not valide, expired or user is not Manager");
+      throw new ResponseStatusException(
+          HttpStatus.UNAUTHORIZED, "Token not valide, expired or user is not Manager");
     }
 
     boolean success =
@@ -62,7 +59,7 @@ public class ManagerController {
             credentials.getPassword(),
             authsService.verifyJwtToken(token)); // email
     if (!success) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use"); 
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
     }
   }
 
@@ -74,10 +71,10 @@ public class ManagerController {
    * @throws ResponseStatusException if the token is invalid or expired.
    */
   @PostMapping("/registerproducer")
-  public void registerProducer(@RequestBody CredentialsProducer credentials,
-                               @RequestHeader("Authorization") String token) {
+  public void registerProducer(
+      @RequestBody CredentialsProducer credentials, @RequestHeader("Authorization") String token) {
     if (authsService.isValidManagerToken(token) == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token not valide or expired"); 
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token not valide or expired");
     }
 
     producerService.registerProducer(

@@ -30,9 +30,7 @@ public class AuthController {
    * @param authsService the injected AuthsService.
    */
   public AuthController(
-      ProfileService profileService,
-      ClientService clientService,
-      AuthsService authsService) {
+      ProfileService profileService, ClientService clientService, AuthsService authsService) {
     this.profileService = profileService;
     this.clientService = clientService;
     this.authsService = authsService;
@@ -46,31 +44,31 @@ public class AuthController {
    */
   private void validateCredentialsRegister(CredentialsRegister credentials) {
     if (credentials == null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Credentials cannot be null"); 
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Credentials cannot be null");
     }
     if (credentials.getName() == null || credentials.getName().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name is required"); 
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name is required");
     }
     if (credentials.getFirstname() == null || credentials.getFirstname().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Firstname is required"); 
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Firstname is required");
     }
     if (credentials.getStreet() == null || credentials.getStreet().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Street is required"); 
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Street is required");
     }
     if (credentials.getNumber() == null || credentials.getNumber().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Street number is required"); 
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Street number is required");
     }
     if (credentials.getPostalCode() == null || credentials.getPostalCode().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Postal code is required"); 
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Postal code is required");
     }
     if (credentials.getCity() == null || credentials.getCity().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "City is required"); 
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "City is required");
     }
     if (credentials.getCountry() == null || credentials.getCountry().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Country is required"); 
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Country is required");
     }
     if (credentials.getPhoneNumber() == null || credentials.getPhoneNumber().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Phone number is required"); 
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Phone number is required");
     }
   }
 
@@ -82,13 +80,13 @@ public class AuthController {
    */
   private void validateCredentialsLogin(Credentials credentials) {
     if (credentials == null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Credentials cannot be null"); 
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Credentials cannot be null");
     }
     if (credentials.getEmail() == null || credentials.getEmail().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required"); 
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required");
     }
     if (credentials.getPassword() == null || credentials.getPassword().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is required"); 
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is required");
     }
   }
 
@@ -116,10 +114,10 @@ public class AuthController {
             credentials.getPhoneNumber());
 
     if (!success) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use"); 
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
     }
   }
-  
+
   /**
    * Sets a new password.
    *
@@ -145,7 +143,7 @@ public class AuthController {
     AuthenticatedUser user = authsService.login(credentials.getEmail(), credentials.getPassword());
 
     if (user == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password"); 
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
     }
 
     return user;
@@ -162,13 +160,13 @@ public class AuthController {
   @PostMapping("/me")
   public String refreshToken(@RequestBody String request) {
     if (request == null || request.isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token is required"); 
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token is required");
     }
 
     String email = authsService.verifyJwtToken(request);
 
     if (email == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token"); 
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
     }
 
     return authsService.createJwtToken(email);

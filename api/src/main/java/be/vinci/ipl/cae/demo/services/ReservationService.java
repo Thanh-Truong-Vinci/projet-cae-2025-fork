@@ -13,9 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * Service class for managing reservations.
- */
+/** Service class for managing reservations. */
 @Service
 public class ReservationService {
 
@@ -30,9 +28,10 @@ public class ReservationService {
    * @param batchRepository the repository for batches
    * @param reservationLineService the service for reservation lines
    */
-  public ReservationService(ReservationRepository reservationRepository,
-                            BatchRepository batchRepository,
-                            ReservationLineService reservationLineService) {
+  public ReservationService(
+      ReservationRepository reservationRepository,
+      BatchRepository batchRepository,
+      ReservationLineService reservationLineService) {
     this.reservationRepository = reservationRepository;
     this.batchRepository = batchRepository;
     this.reservationLineService = reservationLineService;
@@ -46,8 +45,10 @@ public class ReservationService {
    * @param quantity the quantity of the product to reserve
    */
   public void reserveProduct(Client client, Product product, int quantity) {
-    Reservation reservation = reservationRepository.findByClientAndStatus(client, "pending")
-        .orElseGet(() -> createReservation(client, product, quantity));
+    Reservation reservation =
+        reservationRepository
+            .findByClientAndStatus(client, "pending")
+            .orElseGet(() -> createReservation(client, product, quantity));
 
     reservationLineService.addProduct(reservation, product, quantity);
     reservationRepository.save(reservation);
@@ -96,12 +97,14 @@ public class ReservationService {
    * @param reservationId the ID of the reservation to cancel.
    */
   public void cancelReservation(Client client, Long reservationId) {
-    Reservation reservation = reservationRepository.findById(reservationId)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, 
-                                                       "Reservation not found"));
+    Reservation reservation =
+        reservationRepository
+            .findById(reservationId)
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation not found"));
     if (!reservation.getClient().equals(client)) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-          "Reservation does not belong to the client");
+      throw new ResponseStatusException(
+          HttpStatus.FORBIDDEN, "Reservation does not belong to the client");
     }
     cancelReservation(reservation);
   }
@@ -125,4 +128,3 @@ public class ReservationService {
     return reservation;
   }
 }
-

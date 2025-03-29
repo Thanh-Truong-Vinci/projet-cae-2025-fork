@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * Controller for handling client-related operations.
- */
+/** Controller for handling client-related operations. */
 @RestController
 @RequestMapping("/client")
 public class ClientController {
@@ -28,15 +26,17 @@ public class ClientController {
   private final ReservationService reservationService;
 
   /**
-   * Constructs a ClientController with the specified
-   *     AuthsService, ProductService, and ReservationService.
+   * Constructs a ClientController with the specified AuthsService, ProductService, and
+   * ReservationService.
    *
    * @param authsService the AuthsService to be used by this controller.
    * @param productService the ProductService to be used by this controller.
    * @param reservationService the ReservationService to be used by this controller.
    */
-  public ClientController(AuthsService authsService, ProductService productService, 
-                          ReservationService reservationService) {
+  public ClientController(
+      AuthsService authsService,
+      ProductService productService,
+      ReservationService reservationService) {
     this.authsService = authsService;
     this.productService = productService;
     this.reservationService = reservationService;
@@ -53,11 +53,12 @@ public class ClientController {
    */
   @PostMapping("/products")
   public List<Product> getProducts(
-      @RequestBody String search, @RequestBody String type, 
+      @RequestBody String search,
+      @RequestBody String type,
       @RequestHeader("Authorization") String token) {
     if (authsService.isValidClientToken(token) == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, 
-                                        "Token not valid, expired or user is not client");
+      throw new ResponseStatusException(
+          HttpStatus.UNAUTHORIZED, "Token not valid, expired or user is not client");
     }
     return productService.getProducts(search, type);
   }
@@ -70,12 +71,13 @@ public class ClientController {
    * @throws ResponseStatusException if the token is invalid or expired.
    */
   @PostMapping("/reserve")
-  public void reserveProduct(@RequestBody ReservationRequest reservationRequest, 
-                             @RequestHeader("Authorization") String token) {
+  public void reserveProduct(
+      @RequestBody ReservationRequest reservationRequest,
+      @RequestHeader("Authorization") String token) {
     Client client = authsService.isValidClientToken(token);
     if (client == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, 
-                                        "Token not valid, expired or user is not client");
+      throw new ResponseStatusException(
+          HttpStatus.UNAUTHORIZED, "Token not valid, expired or user is not client");
     }
     Product product = productService.findProductById(reservationRequest.getProductId());
     if (product == null) {
@@ -92,12 +94,12 @@ public class ClientController {
    * @throws ResponseStatusException if the token is invalid or expired.
    */
   @PostMapping("/cancelreservation")
-  public void cancelReservation(@RequestBody Long reservationId, 
-                                @RequestHeader("Authorization") String token) {
+  public void cancelReservation(
+      @RequestBody Long reservationId, @RequestHeader("Authorization") String token) {
     Client client = authsService.isValidClientToken(token);
     if (client == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, 
-                                        "Token not valid, expired or user is not client");
+      throw new ResponseStatusException(
+          HttpStatus.UNAUTHORIZED, "Token not valid, expired or user is not client");
     }
     reservationService.cancelReservation(client, reservationId);
   }
@@ -113,8 +115,8 @@ public class ClientController {
   public List<Reservation> getReservations(@RequestHeader("Authorization") String token) {
     Client client = authsService.isValidClientToken(token);
     if (client == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, 
-                                        "Token not valid, expired or user is not client");
+      throw new ResponseStatusException(
+          HttpStatus.UNAUTHORIZED, "Token not valid, expired or user is not client");
     }
     return reservationService.getReservations(client);
   }
