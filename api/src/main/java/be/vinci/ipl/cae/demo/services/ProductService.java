@@ -1,7 +1,8 @@
 package be.vinci.ipl.cae.demo.services;
 
-import be.vinci.ipl.cae.demo.models.dtos.ProductDiponibility;
+import be.vinci.ipl.cae.demo.models.dtos.ProductAvailability;
 import be.vinci.ipl.cae.demo.models.entities.Batch;
+import be.vinci.ipl.cae.demo.models.entities.BatchStatus;
 import be.vinci.ipl.cae.demo.models.entities.Product;
 import be.vinci.ipl.cae.demo.models.entities.ProductType;
 import be.vinci.ipl.cae.demo.repositories.BatchRepository;
@@ -71,7 +72,7 @@ public class ProductService {
    * @param type the type of product
    * @return a list of available products matching the criteria
    */
-  public List<ProductDiponibility> getAvailableProducts(String search, String type) {
+  public List<ProductAvailability> getAvailableProducts(String search, String type) {
     return StreamSupport.stream(productRepository.findAll().spliterator(), false)
         .filter(
             product ->
@@ -82,17 +83,17 @@ public class ProductService {
                     && batchRepository
                         .findByProductAndAvailableQuantityGreaterThan(product, 0)
                         .stream()
-                        .anyMatch(batch -> "approuvé".equalsIgnoreCase(batch.getStatut())))
+                        .anyMatch(batch -> BatchStatus.APPROVED.equals(batch.getStatut())))
         .map(
             product -> {
-              ProductDiponibility dto = new ProductDiponibility();
+              ProductAvailability dto = new ProductAvailability();
               dto.setType(product.getType().getTitle());
               dto.setName(product.getName());
               dto.setDescription(product.getDescription());
               dto.setPhoto(product.getPhoto());
               dto.setQuantity(
                   batchRepository.findByProductAndAvailableQuantityGreaterThan(product, 0).stream()
-                      .filter(batch -> "approuvé".equalsIgnoreCase(batch.getStatut()))
+                      .filter(batch -> BatchStatus.APPROVED.equals(batch.getStatut()))
                       .mapToInt(Batch::getAvailableQuantity)
                       .sum());
               return dto;
@@ -121,7 +122,7 @@ public class ProductService {
    * @param description the description of the product
    * @param photo the url of the photo associated with the product
    */
-  public void createProduct(String name, String type, String description, String photo) {
+  public Product createProduct(String name, String type, String description, String photo) {
     ProductType productType = productTypeRepository.findByTitle(type);
     Product product = new Product();
     product.setName(name);
@@ -129,5 +130,6 @@ public class ProductService {
     product.setDescription(description);
     product.setPhoto(photo);
     productRepository.save(product);
+    return product;
   }
 }

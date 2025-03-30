@@ -25,10 +25,10 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/producer")
 public class ProducerController {
 
-  private BatchService batchService;
-  private ProductService productService;
-  private AuthsService authsService;
-  private NotificationService notificationService;
+  private final BatchService batchService;
+  private final ProductService productService;
+  private final AuthsService authsService;
+  private final NotificationService notificationService;
 
   /**
    * Constructor for ProducerController.
@@ -79,8 +79,14 @@ public class ProducerController {
       throw new ResponseStatusException(
           HttpStatus.UNAUTHORIZED, "Token not valid, expired or user is not producer");
     }
-    if (batchDto.getProductId() == null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product ID is required");
+    if (batchDto.getProduct() == null || batchDto.getProduct().isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product name is required");
+    }
+    if (batchDto.getProductType() == null || batchDto.getProductType().isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product type is required");
+    }
+    if (batchDto.getDescription() == null || batchDto.getDescription().isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product description is required");
     }
     if (batchDto.getPhoto() == null || batchDto.getPhoto().isEmpty()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Photo URL is required");
@@ -99,7 +105,9 @@ public class ProducerController {
     }
     batchService.addBatch(
         producer.getId(),
-        batchDto.getProductId(),
+        batchDto.getProduct(),
+        batchDto.getProductType(),
+        batchDto.getDescription(),
         batchDto.getPhoto(),
         batchDto.getAvailabilityDate(),
         batchDto.getUnitPrice(),

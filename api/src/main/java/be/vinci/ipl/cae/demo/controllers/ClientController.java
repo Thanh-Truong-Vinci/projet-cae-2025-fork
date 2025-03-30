@@ -1,6 +1,6 @@
 package be.vinci.ipl.cae.demo.controllers;
 
-import be.vinci.ipl.cae.demo.models.dtos.ProductDiponibility;
+import be.vinci.ipl.cae.demo.models.dtos.ProductAvailability;
 import be.vinci.ipl.cae.demo.models.dtos.ProductSearchDto;
 import be.vinci.ipl.cae.demo.models.dtos.ReservationRequest;
 import be.vinci.ipl.cae.demo.models.entities.Client;
@@ -53,7 +53,7 @@ public class ClientController {
    * @throws ResponseStatusException if the token is invalid or expired.
    */
   @PostMapping("/products")
-  public List<ProductDiponibility> getProducts(
+  public List<ProductAvailability> getProducts(
       @RequestBody ProductSearchDto productSearchDto,
       @RequestHeader("Authorization") String token) {
     if (authsService.isValidClientToken(token) == null) {
