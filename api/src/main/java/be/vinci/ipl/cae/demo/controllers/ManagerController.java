@@ -5,6 +5,7 @@ import be.vinci.ipl.cae.demo.models.dtos.CredentialsProducer;
 import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.ManagerService;
 import be.vinci.ipl.cae.demo.services.ProducerService;
+import be.vinci.ipl.cae.demo.services.ProductTypeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +22,7 @@ public class ManagerController {
   private final ManagerService managerService;
   private final ProducerService producerService;
   private final AuthsService authsService;
+  private final ProductTypeService productTypeService;
 
   /**
    * Constructs a ManagerController with the specified services.
@@ -30,10 +32,14 @@ public class ManagerController {
    * @param authsService the service for authentication.
    */
   public ManagerController(
-      ManagerService managerService, ProducerService producerService, AuthsService authsService) {
+      ManagerService managerService,
+      ProducerService producerService,
+      AuthsService authsService,
+      ProductTypeService productTypeService) {
     this.managerService = managerService;
     this.producerService = producerService;
     this.authsService = authsService;
+    this.productTypeService = productTypeService;
   }
 
   /**
@@ -90,5 +96,39 @@ public class ManagerController {
         credentials.getCity(),
         credentials.getCountry(),
         credentials.getPhoneNumber());
+  }
+
+  /**
+   * Add a new product type.
+   *
+   * @param newType the new product type to be added.
+   * @param token the authorization token from the request header.
+   * @throws ResponseStatusException if the token is invalid, expired, or the user is not a manager.
+   */
+  @PostMapping("/addproducttype")
+  public void addProductType(
+      @RequestBody String newType, @RequestHeader("Authorization") String token) {
+    if (authsService.isValidManagerToken(token) == null) {
+      throw new ResponseStatusException(
+          HttpStatus.UNAUTHORIZED, "Token not valide, expired or user is not Manager");
+    }
+    productTypeService.addProductType(newType);
+  }
+
+  /**
+   * Delete an existing product type.
+   *
+   * @param id the ID of the product type to be deleted.
+   * @param token the authorization token from the request header.
+   * @throws ResponseStatusException if the token is invalid, expired, or the user is not a manager.
+   */
+  @PostMapping("/deleteproducttype")
+  public void deleteProductType(
+      @RequestBody Long id, @RequestHeader("Authorization") String token) {
+    if (authsService.isValidManagerToken(token) == null) {
+      throw new ResponseStatusException(
+          HttpStatus.UNAUTHORIZED, "Token not valide, expired or user is not Manager");
+    }
+    productTypeService.deleteProductType(id);
   }
 }

@@ -24,7 +24,7 @@ public class ProductTypeService {
    *
    * @param title the title of the product type
    */
-  public void add(String title) {
+  public void addProductType(String title) {
     if (productTypeRepository.findByTitle(title) != null) {
       throw new IllegalArgumentException("Product type already exists");
     }
@@ -36,7 +36,7 @@ public class ProductTypeService {
    *
    * @param id the ID of the product type
    */
-  public void delete(Long id) {
+  public void deleteProductType(Long id) {
     if (!productTypeRepository.existsById(id)) {
       throw new IllegalArgumentException("Product type not found");
     }
