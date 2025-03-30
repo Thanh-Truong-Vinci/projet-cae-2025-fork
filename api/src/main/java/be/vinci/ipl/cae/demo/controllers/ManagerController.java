@@ -1,8 +1,11 @@
 package be.vinci.ipl.cae.demo.controllers;
 
+import be.vinci.ipl.cae.demo.models.dtos.BatchReject;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsManager;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsProducer;
+import be.vinci.ipl.cae.demo.models.entities.Manager;
 import be.vinci.ipl.cae.demo.services.AuthsService;
+import be.vinci.ipl.cae.demo.services.BatchService;
 import be.vinci.ipl.cae.demo.services.ManagerService;
 import be.vinci.ipl.cae.demo.services.ProducerService;
 import be.vinci.ipl.cae.demo.services.ProductTypeService;
@@ -23,6 +26,7 @@ public class ManagerController {
   private final ProducerService producerService;
   private final AuthsService authsService;
   private final ProductTypeService productTypeService;
+  private final BatchService batchService;
 
   /**
    * Constructs a ManagerController with the specified services.
@@ -30,16 +34,20 @@ public class ManagerController {
    * @param managerService the service for managing managers.
    * @param producerService the service for managing producers.
    * @param authsService the service for authentication.
+   * @param productTypeService the service for managing product types.
+   * @param batchService the service for managing batches.
    */
   public ManagerController(
       ManagerService managerService,
       ProducerService producerService,
       AuthsService authsService,
-      ProductTypeService productTypeService) {
+      ProductTypeService productTypeService,
+      BatchService batchService) {
     this.managerService = managerService;
     this.producerService = producerService;
     this.authsService = authsService;
     this.productTypeService = productTypeService;
+    this.batchService = batchService;
   }
 
   /**
@@ -130,5 +138,41 @@ public class ManagerController {
           HttpStatus.UNAUTHORIZED, "Token not valide, expired or user is not Manager");
     }
     productTypeService.deleteProductType(id);
+  }
+
+  /**
+   * Accept a batch.
+   *
+   * @param batchId the ID of the batch to be accepted.
+   * @param token the authorization token from the request header.
+   * @throws ResponseStatusException if the token is invalid, expired, or the user is not a manager.
+   */
+  @PostMapping("/acceptbatch")
+  public void acceptBatch(@RequestBody Long batchId, @RequestHeader("Authorization") String token) {
+    Manager manager = authsService.isValidManagerToken(token);
+    if (manager == null) {
+      throw new ResponseStatusException(
+          HttpStatus.UNAUTHORIZED, "Token not valid, expired or user is not Manager");
+    }
+    batchService.acceptBatch(batchId, manager);
+  }
+
+  /**
+   * Reject a batch.
+   *
+   * @param batchReject the batch rejection details.
+   * @param token the authorization token from the request header.
+   * @throws ResponseStatusException if the token is invalid, expired, or the user is not a manager.
+   */
+  @PostMapping("/rejectbatch")
+  public void rejectBatch(
+      @RequestBody BatchReject batchReject, @RequestHeader("Authorization") String token) {
+    Manager manager = authsService.isValidManagerToken(token);
+    if (manager == null) {
+      throw new ResponseStatusException(
+          HttpStatus.UNAUTHORIZED, "Token not valid, expired or user is not Manager");
+    }
+    batchService.rejectBatch(
+        batchReject.getBatchId(), manager, batchReject.getNotificationMessage());
   }
 }

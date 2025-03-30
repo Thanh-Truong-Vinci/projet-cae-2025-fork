@@ -1,6 +1,7 @@
 package be.vinci.ipl.cae.demo.services;
 
 import be.vinci.ipl.cae.demo.models.entities.Batch;
+import be.vinci.ipl.cae.demo.models.entities.Manager;
 import be.vinci.ipl.cae.demo.models.entities.Notification;
 import be.vinci.ipl.cae.demo.models.entities.Producer;
 import be.vinci.ipl.cae.demo.models.entities.Product;
@@ -105,18 +106,15 @@ public class BatchService {
    * Accepts a batch.
    *
    * @param batchId the ID of the batch
-   * @param managerId the ID of the manager
+   * @param manager the manager
    */
-  public void acceptBatch(Long batchId, Long managerId) {
+  public void acceptBatch(Long batchId, Manager manager) {
     Batch batch =
         batchRepository
             .findById(batchId)
             .orElseThrow(() -> new IllegalArgumentException("Batch not found"));
     batch.setStatut("approuvé");
-    batch.setManager(
-        managerRepository
-            .findById(managerId)
-            .orElseThrow(() -> new IllegalArgumentException("Manager not found")));
+    batch.setManager(manager);
     batchRepository.save(batch);
   }
 
@@ -124,19 +122,16 @@ public class BatchService {
    * Rejects a batch and sends a notification.
    *
    * @param batchId the ID of the batch
-   * @param managerId the ID of the manager
+   * @param manager the manager
    * @param notificationMessage the notification message
    */
-  public void rejectBatch(Long batchId, Long managerId, String notificationMessage) {
+  public void rejectBatch(Long batchId, Manager manager, String notificationMessage) {
     Batch batch =
         batchRepository
             .findById(batchId)
             .orElseThrow(() -> new IllegalArgumentException("Batch not found"));
     batch.setStatut("refusé");
-    batch.setManager(
-        managerRepository
-            .findById(managerId)
-            .orElseThrow(() -> new IllegalArgumentException("Manager not found")));
+    batch.setManager(manager);
     Notification notification = new Notification();
     notification.setMessage(notificationMessage);
     notification.setProducer(batch.getProducer());
