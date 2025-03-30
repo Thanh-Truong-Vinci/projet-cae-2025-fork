@@ -7,6 +7,7 @@ import be.vinci.ipl.cae.demo.models.dtos.CredentialsRegister;
 import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.ClientService;
 import be.vinci.ipl.cae.demo.services.ProfileService;
+import be.vinci.ipl.cae.demo.utils.ValidationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,33 +44,7 @@ public class AuthController {
    * @throws ResponseStatusException with specific message if validation fails
    */
   private void validateCredentialsRegister(CredentialsRegister credentials) {
-    if (credentials == null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Credentials cannot be null");
-    }
-    if (credentials.getName() == null || credentials.getName().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name is required");
-    }
-    if (credentials.getFirstname() == null || credentials.getFirstname().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Firstname is required");
-    }
-    if (credentials.getStreet() == null || credentials.getStreet().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Street is required");
-    }
-    if (credentials.getNumber() == null || credentials.getNumber().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Street number is required");
-    }
-    if (credentials.getPostalCode() == null || credentials.getPostalCode().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Postal code is required");
-    }
-    if (credentials.getCity() == null || credentials.getCity().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "City is required");
-    }
-    if (credentials.getCountry() == null || credentials.getCountry().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Country is required");
-    }
-    if (credentials.getPhoneNumber() == null || credentials.getPhoneNumber().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Phone number is required");
-    }
+    ValidationUtils.validateCredentialsRegister(credentials);
   }
 
   /**
@@ -79,15 +54,7 @@ public class AuthController {
    * @throws ResponseStatusException with specific message if validation fails
    */
   private void validateCredentialsLogin(Credentials credentials) {
-    if (credentials == null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Credentials cannot be null");
-    }
-    if (credentials.getEmail() == null || credentials.getEmail().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required");
-    }
-    if (credentials.getPassword() == null || credentials.getPassword().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is required");
-    }
+    ValidationUtils.validateCredentialsLogin(credentials);
   }
 
   /**
@@ -153,17 +120,17 @@ public class AuthController {
    * Refresh the token. This endpoint receives a token, verifies its validity (including expiration)
    * and returns a new token with a new expiration date.
    *
-   * @param request the token request containing the token to verify.
+   * @param token the token request containing the token to verify.
    * @return a new token if verification is successful.
    * @throws ResponseStatusException if the token is invalid or the verification fails.
    */
   @PostMapping("/me")
-  public String refreshToken(@RequestBody String request) {
-    if (request == null || request.isBlank()) {
+  public String refreshToken(@RequestBody String token) {
+    if (token == null || token.isBlank()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token is required");
     }
 
-    String email = authsService.verifyJwtToken(request);
+    String email = authsService.verifyJwtToken(token);
 
     if (email == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");

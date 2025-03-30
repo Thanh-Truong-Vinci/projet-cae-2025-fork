@@ -6,9 +6,7 @@ import lombok.NoArgsConstructor;
 /** CredentialsManager DTO. */
 @Data
 @NoArgsConstructor
-public class CredentialsManager {
+public class CredentialsManager extends Credentials {
   private String name;
   private String firstname;
-  private String email;
-  private String password;
 }

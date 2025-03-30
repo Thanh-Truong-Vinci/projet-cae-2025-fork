@@ -20,6 +20,7 @@ public class ReservationService {
   private final ReservationRepository reservationRepository;
   private final BatchRepository batchRepository;
   private final ReservationLineService reservationLineService;
+  private final ProductService productService;
 
   /**
    * Constructs a new ReservationService with the specified repositories and services.
@@ -31,20 +32,26 @@ public class ReservationService {
   public ReservationService(
       ReservationRepository reservationRepository,
       BatchRepository batchRepository,
-      ReservationLineService reservationLineService) {
+      ReservationLineService reservationLineService,
+      ProductService productService) {
     this.reservationRepository = reservationRepository;
     this.batchRepository = batchRepository;
     this.reservationLineService = reservationLineService;
+    this.productService = productService;
   }
 
   /**
    * Reserves a product for a client with the specified quantity.
    *
    * @param client the client making the reservation
-   * @param product the product to reserve
+   * @param productId the ID of the product to reserve
    * @param quantity the quantity of the product to reserve
    */
-  public void reserveProduct(Client client, Product product, int quantity) {
+  public void reserveProduct(Client client, Long productId, int quantity) {
+    Product product = productService.findProductById(productId);
+    if (product == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
+    }
     Reservation reservation =
         reservationRepository
             .findByClientAndStatus(client, "pending")
@@ -67,26 +74,16 @@ public class ReservationService {
   /**
    * Completes a reservation.
    *
-   * @param reservation the reservation to complete
+   * @param reservationId the ID of reservation to complete
    */
-  public void completeReservation(Reservation reservation) {
+  public void completeReservation(Long reservationId) {
+    Reservation reservation =
+        reservationRepository
+            .findById(reservationId)
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation not found"));
     reservation.setStatus("completed");
     reservation.setSaleDate(LocalDate.now());
-    reservationRepository.save(reservation);
-  }
-
-  /**
-   * Cancels a reservation.
-   *
-   * @param reservation the reservation to cancel
-   */
-  public void cancelReservation(Reservation reservation) {
-    reservation.setStatus("canceled");
-    for (ReservationLine line : reservation.getReservationLines()) {
-      Batch batch = line.getBatch();
-      batch.setAvailableQuantity(batch.getAvailableQuantity() + line.getQuantity());
-      batchRepository.save(batch);
-    }
     reservationRepository.save(reservation);
   }
 
@@ -106,7 +103,13 @@ public class ReservationService {
       throw new ResponseStatusException(
           HttpStatus.FORBIDDEN, "Reservation does not belong to the client");
     }
-    cancelReservation(reservation);
+    reservation.setStatus("canceled");
+    for (ReservationLine line : reservation.getReservationLines()) {
+      Batch batch = line.getBatch();
+      batch.setAvailableQuantity(batch.getAvailableQuantity() + line.getQuantity());
+      batchRepository.save(batch);
+    }
+    reservationRepository.save(reservation);
   }
 
   /**

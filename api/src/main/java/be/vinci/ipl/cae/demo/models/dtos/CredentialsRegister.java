@@ -6,12 +6,9 @@ import lombok.NoArgsConstructor;
 /** CredentialsRegister DTO. */
 @Data
 @NoArgsConstructor
-public class CredentialsRegister {
-
+public class CredentialsRegister extends Credentials {
   private String name;
   private String firstname;
-  private String email;
-  private String password;
   private String civility;
   private String street;
   private String number;

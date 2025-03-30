@@ -9,6 +9,7 @@ import be.vinci.ipl.cae.demo.services.BatchService;
 import be.vinci.ipl.cae.demo.services.ManagerService;
 import be.vinci.ipl.cae.demo.services.ProducerService;
 import be.vinci.ipl.cae.demo.services.ProductTypeService;
+import be.vinci.ipl.cae.demo.utils.ValidationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -64,7 +65,7 @@ public class ManagerController {
       throw new ResponseStatusException(
           HttpStatus.UNAUTHORIZED, "Token not valide, expired or user is not Manager");
     }
-
+    ValidationUtils.validateCredentialsManager(credentials);
     boolean success =
         managerService.register(
             credentials.getName(),
@@ -90,7 +91,7 @@ public class ManagerController {
     if (authsService.isValidManagerToken(token) == null) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token not valide or expired");
     }
-
+    ValidationUtils.validateCredentialsProducer(credentials);
     producerService.registerProducer(
         credentials.getName(),
         credentials.getFirstname(),

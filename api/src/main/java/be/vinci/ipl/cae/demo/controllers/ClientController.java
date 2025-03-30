@@ -1,9 +1,9 @@
 package be.vinci.ipl.cae.demo.controllers;
 
+import be.vinci.ipl.cae.demo.models.dtos.ProductDiponibility;
 import be.vinci.ipl.cae.demo.models.dtos.ProductSearchDto;
 import be.vinci.ipl.cae.demo.models.dtos.ReservationRequest;
 import be.vinci.ipl.cae.demo.models.entities.Client;
-import be.vinci.ipl.cae.demo.models.entities.Product;
 import be.vinci.ipl.cae.demo.models.entities.Reservation;
 import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.ProductService;
@@ -53,14 +53,14 @@ public class ClientController {
    * @throws ResponseStatusException if the token is invalid or expired.
    */
   @PostMapping("/products")
-  public List<Product> getProducts(
+  public List<ProductDiponibility> getProducts(
       @RequestBody ProductSearchDto productSearchDto,
       @RequestHeader("Authorization") String token) {
     if (authsService.isValidClientToken(token) == null) {
       throw new ResponseStatusException(
           HttpStatus.UNAUTHORIZED, "Token not valid, expired or user is not client");
     }
-    return productService.getDispoProducts(
+    return productService.getAvailableProducts(
         productSearchDto.getSearch(), productSearchDto.getType());
   }
 
@@ -80,11 +80,8 @@ public class ClientController {
       throw new ResponseStatusException(
           HttpStatus.UNAUTHORIZED, "Token not valid, expired or user is not client");
     }
-    Product product = productService.findProductById(reservationRequest.getProductId());
-    if (product == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
-    }
-    reservationService.reserveProduct(client, product, reservationRequest.getQuantity());
+    reservationService.reserveProduct(
+        client, reservationRequest.getProductId(), reservationRequest.getQuantity());
   }
 
   /**

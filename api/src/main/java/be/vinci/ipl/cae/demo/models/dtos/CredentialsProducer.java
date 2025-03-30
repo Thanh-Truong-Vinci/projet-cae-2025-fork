@@ -6,12 +6,10 @@ import lombok.NoArgsConstructor;
 /** CredentialsProducer DTO. */
 @Data
 @NoArgsConstructor
-public class CredentialsProducer {
+public class CredentialsProducer extends Credentials {
   private String name;
   private String firstname;
   private String company;
-  private String email;
-  private String password;
   private String street;
   private String number;
   private String box;

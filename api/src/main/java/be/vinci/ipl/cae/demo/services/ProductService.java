@@ -1,7 +1,10 @@
 package be.vinci.ipl.cae.demo.services;
 
+import be.vinci.ipl.cae.demo.models.dtos.ProductDiponibility;
+import be.vinci.ipl.cae.demo.models.entities.Batch;
 import be.vinci.ipl.cae.demo.models.entities.Product;
 import be.vinci.ipl.cae.demo.models.entities.ProductType;
+import be.vinci.ipl.cae.demo.repositories.BatchRepository;
 import be.vinci.ipl.cae.demo.repositories.ProductRepository;
 import be.vinci.ipl.cae.demo.repositories.ProductTypeRepository;
 import java.util.List;
@@ -15,18 +18,22 @@ public class ProductService {
 
   private final ProductRepository productRepository;
   private final ProductTypeRepository productTypeRepository;
+  private final BatchRepository batchRepository;
 
   /**
    * Constructs a new ProductService with the specified repositories.
    *
    * @param productRepository the repository for products
    * @param productTypeRepository the repository for product types
+   * @param batchRepository the repository for batches
    */
   public ProductService(
       ProductRepository productRepository,
-      ProductTypeRepository productTypeRepository) {
+      ProductTypeRepository productTypeRepository,
+      BatchRepository batchRepository) {
     this.productRepository = productRepository;
     this.productTypeRepository = productTypeRepository;
+    this.batchRepository = batchRepository;
   }
 
   /**
@@ -58,21 +65,38 @@ public class ProductService {
   }
 
   /**
-   * TODO return only dispo products
    * Retrieves a list of available products based on search criteria and type.
    *
    * @param search the search term for product name or description
    * @param type the type of product
    * @return a list of available products matching the criteria
    */
-  public List<Product> getDispoProducts(String search, String type) {
+  public List<ProductDiponibility> getAvailableProducts(String search, String type) {
     return StreamSupport.stream(productRepository.findAll().spliterator(), false)
         .filter(
             product ->
                 (search == null
-                    || product.getName().contains(search)
-                    || product.getDescription().contains(search))
-                    && (type == null || product.getType().getTitle().equalsIgnoreCase(type)))
+                        || product.getName().contains(search)
+                        || product.getDescription().contains(search))
+                    && (type == null || product.getType().getTitle().equalsIgnoreCase(type))
+                    && batchRepository
+                        .findByProductAndAvailableQuantityGreaterThan(product, 0)
+                        .stream()
+                        .anyMatch(batch -> "approuvé".equalsIgnoreCase(batch.getStatut())))
+        .map(
+            product -> {
+              ProductDiponibility dto = new ProductDiponibility();
+              dto.setType(product.getType().getTitle());
+              dto.setName(product.getName());
+              dto.setDescription(product.getDescription());
+              dto.setPhoto(product.getPhoto());
+              dto.setQuantity(
+                  batchRepository.findByProductAndAvailableQuantityGreaterThan(product, 0).stream()
+                      .filter(batch -> "approuvé".equalsIgnoreCase(batch.getStatut()))
+                      .mapToInt(Batch::getAvailableQuantity)
+                      .sum());
+              return dto;
+            })
         .collect(Collectors.toList());
   }
 
@@ -84,7 +108,8 @@ public class ProductService {
    * @throws IllegalArgumentException if the product is not found
    */
   public Product findProductById(Long productId) {
-    return productRepository.findById(productId)
+    return productRepository
+        .findById(productId)
         .orElseThrow(() -> new IllegalArgumentException("Product not found"));
   }
 
