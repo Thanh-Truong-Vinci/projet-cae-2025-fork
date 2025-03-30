@@ -136,7 +136,7 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
           },
         }
 
-        const response = await fetch('/api/auths/registermanager', options)
+        const response = await fetch('/api/manager/registermanager', options)
 
         if (!response.ok)
           throw new Error(
@@ -166,7 +166,7 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
           },
         }
 
-        const response = await fetch('/api/auths/registerproducer', options)
+        const response = await fetch('/api/manager/registerproducer', options)
 
         if (!response.ok)
           throw new Error(
