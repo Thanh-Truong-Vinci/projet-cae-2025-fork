@@ -36,7 +36,7 @@ public class Batch {
   @JoinColumn(name = "produit", nullable = false)
   private Product product;
 
-  @Column(name = "photo", nullable = true)
+  @Column(name = "photo")
   private String photo;
 
   @Column(name = "date_disponibilite", nullable = false)
@@ -51,11 +51,11 @@ public class Batch {
   @Column(name = "quantite_disponible", nullable = false)
   private Integer availableQuantity;
 
-  @Column(nullable = false)
+  @Column(name = "statut", nullable = false)
   private String statut; // e.g., "approuvé", "en attente", "refusé", "supprimé"
 
   @ManyToOne
-  @JoinColumn(name = "notification", nullable = true)
+  @JoinColumn(name = "notification")
   private Notification notification;
 
   @Column(name = "date_depot", nullable = false)

@@ -26,10 +26,11 @@ public class Notification {
   @Column(name = "is_read", nullable = false)
   private Boolean isRead;
 
-  @Column(nullable = true)
+  @Column(name = "message")
   private String message;
 
   @ManyToOne
   @JoinColumn(name = "producer", nullable = false)
   private Producer producer;
 }
+

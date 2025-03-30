@@ -25,16 +25,16 @@ public abstract class User {
   @Column(name = "id_user")
   private Long id;
 
-  @Column(nullable = false)
+  @Column(name = "name", nullable = false)
   private String name;
 
-  @Column(nullable = false)
+  @Column(name = "firstname", nullable = false)
   private String firstname;
 
-  @Column(nullable = false, unique = true)
+  @Column(name = "email", nullable = false, unique = true)
   private String email;
 
-  @Column(nullable = false)
+  @Column(name = "password", nullable = false)
   private String password;
 
   @Column(name = "date_inscription", nullable = false)

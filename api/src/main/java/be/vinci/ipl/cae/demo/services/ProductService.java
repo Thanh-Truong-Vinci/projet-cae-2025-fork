@@ -1,9 +1,7 @@
 package be.vinci.ipl.cae.demo.services;
 
-import be.vinci.ipl.cae.demo.models.entities.Photo;
 import be.vinci.ipl.cae.demo.models.entities.Product;
 import be.vinci.ipl.cae.demo.models.entities.ProductType;
-import be.vinci.ipl.cae.demo.repositories.PhotoRepository;
 import be.vinci.ipl.cae.demo.repositories.ProductRepository;
 import be.vinci.ipl.cae.demo.repositories.ProductTypeRepository;
 import java.util.List;
@@ -17,32 +15,37 @@ public class ProductService {
 
   private final ProductRepository productRepository;
   private final ProductTypeRepository productTypeRepository;
-  private final PhotoRepository photoRepository;
 
   /**
    * Constructs a new ProductService with the specified repositories.
    *
    * @param productRepository the repository for products
    * @param productTypeRepository the repository for product types
-   * @param photoRepository the repository for photos
    */
   public ProductService(
       ProductRepository productRepository,
-      ProductTypeRepository productTypeRepository,
-      PhotoRepository photoRepository) {
+      ProductTypeRepository productTypeRepository) {
     this.productRepository = productRepository;
     this.productTypeRepository = productTypeRepository;
-    this.photoRepository = photoRepository;
   }
 
   /**
-   * Finds a product by its ID.
+   * Adds a new product to the repository.
    *
-   * @param productId the ID of the product
-   * @return the product with the specified ID, or null if not found
+   * @param type the type of the product
+   * @param name the name of the product
+   * @param description the description of the product
+   * @param photo the url of the photo associated with the product
    */
-  public Product findProductById(Long productId) {
-    return productRepository.findById(productId).orElse(null);
+  public void addProduct(String type, String name, String description, String photo) {
+    ProductType productType = productTypeRepository.findByTitle(type);
+    if (productType == null) {
+      throw new IllegalArgumentException("Product type not found");
+    }
+    if (productRepository.findByName(name) != null) {
+      throw new IllegalArgumentException("Product with the same name already exists");
+    }
+    createProduct(name, productType.getTitle(), description, photo);
   }
 
   /**
@@ -64,32 +67,32 @@ public class ProductService {
   }
 
   /**
+   * Finds a product by its ID.
+   *
+   * @param productId the ID of the product
+   * @return the product if found
+   * @throws IllegalArgumentException if the product is not found
+   */
+  public Product findProductById(Long productId) {
+    return productRepository.findById(productId)
+        .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+  }
+
+  /**
    * Creates a new product with the specified details.
    *
    * @param name the name of the product
    * @param type the type of the product
    * @param description the description of the product
-   * @param photoId the ID of the photo associated with the product
+   * @param photo the url of the photo associated with the product
    */
-  public void createProduct(String name, String type, String description, Long photoId) {
+  public void createProduct(String name, String type, String description, String photo) {
     ProductType productType = productTypeRepository.findByTitle(type);
-    Photo photo = photoId != null ? photoRepository.findById(photoId).orElse(null) : null;
     Product product = new Product();
     product.setName(name);
     product.setType(productType);
     product.setDescription(description);
     product.setPhoto(photo);
-  }
-
-  /**
-   * Creates a new product with the specified details and photo.
-   *
-   * @param name the name of the product
-   * @param type the type of the product
-   * @param description the description of the product
-   * @param photo the photo associated with the product
-   */
-  public void createProduct(String name, String type, String description, Photo photo) {
-    // TODO implement createOne Product with Photo
+    productRepository.save(product);
   }
 }

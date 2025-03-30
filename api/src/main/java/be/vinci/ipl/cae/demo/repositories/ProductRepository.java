@@ -6,4 +6,13 @@ import org.springframework.stereotype.Repository;
 
 /** Repository interface for `Product` entities. */
 @Repository
-public interface ProductRepository extends CrudRepository<Product, Long> {}
+public interface ProductRepository extends CrudRepository<Product, Long> {
+  /**
+   * Find a product by its name.
+   *
+   * @param name the name of the product
+   * @return the product with the specified name
+   */
+  Product findByName(String name);
+}
+

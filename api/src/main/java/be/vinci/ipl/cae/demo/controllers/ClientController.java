@@ -9,6 +9,7 @@ import be.vinci.ipl.cae.demo.services.ProductService;
 import be.vinci.ipl.cae.demo.services.ReservationService;
 import java.util.List;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -111,7 +112,7 @@ public class ClientController {
    * @return a list of reservations for the client.
    * @throws ResponseStatusException if the token is invalid or expired.
    */
-  @PostMapping("/reservations")
+  @GetMapping("/reservations")
   public List<Reservation> getReservations(@RequestHeader("Authorization") String token) {
     Client client = authsService.isValidClientToken(token);
     if (client == null) {
