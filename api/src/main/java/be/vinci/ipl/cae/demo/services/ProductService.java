@@ -51,17 +51,27 @@ public class ProductService {
   /**
    * Retrieves a list of products based on search criteria and type.
    *
-   * @param search the search term for product name or description
-   * @param type the type of product
    * @return a list of products matching the criteria
    */
-  public List<Product> getProducts(String search, String type) {
+  public List<Product> getProducts() {
+    return (List<Product>) productRepository.findAll();
+  }
+
+  /**
+   * TODO return only dispo products
+   * Retrieves a list of available products based on search criteria and type.
+   *
+   * @param search the search term for product name or description
+   * @param type the type of product
+   * @return a list of available products matching the criteria
+   */
+  public List<Product> getDispoProducts(String search, String type) {
     return StreamSupport.stream(productRepository.findAll().spliterator(), false)
         .filter(
             product ->
                 (search == null
-                        || product.getName().contains(search)
-                        || product.getDescription().contains(search))
+                    || product.getName().contains(search)
+                    || product.getDescription().contains(search))
                     && (type == null || product.getType().getTitle().equalsIgnoreCase(type)))
         .collect(Collectors.toList());
   }

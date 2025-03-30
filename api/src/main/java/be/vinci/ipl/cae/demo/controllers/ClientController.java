@@ -1,5 +1,6 @@
 package be.vinci.ipl.cae.demo.controllers;
 
+import be.vinci.ipl.cae.demo.models.dtos.ProductSearchDto;
 import be.vinci.ipl.cae.demo.models.dtos.ReservationRequest;
 import be.vinci.ipl.cae.demo.models.entities.Client;
 import be.vinci.ipl.cae.demo.models.entities.Product;
@@ -46,22 +47,21 @@ public class ClientController {
   /**
    * Retrieves a list of products based on search criteria and type.
    *
-   * @param search the search term for product name or description.
-   * @param type the type of product.
+   * @param productSearchDto the search criteria and type encapsulated in a DTO.
    * @param token the authorization token from the request header.
    * @return a list of products matching the criteria.
    * @throws ResponseStatusException if the token is invalid or expired.
    */
   @PostMapping("/products")
   public List<Product> getProducts(
-      @RequestBody String search,
-      @RequestBody String type,
+      @RequestBody ProductSearchDto productSearchDto,
       @RequestHeader("Authorization") String token) {
     if (authsService.isValidClientToken(token) == null) {
       throw new ResponseStatusException(
           HttpStatus.UNAUTHORIZED, "Token not valid, expired or user is not client");
     }
-    return productService.getProducts(search, type);
+    return productService.getDispoProducts(
+        productSearchDto.getSearch(), productSearchDto.getType());
   }
 
   /**
@@ -101,6 +101,9 @@ public class ClientController {
     if (client == null) {
       throw new ResponseStatusException(
           HttpStatus.UNAUTHORIZED, "Token not valid, expired or user is not client");
+    }
+    if (reservationId == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Reservation ID is required");
     }
     reservationService.cancelReservation(client, reservationId);
   }

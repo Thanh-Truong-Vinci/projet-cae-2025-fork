@@ -120,6 +120,9 @@ public class ManagerController {
       throw new ResponseStatusException(
           HttpStatus.UNAUTHORIZED, "Token not valide, expired or user is not Manager");
     }
+    if (newType == null || newType.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product type is required");
+    }
     productTypeService.addProductType(newType);
   }
 
@@ -136,6 +139,9 @@ public class ManagerController {
     if (authsService.isValidManagerToken(token) == null) {
       throw new ResponseStatusException(
           HttpStatus.UNAUTHORIZED, "Token not valide, expired or user is not Manager");
+    }
+    if (id == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product type ID is required");
     }
     productTypeService.deleteProductType(id);
   }
@@ -154,6 +160,9 @@ public class ManagerController {
       throw new ResponseStatusException(
           HttpStatus.UNAUTHORIZED, "Token not valid, expired or user is not Manager");
     }
+    if (batchId == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Batch ID is required");
+    }
     batchService.acceptBatch(batchId, manager);
   }
 
@@ -171,6 +180,10 @@ public class ManagerController {
     if (manager == null) {
       throw new ResponseStatusException(
           HttpStatus.UNAUTHORIZED, "Token not valid, expired or user is not Manager");
+    }
+    if (batchReject.getBatchId() == null) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Batch ID is required for rejection");
     }
     batchService.rejectBatch(
         batchReject.getBatchId(), manager, batchReject.getNotificationMessage());
