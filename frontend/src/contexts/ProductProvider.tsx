@@ -16,7 +16,7 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
         name: 'Tomates Bio',
         price: '3.50€',
         image: 'https://images.unsplash.com/photo-1607305387299-a3d9611cd469',
-        category: 'legumes',
+        category: 'Légumes',
         description:
           'Tomates cultivées sans pesticides, parfaites pour vos salades estivales.',
       },
@@ -51,7 +51,11 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
             price: '10.00€',
             image: item.photo?.url || 'https://via.placeholder.com/150',
             category:
-              item.type?.title?.toLowerCase().replace(' ', '_') || 'autres',
+              item.type?.title
+                ?.toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '') // Supprimer les accents
+                .replace(/\s+/g, '_') || 'autres',
             description: item.description || '',
           })
         )
