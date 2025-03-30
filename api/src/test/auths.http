@@ -20,12 +20,13 @@ Content-Type: application/json
 }
 
 ### Login admin
+# @name login_admin
 POST {{baseUrl}}/auths/login
 Content-Type: application/json
 
 {
   "email": "admin@example.com",
-  "password": "adminpw"
+  "password": "Azqwazqw1@"
 }
 
 ### Create with invalid email
@@ -140,7 +141,7 @@ Content-Type: application/json
 }
 
 ### Register a new manager
-POST {{baseUrl}}/auths/registermanager
+POST {{baseUrl}}/manager/registermanager
 Content-Type: application/json
 Authorization: {{adminToken}}
 
@@ -152,7 +153,7 @@ Authorization: {{adminToken}}
 }
 
 ### Register another new manager
-POST {{baseUrl}}/auths/registermanager
+POST {{baseUrl}}/manager/registermanager
 Content-Type: application/json
 
 {
@@ -163,7 +164,7 @@ Content-Type: application/json
 }
 
 ### Create a Producer
-POST {{baseUrl}}/auths/registerproducer
+POST {{baseUrl}}/manager/registerproducer
 Content-Type: application/json
 Authorization: {{adminToken}}
 
