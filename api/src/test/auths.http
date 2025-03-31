@@ -184,7 +184,7 @@ Authorization: {{adminToken}}
 }
 
 ### Get product details
-GET {{baseUrl}}/products/details/25
+GET {{baseUrl}}/products/details/1
 
 ### Get all products in descending order
 GET {{baseUrl}}/products/?order=desc

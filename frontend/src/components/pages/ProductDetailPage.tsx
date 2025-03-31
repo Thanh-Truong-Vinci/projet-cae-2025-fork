@@ -45,28 +45,27 @@ const ProductDetailPage = () => {
         setLoading(true)
 
         // Appel à l'API pour récupérer les détails du produit
-        const response = await fetch(
-          `http://localhost:3000/products/details/${productId}`
-        )
+        const response = await fetch(`/api/products/${productId}`)
 
         if (!response.ok) {
           throw new Error('Produit non trouvé')
         }
 
         const productData = await response.json()
+        console.log("Données reçues:", productData); // Ajout d'un log pour déboguer
 
         // Transformer les données de l'API pour correspondre à votre interface Product
         const formattedProduct: Product = {
-          id: productData.idProduct,
+          id: productData.id, // Utiliser id au lieu de idProduct
           name: productData.name,
-          price: `${productData.price}€`,
+          price: `10.00€`, // Utiliser une valeur fixe car price n'existe pas dans votre modèle
           image: productData.photo?.url || 'https://via.placeholder.com/300',
           description: productData.description,
           details: {
-            Origine: 'Belgique', // À adapter selon votre modèle de données
+            Origine: 'Belgique',
             Catégorie: productData.type?.title || 'Non catégorisé',
-            Conditionnement: productData.packaging || '500g',
-            Conservation: productData.storage || 'À conserver au frais',
+            Conditionnement: '500g',
+            Conservation: 'À conserver au frais',
           },
         }
 

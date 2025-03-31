@@ -183,7 +183,7 @@ const HomePage = () => {
   }
 
   const handleProductClick = (productId: number) => {
-    navigate(`/products/details/${productId}`)
+    navigate(`/products/${productId}`)
   }
 
   const handleCloseSnackbar = () => {

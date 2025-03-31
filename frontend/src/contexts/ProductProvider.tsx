@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, ReactNode } from 'react'
+import { useState, useEffect, useCallback, ReactNode } from 'react'
 import axios from 'axios'
 import { ProductContext } from './ProductContext'
 import { categoryLabels } from './categoryLabels'
@@ -9,34 +9,14 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
-  const mockProducts = useMemo<Product[]>(
-    () => [
-      {
-        id: 1,
-        name: 'Tomates Bio',
-        price: '3.50€',
-        image: 'https://images.unsplash.com/photo-1607305387299-a3d9611cd469',
-        category: 'Légumes',
-        description:
-          'Tomates cultivées sans pesticides, parfaites pour vos salades estivales.',
-      },
-      {
-        id: 2,
-        name: 'Pommes Royal Gala',
-        price: '2.75€',
-        image: 'https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a',
-        category: 'fruits',
-        description: 'Pommes sucrées et croquantes, idéales comme collation.',
-      },
-    ],
-    []
-  )
-
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setIsLoading(true)
         const response = await axios.get('/api/products')
+
+        // Log pour déboguer la réponse
+        console.log('Réponse API:', response.data)
 
         const formattedProducts = response.data.map(
           (item: {
@@ -61,16 +41,24 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
         )
 
         setProducts(formattedProducts)
+        setError(null)
       } catch (err) {
         console.error('Erreur détaillée:', err)
-        setError('Impossible de charger les produits')
-        setProducts(mockProducts)
+        if (axios.isAxiosError(err)) {
+          setError(
+            `Impossible de charger les produits: ${err.response?.status || ''} ${err.message}`
+          )
+        } else {
+          setError('Impossible de charger les produits')
+        }
+        // Ne pas utiliser de mockProducts, laisser products comme un tableau vide
+        setProducts([])
       } finally {
         setIsLoading(false)
       }
     }
     fetchProducts()
-  }, [mockProducts])
+  }, []) // Supprimer la dépendance mockProducts qui n'existe plus
 
   const getProductById = useCallback(
     (id: number) => products.find((product) => product.id === id),
