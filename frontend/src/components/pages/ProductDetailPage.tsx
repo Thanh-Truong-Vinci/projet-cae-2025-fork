@@ -52,7 +52,7 @@ const ProductDetailPage = () => {
         }
 
         const productData = await response.json()
-        console.log("Données reçues:", productData); // Ajout d'un log pour déboguer
+        console.log('Données reçues:', productData) // Ajout d'un log pour déboguer
 
         // Transformer les données de l'API pour correspondre à votre interface Product
         const formattedProduct: Product = {

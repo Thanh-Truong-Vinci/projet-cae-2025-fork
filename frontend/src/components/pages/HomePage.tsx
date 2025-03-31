@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useMemo } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import {
   Typography,
   Box,
@@ -24,6 +24,19 @@ import { ProductContext } from '../../contexts/ProductContext'
 import { Product } from '../../types'
 
 const HomePage = () => {
+  // Définition des catégories de produits pour le filtre
+  const productCategories = [
+    { value: 'fruits', label: 'Fruits' },
+    { value: 'legumes', label: 'Légumes' },
+    { value: 'viandes', label: 'Viandes' },
+    { value: 'fromages', label: 'Fromages' },
+    { value: 'produits_laitiers', label: 'Produits laitiers' },
+    { value: 'boissons', label: 'Boissons' },
+    { value: 'epicerie', label: 'Épicerie' },
+    { value: 'conserves', label: 'Conserves' },
+    { value: 'autres', label: 'Autres' },
+  ]
+
   // Utilisation sécurisée du ProductContext
   const productContext = useContext(ProductContext)
 
@@ -68,44 +81,22 @@ const HomePage = () => {
   // Nouvel état pour les produits filtrés, initialisé avec les produits du contexte
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
 
-  // Wrap topProducts in useMemo to maintain stable reference
-  const topProducts = useMemo(
-    () => [
-      {
-        id: 1,
-        name: 'Produit 1',
-        price: '10€',
-        image: 'https://via.placeholder.com/300x200',
-      },
-      {
-        id: 2,
-        name: 'Produit 2',
-        price: '20€',
-        image: 'https://via.placeholder.com/300x200',
-      },
-      {
-        id: 3,
-        name: 'Produit 3',
-        price: '30€',
-        image: 'https://via.placeholder.com/300x200',
-      },
-    ],
-    []
-  ) // Empty dependency array means this only runs once
+  // Nouvel état pour les produits aléatoires "plus vendus"
+  const [topProducts, setTopProducts] = useState<Product[]>([])
 
-  // Définir les catégories de produits
-  const productCategories = useMemo(
-    () => [
-      { value: 'legumes', label: 'Légumes' },
-      { value: 'fruits', label: 'Fruits' },
-      { value: 'boulangerie', label: 'Boulangerie' },
-      { value: 'viande', label: 'Viande' },
-      { value: 'produits_laitiers', label: 'Produits laitiers' },
-      { value: 'boissons', label: 'Boissons' },
-      { value: 'autres', label: 'Autres' },
-    ],
-    []
-  )
+  // Générer des produits aléatoires pour les "plus vendus" à partir des produits existants
+  useEffect(() => {
+    if (products.length > 0) {
+      // Si on a moins de 3 produits, on les utilise tous
+      if (products.length <= 3) {
+        setTopProducts(products.slice())
+      } else {
+        // Sinon, on en sélectionne 3 aléatoirement
+        const shuffledProducts = [...products].sort(() => 0.5 - Math.random())
+        setTopProducts(shuffledProducts.slice(0, 3))
+      }
+    }
+  }, [products])
 
   // Initialize quantities state for all products
   useEffect(() => {
@@ -117,15 +108,18 @@ const HomePage = () => {
       initialQuantities[product.id] = 1
     })
     setQuantities(initialQuantities)
-  }, [products, topProducts]) // Add the missing dependencies here
+  }, [products, topProducts])
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentProductIndex(
-        (prevIndex) => (prevIndex + 1) % topProducts.length
-      )
-    }, 8000) // Transition plus lente (8 secondes au lieu de 4)
-    return () => clearInterval(interval)
+    // Ne démarrer le carousel que si nous avons des produits à afficher
+    if (topProducts.length > 0) {
+      const interval = setInterval(() => {
+        setCurrentProductIndex(
+          (prevIndex) => (prevIndex + 1) % topProducts.length
+        )
+      }, 8000) // Transition plus lente (8 secondes au lieu de 4)
+      return () => clearInterval(interval)
+    }
   }, [topProducts.length])
 
   useEffect(() => {
@@ -232,90 +226,104 @@ const HomePage = () => {
         }}
       >
         <Typography variant="h5">Produits les plus vendus</Typography>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            mt: 2,
-            px: 4,
-          }}
-        >
-          {/* Informations du produit à gauche */}
+        {topProducts.length > 0 ? (
           <Box
             sx={{
-              flex: 1,
               display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
+              flexDirection: 'row',
               justifyContent: 'center',
-              pr: 4,
-              textAlign: 'left',
-              cursor: 'pointer', // Ajout du curseur pointer
+              alignItems: 'center',
+              mt: 2,
+              px: 4,
             }}
-            onClick={() =>
-              handleProductClick(topProducts[currentProductIndex].id)
-            }
           >
-            <Typography variant="h6" sx={{ mb: 1 }}>
-              {topProducts[currentProductIndex].name}
-            </Typography>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              Prix: {topProducts[currentProductIndex].price}
-            </Typography>
-
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <IconButton
-                onClick={() =>
-                  handleQuantityChange(topProducts[currentProductIndex].id, -1)
-                }
-                size="small"
-              >
-                <RemoveIcon />
-              </IconButton>
-              <Typography sx={{ mx: 1 }}>
-                {quantities[topProducts[currentProductIndex].id] || 1}
-              </Typography>
-              <IconButton
-                onClick={() =>
-                  handleQuantityChange(topProducts[currentProductIndex].id, 1)
-                }
-                size="small"
-              >
-                <AddIcon />
-              </IconButton>
-            </Box>
-
-            <Button
-              variant="contained"
-              color="success"
-              startIcon={<AddShoppingCartIcon />}
-              onClick={() => handleAddToCart(topProducts[currentProductIndex])}
-            >
-              Ajouter au panier
-            </Button>
-          </Box>
-
-          {/* Image du produit à droite */}
-          <Box sx={{ flex: 1 }}>
-            <img
-              src={topProducts[currentProductIndex].image}
-              alt={topProducts[currentProductIndex].name}
-              style={{
-                width: 300,
-                height: 200,
-                objectFit: 'cover',
-                borderRadius: '8px',
-                boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+            {/* Informations du produit à gauche */}
+            <Box
+              sx={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                justifyContent: 'center',
+                pr: 4,
+                textAlign: 'left',
                 cursor: 'pointer', // Ajout du curseur pointer
               }}
               onClick={() =>
                 handleProductClick(topProducts[currentProductIndex].id)
               }
-            />
+            >
+              <Typography variant="h6" sx={{ mb: 1 }}>
+                {topProducts[currentProductIndex].name}
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 2 }}>
+                Prix: {topProducts[currentProductIndex].price}
+              </Typography>
+
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <IconButton
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleQuantityChange(
+                      topProducts[currentProductIndex].id,
+                      -1
+                    )
+                  }}
+                  size="small"
+                >
+                  <RemoveIcon />
+                </IconButton>
+                <Typography sx={{ mx: 1 }}>
+                  {quantities[topProducts[currentProductIndex].id] || 1}
+                </Typography>
+                <IconButton
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleQuantityChange(topProducts[currentProductIndex].id, 1)
+                  }}
+                  size="small"
+                >
+                  <AddIcon />
+                </IconButton>
+              </Box>
+
+              <Button
+                variant="contained"
+                color="success"
+                startIcon={<AddShoppingCartIcon />}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleAddToCart(topProducts[currentProductIndex])
+                }}
+              >
+                Ajouter au panier
+              </Button>
+            </Box>
+
+            {/* Image du produit à droite */}
+            <Box sx={{ flex: 1 }}>
+              <img
+                src={topProducts[currentProductIndex].image}
+                alt={topProducts[currentProductIndex].name}
+                style={{
+                  width: 300,
+                  height: 200,
+                  objectFit: 'cover',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                  cursor: 'pointer', // Ajout du curseur pointer
+                }}
+                onClick={() =>
+                  handleProductClick(topProducts[currentProductIndex].id)
+                }
+              />
+            </Box>
           </Box>
-        </Box>
+        ) : (
+          <Typography variant="body1" sx={{ mt: 2 }}>
+            Aucun produit disponible pour le moment.
+          </Typography>
+        )}
       </Box>
 
       {/* Sidebar */}
