@@ -3,6 +3,7 @@ package be.vinci.ipl.cae.demo.controllers;
 import be.vinci.ipl.cae.demo.models.dtos.NewProduct;
 import be.vinci.ipl.cae.demo.models.entities.Product;
 import be.vinci.ipl.cae.demo.services.ProductService;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ public class ProductController {
     this.productService = productService;
   }
 
+
   /**
    * Get all Products.
    *
@@ -33,8 +35,23 @@ public class ProductController {
    * @return the list of Products.
    */
   @GetMapping({"", "/"})
-  public Iterable<Product> getProducts(@RequestParam(required = false) String order) {
+  public Iterable<Product> getProducts(@RequestParam(required = true) String order) {
     return productService.readAllProducts(order);
+  }
+
+  /**
+   * Get detailed information about a Product.
+   *
+   * @param id the Product id.
+   * @return the Product details.
+   */
+  @GetMapping("/details/{id}")
+  public Product showProductDetails(@PathVariable long id) {
+    Product product = productService.showProductDetails(id);
+    if (product == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
+    }
+    return product;
   }
 
   /**

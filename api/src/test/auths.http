@@ -20,6 +20,7 @@ Content-Type: application/json
 }
 
 ### Login admin
+# @name login_admin
 POST {{baseUrl}}/auths/login
 Content-Type: application/json
 
@@ -181,3 +182,9 @@ Authorization: {{adminToken}}
   "country": "LePays",
   "phoneNumber": "+324794586718"
 }
+
+### Get product details
+GET {{baseUrl}}/products/details/25
+
+### Get all products in descending order
+GET {{baseUrl}}/products/?order=desc

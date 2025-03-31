@@ -124,6 +124,16 @@ public class ProductService {
   }
 
   /**
+   * Récupère tous les produits avec un ordre optionnel.
+   *
+   * @param id L'id du prodduit choisi
+   * @return un itérable de tous les produits dans l'ordre spécifié
+   */
+public Product showProductDetails(Long id) {
+  return productRepository.findProductById(id);
+}
+
+  /**
    * Récupère un produit par son identifiant.
    *
    * @param id l'identifiant du produit recherché
