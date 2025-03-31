@@ -11,6 +11,7 @@ import be.vinci.ipl.cae.demo.repositories.NotificationRepository;
 import be.vinci.ipl.cae.demo.repositories.ProducerRepository;
 import be.vinci.ipl.cae.demo.repositories.ProductRepository;
 import java.time.LocalDate;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 /** Service class for managing batches. */
@@ -182,5 +183,14 @@ public class BatchService {
     batch.setDepositDate(LocalDate.now());
     batch.setManager(null);
     batchRepository.save(batch);
+  }
+
+  /**
+   * Retrieves all pending batches.
+   *
+   * @return a list of pending batches.
+   */
+  public List<Batch> getPendingBatches() {
+    return batchRepository.findByStatut(BatchStatus.PENDING);
   }
 }

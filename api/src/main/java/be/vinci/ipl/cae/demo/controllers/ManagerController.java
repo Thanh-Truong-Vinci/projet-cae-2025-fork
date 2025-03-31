@@ -4,6 +4,7 @@ import be.vinci.ipl.cae.demo.models.dtos.BatchReject;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsManager;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsProducer;
 import be.vinci.ipl.cae.demo.models.entities.Manager;
+import be.vinci.ipl.cae.demo.models.entities.Batch;
 import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.BatchService;
 import be.vinci.ipl.cae.demo.services.ManagerService;
@@ -16,7 +17,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 /** Controller for managing manager and producer registrations. */
 @RestController
@@ -188,5 +192,21 @@ public class ManagerController {
     }
     batchService.rejectBatch(
         batchReject.getBatchId(), manager, batchReject.getNotificationMessage());
+  }
+
+  /**
+   * Get all pending batches.
+   *
+   * @param token the authorization token from the request header.
+   * @return a list of pending batches.
+   * @throws ResponseStatusException if the token is invalid, expired, or the user is not a manager.
+   */
+  @GetMapping("/pendingbatches")
+  public List<Batch> getPendingBatches(@RequestHeader("Authorization") String token) {
+    if (authsService.isValidManagerToken(token) == null) {
+      throw new ResponseStatusException(
+          HttpStatus.UNAUTHORIZED, "Token not valid, expired or user is not Manager");
+    }
+    return batchService.getPendingBatches();
   }
 }

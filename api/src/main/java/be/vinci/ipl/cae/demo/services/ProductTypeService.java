@@ -4,6 +4,8 @@ import be.vinci.ipl.cae.demo.models.entities.ProductType;
 import be.vinci.ipl.cae.demo.repositories.ProductTypeRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /** Service class for managing product types. */
 @Service
 public class ProductTypeService {
@@ -41,6 +43,10 @@ public class ProductTypeService {
       throw new IllegalArgumentException("Product type not found");
     }
     productTypeRepository.deleteById(id);
+  }
+
+  public List<ProductType> getAllProductTypes() {
+    return (List<ProductType>) productTypeRepository.findAll();
   }
 
   /**

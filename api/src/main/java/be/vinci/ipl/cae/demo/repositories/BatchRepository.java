@@ -2,6 +2,7 @@ package be.vinci.ipl.cae.demo.repositories;
 
 import be.vinci.ipl.cae.demo.models.entities.Batch;
 import be.vinci.ipl.cae.demo.models.entities.Product;
+import be.vinci.ipl.cae.demo.models.entities.BatchStatus;
 import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -18,4 +19,12 @@ public interface BatchRepository extends CrudRepository<Batch, Long> {
    * @return the list of batches
    */
   List<Batch> findByProductAndAvailableQuantityGreaterThan(Product product, int quantity);
+
+  /**
+   * Finds batches by status.
+   *
+   * @param statut the status of the batches
+   * @return the list of batches
+   */
+  List<Batch> findByStatut(BatchStatus statut);
 }

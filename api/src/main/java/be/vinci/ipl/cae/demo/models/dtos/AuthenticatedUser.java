@@ -12,12 +12,4 @@ public class AuthenticatedUser {
   private String firstname;
   private String token;
   private String role;
-
-  public String getRole() {
-    return role;
-  }
-
-  public void setRole(String role) {
-    this.role = role;
-  }
 }
