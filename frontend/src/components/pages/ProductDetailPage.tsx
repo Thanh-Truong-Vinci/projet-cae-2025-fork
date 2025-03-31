@@ -44,65 +44,34 @@ const ProductDetailPage = () => {
       try {
         setLoading(true)
 
-        // Au lieu d'avoir des données mockées fixes, récupérez les informations du produit
-        // en fonction de son ID depuis la même source que HomePage
+        // Appel à l'API pour récupérer les détails du produit
+        const response = await fetch(
+          `http://localhost:3000/products/details/${productId}`
+        )
 
-        // Génération temporaire de donnée mock qui correspond au format de HomePage
-        const products = Array.from({ length: 30 }, (_, i) => ({
-          id: i + 1,
-          name: `Produit ${i + 1}`,
-          price: `${10 + i}€`,
-          image: 'https://via.placeholder.com/300',
-          category: [
-            'legumes',
-            'fruits',
-            'boulangerie',
-            'viande',
-            'produits_laitiers',
-            'boissons',
-            'autres',
-          ][i % 7],
-        }))
-
-        // Trouver le produit avec l'ID correspondant
-        const foundProduct = products.find((p) => p.id === Number(productId))
-
-        if (foundProduct) {
-          // Mapper les catégories aux labels pour affichage
-          const categoryLabels = {
-            legumes: 'Légumes',
-            fruits: 'Fruits',
-            boulangerie: 'Boulangerie',
-            viande: 'Viande',
-            produits_laitiers: 'Produits laitiers',
-            boissons: 'Boissons',
-            autres: 'Autres',
-          }
-
-          // Utiliser le produit trouvé et maintenir ses informations de catégorie
-          const mockProduct = {
-            id: foundProduct.id,
-            name: foundProduct.name,
-            price: foundProduct.price,
-            image: foundProduct.image,
-            description:
-              "Ce produit de qualité supérieure est cultivé localement selon des méthodes respectueuses de l'environnement...",
-            details: {
-              Origine: 'Belgique',
-              Catégorie:
-                categoryLabels[
-                  foundProduct.category as keyof typeof categoryLabels
-                ] || foundProduct.category,
-              Conditionnement: '500g',
-              Conservation: 'À conserver au frais',
-            },
-          }
-
-          setProduct(mockProduct)
-          setError(null)
-        } else {
-          setError('Produit non trouvé')
+        if (!response.ok) {
+          throw new Error('Produit non trouvé')
         }
+
+        const productData = await response.json()
+
+        // Transformer les données de l'API pour correspondre à votre interface Product
+        const formattedProduct: Product = {
+          id: productData.idProduct,
+          name: productData.name,
+          price: `${productData.price}€`,
+          image: productData.photo?.url || 'https://via.placeholder.com/300',
+          description: productData.description,
+          details: {
+            Origine: 'Belgique', // À adapter selon votre modèle de données
+            Catégorie: productData.type?.title || 'Non catégorisé',
+            Conditionnement: productData.packaging || '500g',
+            Conservation: productData.storage || 'À conserver au frais',
+          },
+        }
+
+        setProduct(formattedProduct)
+        setError(null)
       } catch (err) {
         setError('Impossible de charger les détails du produit')
         console.error(err)
