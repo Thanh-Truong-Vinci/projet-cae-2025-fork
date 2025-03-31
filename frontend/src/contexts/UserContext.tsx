@@ -122,17 +122,33 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
   }, [])
   const registerManager = useCallback(
     async (managerData: ManagerRegistrationData) => {
-      const token = document.cookie
+      // First try to get token from cookie
+      let token = document.cookie
         .split('; ')
         .find((row) => row.startsWith('token='))
         ?.split('=')[1]
+
+      // If token not found in cookie, try session storage
+      if (!token) {
+        const userJson = sessionStorage.getItem('user')
+        if (userJson) {
+          const userData = JSON.parse(userJson)
+          token = userData.token
+        }
+      }
+
       try {
+        // Check if we have a token
+        if (!token) {
+          throw new Error('No authentication token found')
+        }
+
         const options = {
           method: 'POST',
           body: JSON.stringify(managerData),
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `${token}`,
+            Authorization: token, // Just send the token without template literal
           },
         }
 
@@ -152,19 +168,32 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
 
   const registerProducer = useCallback(
     async (producerData: ProducerRegistrationData) => {
-      const token = document.cookie
+      // First try to get token from cookie
+      let token = document.cookie
         .split('; ')
         .find((row) => row.startsWith('token='))
         ?.split('=')[1]
+
+      // If token not found in cookie, try session storage
+      if (!token) {
+        const userJson = sessionStorage.getItem('user')
+        if (userJson) {
+          const userData = JSON.parse(userJson)
+          token = userData.token
+        }
+      }
+
       try {
         const headers: Record<string, string> = {
           'Content-Type': 'application/json',
         }
+
         if (token) {
           headers.Authorization = token
         } else {
           throw new Error('No authentication token found')
         }
+
         const options = {
           method: 'POST',
           body: JSON.stringify(producerData),
