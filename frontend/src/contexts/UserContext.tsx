@@ -157,13 +157,18 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
         .find((row) => row.startsWith('token='))
         ?.split('=')[1]
       try {
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+        }
+        if (token) {
+          headers.Authorization = token
+        } else {
+          throw new Error('No authentication token found')
+        }
         const options = {
           method: 'POST',
           body: JSON.stringify(producerData),
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `${token}`,
-          },
+          headers,
         }
 
         const response = await fetch('/api/manager/registerproducer', options)

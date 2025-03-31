@@ -18,46 +18,89 @@ public final class ValidationUtils {
     if (credentials == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Credentials cannot be null");
     }
-    if (credentials instanceof CredentialsRegister || credentials instanceof CredentialsProducer) {
-      if (((CredentialsRegister) credentials).getStreet() == null
-          || ((CredentialsRegister) credentials).getStreet().isBlank()) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Street is required");
-      }
-      if (((CredentialsRegister) credentials).getNumber() == null
-          || ((CredentialsRegister) credentials).getNumber().isBlank()) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Street number is required");
-      }
-      if (((CredentialsRegister) credentials).getPostalCode() == null
-          || ((CredentialsRegister) credentials).getPostalCode().isBlank()) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Postal code is required");
-      }
-      if (((CredentialsRegister) credentials).getCity() == null
-          || ((CredentialsRegister) credentials).getCity().isBlank()) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "City is required");
-      }
-      if (((CredentialsRegister) credentials).getCountry() == null
-          || ((CredentialsRegister) credentials).getCountry().isBlank()) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Country is required");
-      }
-      if (((CredentialsRegister) credentials).getPhoneNumber() == null
-          || ((CredentialsRegister) credentials).getPhoneNumber().isBlank()) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Phone number is required");
-      }
+    
+    // Handle different credential types appropriately
+    if (credentials instanceof CredentialsRegister) {
+      CredentialsRegister register = (CredentialsRegister) credentials;
+      validateAddressFields(register);
+    } else if (credentials instanceof CredentialsProducer) {
+      CredentialsProducer producer = (CredentialsProducer) credentials;
+      validateAddressFields(producer);
+    }
+  }
+
+  // Helper method to validate address fields
+  private static void validateAddressFields(Object credentials) {
+    String street = null;
+    String number = null;
+    String postalCode = null;
+    String city = null;
+    String country = null;
+    String phoneNumber = null;
+    
+    // Get values based on the actual type
+    if (credentials instanceof CredentialsRegister) {
+      CredentialsRegister register = (CredentialsRegister) credentials;
+      street = register.getStreet();
+      number = register.getNumber();
+      postalCode = register.getPostalCode();
+      city = register.getCity();
+      country = register.getCountry();
+      phoneNumber = register.getPhoneNumber();
+    } else if (credentials instanceof CredentialsProducer) {
+      CredentialsProducer producer = (CredentialsProducer) credentials;
+      street = producer.getStreet();
+      number = producer.getNumber();
+      postalCode = producer.getPostalCode();
+      city = producer.getCity();
+      country = producer.getCountry();
+      phoneNumber = producer.getPhoneNumber();
+    }
+    
+    // Validate fields
+    if (street == null || street.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Street is required");
+    }
+    if (number == null || number.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Street number is required");
+    }
+    if (postalCode == null || postalCode.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Postal code is required");
+    }
+    if (city == null || city.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "City is required");
+    }
+    if (country == null || country.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Country is required");
+    }
+    if (phoneNumber == null || phoneNumber.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Phone number is required");
     }
   }
 
   private static void validateNameAndFirstname(Credentials credentials) {
-    if (credentials instanceof CredentialsRegister
-        || credentials instanceof CredentialsManager
-        || credentials instanceof CredentialsProducer) {
-      if (((CredentialsRegister) credentials).getName() == null
-          || ((CredentialsRegister) credentials).getName().isBlank()) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name is required");
-      }
-      if (((CredentialsRegister) credentials).getFirstname() == null
-          || ((CredentialsRegister) credentials).getFirstname().isBlank()) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Firstname is required");
-      }
+    String name = null;
+    String firstname = null;
+    
+    if (credentials instanceof CredentialsRegister) {
+      CredentialsRegister register = (CredentialsRegister) credentials;
+      name = register.getName();
+      firstname = register.getFirstname();
+    } else if (credentials instanceof CredentialsManager) {
+      CredentialsManager manager = (CredentialsManager) credentials;
+      name = manager.getName();
+      firstname = manager.getFirstname();
+    } else if (credentials instanceof CredentialsProducer) {
+      CredentialsProducer producer = (CredentialsProducer) credentials;
+      name = producer.getName();
+      firstname = producer.getFirstname();
+    }
+    
+    if (name == null || name.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name is required");
+    }
+    if (firstname == null || firstname.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Firstname is required");
     }
   }
 
