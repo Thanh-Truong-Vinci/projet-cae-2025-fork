@@ -35,7 +35,7 @@ public class ProductController {
    * @return the list of Products.
    */
   @GetMapping({"", "/"})
-  public Iterable<Product> getProducts(@RequestParam(required = true) String order) {
+  public Iterable<Product> getProducts(@RequestParam(required = false) String order) {
     return productService.readAllProducts(order);
   }
 
