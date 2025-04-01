@@ -20,7 +20,7 @@ export default defineConfig({
     baseURL:
       process.env.NODE_ENV === undefined ||
       process.env.NODE_ENV === "development"
-        ? "http://localhost:5173"
+        ? "http://localhost"
         : process.env.BASE_URL === undefined
         ? "http://reverse-proxy:80"
         : process.env.BASE_URL,
