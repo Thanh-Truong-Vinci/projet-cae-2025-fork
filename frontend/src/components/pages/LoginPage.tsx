@@ -97,7 +97,7 @@ const LoginPage = () => {
 
         {errorMessage && (
           <Box sx={{ mb: 2, p: 2, bgcolor: 'error.light', borderRadius: 1 }}>
-            <Typography color="error" variant="subtitle2" align="center">
+            <Typography color="black" variant="subtitle2" align="center">
               {errorMessage}
             </Typography>
           </Box>

@@ -18,6 +18,9 @@ const ProfilePage = () => {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [passwordFormatError, setPasswordFormatError] = useState<string | null>(
+    null
+  )
   const [loading, setLoading] = useState(false)
 
   // Redirect to login if not authenticated
@@ -29,11 +32,24 @@ const ProfilePage = () => {
     e.preventDefault()
     setLoading(true)
     setError(null)
+    setPasswordFormatError(null)
     setSuccess(false)
 
-    // Basic validation
+    // Basic validation - check if passwords match
     if (newPassword !== confirmPassword) {
       setError('Les mots de passe ne correspondent pas')
+      setLoading(false)
+      return
+    }
+
+    // Check password strength using regex
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9])[a-zA-Z0-9\S]{8,}$/
+
+    if (!passwordRegex.test(newPassword)) {
+      setPasswordFormatError(
+        'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.'
+      )
       setLoading(false)
       return
     }
@@ -104,6 +120,12 @@ const ProfilePage = () => {
               </Alert>
             )}
 
+            {passwordFormatError && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {passwordFormatError}
+              </Alert>
+            )}
+
             <Box component="form" onSubmit={handleSubmit}>
               <TextField
                 margin="normal"
@@ -124,8 +146,15 @@ const ProfilePage = () => {
                 label="Nouveau mot de passe"
                 type="password"
                 value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
+                onChange={(e) => {
+                  setNewPassword(e.target.value)
+                  setPasswordFormatError(null)
+                }}
                 disabled={loading}
+                error={!!passwordFormatError}
+                helperText={
+                  passwordFormatError ? 'Format de mot de passe incorrect' : ''
+                }
               />
               <TextField
                 margin="normal"
@@ -135,8 +164,12 @@ const ProfilePage = () => {
                 label="Confirmer le nouveau mot de passe"
                 type="password"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value)
+                  setError(null)
+                }}
                 disabled={loading}
+                error={error === 'Les mots de passe ne correspondent pas'}
               />
               <Button
                 type="submit"
