@@ -33,4 +33,3 @@ public class Notification {
   @JoinColumn(name = "producer", nullable = false)
   private Producer producer;
 }
-

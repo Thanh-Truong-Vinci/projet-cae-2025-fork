@@ -3,24 +3,23 @@ package be.vinci.ipl.cae.demo.controllers;
 import be.vinci.ipl.cae.demo.models.dtos.BatchReject;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsManager;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsProducer;
-import be.vinci.ipl.cae.demo.models.entities.Manager;
 import be.vinci.ipl.cae.demo.models.entities.Batch;
+import be.vinci.ipl.cae.demo.models.entities.Manager;
 import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.BatchService;
 import be.vinci.ipl.cae.demo.services.ManagerService;
 import be.vinci.ipl.cae.demo.services.ProducerService;
 import be.vinci.ipl.cae.demo.services.ProductTypeService;
 import be.vinci.ipl.cae.demo.utils.ValidationUtils;
+import java.util.List;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
 
 /** Controller for managing manager and producer registrations. */
 @RestController

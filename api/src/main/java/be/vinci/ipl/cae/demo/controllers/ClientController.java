@@ -2,15 +2,10 @@ package be.vinci.ipl.cae.demo.controllers;
 
 import be.vinci.ipl.cae.demo.models.dtos.ProductAvailability;
 import be.vinci.ipl.cae.demo.models.dtos.ProductSearchDto;
-import be.vinci.ipl.cae.demo.models.dtos.ReservationRequest;
-import be.vinci.ipl.cae.demo.models.entities.Client;
-import be.vinci.ipl.cae.demo.models.entities.Reservation;
 import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.ProductService;
-import be.vinci.ipl.cae.demo.services.ReservationService;
 import java.util.List;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -25,23 +20,16 @@ public class ClientController {
 
   private final AuthsService authsService;
   private final ProductService productService;
-  private final ReservationService reservationService;
 
   /**
-   * Constructs a ClientController with the specified AuthsService, ProductService, and
-   * ReservationService.
+   * Constructs a ClientController with the specified AuthsService and ProductService.
    *
-   * @param authsService the AuthsService to be used by this controller.
-   * @param productService the ProductService to be used by this controller.
-   * @param reservationService the ReservationService to be used by this controller.
+   * @param authsService the authentication service.
+   * @param productService the product service.
    */
-  public ClientController(
-      AuthsService authsService,
-      ProductService productService,
-      ReservationService reservationService) {
+  public ClientController(AuthsService authsService, ProductService productService) {
     this.authsService = authsService;
     this.productService = productService;
-    this.reservationService = reservationService;
   }
 
   /**
@@ -62,63 +50,5 @@ public class ClientController {
     }
     return productService.getAvailableProducts(
         productSearchDto.getSearch(), productSearchDto.getType());
-  }
-
-  /**
-   * Reserves a product for a client.
-   *
-   * @param reservationRequest the reservation request containing product ID and quantity.
-   * @param token the authorization token from the request header.
-   * @throws ResponseStatusException if the token is invalid or expired.
-   */
-  @PostMapping("/reserve")
-  public void reserveProduct(
-      @RequestBody ReservationRequest reservationRequest,
-      @RequestHeader("Authorization") String token) {
-    Client client = authsService.isValidClientToken(token);
-    if (client == null) {
-      throw new ResponseStatusException(
-          HttpStatus.UNAUTHORIZED, "Token not valid, expired or user is not client");
-    }
-    reservationService.reserveProduct(
-        client, reservationRequest.getProductId(), reservationRequest.getQuantity());
-  }
-
-  /**
-   * Cancels a reservation for a client.
-   *
-   * @param reservationId the ID of the reservation to cancel.
-   * @param token the authorization token from the request header.
-   * @throws ResponseStatusException if the token is invalid or expired.
-   */
-  @PostMapping("/cancelreservation")
-  public void cancelReservation(
-      @RequestBody Long reservationId, @RequestHeader("Authorization") String token) {
-    Client client = authsService.isValidClientToken(token);
-    if (client == null) {
-      throw new ResponseStatusException(
-          HttpStatus.UNAUTHORIZED, "Token not valid, expired or user is not client");
-    }
-    if (reservationId == null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Reservation ID is required");
-    }
-    reservationService.cancelReservation(client, reservationId);
-  }
-
-  /**
-   * Retrieves the reservations for a client.
-   *
-   * @param token the authorization token from the request header.
-   * @return a list of reservations for the client.
-   * @throws ResponseStatusException if the token is invalid or expired.
-   */
-  @GetMapping("/reservations")
-  public List<Reservation> getReservations(@RequestHeader("Authorization") String token) {
-    Client client = authsService.isValidClientToken(token);
-    if (client == null) {
-      throw new ResponseStatusException(
-          HttpStatus.UNAUTHORIZED, "Token not valid, expired or user is not client");
-    }
-    return reservationService.getReservations(client);
   }
 }

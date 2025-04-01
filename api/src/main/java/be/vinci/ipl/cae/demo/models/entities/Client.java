@@ -15,4 +15,3 @@ public class Client extends UserWithAddress {
   @Column(name = "civility")
   private String civility;
 }
-

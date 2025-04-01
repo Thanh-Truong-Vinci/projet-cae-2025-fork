@@ -16,4 +16,3 @@ public class Producer extends UserWithAddress {
   @Column(name = "company", nullable = false)
   private String company;
 }
-

@@ -31,4 +31,3 @@ public class NotificationService {
     return notificationRepository.findByProducer(producer);
   }
 }
-

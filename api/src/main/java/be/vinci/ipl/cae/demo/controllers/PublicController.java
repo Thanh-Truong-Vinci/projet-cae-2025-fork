@@ -2,10 +2,10 @@ package be.vinci.ipl.cae.demo.controllers;
 
 import be.vinci.ipl.cae.demo.models.entities.ProductType;
 import be.vinci.ipl.cae.demo.services.ProductTypeService;
+import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import java.util.List;
 
 /** Controller for managing public operations. */
 @RestController
@@ -14,6 +14,11 @@ public class PublicController {
 
   private final ProductTypeService productTypeService;
 
+  /**
+   * Constructs a PublicController with the specified ProductTypeService.
+   *
+   * @param productTypeService the product type service.
+   */
   public PublicController(ProductTypeService productTypeService) {
     this.productTypeService = productTypeService;
   }

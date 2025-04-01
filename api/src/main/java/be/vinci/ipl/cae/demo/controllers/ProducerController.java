@@ -39,9 +39,9 @@ public class ProducerController {
    * @param notificationService the notification service
    */
   public ProducerController(
-      BatchService batchService, 
-      ProductService productService, 
-      AuthsService authsService, 
+      BatchService batchService,
+      ProductService productService,
+      AuthsService authsService,
       NotificationService notificationService) {
     this.batchService = batchService;
     this.productService = productService;
@@ -179,8 +179,7 @@ public class ProducerController {
    * @return a list of notifications
    */
   @GetMapping("/notifications")
-  public List<Notification> getNotifications(
-      @RequestHeader("Authorization") String token) {
+  public List<Notification> getNotifications(@RequestHeader("Authorization") String token) {
     Producer producer = authsService.isValidProducerToken(token);
     if (producer == null) {
       throw new ResponseStatusException(
@@ -189,4 +188,3 @@ public class ProducerController {
     return notificationService.getNotifications(producer);
   }
 }
-

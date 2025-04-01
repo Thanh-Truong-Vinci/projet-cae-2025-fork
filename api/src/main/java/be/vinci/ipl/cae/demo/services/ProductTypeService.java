@@ -2,9 +2,8 @@ package be.vinci.ipl.cae.demo.services;
 
 import be.vinci.ipl.cae.demo.models.entities.ProductType;
 import be.vinci.ipl.cae.demo.repositories.ProductTypeRepository;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 /** Service class for managing product types. */
 @Service

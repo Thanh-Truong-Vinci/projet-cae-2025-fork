@@ -1,8 +1,8 @@
 package be.vinci.ipl.cae.demo.repositories;
 
 import be.vinci.ipl.cae.demo.models.entities.Batch;
-import be.vinci.ipl.cae.demo.models.entities.Product;
 import be.vinci.ipl.cae.demo.models.entities.BatchStatus;
+import be.vinci.ipl.cae.demo.models.entities.Product;
 import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

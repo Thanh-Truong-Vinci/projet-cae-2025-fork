@@ -24,4 +24,3 @@ public class ProductType {
   @Column(name = "title", nullable = false)
   private String title;
 }
-

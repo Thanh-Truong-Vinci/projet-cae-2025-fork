@@ -18,4 +18,3 @@ public class Manager extends User {
   @JoinColumn(name = "manager")
   private Manager manager;
 }
-

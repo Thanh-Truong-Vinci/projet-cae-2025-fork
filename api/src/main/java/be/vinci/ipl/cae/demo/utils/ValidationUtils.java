@@ -15,18 +15,17 @@ public final class ValidationUtils {
   }
 
   private static void validateCommonFields(Credentials credentials) {
-    if (credentials == null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Credentials cannot be null");
+    switch (credentials) {
+      case null -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Credentials cannot be null");
+
+
+      // Handle different credential types appropriately
+      case CredentialsRegister register -> validateAddressFields(register);
+      case CredentialsProducer producer -> validateAddressFields(producer);
+      default -> {
+      }
     }
-    
-    // Handle different credential types appropriately
-    if (credentials instanceof CredentialsRegister) {
-      CredentialsRegister register = (CredentialsRegister) credentials;
-      validateAddressFields(register);
-    } else if (credentials instanceof CredentialsProducer) {
-      CredentialsProducer producer = (CredentialsProducer) credentials;
-      validateAddressFields(producer);
-    }
+
   }
 
   // Helper method to validate address fields
@@ -37,18 +36,16 @@ public final class ValidationUtils {
     String city = null;
     String country = null;
     String phoneNumber = null;
-    
+
     // Get values based on the actual type
-    if (credentials instanceof CredentialsRegister) {
-      CredentialsRegister register = (CredentialsRegister) credentials;
+    if (credentials instanceof CredentialsRegister register) {
       street = register.getStreet();
       number = register.getNumber();
       postalCode = register.getPostalCode();
       city = register.getCity();
       country = register.getCountry();
       phoneNumber = register.getPhoneNumber();
-    } else if (credentials instanceof CredentialsProducer) {
-      CredentialsProducer producer = (CredentialsProducer) credentials;
+    } else if (credentials instanceof CredentialsProducer producer) {
       street = producer.getStreet();
       number = producer.getNumber();
       postalCode = producer.getPostalCode();
@@ -56,7 +53,7 @@ public final class ValidationUtils {
       country = producer.getCountry();
       phoneNumber = producer.getPhoneNumber();
     }
-    
+
     // Validate fields
     if (street == null || street.isBlank()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Street is required");
@@ -81,21 +78,18 @@ public final class ValidationUtils {
   private static void validateNameAndFirstname(Credentials credentials) {
     String name = null;
     String firstname = null;
-    
-    if (credentials instanceof CredentialsRegister) {
-      CredentialsRegister register = (CredentialsRegister) credentials;
+
+    if (credentials instanceof CredentialsRegister register) {
       name = register.getName();
       firstname = register.getFirstname();
-    } else if (credentials instanceof CredentialsManager) {
-      CredentialsManager manager = (CredentialsManager) credentials;
+    } else if (credentials instanceof CredentialsManager manager) {
       name = manager.getName();
       firstname = manager.getFirstname();
-    } else if (credentials instanceof CredentialsProducer) {
-      CredentialsProducer producer = (CredentialsProducer) credentials;
+    } else if (credentials instanceof CredentialsProducer producer) {
       name = producer.getName();
       firstname = producer.getFirstname();
     }
-    
+
     if (name == null || name.isBlank()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name is required");
     }
