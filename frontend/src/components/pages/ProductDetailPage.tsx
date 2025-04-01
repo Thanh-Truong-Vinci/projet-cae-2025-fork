@@ -51,7 +51,7 @@ const ProductDetailPage = () => {
           image: productData.photo?.url || 'https://via.placeholder.com/300',
           description: productData.description,
           unitType: productData.unitType || 'unité',
-          category: productData.type?.title
+          category: productData.type?.title,
         }
 
         setProduct(formattedProduct)
@@ -175,7 +175,7 @@ const ProductDetailPage = () => {
             <Typography variant="body1" sx={{ mb: 3 }}>
               {product.description}
             </Typography>
-          
+
             <Divider sx={{ my: 2 }} />
 
             {/* Sélecteur de quantité */}
