@@ -4,7 +4,10 @@ interface UserContextType {
   registerUser: (newUser: User) => Promise<void>
   registerManager: (data: ManagerRegistrationData) => Promise<void>
   registerProducer: (data: ProducerRegistrationData) => Promise<void>
-  loginUser: (user: LoginUser) => Promise<AuthenticatedUser>
+  loginUser: (
+    user: LoginUser,
+    rememberMe?: boolean
+  ) => Promise<AuthenticatedUser>
   clearUser: () => void
   changePassword: (
     currentPassword: string,
@@ -62,8 +65,6 @@ interface LoginUser {
   password: string
 }
 
-type MaybeAuthenticatedUser = AuthenticatedUser | undefined
-
 export interface Product {
   id: number
   name: string
@@ -91,6 +92,8 @@ export interface ProductContextType {
   isLoading: boolean
   error: string | null
 }
+
+type MaybeAuthenticatedUser = AuthenticatedUser | undefined
 
 export type {
   User,
