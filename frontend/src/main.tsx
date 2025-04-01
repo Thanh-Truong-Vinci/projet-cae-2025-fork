@@ -10,6 +10,8 @@ import LoginPage from './components/pages/LoginPage.tsx'
 import CartPage from './components/pages/CartPage.tsx'
 import ProductDetailPage from './components/pages/ProductDetailPage'
 import ReservationsPage from './components/pages/ReservationsPage'
+import AddBatchPage from './components/pages/AddBatchPage.tsx'
+import ProducerHomePage from './components/pages/ProducerHomePage.tsx'
 import { UserContextProvider } from './contexts/UserContext.tsx'
 import { CartProvider } from './contexts/CartContext.tsx'
 import '@fontsource/roboto/700.css'
@@ -20,6 +22,8 @@ import ManagerRegisterPage from './components/pages/ManagerRegisterPage.tsx'
 import ProducerRegisterPage from './components/pages/ProducerRegisterPage.tsx'
 import { ProductProvider } from './contexts/ProductProvider.tsx'
 import ProfilePage from './components/pages/ProfilePage.tsx'
+import ManagerDashboardPage from './components/pages/ManagerDashboardPage.tsx'
+import VolunteerHomePage from './components/pages/VolunteerHomePage.tsx'
 
 const router = createBrowserRouter([
   {
@@ -29,6 +33,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <HomePage />,
+      },
+      {
+        path: 'producer-dashboard',
+        element: <ProducerHomePage />,
       },
       {
         path: 'register',
@@ -61,6 +69,18 @@ const router = createBrowserRouter([
       {
         path: 'profile',
         element: <ProfilePage />,
+      },
+      {
+        path: 'add-product',
+        element: <AddBatchPage />,
+      },
+      {
+        path: 'manager-dashboard',
+        element: <ManagerDashboardPage />,
+      },
+      {
+        path: 'volunteer',
+        element: <VolunteerHomePage />,
       },
     ],
   },

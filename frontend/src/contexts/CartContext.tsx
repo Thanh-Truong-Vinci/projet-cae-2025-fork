@@ -1,7 +1,10 @@
 import { useState, ReactNode, useCallback } from 'react'
-import { CartContext, CartItem } from './CartContextDefinition'
+import { CartContext } from './CartContextDefinition'
+import { CartItem } from '../types'
 
-export { CartContext, type CartItem } from './CartContextDefinition'
+export { CartContext } from './CartContextDefinition'
+
+// Removed local declaration of CartItem to avoid conflict with the imported one
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([])
@@ -58,3 +61,5 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     </CartContext.Provider>
   )
 }
+
+export default CartProvider

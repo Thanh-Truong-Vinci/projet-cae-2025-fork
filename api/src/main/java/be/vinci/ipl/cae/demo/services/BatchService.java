@@ -2,6 +2,7 @@ package be.vinci.ipl.cae.demo.services;
 
 import be.vinci.ipl.cae.demo.models.dtos.NewBatch;
 import be.vinci.ipl.cae.demo.models.entities.Batch;
+import be.vinci.ipl.cae.demo.models.entities.BatchStatus;
 import be.vinci.ipl.cae.demo.models.entities.Manager;
 import be.vinci.ipl.cae.demo.models.entities.Notification;
 import be.vinci.ipl.cae.demo.models.entities.Producer;
@@ -12,12 +13,9 @@ import be.vinci.ipl.cae.demo.repositories.NotificationRepository;
 import be.vinci.ipl.cae.demo.repositories.ProducerRepository;
 import be.vinci.ipl.cae.demo.repositories.ProductRepository;
 import java.time.LocalDate;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 
-/**
- * Service class for managing batches.
- */
+/** Service class for managing batches. */
 @Service
 public class BatchService {
 
@@ -27,14 +25,13 @@ public class BatchService {
   private final ProductRepository productRepository;
   private final NotificationRepository notificationRepository;
 
-  /**
-   * Constructeur du service.
-   */
-  public BatchService(BatchRepository batchRepository, 
-                     ManagerRepository managerRepository,
-                     ProducerRepository producerRepository,
-                     ProductRepository productRepository,
-                     NotificationRepository notificationRepository) {
+  /** Constructeur du service. */
+  public BatchService(
+      BatchRepository batchRepository,
+      ManagerRepository managerRepository,
+      ProducerRepository producerRepository,
+      ProductRepository productRepository,
+      NotificationRepository notificationRepository) {
     this.batchRepository = batchRepository;
     this.managerRepository = managerRepository;
     this.producerRepository = producerRepository;
@@ -49,14 +46,20 @@ public class BatchService {
    * @return le lot créé
    */
   public Batch createBatch(NewBatch newBatch) {
-    Manager manager = managerRepository.findById(newBatch.getManagerId())
-        .orElseThrow(() -> new IllegalArgumentException("Manager non trouvé"));
+    Manager manager =
+        managerRepository
+            .findById(newBatch.getManagerId())
+            .orElseThrow(() -> new IllegalArgumentException("Manager non trouvé"));
 
-    Producer producer = producerRepository.findById(newBatch.getProducerId())
-        .orElseThrow(() -> new IllegalArgumentException("Producteur non trouvé"));
+    Producer producer =
+        producerRepository
+            .findById(newBatch.getProducerId())
+            .orElseThrow(() -> new IllegalArgumentException("Producteur non trouvé"));
 
-    Product product = productRepository.findById(newBatch.getProductId())
-        .orElseThrow(() -> new IllegalArgumentException("Produit non trouvé"));
+    Product product =
+        productRepository
+            .findById(newBatch.getProductId())
+            .orElseThrow(() -> new IllegalArgumentException("Produit non trouvé"));
 
     Batch batch = new Batch();
     batch.setManager(manager);
@@ -67,7 +70,7 @@ public class BatchService {
     batch.setUnitPrice(newBatch.getUnitPrice());
     batch.setSaleUnit(newBatch.getSaleUnit());
     batch.setAvailableQuantity(newBatch.getAvailableQuantity());
-    batch.setStatut("en attente");
+    batch.setStatus(BatchStatus.PENDING);
     batch.setDepositDate(LocalDate.now());
 
     return batchRepository.save(batch);
@@ -101,15 +104,11 @@ public class BatchService {
    * @return le lot accepté ou null si non trouvé
    */
   public Batch acceptBatch(long id) {
-    Optional<Batch> optBatch = batchRepository.findById(id);
-    // TODO throw error here
-    if (optBatch.isEmpty()) {
-      return null;
-    }
+    Batch batch =
+        batchRepository.findById(id).orElseThrow(() -> new RuntimeException("Batch not found"));
 
-    Batch batch = optBatch.get();
-    batch.setStatut("approuvé");
-    
+    batch.setStatus(BatchStatus.APPROVED);
+
     return batchRepository.save(batch);
   }
 
@@ -121,24 +120,19 @@ public class BatchService {
    * @return le lot rejeté ou null si non trouvé
    */
   public Batch rejectBatch(long id, String message) {
-    Optional<Batch> optBatch = batchRepository.findById(id);
-    // TODO throw error here
-    if (optBatch.isEmpty()) {
-      return null;
-    }
+    Batch batch =
+        batchRepository.findById(id).orElseThrow(() -> new RuntimeException("Batch not found"));
+    batch.setStatus(BatchStatus.REJECTED);
 
-    Batch batch = optBatch.get();
-    batch.setStatut("refusé");
-    
     // Création de la notification
     Notification notification = new Notification();
     notification.setIsRead(false);
     notification.setMessage(message);
     notification.setProducer(batch.getProducer());
     notification = notificationRepository.save(notification);
-    
+
     batch.setNotification(notification);
-    
+
     return batchRepository.save(batch);
   }
 }

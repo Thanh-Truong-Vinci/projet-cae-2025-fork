@@ -2,6 +2,8 @@ package be.vinci.ipl.cae.demo.models.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -12,54 +14,53 @@ import java.time.LocalDate;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Batch entity representing a batch of products.
- */
+/** Batch entity representing a batch of products. */
 @Entity
-@Table(name = "batchs")
+@Table(name = "batches")
 @Data
 @NoArgsConstructor
 public class Batch {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id_batch")
+  @Column(name = "id")
   private Long id;
 
   @ManyToOne
-  @JoinColumn(name = "gestionnaire", nullable = false)
+  @JoinColumn(name = "manager_id", nullable = false)
   private Manager manager;
 
   @ManyToOne
-  @JoinColumn(name = "producteur", nullable = false)
+  @JoinColumn(name = "producer_id", nullable = false)
   private Producer producer;
 
   @ManyToOne
-  @JoinColumn(name = "produit", nullable = false)
+  @JoinColumn(name = "product_id", nullable = false)
   private Product product;
 
-  @Column(name = "photo", nullable = true)
+  @Column(name = "photo_url")
   private String photo;
 
-  @Column(name = "date_disponibilite", nullable = false)
+  @Column(name = "availability_date", nullable = false)
   private LocalDate availabilityDate;
 
-  @Column(name = "prix_unitaire", nullable = false)
+  @Column(name = "unit_price", nullable = false)
   private Double unitPrice;
 
-  @Column(name = "unite_vente", nullable = false)
+  @Column(name = "sale_unit", nullable = false)
   private String saleUnit;
 
-  @Column(name = "quantite_disponible", nullable = false)
+  @Column(name = "available_quantity", nullable = false)
   private Integer availableQuantity;
 
-  @Column(nullable = false)
-  private String statut; // e.g., "approuvé", "en attente", "refusé", "supprimé"
+  @Column(name = "status", nullable = false)
+  @Enumerated(EnumType.STRING)
+  private BatchStatus status;
 
   @ManyToOne
-  @JoinColumn(name = "notification", nullable = true)
+  @JoinColumn(name = "notification_id")
   private Notification notification;
 
-  @Column(name = "date_depot", nullable = false)
+  @Column(name = "deposit_date", nullable = false)
   private LocalDate depositDate;
 }

@@ -21,7 +21,8 @@ public class ProducerService {
    * @param producerRepository the manager repository
    */
   public ProducerService(
-      ProducerRepository producerRepository, BCryptPasswordEncoder passwordEncoder, 
+      ProducerRepository producerRepository,
+      BCryptPasswordEncoder passwordEncoder,
       UserRepository userRepository) {
     this.producerRepository = producerRepository;
     this.passwordEncoder = passwordEncoder;

@@ -1,11 +1,13 @@
 package be.vinci.ipl.cae.demo.services;
 
+import be.vinci.ipl.cae.demo.models.entities.Notification;
 import be.vinci.ipl.cae.demo.models.entities.Producer;
 import be.vinci.ipl.cae.demo.repositories.NotificationRepository;
+import java.util.List;
+import org.springframework.stereotype.Service;
 
-/**
- * Service class for managing notifications.
- */
+/** Service class for managing notifications. */
+@Service
 public class NotificationService {
 
   private final NotificationRepository notificationRepository;
@@ -27,8 +29,9 @@ public class NotificationService {
    * Retrieves notifications for a given producer.
    *
    * @param producer the producer whose notifications are to be retrieved
+   * @return a list of notifications for the producer
    */
-  public void getNotifications(Producer producer) {
-    notificationRepository.findByProducer(producer);
+  public List<Notification> getNotifications(Producer producer) {
+    return notificationRepository.findByProducer(producer);
   }
 }

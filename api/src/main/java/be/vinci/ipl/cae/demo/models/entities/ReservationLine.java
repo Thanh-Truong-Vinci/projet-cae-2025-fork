@@ -23,7 +23,7 @@ public class ReservationLine {
   @Column(name = "id_reservation_line")
   private Long id;
 
-  @Column(nullable = false)
+  @Column(name = "quantity", nullable = false)
   private Integer quantity;
 
   @ManyToOne

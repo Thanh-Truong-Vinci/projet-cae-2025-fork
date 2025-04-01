@@ -94,7 +94,7 @@ public class ProductTypeController {
   public void deleteProductType(@PathVariable long id) {
     // TODO verify token if is a manager
     try {
-      productTypeService.delete(id);
+      productTypeService.deleteProductType(id);
     } catch (IllegalArgumentException e) {
       // Correction: ajouter "e" comme troisième paramètre
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);

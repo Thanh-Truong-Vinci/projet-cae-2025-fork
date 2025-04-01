@@ -1,45 +1,58 @@
-import { Box, Typography } from '@mui/material'
-import NavBar from '../Navbar'
+import { AppBar, Toolbar, Typography } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
+import NavBar from '../Navbar'
+import { useContext } from 'react'
+import { UserContext } from '../../contexts/UserContext'
+import { UserContextType } from '../../types'
 
 interface HeaderProps {
   title: string
 }
 
 const Header = ({ title }: HeaderProps) => {
+  const { authenticatedUser } = useContext<UserContextType>(UserContext)
   const navigate = useNavigate()
 
-  return (
-    <Box
-      component="header"
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        px: 2,
-        py: 1,
-        backgroundColor: 'white',
-        borderBottom: '1px solid #ddd',
-      }}
-    >
-      {/* Titre aligné à gauche et cliquable */}
-      <Typography
-        variant="h6"
-        sx={{
-          fontWeight: 'bold',
-          cursor: 'pointer',
-          '&:hover': {
-            color: 'primary.main',
-          },
-        }}
-        onClick={() => navigate('/')}
-      >
-        {title}
-      </Typography>
+  const handleTitleClick = () => {
+    if (authenticatedUser) {
+      if (authenticatedUser.role === 'Producer') {
+        navigate('/producer-dashboard')
+      } else if (authenticatedUser.role === 'Manager') {
+        navigate('/manager-dashboard')
+      } else {
+        navigate('/')
+      }
+    } else {
+      navigate('/')
+    }
+  }
 
-      {/* Navbar alignée à droite */}
-      <NavBar />
-    </Box>
+  return (
+    <AppBar
+      position="static"
+      color="default"
+      elevation={0}
+      sx={{ borderBottom: (theme) => `1px solid ${theme.palette.divider}` }}
+    >
+      <Toolbar sx={{ flexWrap: 'wrap' }}>
+        <Typography
+          variant="h6"
+          color="inherit"
+          noWrap
+          sx={{
+            flexGrow: 1,
+            cursor: 'pointer',
+            color: 'green',
+          }}
+          onClick={handleTitleClick}
+          data-testid="title"
+        >
+          {title}
+        </Typography>
+
+        <NavBar />
+      </Toolbar>
+    </AppBar>
   )
 }
 

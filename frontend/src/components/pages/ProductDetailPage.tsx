@@ -17,18 +17,7 @@ import RemoveIcon from '@mui/icons-material/Remove'
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { CartContext } from '../../contexts/CartContext'
-
-// Définir l'interface pour un produit (à terme, celle-ci devrait être partagée)
-interface Product {
-  id: number
-  name: string
-  price: string
-  image: string
-  description?: string
-  details?: {
-    [key: string]: string
-  }
-}
+import { Product } from '../../types'
 
 const ProductDetailPage = () => {
   const { productId } = useParams<{ productId: string }>()
@@ -61,12 +50,8 @@ const ProductDetailPage = () => {
           price: `10.00€`, // Utiliser une valeur fixe car price n'existe pas dans votre modèle
           image: productData.photo?.url || 'https://via.placeholder.com/300',
           description: productData.description,
-          details: {
-            Origine: 'Belgique',
-            Catégorie: productData.type?.title || 'Non catégorisé',
-            Conditionnement: '500g',
-            Conservation: 'À conserver au frais',
-          },
+          unitType: productData.unitType || 'unité',
+          category: productData.type?.title
         }
 
         setProduct(formattedProduct)
@@ -96,6 +81,7 @@ const ProductDetailPage = () => {
         price: product.price,
         image: product.image,
         quantity: quantity,
+        unitType: product.unitType,
       })
       // Vous pourriez aussi rediriger vers le panier ou afficher une notification
     }
@@ -189,23 +175,7 @@ const ProductDetailPage = () => {
             <Typography variant="body1" sx={{ mb: 3 }}>
               {product.description}
             </Typography>
-
-            <Divider sx={{ my: 2 }} />
-
-            {/* Détails du produit */}
-            {product.details &&
-              Object.entries(product.details).map(([key, value]) => (
-                <Box key={key} sx={{ display: 'flex', mb: 1 }}>
-                  <Typography
-                    variant="body1"
-                    sx={{ fontWeight: 'bold', mr: 1 }}
-                  >
-                    {key}:
-                  </Typography>
-                  <Typography variant="body1">{value}</Typography>
-                </Box>
-              ))}
-
+          
             <Divider sx={{ my: 2 }} />
 
             {/* Sélecteur de quantité */}

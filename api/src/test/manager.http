@@ -1,0 +1,123 @@
+@baseUrl = http://localhost:3000
+@adminToken = {{login_admin.response.body.token}}
+
+### Login admin 
+# @name login_admin
+POST {{baseUrl}}/auths/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "Azqwazqw1@"
+}
+
+### Register a new manager
+POST {{baseUrl}}/manager/registermanager
+Content-Type: application/json
+Authorization: {{adminToken}}
+
+{
+  "name": "Manager",
+  "firstname": "Test",
+  "email": "manager@example.com",
+  "password": "manager123"
+}
+
+### Create a Producer
+POST {{baseUrl}}/manager/registerproducer
+Content-Type: application/json
+Authorization: {{adminToken}}
+
+{
+  "name": "Producer",
+  "firstname": "IDK",
+  "company": "ALEDink",
+  "email": "producer-test@example.com",
+  "password": "prod",
+  "street": "LaRue",
+  "number": "1234",
+  "box": "12",
+  "postalCode": "1251",
+  "city": "LaVille",
+  "country": "LePays",
+  "phoneNumber": "+324794586718"
+}
+
+### Create new product type
+POST {{baseUrl}}/manager/addproducttype
+Content-Type: application/json
+Authorization: {{adminToken}}
+
+{
+  "newType": "test product type"
+}
+
+### Create new product type empty
+POST {{baseUrl}}/manager/addproducttype
+Content-Type: application/json
+Authorization: {{adminToken}}
+
+{
+  "newType": ""
+}
+
+### Remove product type with ID 0
+POST {{baseUrl}}/manager/deleteproducttype
+Content-Type: application/json
+Authorization: {{adminToken}}
+
+{
+  "id": 0
+}
+
+### Remove product type not existing
+POST {{baseUrl}}/manager/deleteproducttype
+Content-Type: application/json
+Authorization: {{adminToken}}
+
+{
+  "id": -1
+}
+
+### Get all pending batches
+GET {{baseUrl}}/manager/pendingbatches
+Content-Type: application/json
+Authorization: {{adminToken}}
+
+### Accept batch with ID 0
+POST {{baseUrl}}/manager/acceptbatch
+Content-Type: application/json
+Authorization: {{adminToken}}
+
+{
+  "batchId": 0
+}
+
+### Accept batch not existing
+POST {{baseUrl}}/manager/acceptbatch
+Content-Type: application/json
+Authorization: {{adminToken}}
+
+{
+  "batchId": -1
+}
+
+### Reject batch with ID 0
+POST {{baseUrl}}/manager/rejectbatch
+Content-Type: application/json
+Authorization: {{adminToken}}
+
+{
+  "batchId": 0,
+  "notificationMessage": "Reason for rejection"
+}
+
+### Reject batch not existing
+POST {{baseUrl}}/manager/rejectbatch
+Content-Type: application/json
+Authorization: {{adminToken}}
+
+{
+  "batchId": -1,
+  "notificationMessage": "Reason for rejection"
+}

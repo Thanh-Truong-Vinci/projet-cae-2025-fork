@@ -9,17 +9,18 @@ import be.vinci.ipl.cae.demo.repositories.BatchRepository;
 import be.vinci.ipl.cae.demo.repositories.ReservationRepository;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-/**
- * Service class for managing reservations.
- */
+/** Service class for managing reservations. */
 @Service
 public class ReservationService {
 
   private final ReservationRepository reservationRepository;
   private final BatchRepository batchRepository;
   private final ReservationLineService reservationLineService;
+  private final ProductService productService;
 
   /**
    * Constructs a new ReservationService with the specified repositories and services.
@@ -28,12 +29,15 @@ public class ReservationService {
    * @param batchRepository the repository for batches
    * @param reservationLineService the service for reservation lines
    */
-  public ReservationService(ReservationRepository reservationRepository,
-                            BatchRepository batchRepository,
-                            ReservationLineService reservationLineService) {
+  public ReservationService(
+      ReservationRepository reservationRepository,
+      BatchRepository batchRepository,
+      ReservationLineService reservationLineService,
+      ProductService productService) {
     this.reservationRepository = reservationRepository;
     this.batchRepository = batchRepository;
     this.reservationLineService = reservationLineService;
+    this.productService = productService;
   }
 
   /**
@@ -59,12 +63,18 @@ public class ReservationService {
    * Reserves a product for a client with the specified quantity.
    *
    * @param client the client making the reservation
-   * @param product the product to reserve
+   * @param productId the ID of the product to reserve
    * @param quantity the quantity of the product to reserve
    */
-  public void reserveProduct(Client client, Product product, int quantity) {
-    Reservation reservation = reservationRepository.findByClientAndStatus(client, "pending")
-        .orElseGet(() -> createReservation(client, product, quantity));
+  public void reserveProduct(Client client, Long productId, int quantity) {
+    Product product = productService.getProductById(productId);
+    if (product == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
+    }
+    Reservation reservation =
+        reservationRepository
+            .findByClientAndStatus(client, "pending")
+            .orElseGet(() -> createReservation(client, product, quantity));
 
     reservationLineService.addProduct(reservation, product, quantity);
     reservationRepository.save(reservation);
@@ -83,20 +93,35 @@ public class ReservationService {
   /**
    * Completes a reservation.
    *
-   * @param reservation the reservation to complete
+   * @param reservationId the ID of reservation to complete
    */
-  public void completeReservation(Reservation reservation) {
+  public void completeReservation(Long reservationId) {
+    Reservation reservation =
+        reservationRepository
+            .findById(reservationId)
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation not found"));
     reservation.setStatus("completed");
     reservation.setSaleDate(LocalDate.now());
     reservationRepository.save(reservation);
   }
 
   /**
-   * Cancels a reservation.
+   * Cancels a reservation for a client by reservation ID.
    *
-   * @param reservation the reservation to cancel
+   * @param client the client who made the reservation.
+   * @param reservationId the ID of the reservation to cancel.
    */
-  public void cancelReservation(Reservation reservation) {
+  public void cancelReservation(Client client, Long reservationId) {
+    Reservation reservation =
+        reservationRepository
+            .findById(reservationId)
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reservation not found"));
+    if (!reservation.getClient().equals(client)) {
+      throw new ResponseStatusException(
+          HttpStatus.FORBIDDEN, "Reservation does not belong to the client");
+    }
     reservation.setStatus("canceled");
     for (ReservationLine line : reservation.getReservationLines()) {
       Batch batch = line.getBatch();

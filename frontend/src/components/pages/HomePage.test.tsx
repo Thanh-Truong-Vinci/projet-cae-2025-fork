@@ -21,6 +21,7 @@ const renderWithProviders = (component: React.ReactNode) => {
         image: 'https://via.placeholder.com/150',
         category: 'legumes',
         description: 'Description test',
+        unitType: 'kg',
       },
     ],
     getProductById: (id: number) =>

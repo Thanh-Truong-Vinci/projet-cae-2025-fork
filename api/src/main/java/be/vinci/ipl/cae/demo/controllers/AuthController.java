@@ -63,7 +63,7 @@ public class AuthController {
             credentials.getPhoneNumber());
 
     if (!success) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use"); 
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
     }
   }
 
@@ -81,7 +81,7 @@ public class AuthController {
     AuthenticatedUser user = authsService.login(credentials.getEmail(), credentials.getPassword());
 
     if (user == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password"); 
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
     }
 
     return user;
@@ -91,20 +91,20 @@ public class AuthController {
    * Refresh the token. This endpoint receives a token, verifies its validity (including expiration)
    * and returns a new token with a new expiration date.
    *
-   * @param request the token request containing the token to verify.
+   * @param token the token request containing the token to verify.
    * @return a new token if verification is successful.
    * @throws ResponseStatusException if the token is invalid or the verification fails.
    */
   @PostMapping("/me")
-  public String refreshToken(@RequestBody String request) {
-    if (request == null || request.isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token is required"); 
+  public String refreshToken(@RequestBody String token) {
+    if (token == null || token.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token is required");
     }
 
-    String email = authsService.verifyJwtToken(request);
+    String email = authsService.verifyJwtToken(token);
 
     if (email == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token"); 
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
     }
 
     return authsService.createJwtToken(email);

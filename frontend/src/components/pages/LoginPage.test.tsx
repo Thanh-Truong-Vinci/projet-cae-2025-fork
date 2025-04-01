@@ -66,10 +66,14 @@ describe('LoginPage', () => {
       fireEvent.change(passwordInput, { target: { value: 'password' } })
       fireEvent.click(submitButton)
 
-      expect(loginUserMock).toHaveBeenCalledWith({
-        email: 'testuser',
-        password: 'password',
-      })
+      // Update expectation to include both arguments (user object and rememberMe=false)
+      expect(loginUserMock).toHaveBeenCalledWith(
+        {
+          email: 'testuser',
+          password: 'password',
+        },
+        false
+      )
 
       await waitFor(() => {
         expect(navigateMock).toHaveBeenCalledWith('/')
@@ -120,10 +124,14 @@ describe('LoginPage', () => {
       fireEvent.change(passwordInput, { target: { value: 'password' } })
       fireEvent.click(submitButton)
 
-      expect(loginUserMock).toHaveBeenCalledWith({
-        email: 'testuser',
-        password: 'password',
-      })
+      // Update expectation to include both arguments (user object and rememberMe=false)
+      expect(loginUserMock).toHaveBeenCalledWith(
+        {
+          email: 'testuser',
+          password: 'password',
+        },
+        false
+      )
 
       // Verify that console.error was called
       await waitFor(() => {

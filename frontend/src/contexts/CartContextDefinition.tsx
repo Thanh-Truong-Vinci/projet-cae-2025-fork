@@ -1,12 +1,5 @@
 import { createContext } from 'react'
-
-export interface CartItem {
-  id: number
-  name: string
-  price: string
-  image: string
-  quantity: number
-}
+import { CartItem } from '../types'
 
 interface CartContextType {
   cartItems: CartItem[]

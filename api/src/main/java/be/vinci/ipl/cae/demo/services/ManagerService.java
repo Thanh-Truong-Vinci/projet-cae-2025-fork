@@ -7,9 +7,7 @@ import java.time.LocalDate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-/**
- * Service class for managing managers.
- */
+/** Service class for managing managers. */
 @Service
 public class ManagerService {
 
@@ -23,7 +21,8 @@ public class ManagerService {
    * @param managerRepository the manager repository
    */
   public ManagerService(
-      ManagerRepository managerRepository, BCryptPasswordEncoder passwordEncoder, 
+      ManagerRepository managerRepository,
+      BCryptPasswordEncoder passwordEncoder,
       UserRepository userRepository) {
     this.managerRepository = managerRepository;
     this.passwordEncoder = passwordEncoder;

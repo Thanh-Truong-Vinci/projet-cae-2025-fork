@@ -70,8 +70,9 @@ export interface Product {
   name: string
   price: string
   image: string
-  category?: string
-  description?: string
+  category: string
+  description: string
+  unitType: string
 }
 
 export const categoryLabels: { [key: string]: string } = {
@@ -82,6 +83,15 @@ export const categoryLabels: { [key: string]: string } = {
   produits_laitiers: 'Produits laitiers',
   boissons: 'Boissons',
   autres: 'Autres',
+}
+
+export interface CartItem {
+  id: number
+  name: string
+  price: string
+  image: string
+  quantity: number
+  unitType: string
 }
 
 export interface ProductContextType {

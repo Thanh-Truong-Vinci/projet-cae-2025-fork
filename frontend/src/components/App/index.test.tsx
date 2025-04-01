@@ -3,7 +3,7 @@ import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { UserContext } from '../../contexts/UserContext'
 
-// Mock the dependencies
+// Mock modules
 vi.mock('../Header', () => ({
   default: ({ title }: { title: string }) => (
     <header data-testid="mock-header">{title}</header>
@@ -22,6 +22,15 @@ vi.mock('react-router-dom', async () => {
   }
 })
 
+// Mock the session utility
+vi.mock('../../utils/session', () => ({
+  getAuthenticatedUser: vi.fn(() => undefined),
+  clearAuthenticatedUser: vi.fn(),
+}))
+
+// Import the mocked session utils for direct manipulation
+import { getAuthenticatedUser } from '../../utils/session'
+
 // Import the App component after all mocks are defined
 import App from './index'
 
@@ -31,11 +40,8 @@ describe('App Component', () => {
   // Setup and teardown
   beforeEach(() => {
     vi.resetAllMocks()
-    // Clear document.cookie more thoroughly by setting expired cookies
-    document.cookie.split(';').forEach((cookie) => {
-      const [name] = cookie.split('=')
-      document.cookie = `${name.trim()}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`
-    })
+    // Reset mock implementations
+    vi.mocked(getAuthenticatedUser).mockReturnValue(undefined)
   })
 
   afterEach(() => {
@@ -93,8 +99,14 @@ describe('App Component', () => {
   })
 
   test('calls authsMe when token exists in cookies', () => {
-    // Set a mock token in document.cookie
-    document.cookie = 'token=fake-token; path=/; max-age=3600'
+    // Mock getAuthenticatedUser to return a user with token
+    vi.mocked(getAuthenticatedUser).mockReturnValue({
+      email: 'test@example.com',
+      name: 'Test',
+      firstname: 'User',
+      token: 'fake-token',
+      role: 'client',
+    })
 
     const mockUserContext = {
       authenticatedUser: undefined,
@@ -120,14 +132,8 @@ describe('App Component', () => {
   })
 
   test('does not call authsMe when no token exists', () => {
-    // Make sure cookies are empty - more thorough approach
-    document.cookie.split(';').forEach((cookie) => {
-      const [name] = cookie.split('=')
-      document.cookie = `${name.trim()}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`
-    })
-
-    // Verify cookie is empty
-    expect(document.cookie).toBe('')
+    // Ensure getAuthenticatedUser returns undefined
+    vi.mocked(getAuthenticatedUser).mockReturnValue(undefined)
 
     const mockUserContext = {
       authenticatedUser: undefined,
@@ -152,7 +158,6 @@ describe('App Component', () => {
     expect(authsMeMock).not.toHaveBeenCalled()
   })
 
-  // Replace the style test with a structure test
   test('has proper layout structure', () => {
     const mockUserContext = {
       authenticatedUser: undefined,

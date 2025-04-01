@@ -105,50 +105,159 @@ const CartPage = () => {
 
   const handleConfirmReservation = () => {
     if (selectedDate && cartItems.length > 0 && isDateValid) {
-      // Création d'une nouvelle réservation
+      if (!authenticatedUser) {
+        setMessage('Vous devez vous connecter pour faire une réservation')
+        setOpenSnackbar(true)
+        setTimeout(() => {
+          navigate('/login', { state: { returnTo: '/cart' } })
+        }, 2000)
+        return
+      }
+
+      // Journalisation détaillée de l'utilisateur et de son ID
+      console.log('Utilisateur authentifié:', JSON.stringify(authenticatedUser))
+
+      // Extraire l'ID utilisateur en mode débogage
+      let userId
+      if ('id' in authenticatedUser) {
+        userId = authenticatedUser.id
+        console.log(
+          'ID trouvé depuis la propriété "id":',
+          userId,
+          'type:',
+          typeof userId
+        )
+      } else if ('userId' in authenticatedUser) {
+        // Remplacer (authenticatedUser as any).userId par une méthode plus typée
+        userId = (authenticatedUser as Record<string, unknown>).userId as
+          | number
+          | string
+        console.log(
+          'ID trouvé depuis la propriété "userId":',
+          userId,
+          'type:',
+          typeof userId
+        )
+      } else {
+        // Parcourir toutes les propriétés pour trouver un ID potentiel
+        const keys = Object.keys(authenticatedUser)
+        console.log("Propriétés disponibles dans l'utilisateur:", keys)
+
+        // Chercher une propriété qui ressemble à un ID
+        for (const key of keys) {
+          if (key.toLowerCase().includes('id')) {
+            // Remplacer (authenticatedUser as any)[key] par une méthode plus typée
+            userId = (authenticatedUser as unknown as Record<string, unknown>)[
+              key
+            ] as number | string
+            console.log(
+              `ID potentiel trouvé dans la propriété "${key}":`,
+              userId
+            )
+            break
+          }
+        }
+
+        if (!userId) {
+          userId = Date.now() // Fallback si aucun ID n'est trouvé
+          console.log(
+            "Aucun ID trouvé, utilisation d'un ID temporaire:",
+            userId
+          )
+        }
+      }
+
+      // Convertir explicitement en nombre pour s'assurer de la cohérence
+      userId = Number(userId)
+      console.log('ID utilisateur final utilisé pour la réservation:', userId)
+
+      // Création d'une nouvelle réservation avec l'ID utilisateur
       const selectedDateObj = new Date(selectedDate)
       const reservation = {
         id: Date.now(),
+        userId: userId,
         date: selectedDateObj,
         items: [...cartItems],
         total: calculateTotal(),
         status: 'En attente',
       }
 
-      // Récupération des réservations existantes
-      const existingReservations = JSON.parse(
-        localStorage.getItem('userReservations') || '[]'
-      )
+      console.log('Nouvelle réservation créée:', JSON.stringify(reservation))
 
-      // Ajout de la nouvelle réservation
-      const updatedReservations = [...existingReservations, reservation]
+      try {
+        // Récupération des réservations existantes
+        const existingReservations = JSON.parse(
+          localStorage.getItem('userReservations') || '[]'
+        )
 
-      // Sauvegarde dans le localStorage
-      localStorage.setItem(
-        'userReservations',
-        JSON.stringify(updatedReservations)
-      )
+        console.log('Réservations existantes:', existingReservations.length)
 
-      // Format de date pour l'affichage
-      const formattedDate = new Intl.DateTimeFormat('fr-FR', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      }).format(selectedDateObj)
+        // Ajout de la nouvelle réservation
+        const updatedReservations = [...existingReservations, reservation]
+        console.log('Réservations mises à jour:', updatedReservations.length)
 
-      // Message de confirmation amélioré
-      const confirmationMessage = `Votre réservation pour le ${formattedDate} a été enregistrée avec succès! Vous pouvez la consulter dans "Mes réservations".`
+        // Sauvegarde dans le localStorage
+        localStorage.setItem(
+          'userReservations',
+          JSON.stringify(updatedReservations)
+        )
 
-      // Fermeture du calendrier et vidage du panier
-      setOpenCalendar(false)
-      clearCart()
+        // Vérifiez immédiatement après
+        const test = localStorage.getItem('userReservations')
+        console.log(
+          'Vérification après sauvegarde:',
+          test ? JSON.parse(test).length : 'aucun'
+        )
 
-      // Redirection vers la page d'accueil avec le message de confirmation
-      navigate('/', {
-        state: {
-          message: confirmationMessage,
-        },
-      })
+        console.log(
+          'Réservation enregistrée avec succès. Vérifiez le localStorage'
+        )
+
+        // Vérifier immédiatement que la réservation a bien été enregistrée
+        const verifyReservations = JSON.parse(
+          localStorage.getItem('userReservations') || '[]'
+        )
+        console.log(
+          'Vérification - nombre de réservations dans localStorage:',
+          verifyReservations.length
+        )
+        console.log(
+          'Dernière réservation dans localStorage:',
+          verifyReservations.length > 0
+            ? JSON.stringify(verifyReservations[verifyReservations.length - 1])
+            : 'aucune'
+        )
+
+        // Format de date pour l'affichage
+        const formattedDate = new Intl.DateTimeFormat('fr-FR', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        }).format(selectedDateObj)
+
+        // Message de confirmation amélioré
+        const confirmationMessage = `Votre réservation pour le ${formattedDate} a été enregistrée avec succès! Vous pouvez la consulter dans "Mes réservations".`
+
+        // Fermeture du calendrier et vidage du panier
+        setOpenCalendar(false)
+        clearCart()
+
+        // Redirection vers la page d'accueil avec le message de confirmation
+        navigate('/', {
+          state: {
+            message: confirmationMessage,
+          },
+        })
+      } catch (error) {
+        console.error(
+          "Erreur lors de l'enregistrement de la réservation:",
+          error
+        )
+        setMessage(
+          "Une erreur est survenue lors de l'enregistrement de votre réservation. Veuillez réessayer."
+        )
+        setOpenSnackbar(true)
+      }
     }
   }
 

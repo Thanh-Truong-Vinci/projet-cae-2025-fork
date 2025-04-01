@@ -173,6 +173,7 @@ const HomePage = () => {
       price: product.price,
       image: product.image,
       quantity: quantities[product.id] || 1,
+      unitType: product.unitType,
     })
   }
 

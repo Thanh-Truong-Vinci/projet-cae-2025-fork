@@ -133,7 +133,7 @@ public class ProductService {
    * @param id l'identifiant du produit recherché
    * @return le produit trouvé ou null si aucun produit ne correspond
    */
-  public Product readProductById(long id) {
+  public Product getProductById(long id) {
     return productRepository.findById(id).orElse(null);
   }
 
@@ -144,7 +144,7 @@ public class ProductService {
    * @return le produit supprimé ou null si aucun produit ne correspond
    */
   public Product deleteProduct(long id) {
-    Product product = readProductById(id);
+    Product product = getProductById(id);
     if (product != null) {
       productRepository.delete(product);
     }
@@ -159,7 +159,7 @@ public class ProductService {
    * @return the updated product if found, null otherwise
    */
   public Product updateProduct(long id, NewProduct newProduct) {
-    Product existingProduct = readProductById(id);
+    Product existingProduct = getProductById(id);
     if (existingProduct != null) {
       if (newProduct.getName() != null) {
         existingProduct.setName(newProduct.getName());
