@@ -46,7 +46,9 @@ INSERT INTO photos (name, url) VALUES
 ('carottes', 'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37'),
 ('biere', 'https://images.unsplash.com/photo-1608270586620-248524c67de9'),
 ('poulet', 'https://images.unsplash.com/photo-1587593810167-a84920ea0781'),
-('yaourt', 'https://images.unsplash.com/photo-1563636619-e9143da7973b');
+('yaourt', 'https://images.unsplash.com/photo-1563636619-e9143da7973b'),
+('pomme_jonagold', 'https://images.unsplash.com/photo-1568702846914-96b305d2aaeb'),
+('choufleur_cheddar', 'https://images.unsplash.com/photo-1568584711075-3d021a7c3ca3');
 
 -- Insérer des produits
 INSERT INTO products (id_product_type, name, description, photo_id)
@@ -88,6 +90,16 @@ INSERT INTO products (id_product_type, name, description, photo_id)
 SELECT pt.id_product_type, 'Yaourt nature', 'Yaourt onctueux préparé avec du lait frais de vaches locales.', p.id_photo
 FROM product_types pt, photos p
 WHERE pt.title = 'Produits laitiers' AND p.name = 'yaourt';
+
+INSERT INTO products (id_product_type, name, description, photo_id)
+SELECT pt.id_product_type, 'Pomme Jonagold', 'Pommes Jonagold juteuses et légèrement acidulées, parfaites pour la cuisine ou en collation.', p.id_photo
+FROM product_types pt, photos p
+WHERE pt.title = 'Fruits' AND p.name = 'pomme_jonagold';
+
+INSERT INTO products (id_product_type, name, description, photo_id)
+SELECT pt.id_product_type, 'Chou-fleur cheddar', 'Variété de chou-fleur au goût légèrement fromager, idéal rôti ou en gratin.', p.id_photo
+FROM product_types pt, photos p
+WHERE pt.title = 'Légumes' AND p.name = 'choufleur_cheddar';
 
 -- Créer des lots pour chaque produit
 INSERT INTO batchs (gestionnaire, producteur, produit, photo, date_disponibilite, prix_unitaire, unite_vente, quantite_disponible, statut, date_depot)

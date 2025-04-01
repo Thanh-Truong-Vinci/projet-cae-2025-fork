@@ -117,7 +117,7 @@ const HomePage = () => {
         setCurrentProductIndex(
           (prevIndex) => (prevIndex + 1) % topProducts.length
         )
-      }, 8000) // Transition plus lente (8 secondes au lieu de 4)
+      }, 4000) // Transition plus lente (8 secondes au lieu de 4)
       return () => clearInterval(interval)
     }
   }, [topProducts.length])
