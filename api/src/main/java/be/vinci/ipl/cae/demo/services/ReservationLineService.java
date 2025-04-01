@@ -29,6 +29,21 @@ public class ReservationLineService {
   }
 
   /**
+   * Creates a new reservation line with the specified details.
+   *
+   * @param reservation the reservation to add the line to
+   * @param batch the batch of the product
+   * @param quantity the quantity of the product
+   */
+  public void createReservationLine(Reservation reservation, Batch batch, int quantity) {
+    ReservationLine reservationLine = new ReservationLine();
+    reservationLine.setReservation(reservation);
+    reservationLine.setBatch(batch);
+    reservationLine.setQuantity(quantity);
+    reservationLineRepository.save(reservationLine);
+  }
+
+  /**
    * Adds a product to a reservation with the specified quantity.
    *
    * @param reservation the reservation to add the product to
@@ -56,20 +71,5 @@ public class ReservationLineService {
       batch.setAvailableQuantity(batch.getAvailableQuantity() - batchQuantity);
       batchRepository.save(batch);
     }
-  }
-
-  /**
-   * Creates a new reservation line with the specified details.
-   *
-   * @param reservation the reservation to add the line to
-   * @param batch the batch of the product
-   * @param quantity the quantity of the product
-   */
-  public void createReservationLine(Reservation reservation, Batch batch, int quantity) {
-    ReservationLine reservationLine = new ReservationLine();
-    reservationLine.setReservation(reservation);
-    reservationLine.setBatch(batch);
-    reservationLine.setQuantity(quantity);
-    reservationLineRepository.save(reservationLine);
   }
 }

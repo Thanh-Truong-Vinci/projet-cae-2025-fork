@@ -32,6 +32,51 @@ public class ClientService {
   }
 
   /**
+   * Create a new client.
+   *
+   * @param name the last name
+   * @param firstname the first name
+   * @param email the email
+   * @param password the password
+   * @param civility the civility
+   * @param street the street
+   * @param number the street number
+   * @param postalCode the postal code
+   * @param city the city
+   * @param country the country
+   * @param phoneNumber the phone number (optional)
+   */
+  public void createClient(
+      String name,
+      String firstname,
+      String email,
+      String password,
+      String civility,
+      String street,
+      String number,
+      String postalCode,
+      String city,
+      String country,
+      String phoneNumber) {
+
+    Client client = new Client();
+    client.setName(name);
+    client.setFirstname(firstname);
+    client.setEmail(email);
+    client.setPassword(passwordEncoder.encode(password));
+    client.setCivility(civility);
+    client.setStreet(street);
+    client.setNumber(number);
+    client.setPostalCode(postalCode);
+    client.setCity(city);
+    client.setCountry(country);
+    client.setPhoneNumber(phoneNumber);
+    client.setDateInscription(LocalDate.now());
+
+    clientRepository.save(client);
+  }
+
+  /**
    * Register a new client.
    *
    * @param name the last name
@@ -77,51 +122,6 @@ public class ClientService {
         country,
         phoneNumber);
     return true;
-  }
-
-  /**
-   * Create a new client.
-   *
-   * @param name the last name
-   * @param firstname the first name
-   * @param email the email
-   * @param password the password
-   * @param civility the civility
-   * @param street the street
-   * @param number the street number
-   * @param postalCode the postal code
-   * @param city the city
-   * @param country the country
-   * @param phoneNumber the phone number (optional)
-   */
-  public void createClient(
-      String name,
-      String firstname,
-      String email,
-      String password,
-      String civility,
-      String street,
-      String number,
-      String postalCode,
-      String city,
-      String country,
-      String phoneNumber) {
-
-    Client client = new Client();
-    client.setName(name);
-    client.setFirstname(firstname);
-    client.setEmail(email);
-    client.setPassword(passwordEncoder.encode(password));
-    client.setCivility(civility);
-    client.setStreet(street);
-    client.setNumber(number);
-    client.setPostalCode(postalCode);
-    client.setCity(city);
-    client.setCountry(country);
-    client.setPhoneNumber(phoneNumber);
-    client.setDateInscription(LocalDate.now());
-
-    clientRepository.save(client);
   }
 }
 

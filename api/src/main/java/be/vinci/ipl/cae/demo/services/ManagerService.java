@@ -31,24 +31,6 @@ public class ManagerService {
   }
 
   /**
-   * Register a new manager.
-   *
-   * @param name the last name
-   * @param firstname the first name
-   * @param email the email
-   * @param password the password
-   * @return true if the registration is successful, false otherwise
-   */
-  public boolean register(
-      String name, String firstname, String email, String password, String requesterEmail) {
-    if (userRepository.findByEmail(email) != null) {
-      return false;
-    }
-    createManager(name, firstname, email, password, requesterEmail);
-    return true;
-  }
-
-  /**
    * Create a new Manager.
    *
    * @param name the last name
@@ -68,5 +50,23 @@ public class ManagerService {
     manager.setDateInscription(LocalDate.now());
 
     managerRepository.save(manager);
+  }
+
+  /**
+   * Register a new manager.
+   *
+   * @param name the last name
+   * @param firstname the first name
+   * @param email the email
+   * @param password the password
+   * @return true if the registration is successful, false otherwise
+   */
+  public boolean register(
+      String name, String firstname, String email, String password, String requesterEmail) {
+    if (userRepository.findByEmail(email) != null) {
+      return false;
+    }
+    createManager(name, firstname, email, password, requesterEmail);
+    return true;
   }
 }

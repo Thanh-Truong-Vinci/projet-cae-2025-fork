@@ -37,6 +37,25 @@ public class ReservationService {
   }
 
   /**
+   * Creates a new reservation for a client with the specified product and quantity.
+   *
+   * @param client the client making the reservation
+   * @param product the product to reserve
+   * @param quantity the quantity of the product to reserve
+   * @return the created reservation
+   */
+  public Reservation createReservation(Client client, Product product, int quantity) {
+    Reservation reservation = new Reservation();
+    reservation.setClient(client);
+    reservation.setPrice(0.0);
+    reservation.setStatus("pending");
+    reservation.setReservationDate(LocalDate.now());
+    reservationLineService.addProduct(reservation, product, quantity);
+    reservationRepository.save(reservation);
+    return reservation;
+  }
+
+  /**
    * Reserves a product for a client with the specified quantity.
    *
    * @param client the client making the reservation
@@ -85,24 +104,5 @@ public class ReservationService {
       batchRepository.save(batch);
     }
     reservationRepository.save(reservation);
-  }
-
-  /**
-   * Creates a new reservation for a client with the specified product and quantity.
-   *
-   * @param client the client making the reservation
-   * @param product the product to reserve
-   * @param quantity the quantity of the product to reserve
-   * @return the created reservation
-   */
-  public Reservation createReservation(Client client, Product product, int quantity) {
-    Reservation reservation = new Reservation();
-    reservation.setClient(client);
-    reservation.setPrice(0.0);
-    reservation.setStatus("pending");
-    reservation.setReservationDate(LocalDate.now());
-    reservationLineService.addProduct(reservation, product, quantity);
-    reservationRepository.save(reservation);
-    return reservation;
   }
 }

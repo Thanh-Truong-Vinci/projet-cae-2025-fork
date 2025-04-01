@@ -38,24 +38,6 @@ public class ProductService {
   }
 
   /**
-   * Retrieves a list of products based on search criteria and type.
-   *
-   * @param search the search term for product name or description
-   * @param type the type of product
-   * @return a list of products matching the criteria
-   */
-  public List<Product> getProducts(String search, String type) {
-    return StreamSupport.stream(productRepository.findAll().spliterator(), false)
-        .filter(
-            product ->
-                (search == null
-                        || product.getName().contains(search)
-                        || product.getDescription().contains(search))
-                    && (type == null || product.getType().getTitle().equalsIgnoreCase(type)))
-        .collect(Collectors.toList());
-  }
-
-  /**
    * Creates a new product with the specified details.
    *
    * @param name the name of the product
@@ -73,12 +55,14 @@ public class ProductService {
     product.setPhoto(photo);
   }
 
+
   /**
    * Crée un nouveau produit à partir des informations fournies.
    *
    * @param newProduct les informations du nouveau produit
    * @return le produit créé et sauvegardé
    */
+  // TODO review this methode
   public Product createProduct(NewProduct newProduct) {
     Product product = new Product();
     product.setName(newProduct.getName());
@@ -102,18 +86,38 @@ public class ProductService {
     return productRepository.save(product);
   }
 
+  // TODO addProduct
+
+  /**
+   * Retrieves a list of products based on search criteria and type.
+   *
+   * @param search the search term for product name or description
+   * @param type the type of product
+   * @return a list of products matching the criteria
+   */
+  public List<Product> getProducts(String search, String type) {
+    return StreamSupport.stream(productRepository.findAll().spliterator(), false)
+        .filter(
+            product ->
+                (search == null
+                    || product.getName().contains(search)
+                    || product.getDescription().contains(search))
+                    && (type == null || product.getType().getTitle().equalsIgnoreCase(type)))
+        .collect(Collectors.toList());
+  }
+
   /**
    * Récupère tous les produits avec un ordre optionnel.
    *
    * @param order l'ordre de tri ("desc" pour descendant, null ou autre pour ascendant)
    * @return un itérable de tous les produits dans l'ordre spécifié
    */
-  public Iterable<Product> readAllProducts(String order) {
+  public Iterable<Product> getAllProducts(String order) {
     Iterable<Product> products = productRepository.findAll();
 
     // Si l'ordre est descendant, convertissez l'itérable en liste et inversez-la
     // Corriger cette ligne (inverser l'ordre des comparaisons)
-    if (order != null && "desc".equalsIgnoreCase(order)) {
+    if ("desc".equalsIgnoreCase(order)) {
       List<Product> productList =
           StreamSupport.stream(products.spliterator(), false).collect(Collectors.toList());
       Collections.reverse(productList);
@@ -122,16 +126,6 @@ public class ProductService {
 
     return products;
   }
-
-  /**
-   * Récupère tous les produits avec un ordre optionnel.
-   *
-   * @param id L'id du prodduit choisi
-   * @return un itérable de tous les produits dans l'ordre spécifié
-   */
-public Product showProductDetails(Long id) {
-  return productRepository.findProductById(id);
-}
 
   /**
    * Récupère un produit par son identifiant.
@@ -172,11 +166,7 @@ public Product showProductDetails(Long id) {
       }
 
       if (newProduct.getTypeId() != null) {
-        ProductType productType =
-            productTypeRepository.findById(newProduct.getTypeId()).orElse(null);
-        if (productType != null) {
-          existingProduct.setType(productType);
-        }
+        productTypeRepository.findById(newProduct.getTypeId()).ifPresent(existingProduct::setType);
       }
 
       if (newProduct.getDescription() != null) {

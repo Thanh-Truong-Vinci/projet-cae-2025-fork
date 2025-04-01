@@ -7,6 +7,7 @@ import be.vinci.ipl.cae.demo.models.dtos.CredentialsRegister;
 import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.ClientService;
 import be.vinci.ipl.cae.demo.services.ProfileService;
+import be.vinci.ipl.cae.demo.utils.ValidationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,60 +40,6 @@ public class AuthController {
   }
 
   /**
-   * Validates registration credentials.
-   *
-   * @param credentials the registration credentials to check
-   * @throws ResponseStatusException with specific message if validation fails
-   */
-  private void validateCredentialsRegister(CredentialsRegister credentials) {
-    if (credentials == null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Credentials cannot be null"); 
-    }
-    if (credentials.getName() == null || credentials.getName().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name is required"); 
-    }
-    if (credentials.getFirstname() == null || credentials.getFirstname().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Firstname is required"); 
-    }
-    if (credentials.getStreet() == null || credentials.getStreet().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Street is required"); 
-    }
-    if (credentials.getNumber() == null || credentials.getNumber().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Street number is required"); 
-    }
-    if (credentials.getPostalCode() == null || credentials.getPostalCode().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Postal code is required"); 
-    }
-    if (credentials.getCity() == null || credentials.getCity().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "City is required"); 
-    }
-    if (credentials.getCountry() == null || credentials.getCountry().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Country is required"); 
-    }
-    if (credentials.getPhoneNumber() == null || credentials.getPhoneNumber().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Phone number is required"); 
-    }
-  }
-
-  /**
-   * Validates login credentials.
-   *
-   * @param credentials the login credentials to check
-   * @throws ResponseStatusException with specific message if validation fails
-   */
-  private void validateCredentialsLogin(Credentials credentials) {
-    if (credentials == null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Credentials cannot be null"); 
-    }
-    if (credentials.getEmail() == null || credentials.getEmail().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required"); 
-    }
-    if (credentials.getPassword() == null || credentials.getPassword().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is required"); 
-    }
-  }
-
-  /**
    * Register a new manager.
    *
    * @param credentials the manager credentials from the request body.
@@ -100,7 +47,7 @@ public class AuthController {
    */
   @PostMapping("/register")
   public void register(@RequestBody CredentialsRegister credentials) {
-    validateCredentialsRegister(credentials);
+    ValidationUtils.validateCredentialsRegister(credentials);
     boolean success =
         clientService.register(
             credentials.getName(),
@@ -119,17 +66,6 @@ public class AuthController {
       throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use"); 
     }
   }
-  
-  /**
-   * Sets a new password.
-   *
-   * @param credentials the producer credentials from the request body.
-   */
-  @PostMapping("/changepassword")
-  public void changePassword(@RequestBody CredentialsProfile credentials) {
-    profileService.changePassword(
-        credentials.getEmail(), credentials.getCurrentPassword(), credentials.getNewPassword());
-  }
 
   /**
    * Login a client.
@@ -140,7 +76,7 @@ public class AuthController {
    */
   @PostMapping("/login")
   public AuthenticatedUser login(@RequestBody Credentials credentials) {
-    validateCredentialsLogin(credentials);
+    ValidationUtils.validateCredentialsLogin(credentials);
 
     AuthenticatedUser user = authsService.login(credentials.getEmail(), credentials.getPassword());
 
@@ -172,5 +108,16 @@ public class AuthController {
     }
 
     return authsService.createJwtToken(email);
+  }
+
+  /**
+   * Sets a new password.
+   *
+   * @param credentials the producer credentials from the request body.
+   */
+  @PostMapping("/changepassword")
+  public void changePassword(@RequestBody CredentialsProfile credentials) {
+    profileService.changePassword(
+        credentials.getEmail(), credentials.getCurrentPassword(), credentials.getNewPassword());
   }
 }

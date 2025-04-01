@@ -3,10 +3,17 @@ package be.vinci.ipl.cae.demo.controllers;
 import be.vinci.ipl.cae.demo.models.dtos.NewProduct;
 import be.vinci.ipl.cae.demo.models.entities.Product;
 import be.vinci.ipl.cae.demo.services.ProductService;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
@@ -36,23 +43,9 @@ public class ProductController {
    */
   @GetMapping({"", "/"})
   public Iterable<Product> getProducts(@RequestParam(required = false) String order) {
-    return productService.readAllProducts(order);
+    return productService.getAllProducts(order);
   }
 
-  /**
-   * Get detailed information about a Product.
-   *
-   * @param id the Product id.
-   * @return the Product details.
-   */
-  @GetMapping("/details/{id}")
-  public Product showProductDetails(@PathVariable long id) {
-    Product product = productService.showProductDetails(id);
-    if (product == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
-    }
-    return product;
-  }
 
   /**
    * Get a Product by id.
@@ -85,7 +78,7 @@ public class ProductController {
         || newProduct.getDescription().isBlank()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid product data");
     }
-
+    // TODO call addProduct, not createProduct
     return productService.createProduct(newProduct);
   }
 
@@ -98,6 +91,7 @@ public class ProductController {
   @DeleteMapping("/{id}")
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   public Product deleteProduct(@PathVariable long id) {
+    // TODO verify token if is a manager
     Product product = productService.deleteProduct(id);
     if (product == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
@@ -115,6 +109,7 @@ public class ProductController {
   @PatchMapping("/{id}")
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   public Product updateProduct(@PathVariable long id, @RequestBody NewProduct newProduct) {
+    // TODO verify token if is a manager
     if (newProduct == null
         || (newProduct.getName() != null && newProduct.getName().isBlank())
         || (newProduct.getDescription() != null && newProduct.getDescription().isBlank())) {
@@ -128,3 +123,4 @@ public class ProductController {
     return product;
   }
 }
+

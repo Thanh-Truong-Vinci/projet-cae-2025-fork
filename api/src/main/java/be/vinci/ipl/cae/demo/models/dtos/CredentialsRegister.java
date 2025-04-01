@@ -1,17 +1,16 @@
 package be.vinci.ipl.cae.demo.models.dtos;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /** CredentialsRegister DTO. */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
-public class CredentialsRegister {
-
+public class CredentialsRegister extends Credentials {
   private String name;
   private String firstname;
-  private String email;
-  private String password;
   private String civility;
   private String street;
   private String number;

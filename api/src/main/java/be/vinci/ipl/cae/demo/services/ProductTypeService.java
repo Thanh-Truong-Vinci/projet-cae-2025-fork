@@ -22,6 +22,17 @@ public class ProductTypeService {
   }
 
   /**
+   * Creates a new product type with the specified title.
+   *
+   * @param title the title of the product type
+   */
+  public ProductType createProductType(String title) {
+    ProductType productType = new ProductType();
+    productType.setTitle(title);
+    return productTypeRepository.save(productType);
+  }
+
+  /**
    * Adds a new product type with the specified title.
    *
    * @param title the title of the product type
@@ -46,17 +57,6 @@ public class ProductTypeService {
   }
 
   /**
-   * Creates a new product type with the specified title.
-   *
-   * @param title the title of the product type
-   */
-  public ProductType createProductType(String title) {
-    ProductType productType = new ProductType();
-    productType.setTitle(title);
-    return productTypeRepository.save(productType);
-  }
-
-  /**
    * Retrieves all product types.
    *
    * @return an iterable of all product types
@@ -71,6 +71,7 @@ public class ProductTypeService {
    * @param id the ID of the product type
    * @return the product type with the specified ID, or null if not found
    */
+  // TODO verify if is necessary (maybe we can get this by his title)
   public ProductType getProductTypeById(long id) {
     return productTypeRepository.findById(id).orElse(null);
   }

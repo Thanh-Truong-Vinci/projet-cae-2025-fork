@@ -43,6 +43,39 @@ public class BatchService {
   }
 
   /**
+   * Crée un nouveau lot.
+   *
+   * @param newBatch les données du lot à créer
+   * @return le lot créé
+   */
+  public Batch createBatch(NewBatch newBatch) {
+    Manager manager = managerRepository.findById(newBatch.getManagerId())
+        .orElseThrow(() -> new IllegalArgumentException("Manager non trouvé"));
+
+    Producer producer = producerRepository.findById(newBatch.getProducerId())
+        .orElseThrow(() -> new IllegalArgumentException("Producteur non trouvé"));
+
+    Product product = productRepository.findById(newBatch.getProductId())
+        .orElseThrow(() -> new IllegalArgumentException("Produit non trouvé"));
+
+    Batch batch = new Batch();
+    batch.setManager(manager);
+    batch.setProducer(producer);
+    batch.setProduct(product);
+    batch.setPhoto(newBatch.getPhoto());
+    batch.setAvailabilityDate(newBatch.getAvailabilityDate());
+    batch.setUnitPrice(newBatch.getUnitPrice());
+    batch.setSaleUnit(newBatch.getSaleUnit());
+    batch.setAvailableQuantity(newBatch.getAvailableQuantity());
+    batch.setStatut("en attente");
+    batch.setDepositDate(LocalDate.now());
+
+    return batchRepository.save(batch);
+  }
+
+  // TODO addBatch
+
+  /**
    * Récupère tous les lots.
    *
    * @return la liste de tous les lots
@@ -62,76 +95,6 @@ public class BatchService {
   }
 
   /**
-   * Crée un nouveau lot.
-   *
-   * @param newBatch les données du lot à créer
-   * @return le lot créé
-   */
-  public Batch createBatch(NewBatch newBatch) {
-    Manager manager = managerRepository.findById(newBatch.getManagerId())
-        .orElseThrow(() -> new IllegalArgumentException("Manager non trouvé"));
-        
-    Producer producer = producerRepository.findById(newBatch.getProducerId())
-        .orElseThrow(() -> new IllegalArgumentException("Producteur non trouvé"));
-        
-    Product product = productRepository.findById(newBatch.getProductId())
-        .orElseThrow(() -> new IllegalArgumentException("Produit non trouvé"));
-
-    Batch batch = new Batch();
-    batch.setManager(manager);
-    batch.setProducer(producer);
-    batch.setProduct(product);
-    batch.setPhoto(newBatch.getPhoto());
-    batch.setAvailabilityDate(newBatch.getAvailabilityDate());
-    batch.setUnitPrice(newBatch.getUnitPrice());
-    batch.setSaleUnit(newBatch.getSaleUnit());
-    batch.setAvailableQuantity(newBatch.getAvailableQuantity());
-    batch.setStatut("en attente");
-    batch.setDepositDate(LocalDate.now());
-
-    return batchRepository.save(batch);
-  }
-
-  /**
-   * Met à jour un lot existant.
-   *
-   * @param id l'ID du lot à mettre à jour
-   * @param newBatch les nouvelles données
-   * @return le lot mis à jour ou null si non trouvé
-   */
-  public Batch updateBatch(long id, NewBatch newBatch) {
-    Optional<Batch> optBatch = batchRepository.findById(id);
-    if (!optBatch.isPresent()) {
-      return null;
-    }
-
-    Batch batch = optBatch.get();
-    
-    // Mise à jour des champs si présents dans le DTO
-    if (newBatch.getPhoto() != null) {
-      batch.setPhoto(newBatch.getPhoto());
-    }
-    
-    if (newBatch.getAvailabilityDate() != null) {
-      batch.setAvailabilityDate(newBatch.getAvailabilityDate());
-    }
-    
-    if (newBatch.getUnitPrice() != null) {
-      batch.setUnitPrice(newBatch.getUnitPrice());
-    }
-    
-    if (newBatch.getSaleUnit() != null) {
-      batch.setSaleUnit(newBatch.getSaleUnit());
-    }
-    
-    if (newBatch.getAvailableQuantity() != null) {
-      batch.setAvailableQuantity(newBatch.getAvailableQuantity());
-    }
-
-    return batchRepository.save(batch);
-  }
-
-  /**
    * Accepte un lot.
    *
    * @param id l'ID du lot à accepter
@@ -139,7 +102,8 @@ public class BatchService {
    */
   public Batch acceptBatch(long id) {
     Optional<Batch> optBatch = batchRepository.findById(id);
-    if (!optBatch.isPresent()) {
+    // TODO throw error here
+    if (optBatch.isEmpty()) {
       return null;
     }
 
@@ -158,7 +122,8 @@ public class BatchService {
    */
   public Batch rejectBatch(long id, String message) {
     Optional<Batch> optBatch = batchRepository.findById(id);
-    if (!optBatch.isPresent()) {
+    // TODO throw error here
+    if (optBatch.isEmpty()) {
       return null;
     }
 

@@ -5,12 +5,16 @@ import be.vinci.ipl.cae.demo.models.entities.ProductType;
 import be.vinci.ipl.cae.demo.services.ProductTypeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * Controller pour gérer les opérations sur les types de produits.
- */
+/** Controller pour gérer les opérations sur les types de produits. */
 @RestController
 @RequestMapping("/product-types")
 public class ProductTypeController {
@@ -42,6 +46,7 @@ public class ProductTypeController {
    * @param id l'identifiant du type de produit
    * @return le type de produit correspondant
    */
+  // TODO is realy necessary, we can do it by title
   @GetMapping("/{id}")
   public ProductType getProductTypeById(@PathVariable long id) {
     ProductType productType = productTypeService.getProductTypeById(id);
@@ -60,10 +65,14 @@ public class ProductTypeController {
   @PostMapping({"", "/"})
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   public ProductType createProductType(@RequestBody NewProductType newProductType) {
-    if (newProductType == null || newProductType.getTitle() == null || newProductType.getTitle().isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Données du type de produit invalides");
+    // TODO verify token if is a manager
+    if (newProductType == null
+        || newProductType.getTitle() == null
+        || newProductType.getTitle().isBlank()) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Données du type de produit invalides");
     }
-    
+
     try {
       return productTypeService.createProductType(newProductType.getTitle());
     } catch (IllegalArgumentException e) {
@@ -83,6 +92,7 @@ public class ProductTypeController {
   @DeleteMapping("/{id}")
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   public void deleteProductType(@PathVariable long id) {
+    // TODO verify token if is a manager
     try {
       productTypeService.delete(id);
     } catch (IllegalArgumentException e) {
@@ -94,3 +104,4 @@ public class ProductTypeController {
     }
   }
 }
+
