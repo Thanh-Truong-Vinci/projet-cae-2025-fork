@@ -79,14 +79,14 @@ deploy:
     - |
       for i in {1..30}; do
         HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $BASE_URL/actuator/health);
-        if [ "$HTTP_STATUS" -eq 200]; then
+        if [ "$HTTP_STATUS" -eq 200 ]; then
           echo "Azure Web App is functional."
           break
         fi
         echo "Azure Web App is not ready yet. Waiting for 10 seconds..."
         sleep 10
       done
-      if [ "$HTTP_STATUS" -ne 200]; then
+      if [ "$HTTP_STATUS" -ne 200 ]; then
         echo "Azure Web App failed to become functional."
         exit 1
       fi
@@ -100,7 +100,7 @@ e2e tests:
     - cd ./e2e
     - npm ci
     - npx playwright test
-    - if [ $? -ne 0]; then echo "E2E tests failed"; exit 1; fi
+    - if [ $? -ne 0 ]; then echo "E2E tests failed"; exit 1; fi
   artifacts:
     paths:
       - e2e/playwright-report/
