@@ -51,6 +51,10 @@ test.describe("Login", () => {
     await loginWith(page, formData);
 
     await expect(page).toHaveURL("/")
+
+    await expect(page.getByText("Se déconnecter")).toBeVisible();
+
+    await expect(page.getByText("Terroir & Cie")).toBeVisible();
   });
 
   test("TC2.2: should successfully logout when user clicks on logout button", async ({ page }) => {
