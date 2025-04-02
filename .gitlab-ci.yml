@@ -65,43 +65,42 @@ build:
       docker push $REGISTRY_IMAGE_BASE_PATH/$service:$VERSION;
       done
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop")
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
 
 deploy:
   stage: staging
   image: mcr.microsoft.com/azure-cli
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop")
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
   script:
     - az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
     - az webapp config container set --name $AZURE_WEBAPP_NAME --resource-group $AZURE_WEBAPP_RESOURCE_GROUP --multicontainer-config-type compose --multicontainer-config-file docker-compose.deploy.yml --container-registry-user $PULL_IMAGE_TOKEN_USERNAME --container-registry-password $PULL_IMAGE_TOKEN_PASSWORD
     - az webapp start --name $AZURE_WEBAPP_NAME --resource-group $AZURE_WEBAPP_RESOURCE_GROUP
     - |
       for i in {1..30}; do
-        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $BASE_URL/api/products);
-        if [ "$HTTP_STATUS" -eq 200 ]; then
+        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $BASE_URL/actuator/health);
+        if [ "$HTTP_STATUS" -eq 200]; then
           echo "Azure Web App is functional."
           break
         fi
         echo "Azure Web App is not ready yet. Waiting for 10 seconds..."
         sleep 10
       done
-      if [ "$HTTP_STATUS" -ne 200 ]; then
+      if [ "$HTTP_STATUS" -ne 200]; then
         echo "Azure Web App failed to become functional."
         exit 1
       fi
-  
 
 e2e tests:
   stage: e2e
   image: mcr.microsoft.com/playwright:v1.51.0-jammy
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $CI_DEFAULT_BRANCH || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop")
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
   script:
     - cd ./e2e
     - npm ci
     - npx playwright test
-    - if [ $? -ne 0 ]; then echo "E2E tests failed"; exit 1; fi
+    - if [ $? -ne 0]; then echo "E2E tests failed"; exit 1; fi
   artifacts:
     paths:
       - e2e/playwright-report/
