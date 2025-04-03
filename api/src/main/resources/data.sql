@@ -51,53 +51,53 @@ INSERT INTO photos (name, url) VALUES
 ('choufleur_cheddar', 'https://images.unsplash.com/photo-1568584711075-3d021a7c3ca3');
 
 -- Insérer des produits
-INSERT INTO products (id_product_type, name, description, photo_id, photo)
-SELECT pt.id_product_type, 'Tomates Bio', 'Tomates cultivées sans pesticides, parfaites pour vos salades estivales.', p.id_photo, p.url
+INSERT INTO products (id_product_type, name, description, photo_id)
+SELECT pt.id_product_type, 'Tomates Bio', 'Tomates cultivées sans pesticides, parfaites pour vos salades estivales.', p.id_photo
 FROM product_types pt, photos p
 WHERE pt.title = 'Légumes' AND p.name = 'tomate_bio';
 
-INSERT INTO products (id_product_type, name, description, photo_id, photo)
-SELECT pt.id_product_type, 'Pommes Royal Gala', 'Pommes sucrées et croquantes, idéales comme collation.', p.id_photo, p.url
+INSERT INTO products (id_product_type, name, description, photo_id)
+SELECT pt.id_product_type, 'Pommes Royal Gala', 'Pommes sucrées et croquantes, idéales comme collation.', p.id_photo
 FROM product_types pt, photos p
 WHERE pt.title = 'Fruits' AND p.name = 'pomme_rouge';
 
-INSERT INTO products (id_product_type, name, description, photo_id, photo)
-SELECT pt.id_product_type, 'Pain au levain', 'Pain artisanal à l''ancienne préparé avec du levain naturel.', p.id_photo, p.url
+INSERT INTO products (id_product_type, name, description, photo_id)
+SELECT pt.id_product_type, 'Pain au levain', 'Pain artisanal à l''ancienne préparé avec du levain naturel.', p.id_photo
 FROM product_types pt, photos p
 WHERE pt.title = 'Boulangerie' AND p.name = 'pain_artisanal';
 
-INSERT INTO products (id_product_type, name, description, photo_id, photo)
-SELECT pt.id_product_type, 'Fromage fermier', 'Fromage à pâte dure affiné pendant 6 mois.', p.id_photo, p.url
+INSERT INTO products (id_product_type, name, description, photo_id)
+SELECT pt.id_product_type, 'Fromage fermier', 'Fromage à pâte dure affiné pendant 6 mois.', p.id_photo
 FROM product_types pt, photos p
 WHERE pt.title = 'Produits laitiers' AND p.name = 'fromage';
 
-INSERT INTO products (id_product_type, name, description, photo_id, photo)
-SELECT pt.id_product_type, 'Carottes Bio', 'Carottes fraîches cultivées en agriculture biologique, riches en bêta-carotène.', p.id_photo, p.url
+INSERT INTO products (id_product_type, name, description, photo_id)
+SELECT pt.id_product_type, 'Carottes Bio', 'Carottes fraîches cultivées en agriculture biologique, riches en bêta-carotène.', p.id_photo
 FROM product_types pt, photos p
 WHERE pt.title = 'Légumes' AND p.name = 'carottes';
 
-INSERT INTO products (id_product_type, name, description, photo_id, photo)
-SELECT pt.id_product_type, 'Bière artisanale', 'Bière blonde artisanale brassée localement avec des ingrédients de qualité.', p.id_photo, p.url
+INSERT INTO products (id_product_type, name, description, photo_id)
+SELECT pt.id_product_type, 'Bière artisanale', 'Bière blonde artisanale brassée localement avec des ingrédients de qualité.', p.id_photo
 FROM product_types pt, photos p
 WHERE pt.title = 'Boissons' AND p.name = 'biere';
 
-INSERT INTO products (id_product_type, name, description, photo_id, photo)
-SELECT pt.id_product_type, 'Poulet fermier', 'Poulet élevé en plein air, nourri aux grains et sans antibiotiques.', p.id_photo, p.url
+INSERT INTO products (id_product_type, name, description, photo_id)
+SELECT pt.id_product_type, 'Poulet fermier', 'Poulet élevé en plein air, nourri aux grains et sans antibiotiques.', p.id_photo
 FROM product_types pt, photos p
 WHERE pt.title = 'Viande' AND p.name = 'poulet';
 
-INSERT INTO products (id_product_type, name, description, photo_id, photo)
-SELECT pt.id_product_type, 'Yaourt nature', 'Yaourt onctueux préparé avec du lait frais de vaches locales.', p.id_photo, p.url
+INSERT INTO products (id_product_type, name, description, photo_id)
+SELECT pt.id_product_type, 'Yaourt nature', 'Yaourt onctueux préparé avec du lait frais de vaches locales.', p.id_photo
 FROM product_types pt, photos p
 WHERE pt.title = 'Produits laitiers' AND p.name = 'yaourt';
 
-INSERT INTO products (id_product_type, name, description, photo_id, photo)
-SELECT pt.id_product_type, 'Pomme Jonagold', 'Pommes Jonagold juteuses et légèrement acidulées, parfaites pour la cuisine ou en collation.', p.id_photo, p.url
+INSERT INTO products (id_product_type, name, description, photo_id)
+SELECT pt.id_product_type, 'Pomme Jonagold', 'Pommes Jonagold juteuses et légèrement acidulées, parfaites pour la cuisine ou en collation.', p.id_photo
 FROM product_types pt, photos p
 WHERE pt.title = 'Fruits' AND p.name = 'pomme_jonagold';
 
-INSERT INTO products (id_product_type, name, description, photo_id, photo)
-SELECT pt.id_product_type, 'Chou-fleur cheddar', 'Variété de chou-fleur au goût légèrement fromager, idéal rôti ou en gratin.', p.id_photo, p.url
+INSERT INTO products (id_product_type, name, description, photo_id)
+SELECT pt.id_product_type, 'Chou-fleur cheddar', 'Variété de chou-fleur au goût légèrement fromager, idéal rôti ou en gratin.', p.id_photo
 FROM product_types pt, photos p
 WHERE pt.title = 'Légumes' AND p.name = 'choufleur_cheddar';
 
@@ -112,7 +112,7 @@ SELECT
     3.50,
     'kg',
     50,
-    1,
+    'APPROVED',
     '2025-03-20',
     'Lot de tomates bio fraîchement récoltées, cultivées sans pesticides ni engrais chimiques.'
 FROM products p
@@ -129,7 +129,7 @@ SELECT
     2.75,
     'kg',
     75,
-    1,
+    'APPROVED',
     '2025-03-15',
     'Pommes Royal Gala juteuses et croquantes, idéales pour les desserts ou en collation.'
 FROM products p
@@ -146,7 +146,7 @@ SELECT
     4.20,
     'piece',
     30,
-    1,
+    'APPROVED',
     '2025-03-25',
     'Pain au levain authentique, préparé selon des méthodes traditionnelles avec une fermentation lente.'
 FROM products p
@@ -163,7 +163,7 @@ SELECT
     7.50,
     'piece',
     25,
-    1,
+    'APPROVED',
     '2025-03-18',
     'Fromage fermier à pâte dure, affiné pendant 6 mois pour un goût prononcé et une texture parfaite.'
 FROM products p
@@ -180,7 +180,7 @@ SELECT
     2.80,
     'kg',
     60,
-    1,
+    'APPROVED',
     '2025-03-22',
     'Carottes bio récoltées à la main, parfaites pour vos potages, salades et plats cuisinés.'
 FROM products p
@@ -197,7 +197,7 @@ SELECT
     4.50,
     'bottle',
     45,
-    1,
+    'APPROVED',
     '2025-03-21',
     'Bière artisanale blonde brassée avec des ingrédients locaux selon une recette traditionnelle.'
 FROM products p
@@ -214,7 +214,7 @@ SELECT
     12.90,
     'kg',
     20,
-    1,
+    'APPROVED',
     '2025-03-19',
     'Poulet fermier élevé en liberté, nourri avec des céréales bio et sans antibiotiques.'
 FROM products p
@@ -231,7 +231,7 @@ SELECT
     3.25,
     'pot',
     40,
-    1,
+    'APPROVED',
     '2025-03-16',
     'Yaourt nature crémeux préparé avec du lait entier de vaches nourries à l''herbe.'
 FROM products p

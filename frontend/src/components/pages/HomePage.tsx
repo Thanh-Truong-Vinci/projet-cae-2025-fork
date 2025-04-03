@@ -29,11 +29,9 @@ const HomePage = () => {
     { value: 'fruits', label: 'Fruits' },
     { value: 'legumes', label: 'Légumes' },
     { value: 'viandes', label: 'Viandes' },
-    { value: 'fromages', label: 'Fromages' },
     { value: 'produits_laitiers', label: 'Produits laitiers' },
     { value: 'boissons', label: 'Boissons' },
-    { value: 'epicerie', label: 'Épicerie' },
-    { value: 'conserves', label: 'Conserves' },
+    { value: 'boulangerie', label: 'Boulangerie' },
     { value: 'autres', label: 'Autres' },
   ]
 
