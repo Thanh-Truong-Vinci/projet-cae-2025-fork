@@ -79,7 +79,7 @@ deploy:
     - az webapp start --name $AZURE_WEBAPP_NAME --resource-group $AZURE_WEBAPP_RESOURCE_GROUP
     - |
       for i in {1..30}; do
-        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $BASE_URL/actuator/health);
+        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $BASE_URL/api/products);
         if [ "$HTTP_STATUS" -eq 200 ]; then
           echo "Azure Web App is functional."
           break
