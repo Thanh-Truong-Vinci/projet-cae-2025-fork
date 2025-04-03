@@ -75,7 +75,6 @@ deploy:
   script:
     - az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
     - az webapp stop --name $AZURE_WEBAPP_NAME --resource-group $AZURE_WEBAPP_RESOURCE_GROUP
-    - az webapp config container delete --name $AZURE_WEBAPP_NAME --resource-group $AZURE_WEBAPP_RESOURCE_GROUP
     - az webapp config container set --name $AZURE_WEBAPP_NAME --resource-group $AZURE_WEBAPP_RESOURCE_GROUP --multicontainer-config-type compose --multicontainer-config-file docker-compose.deploy.yml --container-registry-user $PULL_IMAGE_TOKEN_USERNAME --container-registry-password $PULL_IMAGE_TOKEN_PASSWORD
     - az webapp start --name $AZURE_WEBAPP_NAME --resource-group $AZURE_WEBAPP_RESOURCE_GROUP
     - |
