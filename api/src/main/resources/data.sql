@@ -102,7 +102,7 @@ FROM product_types pt, photos p
 WHERE pt.title = 'Légumes' AND p.name = 'choufleur_cheddar';
 
 -- Créer des lots pour chaque produit
-INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit, available_quantity, status, deposit_date, description)
+INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit, available_quantity, status, deposit_date)
 SELECT 
     (SELECT id_user FROM manager LIMIT 1),
     (SELECT id_user FROM producer LIMIT 1),
@@ -113,13 +113,12 @@ SELECT
     'kg',
     50,
     'APPROVED',
-    '2025-03-20',
-    'Lot de tomates bio fraîchement récoltées, cultivées sans pesticides ni engrais chimiques.'
+    '2025-03-20'
 FROM products p
 JOIN photos ph ON p.photo_id = ph.id_photo
 WHERE p.name = 'Tomates Bio';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit, available_quantity, status, deposit_date, description)
+INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit, available_quantity, status, deposit_date)
 SELECT 
     (SELECT id_user FROM manager LIMIT 1),
     (SELECT id_user FROM producer LIMIT 1),
@@ -130,13 +129,12 @@ SELECT
     'kg',
     75,
     'APPROVED',
-    '2025-03-15',
-    'Pommes Royal Gala juteuses et croquantes, idéales pour les desserts ou en collation.'
+    '2025-03-15'
 FROM products p
 JOIN photos ph ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pommes Royal Gala';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit, available_quantity, status, deposit_date, description)
+INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit, available_quantity, status, deposit_date)
 SELECT 
     (SELECT id_user FROM manager LIMIT 1),
     (SELECT id_user FROM producer LIMIT 1),
@@ -147,13 +145,12 @@ SELECT
     'piece',
     30,
     'APPROVED',
-    '2025-03-25',
-    'Pain au levain authentique, préparé selon des méthodes traditionnelles avec une fermentation lente.'
+    '2025-03-25'
 FROM products p
 JOIN photos ph ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pain au levain';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit, available_quantity, status, deposit_date, description)
+INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit, available_quantity, status, deposit_date)
 SELECT 
     (SELECT id_user FROM manager LIMIT 1),
     (SELECT id_user FROM producer LIMIT 1),
@@ -164,13 +161,12 @@ SELECT
     'piece',
     25,
     'APPROVED',
-    '2025-03-18',
-    'Fromage fermier à pâte dure, affiné pendant 6 mois pour un goût prononcé et une texture parfaite.'
+    '2025-03-18'
 FROM products p
 JOIN photos ph ON p.photo_id = ph.id_photo
 WHERE p.name = 'Fromage fermier';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit, available_quantity, status, deposit_date, description)
+INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit, available_quantity, status, deposit_date)
 SELECT 
     (SELECT id_user FROM manager LIMIT 1),
     (SELECT id_user FROM producer LIMIT 1),
@@ -181,13 +177,12 @@ SELECT
     'kg',
     60,
     'APPROVED',
-    '2025-03-22',
-    'Carottes bio récoltées à la main, parfaites pour vos potages, salades et plats cuisinés.'
+    '2025-03-22'
 FROM products p
 JOIN photos ph ON p.photo_id = ph.id_photo
 WHERE p.name = 'Carottes Bio';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit, available_quantity, status, deposit_date, description)
+INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit, available_quantity, status, deposit_date)
 SELECT 
     (SELECT id_user FROM manager LIMIT 1),
     (SELECT id_user FROM producer LIMIT 1),
@@ -198,13 +193,12 @@ SELECT
     'bottle',
     45,
     'APPROVED',
-    '2025-03-21',
-    'Bière artisanale blonde brassée avec des ingrédients locaux selon une recette traditionnelle.'
+    '2025-03-21'
 FROM products p
 JOIN photos ph ON p.photo_id = ph.id_photo
 WHERE p.name = 'Bière artisanale';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit, available_quantity, status, deposit_date, description)
+INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit, available_quantity, status, deposit_date)
 SELECT 
     (SELECT id_user FROM manager LIMIT 1),
     (SELECT id_user FROM producer LIMIT 1),
@@ -215,13 +209,12 @@ SELECT
     'kg',
     20,
     'APPROVED',
-    '2025-03-19',
-    'Poulet fermier élevé en liberté, nourri avec des céréales bio et sans antibiotiques.'
+    '2025-03-19'
 FROM products p
 JOIN photos ph ON p.photo_id = ph.id_photo
 WHERE p.name = 'Poulet fermier';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit, available_quantity, status, deposit_date, description)
+INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit, available_quantity, status, deposit_date)
 SELECT 
     (SELECT id_user FROM manager LIMIT 1),
     (SELECT id_user FROM producer LIMIT 1),
@@ -232,8 +225,7 @@ SELECT
     'pot',
     40,
     'APPROVED',
-    '2025-03-16',
-    'Yaourt nature crémeux préparé avec du lait entier de vaches nourries à l''herbe.'
+    '2025-03-16'
 FROM products p
 JOIN photos ph ON p.photo_id = ph.id_photo
 WHERE p.name = 'Yaourt nature';
