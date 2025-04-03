@@ -18,6 +18,16 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
     entrypoint: ["java", "-jar", "app.jar", "--spring.profiles.active=staging"]
 
+  db:
+    image: postgres:latest
+    container_name: db-test
+    environment:
+      POSTGRES_DB: cae_db
+      POSTGRES_USER: cae_user
+      POSTGRES_PASSWORD: cae
+    ports:
+      - "5432:5432"
+      
   reverse-proxy:
     image: registry.gitlab.com/e-vinci/cae-projects/2025-cae-projects/cae-group-09/reverse-proxy-prod:latest # Remplacer par l'image Docker de votre reverse proxy
     container_name: reverse-proxy-prod
