@@ -24,6 +24,5 @@ public class Photo {
   @Column(name = "product_name", nullable = false)
   private String productName;
 
-  @Column
-  private String imageLocation;
+  @Column private String imageLocation;
 }

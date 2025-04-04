@@ -55,11 +55,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       String email = authsService.verifyJwtToken(token);
       if (email != null) {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        
+
         // Use the same role determination logic
         String role = authsService.determineUserRole(email);
         authorities.add(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase(Locale.ROOT)));
-        
+
         // Create authentication with appropriate authorities
         UsernamePasswordAuthenticationToken authentication =
             new UsernamePasswordAuthenticationToken(email, null, authorities);

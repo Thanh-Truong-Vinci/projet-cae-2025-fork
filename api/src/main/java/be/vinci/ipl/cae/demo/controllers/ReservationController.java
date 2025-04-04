@@ -15,9 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * Controller for handling reservation-related operations.
- */
+/** Controller for handling reservation-related operations. */
 @RestController
 @RequestMapping("/reservation")
 public class ReservationController {

@@ -55,7 +55,6 @@ public class ProductService {
     product.setPhoto(photo);
   }
 
-
   /**
    * Crée un nouveau produit à partir des informations fournies.
    *
@@ -100,8 +99,8 @@ public class ProductService {
         .filter(
             product ->
                 (search == null
-                    || product.getName().contains(search)
-                    || product.getDescription().contains(search))
+                        || product.getName().contains(search)
+                        || product.getDescription().contains(search))
                     && (type == null || product.getType().getTitle().equalsIgnoreCase(type)))
         .collect(Collectors.toList());
   }

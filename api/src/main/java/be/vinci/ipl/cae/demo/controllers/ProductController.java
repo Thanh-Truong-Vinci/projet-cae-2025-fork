@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * ProductController to handle Product requests.
- */
+/** ProductController to handle Product requests. */
 @RestController
 @RequestMapping("/products")
 public class ProductController {
@@ -34,7 +32,6 @@ public class ProductController {
     this.productService = productService;
   }
 
-
   /**
    * Get all Products.
    *
@@ -45,7 +42,6 @@ public class ProductController {
   public Iterable<Product> getProducts(@RequestParam(required = false) String order) {
     return productService.getAllProducts(order);
   }
-
 
   /**
    * Get a Product by id.
@@ -102,7 +98,7 @@ public class ProductController {
   /**
    * Update a Product.
    *
-   * @param id         the Product id.
+   * @param id the Product id.
    * @param newProduct the new Product data.
    * @return the updated Product.
    */
@@ -123,4 +119,3 @@ public class ProductController {
     return product;
   }
 }
-

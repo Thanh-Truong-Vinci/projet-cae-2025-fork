@@ -31,9 +31,7 @@ public class AuthController {
    * @param authsService the injected AuthsService.
    */
   public AuthController(
-      ProfileService profileService,
-      ClientService clientService,
-      AuthsService authsService) {
+      ProfileService profileService, ClientService clientService, AuthsService authsService) {
     this.profileService = profileService;
     this.clientService = clientService;
     this.authsService = authsService;

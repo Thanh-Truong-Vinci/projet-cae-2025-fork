@@ -15,9 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * Controller pour gérer les opérations sur les lots.
- */
+/** Controller pour gérer les opérations sur les lots. */
 @RestController
 @RequestMapping("/batches")
 public class BatchController {
@@ -115,4 +113,3 @@ public class BatchController {
     return batch;
   }
 }
-

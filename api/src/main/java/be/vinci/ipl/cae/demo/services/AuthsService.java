@@ -25,45 +25,6 @@ public class AuthsService {
   private static final String JWT_SECRET = "JWT_SECRET";
   private static final long LIFETIME_JWT = 24 * 60 * 60 * 1000; // 24 hours
   private static final Algorithm algorithm = Algorithm.HMAC256(JWT_SECRET);
-
-  /**
-   * Enum representing user roles in the system.
-   */
-  public enum Role {
-    CLIENT("Client"),
-    MANAGER("Manager"),
-    PRODUCER("Producer"),
-    VOLUNTEER("Volunteer"),
-    ADMIN("Admin"),
-    UNKNOWN("Unknown");
-
-    private final String displayName;
-
-    Role(String displayName) {
-      this.displayName = displayName;
-    }
-    
-    public String getDisplayName() {
-      return displayName;
-    }
-    
-    public String getAuthority() {
-      return "ROLE_" + name();
-    }
-  }
-  
-  /**
-   * Security constants for PreAuthorize expressions
-   */
-  public static final class SecurityConstants {
-    private SecurityConstants() {}
-    public static final String HAS_ROLE_CLIENT = "hasRole('ROLE_CLIENT')";
-    public static final String HAS_ROLE_MANAGER = "hasRole('ROLE_MANAGER')";
-    public static final String HAS_ROLE_PRODUCER = "hasRole('ROLE_PRODUCER')";
-    public static final String HAS_ROLE_VOLUNTEER = "hasRole('ROLE_VOLUNTEER')";
-    public static final String HAS_ROLE_ADMIN = "hasRole('ROLE_ADMIN')";
-  }
-
   private final UserRepository userRepository;
   private final ClientRepository clientRepository;
   private final ManagerRepository managerRepository;
@@ -185,12 +146,12 @@ public class AuthsService {
   public String determineUserRole(String email) {
     return determineUserRoleEnum(email).getDisplayName();
   }
-  
+
   /**
    * Determine the role of a user based on their email.
    *
    * @param email the user's email
-   * @return the role as an enum
+   * @return the role as an enum.
    */
   public Role determineUserRoleEnum(String email) {
     if ("volunteer@example.com".equals(email)) {
@@ -234,4 +195,44 @@ public class AuthsService {
 
     return authenticatedUser;
   }
+  
+  /**
+   * Enum representing user roles in the system.
+   */
+  public enum Role {
+    CLIENT("Client"),
+    MANAGER("Manager"),
+    PRODUCER("Producer"),
+    VOLUNTEER("Volunteer"),
+    ADMIN("Admin"),
+    UNKNOWN("Unknown");
+
+    private final String displayName;
+
+    Role(String displayName) {
+      this.displayName = displayName;
+    }
+
+    public String getDisplayName() {
+      return displayName;
+    }
+
+    public String getAuthority() {
+      return "ROLE_" + name();
+    }
+  }
+
+  /**
+   * Security constants for PreAuthorize expressions.
+   */
+  public static final class SecurityConstants {
+    public static final String HAS_ROLE_CLIENT = "hasRole('ROLE_CLIENT')";
+    public static final String HAS_ROLE_MANAGER = "hasRole('ROLE_MANAGER')";
+    public static final String HAS_ROLE_PRODUCER = "hasRole('ROLE_PRODUCER')";
+    public static final String HAS_ROLE_VOLUNTEER = "hasRole('ROLE_VOLUNTEER')";
+    public static final String HAS_ROLE_ADMIN = "hasRole('ROLE_ADMIN')";
+
+    private SecurityConstants() {}
+  }
 }
+

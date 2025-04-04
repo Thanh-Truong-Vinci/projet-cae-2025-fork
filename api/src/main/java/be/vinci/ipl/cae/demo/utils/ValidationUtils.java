@@ -20,11 +20,9 @@ public final class ValidationUtils {
     }
 
     // Handle different credential types appropriately
-    if (credentials instanceof CredentialsRegister) {
-      CredentialsRegister register = (CredentialsRegister) credentials;
+    if (credentials instanceof CredentialsRegister register) {
       validateAddressFields(register);
-    } else if (credentials instanceof CredentialsProducer) {
-      CredentialsProducer producer = (CredentialsProducer) credentials;
+    } else if (credentials instanceof CredentialsProducer producer) {
       validateAddressFields(producer);
     }
   }
@@ -39,16 +37,14 @@ public final class ValidationUtils {
     String phoneNumber = null;
 
     // Get values based on the actual type
-    if (credentials instanceof CredentialsRegister) {
-      CredentialsRegister register = (CredentialsRegister) credentials;
+    if (credentials instanceof CredentialsRegister register) {
       street = register.getStreet();
       number = register.getNumber();
       postalCode = register.getPostalCode();
       city = register.getCity();
       country = register.getCountry();
       phoneNumber = register.getPhoneNumber();
-    } else if (credentials instanceof CredentialsProducer) {
-      CredentialsProducer producer = (CredentialsProducer) credentials;
+    } else if (credentials instanceof CredentialsProducer producer) {
       street = producer.getStreet();
       number = producer.getNumber();
       postalCode = producer.getPostalCode();
@@ -82,16 +78,13 @@ public final class ValidationUtils {
     String name = null;
     String firstname = null;
 
-    if (credentials instanceof CredentialsRegister) {
-      CredentialsRegister register = (CredentialsRegister) credentials;
+    if (credentials instanceof CredentialsRegister register) {
       name = register.getName();
       firstname = register.getFirstname();
-    } else if (credentials instanceof CredentialsManager) {
-      CredentialsManager manager = (CredentialsManager) credentials;
+    } else if (credentials instanceof CredentialsManager manager) {
       name = manager.getName();
       firstname = manager.getFirstname();
-    } else if (credentials instanceof CredentialsProducer) {
-      CredentialsProducer producer = (CredentialsProducer) credentials;
+    } else if (credentials instanceof CredentialsProducer producer) {
       name = producer.getName();
       firstname = producer.getFirstname();
     }
