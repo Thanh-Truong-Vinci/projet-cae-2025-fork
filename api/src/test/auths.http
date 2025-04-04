@@ -188,3 +188,24 @@ GET {{baseUrl}}/products/details/1
 
 ### Get all products in descending order
 GET {{baseUrl}}/products/?order=desc
+
+#### Create a pizza with the admin token and an image
+#### Create a photo with the admin token
+POST {{baseUrl}}/photo
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="product"
+Content-Type: application/json
+
+{
+  "product":"Magic Green"
+}
+--boundary
+Content-Disposition: form-data; name="image"; filename="unavailable-photographer-WY6OwvMJEn8-unsplash.png"
+Content-Type: image/jpg
+
+// The 'pizza.png' file will be uploaded
+< ./unavailable-photographer-WY6OwvMJEn8-unsplash.jpg
+
+--boundary--
