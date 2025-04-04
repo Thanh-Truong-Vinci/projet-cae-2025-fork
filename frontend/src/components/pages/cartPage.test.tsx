@@ -224,7 +224,9 @@ describe('CartPage', () => {
     // Dialog should appear
     expect(screen.getByText('Choisissez une date de retrait')).toBeTruthy()
     // Utiliser le bon libellé mis à jour dans le composant
-    expect(screen.getByLabelText('Date de retrait (mardi ou jeudi)')).toBeTruthy()
+    expect(
+      screen.getByLabelText('Date de retrait (mardi ou jeudi)')
+    ).toBeTruthy()
   })
 
   test('validates selected date in calendar', () => {
@@ -249,7 +251,11 @@ describe('CartPage', () => {
     expect(confirmButton.hasAttribute('disabled')).toBe(true)
 
     // Should show error message - le message a changé dans le composant
-    expect(screen.getByText('Veuillez choisir un mardi ou un jeudi après la date d\'aujourd\'hui.')).toBeTruthy()
+    expect(
+      screen.getByText(
+        "Veuillez choisir un mardi ou un jeudi après la date d'aujourd'hui."
+      )
+    ).toBeTruthy()
 
     // Set a valid future date (mardi ou jeudi)
     const futureDate = new Date()

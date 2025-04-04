@@ -126,7 +126,7 @@ const CartPage = () => {
     setIsDateValid(isAfterTomorrow && isTuesdayThursday)
 
     if (!isTuesdayThursday) {
-      setMessage("Veuillez sélectionner un mardi ou un jeudi uniquement")
+      setMessage('Veuillez sélectionner un mardi ou un jeudi uniquement')
       setOpenSnackbar(true)
     }
   }
@@ -435,8 +435,8 @@ const CartPage = () => {
             <DialogTitle>Choisissez une date de retrait</DialogTitle>
             <DialogContent>
               <DialogContentText>
-                Sélectionnez une date pour venir chercher votre commande. Les retraits sont 
-                disponibles uniquement les mardis et jeudis.
+                Sélectionnez une date pour venir chercher votre commande. Les
+                retraits sont disponibles uniquement les mardis et jeudis.
               </DialogContentText>
               <Box
                 sx={{
@@ -467,7 +467,8 @@ const CartPage = () => {
                   />
                   {!isDateValid && selectedDate !== '' && (
                     <FormHelperText>
-                      Veuillez choisir un mardi ou un jeudi après la date d'aujourd'hui.
+                      Veuillez choisir un mardi ou un jeudi après la date
+                      d'aujourd'hui.
                     </FormHelperText>
                   )}
                 </FormControl>
@@ -479,7 +480,7 @@ const CartPage = () => {
                       weekday: 'long',
                       year: 'numeric',
                       month: 'long',
-                      day: 'numeric'
+                      day: 'numeric',
                     })}
                   </Typography>
                 )}
