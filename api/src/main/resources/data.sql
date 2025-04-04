@@ -56,7 +56,7 @@ VALUES ('Légumes'),
        ('Autres');
 
 -- Insérer quelques photos
-INSERT INTO photos (name, url)
+INSERT INTO photos (product_name, url)
 VALUES ('tomate_bio', 'https://images.unsplash.com/photo-1607305387299-a3d9611cd469'),
        ('pomme_rouge', 'https://images.unsplash.com/photo-1570913149827-d2ac84ab3f9a'),
        ('pain_artisanal', 'https://images.unsplash.com/photo-1549931319-a545dcf3bc73'),
@@ -77,14 +77,14 @@ SELECT pt.id_product_type,
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Légumes'
-  AND p.name = 'tomate_bio';
+  AND p.product_name = 'tomate_bio';
 
 INSERT INTO products (id_product_type, name, description, photo_id)
 SELECT pt.id_product_type, 'Pommes Royal Gala', 'Pommes sucrées et croquantes, idéales comme collation.', p.id_photo
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Fruits'
-  AND p.name = 'pomme_rouge';
+  AND p.product_name = 'pomme_rouge';
 
 INSERT INTO products (id_product_type, name, description, photo_id)
 SELECT pt.id_product_type,
@@ -94,7 +94,7 @@ SELECT pt.id_product_type,
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Boulangerie'
-  AND p.name = 'pain_artisanal';
+  AND p.product_name = 'pain_artisanal';
 
 INSERT INTO products (id_product_type, name, description, photo_id)
 SELECT pt.id_product_type, 'Fromage fermier', 'Fromage à pâte dure affiné pendant 6 mois.', p.id_photo
@@ -111,7 +111,7 @@ SELECT pt.id_product_type,
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Légumes'
-  AND p.name = 'carottes';
+  AND p.product_name = 'carottes';
 
 INSERT INTO products (id_product_type, name, description, photo_id)
 SELECT pt.id_product_type,
@@ -121,7 +121,7 @@ SELECT pt.id_product_type,
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Boissons'
-  AND p.name = 'biere';
+  AND p.product_name = 'biere';
 
 INSERT INTO products (id_product_type, name, description, photo_id)
 SELECT pt.id_product_type,
@@ -131,7 +131,7 @@ SELECT pt.id_product_type,
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Viande'
-  AND p.name = 'poulet';
+  AND p.product_name = 'poulet';
 
 INSERT INTO products (id_product_type, name, description, photo_id)
 SELECT pt.id_product_type,
@@ -141,7 +141,7 @@ SELECT pt.id_product_type,
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Produits laitiers'
-  AND p.name = 'yaourt';
+  AND p.product_name = 'yaourt';
 
 INSERT INTO products (id_product_type, name, description, photo_id)
 SELECT pt.id_product_type,
@@ -151,7 +151,7 @@ SELECT pt.id_product_type,
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Fruits'
-  AND p.name = 'pomme_jonagold';
+  AND p.product_name = 'pomme_jonagold';
 
 INSERT INTO products (id_product_type, name, description, photo_id)
 SELECT pt.id_product_type,
@@ -161,7 +161,7 @@ SELECT pt.id_product_type,
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Légumes'
-  AND p.name = 'choufleur_cheddar';
+  AND p.product_name = 'choufleur_cheddar';
 
 -- Créer des lots pour chaque produit
 INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
