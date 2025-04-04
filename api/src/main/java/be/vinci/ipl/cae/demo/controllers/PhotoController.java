@@ -34,7 +34,7 @@ public class PhotoController {
     if (product == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
-     return photoService.ceartePhoto(product, image);
+     return photoService.createPhoto(product, image);
   }
 }
 
