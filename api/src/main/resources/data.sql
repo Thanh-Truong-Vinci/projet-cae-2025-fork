@@ -11,6 +11,8 @@ TRUNCATE TABLE reservation_lines CASCADE;
 TRUNCATE TABLE user_with_address CASCADE;
 TRUNCATE TABLE users CASCADE;
 
+ALTER TABLE photos DROP COLUMN name;
+
 -- Insérer un administrateur
 INSERT INTO users (name, firstname, email, password, date_inscription)
 VALUES ('Admin', 'Admin', 'admin@example.com', '$2a$10$Gx8Kku6mS5PdMgiSne0neumKPPZWr28huUKo/joIs.79deMbi4M4i',
@@ -101,7 +103,7 @@ SELECT pt.id_product_type, 'Fromage fermier', 'Fromage à pâte dure affiné pen
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Produits laitiers'
-  AND p.name = 'fromage';
+  AND p.product_name = 'fromage';
 
 INSERT INTO products (id_product_type, name, description, photo_id)
 SELECT pt.id_product_type,
