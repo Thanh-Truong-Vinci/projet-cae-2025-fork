@@ -14,7 +14,7 @@ Content-Type: application/json
 ### Register a new manager
 POST {{baseUrl}}/manager/registermanager
 Content-Type: application/json
-Authorization: {{adminToken}}
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhdXRoMCIsImVtYWlsIjoicHJvZHVjZXItdGVzdEBleGFtcGxlLmNvbSIsImlhdCI6MTc0Mzc3MzE1NSwiZXhwIjoxNzQzODU5NTU1fQ.bNpQxZUM5vX1Gorugu6rqJlGDzv2it6YDujfE4ZOvbg
 
 {
   "name": "Manager",
@@ -26,13 +26,13 @@ Authorization: {{adminToken}}
 ### Create a Producer
 POST {{baseUrl}}/manager/registerproducer
 Content-Type: application/json
-Authorization: {{adminToken}}
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhdXRoMCIsImVtYWlsIjoicHJvZHVjZXItdGVzdEBleGFtcGxlLmNvbSIsImlhdCI6MTc0Mzc3MjkwNywiZXhwIjoxNzQzODU5MzA3fQ.CxgFQnys-YPZIGp2Pop_U43RgP1V4DsQQbkEJ9JmhbY
 
 {
   "name": "Producer",
   "firstname": "IDK",
   "company": "ALEDink",
-  "email": "producer-test@example.com",
+  "email": "producer-testT5@example.com",
   "password": "prod",
   "street": "LaRue",
   "number": "1234",
@@ -43,10 +43,19 @@ Authorization: {{adminToken}}
   "phoneNumber": "+324794586718"
 }
 
+### Login producer
+POST {{baseUrl}}/auths/login
+Content-Type: application/json
+
+{
+  "email": "producer-test@example.com",
+  "password": "prod"
+}
+
 ### Create new product type
 POST {{baseUrl}}/manager/addproducttype
 Content-Type: application/json
-Authorization: {{adminToken}}
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhdXRoMCIsImVtYWlsIjoiYWRtaW5AZXhhbXBsZS5jb20iLCJpYXQiOjE3NDM3NzA0MTAsImV4cCI6MTc0Mzg1NjgxMH0.gG0Uf8uJtmKSz2l5EERxkc1-7vWPHRdQrh6BU97ZA7I
 
 {
   "newType": "test product type"

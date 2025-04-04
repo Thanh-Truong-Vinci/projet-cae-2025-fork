@@ -163,4 +163,18 @@ public final class ValidationUtils {
     }
     validateEmailAndPassword(credentials);
   }
+
+  /**
+   * Checks if an operation was successful and throws an appropriate exception if not.
+   *
+   * @param success the result of the operation
+   * @param status the HTTP status to use if unsuccessful
+   * @param message the error message to include
+   * @throws ResponseStatusException if the operation was not successful
+   */
+  public static void ensureSuccess(boolean success, HttpStatus status, String message) {
+    if (!success) {
+      throw new ResponseStatusException(status, message);
+    }
+  }
 }

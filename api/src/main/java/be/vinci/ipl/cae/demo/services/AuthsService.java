@@ -139,6 +139,28 @@ public class AuthsService {
   }
 
   /**
+   * Determine the role of a user based on their email.
+   *
+   * @param email the user's email
+   * @return the role as a string
+   */
+  public String determineUserRole(String email) {
+    if ("volunteer@example.com".equals(email)) {
+      return "Volunteer";
+    } else if (clientRepository.findByEmail(email) != null) {
+      return "Client";
+    } else if (managerRepository.findByEmail(email) != null) {
+      return "Manager";
+    } else if (producerRepository.findByEmail(email) != null) {
+      return "Producer";
+    } else if ("admin@admin.com".equals(email)) {
+      return "Admin";
+    } else {
+      return "Unknown";
+    }
+  }
+
+  /**
    * Login a client.
    *
    * @param email the email
@@ -162,17 +184,7 @@ public class AuthsService {
     authenticatedUser.setFirstname(user.getFirstname());
     authenticatedUser.setToken(createJwtToken(email));
 
-    if ("volunteer@example.com".equals(email)) {
-      authenticatedUser.setRole("Volunteer");
-    } else if (clientRepository.findByEmail(email) != null) {
-      authenticatedUser.setRole("Client");
-    } else if (managerRepository.findByEmail(email) != null) {
-      authenticatedUser.setRole("Manager");
-    } else if (producerRepository.findByEmail(email) != null) {
-      authenticatedUser.setRole("Producer");
-    } else {
-      authenticatedUser.setRole("Unknown");
-    }
+    authenticatedUser.setRole(determineUserRole(email));
 
     return authenticatedUser;
   }

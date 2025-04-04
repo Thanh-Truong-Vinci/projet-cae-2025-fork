@@ -5,7 +5,10 @@ import be.vinci.ipl.cae.demo.models.dtos.CredentialsProducer;
 import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.ManagerService;
 import be.vinci.ipl.cae.demo.services.ProducerService;
+import be.vinci.ipl.cae.demo.utils.ValidationUtils;
+
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -47,39 +50,30 @@ public class ManagerController {
    * @throws ResponseStatusException if the credentials are invalid or the email is already in use.
    */
   @PostMapping("/registermanager")
+  @PreAuthorize("hasRole('ROLE_MANAGER')")
   public void register(
       @RequestBody CredentialsManager credentials, @RequestHeader("Authorization") String token) {
-    if (authsService.isValidManagerToken(token) == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token not valide or expired"); 
-    }
-
     boolean success =
         managerService.register(
             credentials.getName(),
             credentials.getFirstname(),
             credentials.getEmail(),
             credentials.getPassword(),
-            authsService.verifyJwtToken(token)); // email
-    if (!success) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use"); 
-    }
-  }
+            authsService.verifyJwtToken(token));
+            ValidationUtils.ensureSuccess(success, HttpStatus.CONFLICT, "Email is already in use");  }
 
   /**
    * Register a new producer.
    *
    * @param credentials the producer credentials from the request body.
    * @param token the authorization token from the request header.
-   * @throws ResponseStatusException if the token is invalid or expired.
+   * @throws ResponseStatusException if the token is invalid or expired, or if email already exists.
    */
   @PostMapping("/registerproducer")
+  @PreAuthorize("hasRole('ROLE_MANAGER')")
   public void registerProducer(@RequestBody CredentialsProducer credentials,
                                @RequestHeader("Authorization") String token) {
-    if (authsService.isValidManagerToken(token) == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token not valide or expired"); 
-    }
-
-    producerService.registerProducer(
+    boolean success = producerService.registerProducer(
         credentials.getName(),
         credentials.getFirstname(),
         credentials.getCompany(),
@@ -92,5 +86,6 @@ public class ManagerController {
         credentials.getCity(),
         credentials.getCountry(),
         credentials.getPhoneNumber());
+        ValidationUtils.ensureSuccess(success, HttpStatus.CONFLICT, "Email is already in use");
   }
 }
