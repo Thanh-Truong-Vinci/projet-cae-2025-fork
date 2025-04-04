@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, test, expect, vi, beforeEach } from 'vitest'
-import CartPage from '../../components/pages/CartPage'
+import CartPage from './CartPage'
 import { CartContext } from '../../contexts/CartContext'
 import { UserContext } from '../../contexts/UserContext'
 import { CartItem } from '../../types' // Import the CartItem type

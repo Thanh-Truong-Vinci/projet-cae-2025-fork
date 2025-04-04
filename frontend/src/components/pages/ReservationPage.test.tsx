@@ -200,8 +200,8 @@ describe('ReservationsPage', () => {
     const accordions = screen.getAllByTestId('mock-accordion')
     expect(accordions).toHaveLength(2)
 
-    // First reservation title should be visible - utilisons getAllByText au lieu de getByText
-    const reservationDates = screen.getAllByText(/Réservation du/i)
+    // First reservation title should be visible - mise à jour du texte recherché
+    const reservationDates = screen.getAllByText(/Retrait prévu le/i)
     expect(reservationDates.length).toBeGreaterThan(0)
 
     // Check for the status chips

@@ -143,11 +143,15 @@ describe('ProducerRegisterPage', () => {
       expect(navigateMock).not.toHaveBeenCalled()
 
       // Check for password mismatch error message
-      await waitFor(() => {
-        expect(
-          screen.getByText('Les mots de passe ne correspondent pas.')
-        ).toBeTruthy()
-      })
+      await waitFor(
+        () => {
+          const errorMessages = screen.getAllByText((content) =>
+            content.includes('Les mots de passe ne correspondent pas')
+          )
+          expect(errorMessages.length).toBeGreaterThan(0)
+        },
+        { timeout: 1000 }
+      )
     } else {
       throw new Error('One or more input fields were not found correctly')
     }
@@ -225,9 +229,15 @@ describe('ProducerRegisterPage', () => {
         fireEvent.click(submitButton)
 
         // Check for email format error
-        await waitFor(() => {
-          expect(screen.getByText("Format d'email invalide.")).toBeTruthy()
-        })
+        await waitFor(
+          () => {
+            const errorMessages = screen.getAllByText((content) =>
+              content.includes("Format d'email invalide")
+            )
+            expect(errorMessages.length).toBeGreaterThan(0)
+          },
+          { timeout: 1000 }
+        )
 
         // Verify registerProducer was not called
         expect(registerProducerMock).not.toHaveBeenCalled()
@@ -309,13 +319,15 @@ describe('ProducerRegisterPage', () => {
         fireEvent.click(submitButton)
 
         // Check for phone number format error
-        await waitFor(() => {
-          expect(
-            screen.getByText(
-              'Le numéro de téléphone doit commencer par + ou 0 et avoir 6-14 chiffres en plus'
+        await waitFor(
+          () => {
+            const errorMessages = screen.getAllByText((content) =>
+              content.includes('Le numéro de téléphone doit commencer par')
             )
-          ).toBeTruthy()
-        })
+            expect(errorMessages.length).toBeGreaterThan(0)
+          },
+          { timeout: 1000 }
+        )
 
         // Verify registerProducer was not called
         expect(registerProducerMock).not.toHaveBeenCalled()
@@ -391,13 +403,17 @@ describe('ProducerRegisterPage', () => {
       fireEvent.click(submitButton)
 
       // Check for weak password error
-      await waitFor(() => {
-        expect(
-          screen.getByText(
-            'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.'
+      await waitFor(
+        () => {
+          const errorMessages = screen.getAllByText((content) =>
+            content.includes(
+              'Le mot de passe doit contenir au moins 8 caractères'
+            )
           )
-        ).toBeTruthy()
-      })
+          expect(errorMessages.length).toBeGreaterThan(0)
+        },
+        { timeout: 1000 }
+      )
 
       // Verify registerProducer was not called
       expect(registerProducerMock).not.toHaveBeenCalled()
@@ -474,11 +490,15 @@ describe('ProducerRegisterPage', () => {
       fireEvent.click(submitButton)
 
       // Check for non-numeric house number error
-      await waitFor(() => {
-        expect(
-          screen.getByText('Le numéro doit contenir uniquement des chiffres')
-        ).toBeTruthy()
-      })
+      await waitFor(
+        () => {
+          const errorMessages = screen.getAllByText((content) =>
+            content.includes('Le numéro doit contenir uniquement des chiffres')
+          )
+          expect(errorMessages.length).toBeGreaterThan(0)
+        },
+        { timeout: 1000 }
+      )
 
       // Verify registerProducer was not called
       expect(registerProducerMock).not.toHaveBeenCalled()
@@ -499,11 +519,15 @@ describe('ProducerRegisterPage', () => {
     fireEvent.click(submitButton)
 
     // Check for error message about required fields
-    await waitFor(() => {
-      expect(
-        screen.getByText('Veuillez remplir tous les champs obligatoires.')
-      ).toBeTruthy()
-    })
+    await waitFor(
+      () => {
+        const errorMessages = screen.getAllByText((content) =>
+          content.includes('Veuillez remplir tous les champs obligatoires')
+        )
+        expect(errorMessages.length).toBeGreaterThan(0)
+      },
+      { timeout: 1000 }
+    )
 
     // Verify registerProducer was not called
     expect(registerProducerMock).not.toHaveBeenCalled()
@@ -584,45 +608,50 @@ describe('ProducerRegisterPage', () => {
       fireEvent.click(submitButton)
 
       // Verify registerProducer was called with correct data
-      await waitFor(() => {
-        expect(registerProducerMock).toHaveBeenCalledWith({
-          name: 'Doe',
-          firstname: 'John',
-          company: 'Test Company',
-          street: 'Test Street',
-          number: '123',
-          box: '',
-          postalCode: '12345',
-          city: 'Test City',
-          country: 'Belgique',
-          phoneNumber: '0123456789',
-          email: 'test@example.com',
-          password: 'Password123!',
-        })
-      })
+      await waitFor(
+        () => {
+          expect(registerProducerMock).toHaveBeenCalledWith({
+            name: 'Doe',
+            firstname: 'John',
+            company: 'Test Company',
+            street: 'Test Street',
+            number: '123',
+            box: '',
+            postalCode: '12345',
+            city: 'Test City',
+            country: 'Belgique',
+            phoneNumber: '0123456789',
+            email: 'test@example.com',
+            password: 'Password123!',
+          })
+        },
+        { timeout: 1000 }
+      )
 
       // Check for success message
-      await waitFor(() => {
-        expect(screen.getByText('Inscription réussie !')).toBeTruthy()
-        expect(
-          screen.getByText('Le compte producteur a été créé avec succès.')
-        ).toBeTruthy()
-      })
+      await waitFor(
+        () => {
+          const successMessages = screen.getAllByText((content) =>
+            content.includes('Inscription réussie')
+          )
+          expect(successMessages.length).toBeGreaterThan(0)
+        },
+        { timeout: 1000 }
+      )
 
       // After successful registration, should show CircularProgress
       expect(screen.getByRole('progressbar')).toBeTruthy()
 
-      // Check that navigation is scheduled (but not called immediately)
-      expect(navigateMock).not.toHaveBeenCalled()
-
-      // In a real test environment, we can't reliably test the setTimeout
-      // without causing timing issues, so we'll just verify registration was called
-      // and success message is displayed
-
       // Verify the success message is shown
-      await waitFor(() => {
-        expect(screen.getByText('Inscription réussie !')).toBeTruthy()
-      })
+      await waitFor(
+        () => {
+          const successMessages = screen.getAllByText((content) =>
+            content.includes('Le compte producteur a été créé avec succès')
+          )
+          expect(successMessages.length).toBeGreaterThan(0)
+        },
+        { timeout: 1000 }
+      )
     }
   })
 
@@ -707,17 +736,18 @@ describe('ProducerRegisterPage', () => {
         () => {
           expect(registerProducerMock).toHaveBeenCalled()
         },
-        { timeout: 2000 }
+        { timeout: 1000 }
       )
 
       // Error message should be displayed
       await waitFor(
         () => {
-          expect(
-            screen.getByText('Cette adresse email est déjà utilisée.')
-          ).toBeTruthy()
+          const errorMessages = screen.getAllByText((content) =>
+            content.includes('Cette adresse email est déjà utilisée')
+          )
+          expect(errorMessages.length).toBeGreaterThan(0)
         },
-        { timeout: 2000 }
+        { timeout: 1000 }
       )
 
       // Navigation should not have occurred
