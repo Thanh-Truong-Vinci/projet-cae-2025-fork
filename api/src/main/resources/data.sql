@@ -11,8 +11,6 @@ TRUNCATE TABLE reservation_lines CASCADE;
 TRUNCATE TABLE user_with_address CASCADE;
 TRUNCATE TABLE users CASCADE;
 
-ALTER TABLE photos DROP COLUMN name;
-
 -- Insérer un administrateur
 INSERT INTO users (name, firstname, email, password, date_inscription)
 VALUES ('Admin', 'Admin', 'admin@example.com', '$2a$10$Gx8Kku6mS5PdMgiSne0neumKPPZWr28huUKo/joIs.79deMbi4M4i',
