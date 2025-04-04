@@ -92,6 +92,7 @@ export interface CartItem {
   image: string
   quantity: number
   unitType: string
+  category: string
 }
 
 export interface ProductContextType {

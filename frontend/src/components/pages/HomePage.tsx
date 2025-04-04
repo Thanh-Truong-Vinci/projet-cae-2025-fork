@@ -29,9 +29,11 @@ const HomePage = () => {
     { value: 'fruits', label: 'Fruits' },
     { value: 'legumes', label: 'Légumes' },
     { value: 'viandes', label: 'Viandes' },
+    { value: 'fromages', label: 'Fromages' },
     { value: 'produits_laitiers', label: 'Produits laitiers' },
     { value: 'boissons', label: 'Boissons' },
-    { value: 'boulangerie', label: 'Boulangerie' },
+    { value: 'epicerie', label: 'Épicerie' },
+    { value: 'conserves', label: 'Conserves' },
     { value: 'autres', label: 'Autres' },
   ]
 
@@ -172,6 +174,7 @@ const HomePage = () => {
       image: product.image,
       quantity: quantities[product.id] || 1,
       unitType: product.unitType,
+      category: product.category || 'autres', // Ajout de la propriété category
     })
   }
 

@@ -47,6 +47,26 @@ const CartPage = () => {
     return tomorrow.toISOString().split('T')[0] // Format YYYY-MM-DD
   }
 
+  // Nouvelle fonction pour vérifier si une date est un mardi ou jeudi
+  const isTuesdayOrThursday = (dateString: string) => {
+    const date = new Date(dateString)
+    const day = date.getDay() // 0 = dimanche, 1 = lundi, 2 = mardi, etc.
+    return day === 2 || day === 4 // 2 = mardi, 4 = jeudi
+  }
+
+  // Nouvelle fonction pour trouver le prochain mardi ou jeudi à partir d'aujourd'hui
+  const getNextTuesdayOrThursday = () => {
+    const date = new Date()
+    date.setDate(date.getDate() + 1) // On commence à demain
+
+    // Cherche jusqu'à trouver un mardi ou jeudi
+    while (date.getDay() !== 2 && date.getDay() !== 4) {
+      date.setDate(date.getDate() + 1)
+    }
+
+    return date.toISOString().split('T')[0] // Format YYYY-MM-DD
+  }
+
   const calculateTotal = () => {
     return cartItems.reduce(
       (total, item) =>
@@ -82,7 +102,7 @@ const CartPage = () => {
       return
     }
     setOpenCalendar(true)
-    setSelectedDate(getTomorrowFormatted())
+    setSelectedDate(getNextTuesdayOrThursday())
     setIsDateValid(true)
   }
 
@@ -94,13 +114,21 @@ const CartPage = () => {
     const dateValue = e.target.value
     setSelectedDate(dateValue)
 
-    // Vérification que la date est valide (au moins demain)
+    // Vérification que la date est valide (au moins demain ET un mardi ou jeudi)
     const selectedDateObj = new Date(dateValue)
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
     tomorrow.setHours(0, 0, 0, 0)
 
-    setIsDateValid(selectedDateObj >= tomorrow)
+    const isAfterTomorrow = selectedDateObj >= tomorrow
+    const isTuesdayThursday = isTuesdayOrThursday(dateValue)
+
+    setIsDateValid(isAfterTomorrow && isTuesdayThursday)
+
+    if (!isTuesdayThursday) {
+      setMessage("Veuillez sélectionner un mardi ou un jeudi uniquement")
+      setOpenSnackbar(true)
+    }
   }
 
   const handleConfirmReservation = () => {
@@ -407,8 +435,8 @@ const CartPage = () => {
             <DialogTitle>Choisissez une date de retrait</DialogTitle>
             <DialogContent>
               <DialogContentText>
-                Sélectionnez une date pour venir chercher votre commande. Nous
-                préparons votre panier pour qu'il soit prêt le jour choisi.
+                Sélectionnez une date pour venir chercher votre commande. Les retraits sont 
+                disponibles uniquement les mardis et jeudis.
               </DialogContentText>
               <Box
                 sx={{
@@ -424,7 +452,7 @@ const CartPage = () => {
                 >
                   <TextField
                     id="date"
-                    label="Date de retrait"
+                    label="Date de retrait (mardi ou jeudi)"
                     type="date"
                     value={selectedDate}
                     onChange={handleDateChange}
@@ -438,14 +466,21 @@ const CartPage = () => {
                     margin="normal"
                   />
                   {!isDateValid && selectedDate !== '' && (
-                    <FormHelperText>Veuillez choisir une date.</FormHelperText>
+                    <FormHelperText>
+                      Veuillez choisir un mardi ou un jeudi après la date d'aujourd'hui.
+                    </FormHelperText>
                   )}
                 </FormControl>
 
                 {selectedDate && isDateValid && (
                   <Typography align="center" sx={{ mt: 2 }}>
                     Date sélectionnée:{' '}
-                    {new Date(selectedDate).toLocaleDateString('fr-FR')}
+                    {new Date(selectedDate).toLocaleDateString('fr-FR', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
                   </Typography>
                 )}
               </Box>

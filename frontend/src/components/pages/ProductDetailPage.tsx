@@ -82,6 +82,7 @@ const ProductDetailPage = () => {
         image: product.image,
         quantity: quantity,
         unitType: product.unitType,
+        category: product.category || 'autres', // Ajout de la propriété category
       })
       // Vous pourriez aussi rediriger vers le panier ou afficher une notification
     }
