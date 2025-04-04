@@ -3,6 +3,7 @@ package be.vinci.ipl.cae.demo.controllers;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsManager;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsProducer;
 import be.vinci.ipl.cae.demo.services.AuthsService;
+import be.vinci.ipl.cae.demo.services.AuthsService.SecurityConstants;
 import be.vinci.ipl.cae.demo.services.ManagerService;
 import be.vinci.ipl.cae.demo.services.ProducerService;
 import be.vinci.ipl.cae.demo.utils.ValidationUtils;
@@ -50,7 +51,7 @@ public class ManagerController {
    * @throws ResponseStatusException if the credentials are invalid or the email is already in use.
    */
   @PostMapping("/registermanager")
-  @PreAuthorize("hasRole('ROLE_MANAGER')")
+  @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
   public void register(
       @RequestBody CredentialsManager credentials, @RequestHeader("Authorization") String token) {
     boolean success =
@@ -70,7 +71,7 @@ public class ManagerController {
    * @throws ResponseStatusException if the token is invalid or expired, or if email already exists.
    */
   @PostMapping("/registerproducer")
-  @PreAuthorize("hasRole('ROLE_MANAGER')")
+  @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
   public void registerProducer(@RequestBody CredentialsProducer credentials,
                                @RequestHeader("Authorization") String token) {
     boolean success = producerService.registerProducer(

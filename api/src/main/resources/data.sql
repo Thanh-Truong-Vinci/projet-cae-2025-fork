@@ -1,8 +1,15 @@
--- Nettoyer les tables
-TRUNCATE TABLE users CASCADE;
+TRUNCATE TABLE batches CASCADE;
+TRUNCATE TABLE client CASCADE;
+TRUNCATE TABLE manager CASCADE;
+TRUNCATE TABLE notifications CASCADE;
 TRUNCATE TABLE photos CASCADE;
+TRUNCATE TABLE producer CASCADE;
 TRUNCATE TABLE product_types CASCADE;
 TRUNCATE TABLE products CASCADE;
+TRUNCATE TABLE reservation CASCADE;
+TRUNCATE TABLE reservation_lines CASCADE;
+TRUNCATE TABLE users_with_address CASCADE;
+TRUNCATE TABLE users CASCADE;
 
 -- Insérer un administrateur
 INSERT INTO users (name, firstname, email, password, date_inscription)
@@ -251,4 +258,3 @@ INSERT INTO manager (id_user, manager)
 SELECT id_user, NULL
 FROM users
 WHERE email = 'volunteer@example.com';
-
