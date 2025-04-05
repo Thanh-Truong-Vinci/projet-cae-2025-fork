@@ -2,7 +2,7 @@ package be.vinci.ipl.cae.demo.controllers;
 
 import be.vinci.ipl.cae.demo.models.entities.Photo;
 import be.vinci.ipl.cae.demo.services.PhotoService;
-import be.vinci.ipl.cae.demo.dtos.NewPhoto;
+import be.vinci.ipl.cae.demo.models.dtos.NewPhoto;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
