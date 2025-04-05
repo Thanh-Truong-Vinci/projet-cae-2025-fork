@@ -32,10 +32,10 @@ public class PhotoController {
   @PostMapping({"", "/"})
   public Photo putPhoto(@RequestPart("product") NewPhoto newPhoto,
                        @RequestPart("image") MultipartFile image) {
-    if (product == null) {
+    if (newPhoto == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
-     return photoService.createPhoto(newPhoto.getProduct(), image);
+    return photoService.createPhoto(newPhoto.getProduct(), image);
   }
 }
 
