@@ -29,12 +29,12 @@ public class PhotoController {
    * @param  image the image to upload
    */
   @PostMapping({"", "/"})
-  public Photo putPhoto(@RequestPart("product") String product,
+  public Photo putPhoto(@RequestPart("product") NewPhoto newPhoto,
                        @RequestPart("image") MultipartFile image) {
     if (product == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
-     return photoService.createPhoto(product, image);
+     return photoService.createPhoto(newPhoto.getProduct(), image);
   }
 }
 
