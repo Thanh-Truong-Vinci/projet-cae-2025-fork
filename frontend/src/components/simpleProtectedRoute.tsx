@@ -7,7 +7,7 @@ interface ProtectedRouteProps {
   requiredRole?: string | string[]
 }
 
-const simpleProtectedRoute = ({
+const SimpleProtectedRoute = ({
   children,
   requiredRole,
 }: ProtectedRouteProps) => {
@@ -34,4 +34,4 @@ const simpleProtectedRoute = ({
   return <>{children}</>
 }
 
-export default simpleProtectedRoute
+export default SimpleProtectedRoute
