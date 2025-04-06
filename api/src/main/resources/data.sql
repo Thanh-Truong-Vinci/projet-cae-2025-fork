@@ -24,7 +24,8 @@ WHERE email = 'admin@example.com';
 
 -- Créer un producteur de test
 INSERT INTO users (name, firstname, email, password, date_inscription)
-VALUES ('Dupont', 'Jean', 'producteur@example.com', '$2a$10$8Cv0QyLMQ.dDlswhLhd8peiW6.KWnQLl0VmL5lw41/trJgprkg2vm', '2024-01-15');
+VALUES ('Dupont', 'Jean', 'producteur@example.com', '$2a$10$8Cv0QyLMQ.dDlswhLhd8peiW6.KWnQLl0VmL5lw41/trJgprkg2vm',
+        '2024-01-15');
 
 -- Récupérer l'ID et créer l'adresse du producteur
 INSERT INTO user_with_address (id_user, street, number, box, postal_code, city, country, phone_number)
@@ -177,7 +178,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        'PENDING',
        '2025-03-20'
 FROM products p
-         JOIN photos ph ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Tomates Bio';
 
 INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
@@ -193,7 +195,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        'PENDING',
        '2025-03-15'
 FROM products p
-         JOIN photos ph ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pommes Royal Gala';
 
 INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
@@ -209,7 +212,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        'PENDING',
        '2025-03-25'
 FROM products p
-         JOIN photos ph ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pain au levain';
 
 INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
@@ -225,7 +229,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        'PENDING',
        '2025-03-18'
 FROM products p
-         JOIN photos ph ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Fromage fermier';
 
 INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
@@ -241,7 +246,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        'PENDING',
        '2025-03-22'
 FROM products p
-         JOIN photos ph ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Carottes Bio';
 
 INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
@@ -257,7 +263,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        'PENDING',
        '2025-03-21'
 FROM products p
-         JOIN photos ph ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Bière artisanale';
 
 INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
@@ -273,7 +280,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        'PENDING',
        '2025-03-19'
 FROM products p
-         JOIN photos ph ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Poulet fermier';
 
 INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
@@ -289,7 +297,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        'PENDING',
        '2025-03-16'
 FROM products p
-         JOIN photos ph ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Yaourt nature';
 
 -- Add approved batches
@@ -306,7 +315,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        'APPROVED',
        '2025-03-10'
 FROM products p
-         JOIN photos ph ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pomme Jonagold';
 
 INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
@@ -322,7 +332,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        'APPROVED',
        '2025-03-12'
 FROM products p
-         JOIN photos ph ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Chou-fleur cheddar';
 
 INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
@@ -338,7 +349,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        'APPROVED',
        '2025-03-18'
 FROM products p
-         JOIN photos ph ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Fromage fermier';
 
 SELECT id_user, NULL

@@ -9,13 +9,10 @@ import be.vinci.ipl.cae.demo.repositories.ProductTypeRepository;
 import be.vinci.ipl.cae.demo.services.AuthsService.SecurityConstants;
 import be.vinci.ipl.cae.demo.services.BatchService;
 import be.vinci.ipl.cae.demo.services.PhotoService;
-
-import java.util.List;
-import java.util.Optional;
-
 import be.vinci.ipl.cae.demo.services.ProductService;
 import be.vinci.ipl.cae.demo.services.ProductTypeService;
-
+import java.util.List;
+import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,7 +20,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,7 +47,12 @@ public class BatchController {
    * @param photoService le service de gestion des photos injecté
    * @param productTypeService le service de gestion des types de produit injecté
    */
-  public BatchController(BatchService batchService, ProductService productService, PhotoService photoService, ProductTypeService productTypeService, ProductTypeRepository productTypeRepository) {
+  public BatchController(
+      BatchService batchService,
+      ProductService productService,
+      PhotoService photoService,
+      ProductTypeService productTypeService,
+      ProductTypeRepository productTypeRepository) {
     this.batchService = batchService;
     this.productService = productService;
     this.photoService = photoService;
@@ -63,39 +64,40 @@ public class BatchController {
    * Crée un nouveau lot avec un produit et une photo associée.
    *
    * @param newBatch les informations du lot à créer (au format JSON)
-   * @param productName le nom du produit
-   * @param productType le type du produit
-   * @param productDescription la description du produit
-   * @param image l'image du produit
+   * @param image le nom du produit
    * @return le lot créé
    */
   @PostMapping(value = "/createbatch", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @PreAuthorize(SecurityConstants.HAS_ROLE_PRODUCER)
-  public Batch createBatch(@RequestPart("batch") NewBatch newBatch,
-                           @RequestPart("image") MultipartFile image) {
-      
-      if (newBatch == null || image == null) {
-          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Données invalides");
-      }
+  public Batch createBatch(
+      @RequestPart("batch") NewBatch newBatch, @RequestPart("image") MultipartFile image) {
 
-      try {
-          // 1. Upload the photo and create a Photo entity
-          Photo photo = photoService.createPhoto(newBatch.getProductName(), image);
+    if (newBatch == null || image == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Données invalides");
+    }
 
-          ProductType productType = Optional.ofNullable(productTypeRepository.findByTitle(newBatch.getProductType()))
-    .orElseGet(() -> productTypeService.createProductType(newBatch.getProductType()));
+    try {
+      // 1. Upload the photo and create a Photo entity
+      Photo photo = photoService.createPhoto(newBatch.getProductName(), image);
 
-          Product product = productService.createProduct(newBatch.getProductName(), productType, newBatch.getProductDescription(), photo);
-          
-          // 2. Create the product with the photo
-          productService.createProduct(newBatch.getProductName(), productType, newBatch.getProductDescription(), photo);
-          
-          // 3. Create the batch with the product info
-          return batchService.createBatch(newBatch, product, photo);
-      } catch (Exception e) {
-          throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, 
-                                          "Erreur lors de la création du lot: " + e.getMessage());
-      }
+      ProductType productType =
+          Optional.ofNullable(productTypeRepository.findByTitle(newBatch.getProductType()))
+              .orElseGet(() -> productTypeService.createProductType(newBatch.getProductType()));
+
+      Product product =
+          productService.createProduct(
+              newBatch.getProductName(), productType, newBatch.getProductDescription(), photo);
+
+      // 2. Create the product with the photo
+      productService.createProduct(
+          newBatch.getProductName(), productType, newBatch.getProductDescription(), photo);
+
+      // 3. Create the batch with the product info
+      return batchService.createBatch(newBatch, product, photo);
+    } catch (Exception e) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la création du lot: " + e.getMessage());
+    }
   }
 
   /**

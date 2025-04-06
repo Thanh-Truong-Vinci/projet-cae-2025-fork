@@ -12,7 +12,6 @@ import be.vinci.ipl.cae.demo.repositories.NotificationRepository;
 import be.vinci.ipl.cae.demo.repositories.ProducerRepository;
 import java.time.LocalDate;
 import java.util.List;
-
 import org.springframework.stereotype.Service;
 
 /** Service class for managing batches. */
@@ -41,10 +40,7 @@ public class BatchService {
    */
   public Batch createBatch(NewBatch newBatch, Product product, Photo photo) {
 
-    Producer producer =
-        producerRepository
-            .findByEmail(newBatch.getEmail());
-
+    Producer producer = producerRepository.findByEmail(newBatch.getEmail());
 
     Batch batch = new Batch();
     batch.setProducer(producer);
@@ -128,13 +124,13 @@ public class BatchService {
    * @throws RuntimeException si le lot n'est pas dans le statut APPROVED
    */
   public Batch receiveBatch(long id) {
-    Batch batch = 
+    Batch batch =
         batchRepository.findById(id).orElseThrow(() -> new RuntimeException("Batch not found"));
-    
+
     if (batch.getStatus() != BatchStatus.APPROVED) {
       throw new RuntimeException("Only approved batches can be marked as received");
     }
-    
+
     batch.setStatus(BatchStatus.RECEIVED);
     return batchRepository.save(batch);
   }

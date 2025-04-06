@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 public class NewBatch {
   // Informations du producteur
   private String email;
-  
+
   // Informations du produit
   private String productName;
   private String productType;
-  
+
   // Informations du lot
   private LocalDate availabilityDate;
   private Double unitPrice;

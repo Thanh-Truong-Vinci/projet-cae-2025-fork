@@ -49,8 +49,8 @@ public class PhotoService {
    * @param image the image file to be uploaded
    * @return the created Photo entity
    */
-  public Photo createPhoto(@RequestPart("product") String product,
-    @RequestPart("image") MultipartFile image) {
+  public Photo createPhoto(
+      @RequestPart("product") String product, @RequestPart("image") MultipartFile image) {
     Photo photo = new Photo();
     photo.setProductName(product);
     if (image != null && !image.isEmpty()) {
@@ -61,8 +61,8 @@ public class PhotoService {
   }
 
   /**
-   * Upload an image to a blob on Azure storage with a generated UUID as filename.
-   * The image is uploaded to the "images" folder. The original filename is stored in the metadata.
+   * Upload an image to a blob on Azure storage with a generated UUID as filename. The image is
+   * uploaded to the "images" folder. The original filename is stored in the metadata.
    *
    * @param image the image file to be uploaded
    * @return the blob URL of the uploaded image
@@ -92,4 +92,3 @@ public class PhotoService {
     return blobClientBuilder.buildClient().getBlobUrl();
   }
 }
-

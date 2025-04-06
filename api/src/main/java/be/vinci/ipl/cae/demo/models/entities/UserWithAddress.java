@@ -31,5 +31,4 @@ public abstract class UserWithAddress extends User {
 
   @Column(nullable = false)
   private String phoneNumber;
-  
 }

@@ -195,10 +195,8 @@ public class AuthsService {
 
     return authenticatedUser;
   }
-  
-  /**
-   * Enum representing user roles in the system.
-   */
+
+  /** Enum representing user roles in the system. */
   public enum Role {
     CLIENT("Client"),
     MANAGER("Manager"),
@@ -222,9 +220,7 @@ public class AuthsService {
     }
   }
 
-  /**
-   * Security constants for PreAuthorize expressions.
-   */
+  /** Security constants for PreAuthorize expressions. */
   public static final class SecurityConstants {
     public static final String HAS_ROLE_CLIENT = "hasRole('ROLE_CLIENT')";
     public static final String HAS_ROLE_MANAGER = "hasRole('ROLE_MANAGER')";
@@ -235,4 +231,3 @@ public class AuthsService {
     private SecurityConstants() {}
   }
 }
-

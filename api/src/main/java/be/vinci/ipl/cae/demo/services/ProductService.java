@@ -43,7 +43,7 @@ public class ProductService {
    * @param name the name of the product
    * @param type the type of the product
    * @param description the description of the product
-   * @param photoId the ID of the photo associated with the product
+   * @param photo the photo associated with the product
    */
   public Product createProduct(String name, ProductType type, String description, Photo photo) {
     Product product = new Product();
