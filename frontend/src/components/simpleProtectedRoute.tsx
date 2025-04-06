@@ -7,7 +7,10 @@ interface ProtectedRouteProps {
   requiredRole?: string | string[]
 }
 
-const simpleProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
+const simpleProtectedRoute = ({
+  children,
+  requiredRole,
+}: ProtectedRouteProps) => {
   const { authenticatedUser } = useContext(UserContext)
 
   // Si l'utilisateur n'est pas connecté, rediriger vers la page de connexion

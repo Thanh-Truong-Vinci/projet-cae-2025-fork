@@ -2,7 +2,7 @@ import React, { ReactNode, useContext } from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
 
-import { RouterProvider, createBrowserRouter, Navigate, } from 'react-router-dom'
+import { RouterProvider, createBrowserRouter, Navigate } from 'react-router-dom'
 import App from './components/App/index.tsx'
 import HomePage from './components/pages/HomePage.tsx'
 import RegisterPage from './components/pages/RegisterPage.tsx'
@@ -27,7 +27,13 @@ import ManagerDashboardPage from './components/pages/ManagerDashboardPage.tsx'
 import VolunteerHomePage from './components/pages/VolunteerHomePage.tsx'
 
 // Fonction de protection pour les routes qui nécessitent une authentification
-const ProtectedRoute = ({ children, requiredRole }: { children: ReactNode, requiredRole?: string | string[] }) => {
+const ProtectedRoute = ({
+  children,
+  requiredRole,
+}: {
+  children: ReactNode
+  requiredRole?: string | string[]
+}) => {
   const { authenticatedUser } = useContext(UserContext)
 
   // Si l'utilisateur n'est pas connecté, rediriger vers la page de connexion
@@ -86,7 +92,11 @@ const router = createBrowserRouter([
       },
       {
         path: 'producer-dashboard',
-        element: <ProtectedRoute requiredRole="Producer"><ProducerHomePage /></ProtectedRoute>,
+        element: (
+          <ProtectedRoute requiredRole="Producer">
+            <ProducerHomePage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'register',
@@ -98,15 +108,27 @@ const router = createBrowserRouter([
       },
       {
         path: 'register-manager',
-        element: <ProtectedRoute requiredRole="Manager"><ManagerRegisterPage /></ProtectedRoute>,
+        element: (
+          <ProtectedRoute requiredRole="Manager">
+            <ManagerRegisterPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'register-producer',
-        element: <ProtectedRoute requiredRole="Manager"><ProducerRegisterPage /></ProtectedRoute>,
+        element: (
+          <ProtectedRoute requiredRole="Manager">
+            <ProducerRegisterPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'cart',
-        element: <ProtectedRoute requiredRole="Client"><CartPage /></ProtectedRoute>,
+        element: (
+          <ProtectedRoute requiredRole="Client">
+            <CartPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'products/:productId',
@@ -114,23 +136,43 @@ const router = createBrowserRouter([
       },
       {
         path: 'reservations',
-        element: <ProtectedRoute requiredRole="Client"><ReservationsPage /></ProtectedRoute>,
+        element: (
+          <ProtectedRoute requiredRole="Client">
+            <ReservationsPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'profile',
-        element: <ProtectedRoute><ProfilePage /></ProtectedRoute>,
+        element: (
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'add-product',
-        element: <ProtectedRoute requiredRole="Producer"><AddBatchPage /></ProtectedRoute>,
+        element: (
+          <ProtectedRoute requiredRole="Producer">
+            <AddBatchPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'manager-dashboard',
-        element: <ProtectedRoute requiredRole="Manager"><ManagerDashboardPage /></ProtectedRoute>,
+        element: (
+          <ProtectedRoute requiredRole="Manager">
+            <ManagerDashboardPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'volunteer',
-        element: <ProtectedRoute requiredRole="Volunteer"><VolunteerHomePage /></ProtectedRoute>,
+        element: (
+          <ProtectedRoute requiredRole="Volunteer">
+            <VolunteerHomePage />
+          </ProtectedRoute>
+        ),
       },
       // Route de secours pour toutes les autres URL
       {
