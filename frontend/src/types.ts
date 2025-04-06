@@ -104,6 +104,31 @@ export interface ProductContextType {
   error: string | null
 }
 
+export interface Batch {
+  id: number
+  productName: string
+  productType: string
+  imageUrl: string
+  availabilityDate: string
+  availableQuantity: number
+  initialQuantity: number
+  unitPrice: number
+  unitType: string
+  producerId: number
+  producerName?: string
+  createdAt: string
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'RECEIVED'
+  rejectionReason?: string
+}
+
+export interface BatchContextType {
+  approvedBatches: Batch[]
+  isLoading: boolean
+  error: string | null
+  fetchApprovedBatches: () => Promise<void>
+  receiveBatch: (batchId: number) => Promise<Batch | null>
+}
+
 type MaybeAuthenticatedUser = AuthenticatedUser | undefined
 
 export type {

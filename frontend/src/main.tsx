@@ -21,6 +21,7 @@ import theme from './themes.ts'
 import ManagerRegisterPage from './components/pages/ManagerRegisterPage.tsx'
 import ProducerRegisterPage from './components/pages/ProducerRegisterPage.tsx'
 import { ProductProvider } from './contexts/ProductProvider.tsx'
+import { BatchProvider } from './contexts/BatchProvider.tsx'
 import ProfilePage from './components/pages/ProfilePage.tsx'
 import ManagerDashboardPage from './components/pages/ManagerDashboardPage.tsx'
 import VolunteerHomePage from './components/pages/VolunteerHomePage.tsx'
@@ -92,9 +93,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <CssBaseline />
       <UserContextProvider>
         <ProductProvider>
-          <CartProvider>
-            <RouterProvider router={router} />
-          </CartProvider>
+          <BatchProvider>
+            <CartProvider>
+              <RouterProvider router={router} />
+            </CartProvider>
+          </BatchProvider>
         </ProductProvider>
       </UserContextProvider>
     </ThemeProvider>
