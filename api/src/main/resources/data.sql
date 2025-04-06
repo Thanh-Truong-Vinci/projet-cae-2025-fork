@@ -165,12 +165,13 @@ WHERE pt.title = 'Légumes'
   AND p.product_name = 'choufleur_cheddar';
 
 -- Créer des lots pour chaque produit
-INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
+-- Fix all pending batches inserts
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
                      available_quantity, status, deposit_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
        p.id_product,
-       ph.url,
+       ph.id_photo,
        '2025-04-15',
        3.50,
        'kg',
@@ -182,12 +183,12 @@ FROM products p
 ON p.photo_id = ph.id_photo
 WHERE p.name = 'Tomates Bio';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
                      available_quantity, status, deposit_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
        p.id_product,
-       ph.url,
+       ph.id_photo,
        '2025-04-10',
        2.75,
        'kg',
@@ -199,12 +200,12 @@ FROM products p
 ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pommes Royal Gala';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
                      available_quantity, status, deposit_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
        p.id_product,
-       ph.url,
+       ph.id_photo,
        '2025-03-30',
        4.20,
        'piece',
@@ -216,12 +217,12 @@ FROM products p
 ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pain au levain';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
                      available_quantity, status, deposit_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
        p.id_product,
-       ph.url,
+       ph.id_photo,
        '2025-04-05',
        7.50,
        'piece',
@@ -233,12 +234,12 @@ FROM products p
 ON p.photo_id = ph.id_photo
 WHERE p.name = 'Fromage fermier';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
                      available_quantity, status, deposit_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
        p.id_product,
-       ph.url,
+       ph.id_photo,
        '2025-04-20',
        2.80,
        'kg',
@@ -250,12 +251,12 @@ FROM products p
 ON p.photo_id = ph.id_photo
 WHERE p.name = 'Carottes Bio';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
                      available_quantity, status, deposit_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
        p.id_product,
-       ph.url,
+       ph.id_photo,
        '2025-04-18',
        4.50,
        'bottle',
@@ -267,12 +268,12 @@ FROM products p
 ON p.photo_id = ph.id_photo
 WHERE p.name = 'Bière artisanale';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
                      available_quantity, status, deposit_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
        p.id_product,
-       ph.url,
+       ph.id_photo,
        '2025-04-12',
        12.90,
        'kg',
@@ -284,12 +285,12 @@ FROM products p
 ON p.photo_id = ph.id_photo
 WHERE p.name = 'Poulet fermier';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
                      available_quantity, status, deposit_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
        p.id_product,
-       ph.url,
+       ph.id_photo,
        '2025-04-08',
        3.25,
        'pot',
@@ -301,13 +302,13 @@ FROM products p
 ON p.photo_id = ph.id_photo
 WHERE p.name = 'Yaourt nature';
 
--- Add approved batches
-INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
+-- Fix all approved batches inserts
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
                      available_quantity, status, deposit_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
        p.id_product,
-       ph.url,
+       ph.id_photo,
        '2025-04-22',
        3.80,
        'kg',
@@ -319,12 +320,12 @@ FROM products p
 ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pomme Jonagold';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
                      available_quantity, status, deposit_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
        p.id_product,
-       ph.url,
+       ph.id_photo,
        '2025-04-25',
        4.90,
        'kg',
@@ -336,12 +337,12 @@ FROM products p
 ON p.photo_id = ph.id_photo
 WHERE p.name = 'Chou-fleur cheddar';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
                      available_quantity, status, deposit_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
        p.id_product,
-       ph.url,
+       ph.id_photo,
        '2025-04-17',
        5.75,
        'piece',
