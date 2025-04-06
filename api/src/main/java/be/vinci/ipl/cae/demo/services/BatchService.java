@@ -3,17 +3,16 @@ package be.vinci.ipl.cae.demo.services;
 import be.vinci.ipl.cae.demo.models.dtos.NewBatch;
 import be.vinci.ipl.cae.demo.models.entities.Batch;
 import be.vinci.ipl.cae.demo.models.entities.BatchStatus;
-import be.vinci.ipl.cae.demo.models.entities.Manager;
 import be.vinci.ipl.cae.demo.models.entities.Notification;
+import be.vinci.ipl.cae.demo.models.entities.Photo;
 import be.vinci.ipl.cae.demo.models.entities.Producer;
 import be.vinci.ipl.cae.demo.models.entities.Product;
 import be.vinci.ipl.cae.demo.repositories.BatchRepository;
-import be.vinci.ipl.cae.demo.repositories.ManagerRepository;
 import be.vinci.ipl.cae.demo.repositories.NotificationRepository;
 import be.vinci.ipl.cae.demo.repositories.ProducerRepository;
-import be.vinci.ipl.cae.demo.repositories.ProductRepository;
 import java.time.LocalDate;
 import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 /** Service class for managing batches. */
@@ -22,42 +21,35 @@ public class BatchService {
 
   private final BatchRepository batchRepository;
   private final ProducerRepository producerRepository;
-  private final ProductRepository productRepository;
   private final NotificationRepository notificationRepository;
 
   /** Constructeur du service. */
   public BatchService(
       BatchRepository batchRepository,
       ProducerRepository producerRepository,
-      ProductRepository productRepository,
       NotificationRepository notificationRepository) {
     this.batchRepository = batchRepository;
     this.producerRepository = producerRepository;
-    this.productRepository = productRepository;
     this.notificationRepository = notificationRepository;
   }
 
   /**
-   * Crée un nouveau lot.
+   * Crée un nouveau lot de 0.
    *
    * @param newBatch les données du lot à créer
    * @return le lot créé
    */
-  public Batch createBatch(NewBatch newBatch) {
+  public Batch createBatch(NewBatch newBatch, Product product, Photo photo) {
 
     Producer producer =
         producerRepository
             .findByEmail(newBatch.getEmail());
 
-    Product product =
-        productRepository
-            .findById(newBatch.getProductId())
-            .orElseThrow(() -> new IllegalArgumentException("Produit non trouvé"));
 
     Batch batch = new Batch();
     batch.setProducer(producer);
     batch.setProduct(product);
-    batch.setPhoto();
+    batch.setPhoto(photo);
     batch.setAvailabilityDate(newBatch.getAvailabilityDate());
     batch.setUnitPrice(newBatch.getUnitPrice());
     batch.setSaleUnit(newBatch.getSaleUnit());
