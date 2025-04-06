@@ -29,12 +29,12 @@ public class PhotoController {
   /**
    * Endpoint to upload a photo.
    *
-   * @param  newPhoto name of the product
+   * @param newPhoto name of the product
    * @param image the image to upload
    */
   @PostMapping({"", "/"})
   public Photo putPhoto(
-          @RequestPart("photo") NewPhoto newPhoto, @RequestPart("image") MultipartFile image) {
+      @RequestPart("photo") NewPhoto newPhoto, @RequestPart("image") MultipartFile image) {
     if (newPhoto == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }

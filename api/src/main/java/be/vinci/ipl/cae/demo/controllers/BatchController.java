@@ -64,7 +64,7 @@ public class BatchController {
    * Crée un nouveau lot avec un produit et une photo associée.
    *
    * @param newBatch les informations du lot à créer (au format JSON)
-   * @param image le nom du produit
+   * @param image le fichier image du produit
    * @return le lot créé
    */
   @PostMapping(value = "/createbatch", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -84,19 +84,19 @@ public class BatchController {
           Optional.ofNullable(productTypeRepository.findByTitle(newBatch.getProductType()))
               .orElseGet(() -> productTypeService.createProductType(newBatch.getProductType()));
 
+      // 2. Create the product with the photo (une seule fois!)
       Product product =
           productService.createProduct(
               newBatch.getProductName(), productType, newBatch.getProductDescription(), photo);
 
-      // 2. Create the product with the photo
-      productService.createProduct(
-          newBatch.getProductName(), productType, newBatch.getProductDescription(), photo);
-
       // 3. Create the batch with the product info
       return batchService.createBatch(newBatch, product, photo);
     } catch (Exception e) {
+      // Préserver la stack trace en passant l'exception originale comme cause
       throw new ResponseStatusException(
-          HttpStatus.INTERNAL_SERVER_ERROR, "Erreur lors de la création du lot: " + e.getMessage());
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          "Erreur lors de la création du lot: " + e.getMessage(),
+          e);
     }
   }
 
