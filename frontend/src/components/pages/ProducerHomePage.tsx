@@ -163,7 +163,7 @@ const ProducerHomePage = () => {
   }, [authenticatedUser])
 
   const handleAddBatch = () => {
-    navigate('/add-product')
+    navigate('/add-batch')
   }
 
   const handleEditBatch = (batchId: number) => {

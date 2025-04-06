@@ -72,7 +72,7 @@ const router = createBrowserRouter([
         element: <ProfilePage />,
       },
       {
-        path: 'add-product',
+        path: 'add-batch',
         element: <AddBatchPage />,
       },
       {

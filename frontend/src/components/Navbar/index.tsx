@@ -127,7 +127,7 @@ const NavBar = () => {
       {/* Producer: Ajouter lot */}
       {authenticatedUser.role === 'Producer' && (
         <IconButton
-          onClick={() => navigate('/add-lot')}
+          onClick={() => navigate('/add-batch')}
           sx={{ mr: 1 }}
           aria-label="ajouter-lot"
         >

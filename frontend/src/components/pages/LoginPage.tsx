@@ -41,10 +41,21 @@ const LoginPage = () => {
         user,
         rememberMe
       )
-      if (authenticatedUser?.role === 'Volunteer') {
-        navigate('/volunteer')
-      } else {
-        handleLoginSuccess()
+      
+      // Redirection basée sur le rôle de l'utilisateur
+      switch (authenticatedUser?.role) {
+        case 'Volunteer':
+          navigate('/volunteer')
+          break
+        case 'Manager':
+          navigate('/manager-dashboard')
+          break
+        case 'Producer':
+          navigate('/producer-dashboard')
+          break
+        default:
+          // Pour les clients
+          handleLoginSuccess()
       }
     } catch (err) {
       console.error('LoginPage::error: ', err)
