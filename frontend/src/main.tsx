@@ -25,6 +25,7 @@ import { BatchProvider } from './contexts/BatchProvider.tsx'
 import ProfilePage from './components/pages/ProfilePage.tsx'
 import ManagerDashboardPage from './components/pages/ManagerDashboardPage.tsx'
 import VolunteerHomePage from './components/pages/VolunteerHomePage.tsx'
+import ProtectedRoute from './components/ProtectedRoute.tsx'
 
 const router = createBrowserRouter([
   {
@@ -37,27 +38,51 @@ const router = createBrowserRouter([
       },
       {
         path: 'producer-dashboard',
-        element: <ProducerHomePage />,
+        element: (
+          <ProtectedRoute allowedRoles={['Producer']}>
+            <ProducerHomePage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'register',
-        element: <RegisterPage />,
+        element: (
+          <ProtectedRoute requireAuth={false}>
+            <RegisterPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'login',
-        element: <LoginPage />,
+        element: (
+          <ProtectedRoute requireAuth={false}>
+            <LoginPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'register-manager',
-        element: <ManagerRegisterPage />,
+        element: (
+          <ProtectedRoute allowedRoles={['Manager', 'Admin']}>
+            <ManagerRegisterPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'register-producer',
-        element: <ProducerRegisterPage />,
+        element: (
+          <ProtectedRoute allowedRoles={['Manager', 'Admin']}>
+            <ProducerRegisterPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'cart',
-        element: <CartPage />,
+        element: (
+          <ProtectedRoute allowedRoles={['Client']}>
+            <CartPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'products/:productId',
@@ -65,23 +90,43 @@ const router = createBrowserRouter([
       },
       {
         path: 'reservations',
-        element: <ReservationsPage />,
+        element: (
+          <ProtectedRoute allowedRoles={['Client']}>
+            <ReservationsPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'profile',
-        element: <ProfilePage />,
+        element: (
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'add-product',
-        element: <AddBatchPage />,
+        element: (
+          <ProtectedRoute allowedRoles={['Producer']}>
+            <AddBatchPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'manager-dashboard',
-        element: <ManagerDashboardPage />,
+        element: (
+          <ProtectedRoute allowedRoles={['Manager', 'Admin']}>
+            <ManagerDashboardPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'volunteer',
-        element: <VolunteerHomePage />,
+        element: (
+          <ProtectedRoute allowedRoles={['Volunteer', 'Admin']}>
+            <VolunteerHomePage />
+          </ProtectedRoute>
+        ),
       },
     ],
   },
