@@ -22,14 +22,19 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
           (item: {
             id: number
             name: string
-            photo?: { url: string }
+            photo?: {
+              id: number
+              productName: string
+              imageLocation: string
+            }
             type?: { title: string }
             description?: string
           }) => ({
             id: item.id,
             name: item.name,
             price: '10.00€',
-            image: item.photo?.url || 'https://via.placeholder.com/150',
+            image:
+              item.photo?.imageLocation || 'https://via.placeholder.com/150',
             category:
               item.type?.title
                 ?.toLowerCase()
