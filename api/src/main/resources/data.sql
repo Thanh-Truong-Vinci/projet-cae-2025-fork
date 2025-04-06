@@ -24,7 +24,7 @@ WHERE email = 'admin@example.com';
 
 -- Créer un producteur de test
 INSERT INTO users (name, firstname, email, password, date_inscription)
-VALUES ('Dupont', 'Jean', 'producteur@example.com', '$2a$10$8Cv0QyLMQ.dDlswhLhd8peiW6.KWnQLl0VmL5lw41/trJgprkg2vm',
+VALUES ('Dupont', 'Jean', 'producer@example.com', '$2a$10$8Cv0QyLMQ.dDlswhLhd8peiW6.KWnQLl0VmL5lw41/trJgprkg2vm',
         '2024-01-15');
 
 -- Récupérer l'ID et créer l'adresse du producteur
@@ -38,13 +38,13 @@ SELECT id_user,
        'Belgique',
        '+32456789012'
 FROM users
-WHERE email = 'producteur@example.com';
+WHERE email = 'producer@example.com';
 
 -- Créer l'entrée producteur avec sa compagnie
 INSERT INTO producer (id_user, company)
 SELECT id_user, 'Ferme Bio du Bon Vivant'
 FROM users
-WHERE email = 'producteur@example.com';
+WHERE email = 'producer@example.com';
 
 -- Insérer les types de produits
 INSERT INTO product_types (title)
