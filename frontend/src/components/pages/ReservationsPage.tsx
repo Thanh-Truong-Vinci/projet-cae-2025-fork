@@ -153,7 +153,7 @@ const ReservationsPage = () => {
 
   return (
     <Box sx={{ width: '100%', p: 3 }}>
-      <Typography variant="h4" sx={{ mb: 3 }}>
+      <Typography variant="h4" sx={{ mb: 3 }} data-testid="reservations-page">
         Mes Réservations
       </Typography>
 

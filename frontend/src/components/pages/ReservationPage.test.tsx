@@ -201,7 +201,7 @@ describe('ReservationsPage', () => {
     expect(accordions).toHaveLength(2)
 
     // First reservation title should be visible - mise à jour du texte recherché
-    const reservationDates = screen.getAllByText(/Retrait prévu le/i)
+    const reservationDates = screen.getAllByText(/Retiré le/i)
     expect(reservationDates.length).toBeGreaterThan(0)
 
     // Check for the status chips
