@@ -10,9 +10,7 @@ import be.vinci.ipl.cae.demo.services.AuthsService.SecurityConstants;
 import be.vinci.ipl.cae.demo.services.BatchService;
 import be.vinci.ipl.cae.demo.services.PhotoService;
 import be.vinci.ipl.cae.demo.services.ProductService;
-import be.vinci.ipl.cae.demo.services.ProductTypeService;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,7 +34,6 @@ public class BatchController {
   private final BatchService batchService;
   private final ProductService productService;
   private final PhotoService photoService;
-  private final ProductTypeService productTypeService;
   private final ProductTypeRepository productTypeRepository;
 
   /**
@@ -51,12 +48,10 @@ public class BatchController {
       BatchService batchService,
       ProductService productService,
       PhotoService photoService,
-      ProductTypeService productTypeService,
       ProductTypeRepository productTypeRepository) {
     this.batchService = batchService;
     this.productService = productService;
     this.photoService = photoService;
-    this.productTypeService = productTypeService;
     this.productTypeRepository = productTypeRepository;
   }
 
