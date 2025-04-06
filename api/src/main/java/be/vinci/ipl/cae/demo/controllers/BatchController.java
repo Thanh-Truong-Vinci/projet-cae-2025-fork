@@ -7,7 +7,9 @@ import be.vinci.ipl.cae.demo.services.BatchService;
 
 import java.util.List;
 
+import be.vinci.ipl.cae.demo.services.ProductService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -17,7 +19,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 /** Controller pour gérer les opérations sur les lots. */
@@ -26,14 +30,16 @@ import org.springframework.web.server.ResponseStatusException;
 public class BatchController {
 
   private final BatchService batchService;
+  private final ProductService productService;
 
   /**
    * Constructeur du controller.
    *
    * @param batchService le service de gestion des lots injecté
    */
-  public BatchController(BatchService batchService) {
+  public BatchController(BatchService batchService, ProductService productService) {
     this.batchService = batchService;
+    this.productService = productService;
   }
 
   /**
@@ -43,15 +49,52 @@ public class BatchController {
    * @return le lot créé
    */
   @PostMapping({"", "/"})
-  @PreAuthorize("hasRole('ROLE_MANAGER')")
+  @PreAuthorize(SecurityConstants.HAS_ROLE_PRODUCER)
   public Batch createBatch(@RequestBody NewBatch newBatch) {
-    // TODO verify token if is a producer
     if (newBatch == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Données du lot invalides");
     }
 
     // TODO call addBatch, not createBatch
     return batchService.createBatch(newBatch);
+  }
+
+  /**
+   * Crée un nouveau lot avec un produit et une photo associée.
+   *
+   * @param newBatchJson les informations du lot à créer (au format JSON)
+   * @param productName le nom du produit
+   * @param productType le type du produit
+   * @param productDescription la description du produit
+   * @param image l'image du produit
+   * @return le lot créé
+   */
+  @PostMapping(value = {"", "/"}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PreAuthorize(SecurityConstants.HAS_ROLE_PRODUCER)
+  public Batch createBatch(@RequestPart("batch") NewBatch newBatchJson,
+                           @RequestPart("productName") String productName,
+                           @RequestPart("productType") String productType,
+                           @RequestPart("productDescription") String productDescription,
+                           @RequestPart("image") MultipartFile image) {
+      
+      if (newBatchJson == null || productName == null || productType == null || image == null) {
+          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Données invalides");
+      }
+
+      try {
+          // 1. Upload the photo and create a Photo entity
+          Photo photo = photoService.createPhoto(productName, image);
+          
+          // 2. Create the product with the photo
+          productService.createProduct(productName, productType, productDescription, photo.getId());
+          
+          // 3. Create the batch with the product info
+          newBatchJson.setProductName(productName);
+          return batchService.createBatch(newBatchJson);
+      } catch (Exception e) {
+          throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, 
+                                          "Erreur lors de la création du lot: " + e.getMessage());
+      }
   }
 
   /**

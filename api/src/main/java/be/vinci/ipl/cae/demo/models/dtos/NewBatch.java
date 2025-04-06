@@ -8,10 +8,18 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class NewBatch {
-  private Long managerId;
-  private Long producerId;
+  // Informations du producteur
+  private String email;
+  
+  // Informations du produit
+  private String productName;
+  private String productType;
   private Long productId;
-  private String photo;
+  
+  // Informations de la photo
+  private Long photoId;
+  
+  // Informations du lot
   private LocalDate availabilityDate;
   private Double unitPrice;
   private String saleUnit;

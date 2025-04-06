@@ -24,7 +24,7 @@ WHERE email = 'admin@example.com';
 
 -- Créer un producteur de test
 INSERT INTO users (name, firstname, email, password, date_inscription)
-VALUES ('Dupont', 'Jean', 'producteur@example.com', 'password123', '2024-01-15');
+VALUES ('Dupont', 'Jean', 'producteur@example.com', '$2a$10$8Cv0QyLMQ.dDlswhLhd8peiW6.KWnQLl0VmL5lw41/trJgprkg2vm', '2024-01-15');
 
 -- Récupérer l'ID et créer l'adresse du producteur
 INSERT INTO user_with_address (id_user, street, number, box, postal_code, city, country, phone_number)

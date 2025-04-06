@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 public class BatchService {
 
   private final BatchRepository batchRepository;
-  private final ManagerRepository managerRepository;
   private final ProducerRepository producerRepository;
   private final ProductRepository productRepository;
   private final NotificationRepository notificationRepository;
@@ -29,12 +28,10 @@ public class BatchService {
   /** Constructeur du service. */
   public BatchService(
       BatchRepository batchRepository,
-      ManagerRepository managerRepository,
       ProducerRepository producerRepository,
       ProductRepository productRepository,
       NotificationRepository notificationRepository) {
     this.batchRepository = batchRepository;
-    this.managerRepository = managerRepository;
     this.producerRepository = producerRepository;
     this.productRepository = productRepository;
     this.notificationRepository = notificationRepository;
@@ -47,15 +44,10 @@ public class BatchService {
    * @return le lot créé
    */
   public Batch createBatch(NewBatch newBatch) {
-    Manager manager =
-        managerRepository
-            .findById(newBatch.getManagerId())
-            .orElseThrow(() -> new IllegalArgumentException("Manager non trouvé"));
 
     Producer producer =
         producerRepository
-            .findById(newBatch.getProducerId())
-            .orElseThrow(() -> new IllegalArgumentException("Producteur non trouvé"));
+            .findByEmail(newBatch.getEmail());
 
     Product product =
         productRepository
@@ -63,10 +55,9 @@ public class BatchService {
             .orElseThrow(() -> new IllegalArgumentException("Produit non trouvé"));
 
     Batch batch = new Batch();
-    batch.setManager(manager);
     batch.setProducer(producer);
     batch.setProduct(product);
-    batch.setPhoto(newBatch.getPhoto());
+    batch.setPhoto();
     batch.setAvailabilityDate(newBatch.getAvailabilityDate());
     batch.setUnitPrice(newBatch.getUnitPrice());
     batch.setSaleUnit(newBatch.getSaleUnit());
