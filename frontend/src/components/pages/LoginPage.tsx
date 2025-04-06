@@ -41,7 +41,7 @@ const LoginPage = () => {
         user,
         rememberMe
       )
-      
+
       // Redirection basée sur le rôle de l'utilisateur
       switch (authenticatedUser?.role) {
         case 'Volunteer':
