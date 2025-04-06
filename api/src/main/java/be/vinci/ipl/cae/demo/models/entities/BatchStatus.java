@@ -4,5 +4,6 @@ package be.vinci.ipl.cae.demo.models.entities;
 public enum BatchStatus {
   PENDING,
   APPROVED,
-  REJECTED
+  REJECTED,
+  RECEIVED
 }

@@ -13,6 +13,7 @@ import be.vinci.ipl.cae.demo.repositories.NotificationRepository;
 import be.vinci.ipl.cae.demo.repositories.ProducerRepository;
 import be.vinci.ipl.cae.demo.repositories.ProductRepository;
 import java.time.LocalDate;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 /** Service class for managing batches. */
@@ -134,5 +135,33 @@ public class BatchService {
     batch.setNotification(notification);
 
     return batchRepository.save(batch);
+  }
+
+  /**
+   * Marque un lot comme reçu.
+   *
+   * @param id l'ID du lot à marquer comme reçu
+   * @return le lot mis à jour ou null si non trouvé
+   * @throws RuntimeException si le lot n'est pas dans le statut APPROVED
+   */
+  public Batch receiveBatch(long id) {
+    Batch batch = 
+        batchRepository.findById(id).orElseThrow(() -> new RuntimeException("Batch not found"));
+    
+    if (batch.getStatus() != BatchStatus.APPROVED) {
+      throw new RuntimeException("Only approved batches can be marked as received");
+    }
+    
+    batch.setStatus(BatchStatus.RECEIVED);
+    return batchRepository.save(batch);
+  }
+
+  /**
+   * Récupère tous les lots ayant le statut APPROVED.
+   *
+   * @return la liste des lots approuvés
+   */
+  public List<Batch> getApprovedBatches() {
+    return batchRepository.findByStatus(BatchStatus.APPROVED);
   }
 }

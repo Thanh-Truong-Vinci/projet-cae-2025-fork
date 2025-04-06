@@ -2,7 +2,11 @@ package be.vinci.ipl.cae.demo.controllers;
 
 import be.vinci.ipl.cae.demo.models.dtos.NewBatch;
 import be.vinci.ipl.cae.demo.models.entities.Batch;
+import be.vinci.ipl.cae.demo.services.AuthsService.SecurityConstants;
 import be.vinci.ipl.cae.demo.services.BatchService;
+
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +14,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -111,5 +116,35 @@ public class BatchController {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lot non trouvé");
     }
     return batch;
+  }
+
+  /**
+   * Marque un lot comme reçu.
+   *
+   * @param id l'identifiant du lot à marquer comme reçu
+   * @return le lot mis à jour
+   */
+  @PatchMapping("/{id}/receive")
+  @PreAuthorize(SecurityConstants.HAS_ROLE_VOLUNTEER)
+  public Batch receiveBatch(@PathVariable long id, @RequestHeader("Authorization") String token) {
+    try {
+      return batchService.receiveBatch(id);
+    } catch (RuntimeException e) {
+      if ("Batch not found".equals(e.getMessage())) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lot non trouvé", e);
+      } else {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+      }
+    }
+  }
+
+  /**
+   * Récupère tous les lots approuvés.
+   *
+   * @return la liste des lots avec le statut APPROVED
+   */
+  @GetMapping("/approved")
+  public List<Batch> getApprovedBatches() {
+    return batchService.getApprovedBatches();
   }
 }

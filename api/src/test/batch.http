@@ -1,0 +1,21 @@
+@baseUrl = http://localhost:3000
+@volunteerToken = {{login_volunteer.response.body.token}}
+
+### Login as a volunteer
+# @name login_volunteer
+POST {{baseUrl}}/auths/login
+Content-Type: application/json
+
+{
+  "email": "volunteer@example.com",
+  "password": "Azqwazqw1@"
+}
+
+### Get all batches
+GET {{baseUrl}}/batches
+Content-Type: application/json
+
+### Mark an approved batch as received (replace 3 with an APPROVED batch ID)
+PATCH {{baseUrl}}/batches/9/receive
+Content-Type: application/json
+Authorization: {{volunteerToken}}

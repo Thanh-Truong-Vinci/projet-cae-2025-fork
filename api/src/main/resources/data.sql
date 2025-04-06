@@ -292,6 +292,55 @@ FROM products p
          JOIN photos ph ON p.photo_id = ph.id_photo
 WHERE p.name = 'Yaourt nature';
 
+-- Add approved batches
+INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
+                     available_quantity, status, deposit_date)
+SELECT (SELECT id_user FROM manager LIMIT 1),
+       (SELECT id_user FROM producer LIMIT 1),
+       p.id_product,
+       ph.url,
+       '2025-04-22',
+       3.80,
+       'kg',
+       45,
+       'APPROVED',
+       '2025-03-10'
+FROM products p
+         JOIN photos ph ON p.photo_id = ph.id_photo
+WHERE p.name = 'Pomme Jonagold';
+
+INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
+                     available_quantity, status, deposit_date)
+SELECT (SELECT id_user FROM manager LIMIT 1),
+       (SELECT id_user FROM producer LIMIT 1),
+       p.id_product,
+       ph.url,
+       '2025-04-25',
+       4.90,
+       'kg',
+       35,
+       'APPROVED',
+       '2025-03-12'
+FROM products p
+         JOIN photos ph ON p.photo_id = ph.id_photo
+WHERE p.name = 'Chou-fleur cheddar';
+
+INSERT INTO batches (manager_id, producer_id, product_id, photo_url, availability_date, unit_price, sale_unit,
+                     available_quantity, status, deposit_date)
+SELECT (SELECT id_user FROM manager LIMIT 1),
+       (SELECT id_user FROM producer LIMIT 1),
+       p.id_product,
+       ph.url,
+       '2025-04-17',
+       5.75,
+       'piece',
+       30,
+       'APPROVED',
+       '2025-03-18'
+FROM products p
+         JOIN photos ph ON p.photo_id = ph.id_photo
+WHERE p.name = 'Fromage fermier';
+
 SELECT id_user, NULL
 FROM users
 WHERE email = 'admin@example.com';
