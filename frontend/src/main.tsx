@@ -25,7 +25,7 @@ import { BatchProvider } from './contexts/BatchProvider.tsx'
 import ProfilePage from './components/pages/ProfilePage.tsx'
 import ManagerDashboardPage from './components/pages/ManagerDashboardPage.tsx'
 import VolunteerHomePage from './components/pages/VolunteerHomePage.tsx'
-import ProtectedRoute from './components/ProtectedRoute.tsx'
+import SimpleProtectedRoute from './components/simpleProtectedRoute.tsx'
 
 const router = createBrowserRouter([
   {
@@ -39,49 +39,41 @@ const router = createBrowserRouter([
       {
         path: 'producer-dashboard',
         element: (
-          <ProtectedRoute allowedRoles={['Producer']}>
+          <SimpleProtectedRoute requiredRole="Producer">
             <ProducerHomePage />
-          </ProtectedRoute>
+          </SimpleProtectedRoute>
         ),
       },
       {
         path: 'register',
-        element: (
-          <ProtectedRoute requireAuth={false}>
-            <RegisterPage />
-          </ProtectedRoute>
-        ),
+        element: <RegisterPage />,
       },
       {
         path: 'login',
-        element: (
-          <ProtectedRoute requireAuth={false}>
-            <LoginPage />
-          </ProtectedRoute>
-        ),
+        element: <LoginPage />,
       },
       {
         path: 'register-manager',
         element: (
-          <ProtectedRoute allowedRoles={['Manager', 'Admin']}>
+          <SimpleProtectedRoute requiredRole="Manager">
             <ManagerRegisterPage />
-          </ProtectedRoute>
+          </SimpleProtectedRoute>
         ),
       },
       {
         path: 'register-producer',
         element: (
-          <ProtectedRoute allowedRoles={['Manager', 'Admin']}>
+          <SimpleProtectedRoute requiredRole="Manager">
             <ProducerRegisterPage />
-          </ProtectedRoute>
+          </SimpleProtectedRoute>
         ),
       },
       {
         path: 'cart',
         element: (
-          <ProtectedRoute allowedRoles={['Client']}>
+          <SimpleProtectedRoute requiredRole="Client">
             <CartPage />
-          </ProtectedRoute>
+          </SimpleProtectedRoute>
         ),
       },
       {
@@ -91,41 +83,41 @@ const router = createBrowserRouter([
       {
         path: 'reservations',
         element: (
-          <ProtectedRoute allowedRoles={['Client']}>
+          <SimpleProtectedRoute requiredRole="Client">
             <ReservationsPage />
-          </ProtectedRoute>
+          </SimpleProtectedRoute>
         ),
       },
       {
         path: 'profile',
         element: (
-          <ProtectedRoute>
+          <SimpleProtectedRoute>
             <ProfilePage />
-          </ProtectedRoute>
+          </SimpleProtectedRoute>
         ),
       },
       {
         path: 'add-product',
         element: (
-          <ProtectedRoute allowedRoles={['Producer']}>
+          <SimpleProtectedRoute requiredRole="Producer">
             <AddBatchPage />
-          </ProtectedRoute>
+          </SimpleProtectedRoute>
         ),
       },
       {
         path: 'manager-dashboard',
         element: (
-          <ProtectedRoute allowedRoles={['Manager', 'Admin']}>
+          <SimpleProtectedRoute requiredRole="Manager">
             <ManagerDashboardPage />
-          </ProtectedRoute>
+          </SimpleProtectedRoute>
         ),
       },
       {
         path: 'volunteer',
         element: (
-          <ProtectedRoute allowedRoles={['Volunteer', 'Admin']}>
+          <SimpleProtectedRoute requiredRole="Volunteer">
             <VolunteerHomePage />
-          </ProtectedRoute>
+          </SimpleProtectedRoute>
         ),
       },
     ],
