@@ -80,9 +80,7 @@ public class BatchController {
       // 1. Upload the photo and create a Photo entity
       Photo photo = photoService.createPhoto(newBatch.getProductName(), image);
 
-      ProductType productType =
-          Optional.ofNullable(productTypeRepository.findByTitle(newBatch.getProductType()))
-              .orElseGet(() -> productTypeService.createProductType(newBatch.getProductType()));
+      ProductType productType = productTypeRepository.findByTitle(newBatch.getProductType());
 
       // 2. Create the product with the photo (une seule fois!)
       Product product =
