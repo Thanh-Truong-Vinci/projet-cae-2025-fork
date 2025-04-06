@@ -183,6 +183,9 @@ Authorization: {{adminToken}}
   "phoneNumber": "+324794586718"
 }
 
+### Get all products
+GET {{baseUrl}}/products/
+
 ### Get product details
 GET {{baseUrl}}/products/details/1
 
