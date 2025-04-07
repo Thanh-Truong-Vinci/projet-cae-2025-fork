@@ -4,9 +4,7 @@ import be.vinci.ipl.cae.demo.models.dtos.NewBatch;
 import be.vinci.ipl.cae.demo.models.entities.Batch;
 import be.vinci.ipl.cae.demo.models.entities.BatchStatus;
 import be.vinci.ipl.cae.demo.models.entities.Notification;
-import be.vinci.ipl.cae.demo.models.entities.Photo;
 import be.vinci.ipl.cae.demo.models.entities.Producer;
-import be.vinci.ipl.cae.demo.models.entities.Product;
 import be.vinci.ipl.cae.demo.repositories.BatchRepository;
 import be.vinci.ipl.cae.demo.repositories.NotificationRepository;
 import be.vinci.ipl.cae.demo.repositories.ProducerRepository;
@@ -38,14 +36,14 @@ public class BatchService {
    * @param newBatch les données du lot à créer
    * @return le lot créé
    */
-  public Batch createBatch(NewBatch newBatch, Product product, Photo photo) {
+  public Batch createBatch(NewBatch newBatch, Long productId, Long photoId) {
 
     Producer producer = producerRepository.findByEmail(newBatch.getEmail());
 
     Batch batch = new Batch();
-    batch.setProducer(producer);
-    batch.setProduct(product);
-    batch.setPhoto(photo);
+    batch.setProducerId(producer.getId());
+    batch.setProductId(productId);
+    batch.setPhotoId(photoId);
     batch.setAvailabilityDate(newBatch.getAvailabilityDate());
     batch.setUnitPrice(newBatch.getUnitPrice());
     batch.setSaleUnit(newBatch.getSaleUnit());
@@ -108,10 +106,12 @@ public class BatchService {
     Notification notification = new Notification();
     notification.setIsRead(false);
     notification.setMessage(message);
-    notification.setProducer(batch.getProducer());
+    Producer producer = producerRepository.findById(batch.getProducerId())
+        .orElseThrow(() -> new RuntimeException("Producer not found"));
+    notification.setProducer(producer);
     notification = notificationRepository.save(notification);
 
-    batch.setNotification(notification);
+    batch.setNotificationId(notification.getId());
 
     return batchRepository.save(batch);
   }

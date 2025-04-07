@@ -33,7 +33,7 @@ Authorization: {{volunteerToken}}
 
 #### Create a pizza with the admin token and an image
 #### Create a photo with the admin token
-POST {{baseUrl}}/createbatch
+POST {{baseUrl}}/photo
 Content-Type: multipart/form-data; boundary=boundary
 
 --boundary

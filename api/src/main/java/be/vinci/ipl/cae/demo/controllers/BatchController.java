@@ -72,20 +72,21 @@ public class BatchController {
     }
 
     try {
-      // 1. Upload the photo and create a Photo entity
+      // 1. Upload the photo and get its ID
       Photo photo = photoService.createPhoto(newBatch.getProductName(), image);
+      Long photoId = photo.getId();
 
+      // 2. Get or create the product type and get its ID
       ProductType productType = productTypeRepository.findByTitle(newBatch.getProductType());
 
-      // 2. Create the product with the photo (une seule fois!)
-      Product product =
-          productService.createProduct(
-              newBatch.getProductName(), productType, newBatch.getProductDescription(), photo);
+      // 3. Create the product and get its ID
+      Product product = productService.createProduct(
+          newBatch.getProductName(), productType, newBatch.getProductDescription(), photo);
+      Long productId = product.getId();
 
-      // 3. Create the batch with the product info
-      return batchService.createBatch(newBatch, product, photo);
+      // 4. Create the batch with the IDs
+      return batchService.createBatch(newBatch, productId, photoId);
     } catch (Exception e) {
-      // Préserver la stack trace en passant l'exception originale comme cause
       throw new ResponseStatusException(
           HttpStatus.INTERNAL_SERVER_ERROR,
           "Erreur lors de la création du lot: " + e.getMessage(),
