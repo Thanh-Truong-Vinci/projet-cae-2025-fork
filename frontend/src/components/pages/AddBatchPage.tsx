@@ -36,6 +36,7 @@ type ProductType =
 interface FormErrors {
   productName?: string
   productType?: string
+  productDescription?: string // Ajout de la description
   productImage?: string
   availabilityDate?: string
   availableQuantity?: string
@@ -50,6 +51,7 @@ const AddBatchPage = () => {
   // États du formulaire
   const [productName, setProductName] = useState('')
   const [productType, setProductType] = useState<ProductType | ''>('')
+  const [productDescription, setProductDescription] = useState('') // Nouvel état pour la description
   const [productImage, setProductImage] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [availabilityDate, setAvailabilityDate] = useState<Dayjs | null>(null)
@@ -128,6 +130,11 @@ const AddBatchPage = () => {
     if (!productName.trim())
       newErrors.productName = 'Le nom du produit est requis'
     if (!productType) newErrors.productType = 'Le type de produit est requis'
+    // La description n'est pas obligatoire, mais on pourrait ajouter une validation si nécessaire
+    if (productDescription && productDescription.length > 500) {
+      newErrors.productDescription =
+        'La description ne doit pas dépasser 500 caractères'
+    }
     if (!productImage) newErrors.productImage = 'Une image est requise'
     if (!availabilityDate)
       newErrors.availabilityDate = 'La date de disponibilité est requise'
@@ -161,6 +168,7 @@ const AddBatchPage = () => {
       const formData = new FormData()
       formData.append('productName', productName)
       formData.append('productType', productType)
+      formData.append('productDescription', productDescription) // Ajout de la description
       if (productImage) formData.append('productImage', productImage)
       if (availabilityDate)
         formData.append('availabilityDate', availabilityDate.toISOString())
@@ -189,6 +197,7 @@ const AddBatchPage = () => {
       console.log('Données du produit à envoyer:', {
         productName,
         productType,
+        productDescription, // Inclusion de la description
         imageFile: productImage?.name,
         availabilityDate,
         availableQuantity,
@@ -203,6 +212,7 @@ const AddBatchPage = () => {
         id: Math.floor(Math.random() * 10000), // ID temporaire pour la simulation
         productName,
         productType,
+        productDescription, // Inclusion de la description
         imageUrl: imagePreview || 'https://via.placeholder.com/300', // Utiliser l'aperçu de l'image ou une image par défaut
         availabilityDate: availabilityDate
           ? availabilityDate.toISOString()
@@ -224,6 +234,7 @@ const AddBatchPage = () => {
       // Réinitialiser le formulaire après soumission réussie
       setProductName('')
       setProductType('')
+      setProductDescription('') // Réinitialiser la description
       setProductImage(null)
       setImagePreview(null)
       setAvailabilityDate(null)
@@ -302,6 +313,20 @@ const AddBatchPage = () => {
                   <FormHelperText>{errors.productType}</FormHelperText>
                 )}
               </FormControl>
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Description du produit"
+                placeholder="Ajoutez une description (max 500 caractères)"
+                value={productDescription}
+                onChange={(e) => setProductDescription(e.target.value)}
+                error={!!errors.productDescription}
+                helperText={errors.productDescription}
+                multiline
+                rows={4}
+              />
             </Grid>
 
             <Grid item xs={12}>
