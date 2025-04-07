@@ -137,7 +137,7 @@ export interface BatchContextType {
   error: string | null
   fetchApprovedBatches: () => Promise<void>
   receiveBatch: (batchId: number) => Promise<Batch | null>
-  addBatch: (newBatch: NewBatch, image: File) => Promise<void>
+  createBatch: (newBatch: NewBatch, image: File) => Promise<void>
 }
 
 type MaybeAuthenticatedUser = AuthenticatedUser | undefined

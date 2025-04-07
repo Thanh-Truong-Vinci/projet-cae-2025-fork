@@ -17,6 +17,7 @@ import {
   Alert,
 } from '@mui/material'
 import { UserContext } from '../../contexts/UserContext'
+import { BatchContext } from '../../contexts/BatchContext'
 import { useNavigate } from 'react-router-dom'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -48,11 +49,12 @@ interface FormErrors {
 const AddBatchPage = () => {
   const navigate = useNavigate()
   const { authenticatedUser } = useContext(UserContext)
+  const batchContext = useContext(BatchContext)
 
   // États du formulaire
   const [productName, setProductName] = useState('')
   const [productType, setProductType] = useState<ProductType | ''>('')
-  const [productDescription, setProductDescription] = useState('') // Nouvel état pour la description
+  const [productDescription, setProductDescription] = useState('')
   const [productImage, setProductImage] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [availabilityDate, setAvailabilityDate] = useState<Dayjs | null>(null)
@@ -67,7 +69,12 @@ const AddBatchPage = () => {
     'success'
   )
 
-  // Rediriger vers la page d'accueil si l'utilisateur n'est pas connecté ou n'est pas un producteur
+  useEffect(() => {
+    if (!batchContext) {
+      console.error("BatchContext n'est pas disponible")
+    }
+  }, [batchContext])
+
   useEffect(() => {
     if (!authenticatedUser) {
       navigate('/')
@@ -85,7 +92,6 @@ const AddBatchPage = () => {
     }
   }, [authenticatedUser, navigate])
 
-  // Si l'utilisateur n'est pas connecté ou n'est pas un producteur, ne pas rendre le formulaire
   if (!authenticatedUser || authenticatedUser.role !== 'Producer') {
     return (
       <Container maxWidth="md" sx={{ py: 4 }}>
@@ -112,7 +118,6 @@ const AddBatchPage = () => {
       const selectedFile = e.target.files[0]
       setProductImage(selectedFile)
 
-      // Créer une prévisualisation de l'image
       const reader = new FileReader()
       reader.onload = () => {
         setImagePreview(reader.result as string)
@@ -131,7 +136,6 @@ const AddBatchPage = () => {
     if (!productName.trim())
       newErrors.productName = 'Le nom du produit est requis'
     if (!productType) newErrors.productType = 'Le type de produit est requis'
-    // La description n'est pas obligatoire, mais on pourrait ajouter une validation si nécessaire
     if (productDescription && productDescription.length > 500) {
       newErrors.productDescription =
         'La description ne doit pas dépasser 500 caractères'
@@ -165,12 +169,64 @@ const AddBatchPage = () => {
     setIsSubmitting(true)
 
     try {
-      // Vérification que l'image est disponible
       if (!productImage) {
         throw new Error("L'image du produit est requise")
       }
 
-      // Création d'un objet conforme à l'interface NewBatch du fichier types.ts
+      const compressImage = (file: File): Promise<File> => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target?.result as string;
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              let width = img.width;
+              let height = img.height;
+              
+              // Calculer les dimensions maximales (800px max)
+              const MAX_SIZE = 800;
+              if (width > height) {
+                if (width > MAX_SIZE) {
+                  height = Math.round((height * MAX_SIZE) / width);
+                  width = MAX_SIZE;
+                }
+              } else {
+                if (height > MAX_SIZE) {
+                  width = Math.round((width * MAX_SIZE) / height);
+                  height = MAX_SIZE;
+                }
+              }
+              
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              ctx?.drawImage(img, 0, 0, width, height);
+              
+              // Convertir en blob avec compression
+              canvas.toBlob(
+                (blob) => {
+                  if (blob) {
+                    // Créer un nouveau fichier à partir du blob
+                    const compressedFile = new File([blob], file.name, {
+                      type: 'image/jpeg',
+                      lastModified: Date.now(),
+                    });
+                    resolve(compressedFile);
+                  } else {
+                    reject(new Error("Échec de compression de l'image"));
+                  }
+                },
+                'image/jpeg',
+                0.7  // Niveau de qualité: 0.7 = 70%
+              );
+            };
+          };
+          reader.onerror = (error) => reject(error);
+        });
+      };
+
       const batchData: NewBatch = {
         email: authenticatedUser.email,
         productName: productName,
@@ -178,37 +234,16 @@ const AddBatchPage = () => {
         productDescription: productDescription,
         availabilityDate: availabilityDate?.format('YYYY-MM-DD') || '',
         unitPrice: parseFloat(unitPrice),
-        saleUnit: unitType, // Utilisation de saleUnit au lieu de unitType
-        availableQuantity: parseInt(availableQuantity)
+        saleUnit: unitType,
+        availableQuantity: parseInt(availableQuantity),
       }
 
-      // Création d'un FormData pour l'envoi multipart
-      const formData = new FormData()
-      
-      // Ajouter le JSON comme blob dans une partie nommée "batch"
-      const batchBlob = new Blob([JSON.stringify(batchData)], {
-        type: 'application/json'
-      })
-      formData.append('batch', batchBlob)
-      
-      // Ajouter l'image dans une partie nommée "image"
-      formData.append('image', productImage)
-
-      // Envoi de la requête
-      const response = await fetch('/api/batches/createbatch', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${authenticatedUser.token}`
-        },
-        body: formData
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || 'Erreur lors de la création du lot')
+      if (batchContext) {
+        await batchContext.createBatch(batchData, await compressImage(productImage))
+      } else {
+        throw new Error("Le contexte BatchContext n'est pas disponible")
       }
 
-      // Réinitialiser le formulaire après succès
       setProductName('')
       setProductType('')
       setProductDescription('')
@@ -219,17 +254,20 @@ const AddBatchPage = () => {
       setUnitPrice('')
       setUnitType('')
 
-      setSnackbarMessage('Lot ajouté avec succès! Il sera examiné par un gestionnaire.')
+      setSnackbarMessage(
+        'Lot ajouté avec succès! Il sera examiné par un gestionnaire.'
+      )
       setSnackbarSeverity('success')
       setOpenSnackbar(true)
 
-      // Rediriger vers le tableau de bord producteur après un court délai
       setTimeout(() => {
         navigate('/producer-dashboard')
       }, 2000)
     } catch (error) {
-      console.error("Erreur lors de l'ajout du lot:", error)
-      setSnackbarMessage(error instanceof Error ? error.message : "Erreur lors de l'ajout du lot")
+      console.error('Erreur lors de l\'ajout du lot:', error)
+      setSnackbarMessage(
+        error instanceof Error ? error.message : 'Erreur lors de l\'ajout du lot'
+      )
       setSnackbarSeverity('error')
       setOpenSnackbar(true)
     } finally {

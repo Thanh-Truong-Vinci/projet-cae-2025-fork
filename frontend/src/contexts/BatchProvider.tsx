@@ -98,7 +98,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
     }
   }
 
-  const addBatch = async (newBatch: NewBatch, image: File): Promise<void> => {
+  const createBatch = async (newBatch: NewBatch, image: File): Promise<void> => {
     try {
       if (!authenticatedUser) {
         throw new Error("Vous devez être authentifié pour ajouter un lot")
@@ -107,41 +107,33 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
       // Préparation du FormData pour l'envoi multipart
       const formData = new FormData()
 
-      // Ajouter le JSON comme blob
-      formData.append(
-        'batch',
-        new Blob([JSON.stringify(newBatch)], {
-          type: 'application/json'
-        })
-      )
+      // Ajouter les données JSON sous forme de chaîne, mais avec le bon nom de fichier et type MIME
+      const batchBlob = new Blob([JSON.stringify(newBatch)], {
+        type: 'application/json'
+      });
+      formData.append('batch', batchBlob, 'batch.json');  // Ajout du nom de fichier
 
       // Ajouter l'image
       formData.append('image', image)
 
-      // Options pour la requête
-      const options = {
-        method: 'POST',
-        body: formData,
+      console.log('Envoi batch:', newBatch);
+      console.log('Envoi image:', image.name, image.type, image.size);
+
+      // Envoi de la requête avec Axios
+      const response = await axios.post('/api/batches/createbatch', formData, {
         headers: {
-          Authorization: `Bearer ${authenticatedUser.token}`,
-        },
-      }
+          Authorization: authenticatedUser.token,
+          // Ne pas définir Content-Type, Axios le fera automatiquement avec la boundary pour multipart/form-data
+        }
+      })
 
-      // Envoi de la requête
-      const response = await fetch('/api/batches/createbatch', options)
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || `Erreur: ${response.status}`)
-      }
-
-      // Simplement vérifier que la réponse est valide
-      await response.json();
-
-      // Mise à jour des états si nécessaire (par exemple pour refresh la liste)
-      // Notez que ceci est optionnel car les lots créés ne sont pas "approved" immédiatement
+      return response.data;
     } catch (err) {
       console.error('addBatch::error: ', err)
+      if (axios.isAxiosError(err)) {
+        console.error('Response data:', err.response?.data)
+        throw new Error(err.response?.data?.message || `Erreur: ${err.response?.status}`)
+      }
       throw err
     }
   }
@@ -160,7 +152,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
         error,
         fetchApprovedBatches,
         receiveBatch,
-        addBatch
+        createBatch
       }}
     >
       {children}
