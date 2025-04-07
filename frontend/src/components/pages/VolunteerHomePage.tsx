@@ -182,8 +182,7 @@ const VolunteerHomePage = () => {
                     </TableCell>
                     <TableCell>
                       <Typography>
-                        <strong>{batch.availableQuantity}</strong>/
-                        {batch.initialQuantity} {batch.unitType}
+                        <strong>{batch.availableQuantity}</strong> {batch.unitType}
                       </Typography>
                     </TableCell>
                     <TableCell>

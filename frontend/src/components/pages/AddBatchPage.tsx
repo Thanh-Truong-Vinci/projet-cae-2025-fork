@@ -24,6 +24,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { Dayjs } from 'dayjs'
 import 'dayjs/locale/fr'
+import { NewBatch } from '../../types'
 
 type ProductType =
   | 'Légume'
@@ -36,7 +37,7 @@ type ProductType =
 interface FormErrors {
   productName?: string
   productType?: string
-  productDescription?: string // Ajout de la description
+  productDescription?: string
   productImage?: string
   availabilityDate?: string
   availableQuantity?: string
@@ -164,77 +165,53 @@ const AddBatchPage = () => {
     setIsSubmitting(true)
 
     try {
-      // Création d'un objet FormData pour envoyer les données, y compris l'image
-      const formData = new FormData()
-      formData.append('productName', productName)
-      formData.append('productType', productType)
-      formData.append('productDescription', productDescription) // Ajout de la description
-      if (productImage) formData.append('productImage', productImage)
-      if (availabilityDate)
-        formData.append('availabilityDate', availabilityDate.toISOString())
-      formData.append('availableQuantity', availableQuantity)
-      formData.append('unitPrice', unitPrice)
-      formData.append('unitType', unitType)
-
-      // Ajout de l'ID du producteur
-      if (authenticatedUser && 'id' in authenticatedUser) {
-        formData.append(
-          'producerId',
-          (authenticatedUser as { id: number }).id.toString()
-        )
+      // Vérification que l'image est disponible
+      if (!productImage) {
+        throw new Error("L'image du produit est requise")
       }
 
-      // Normalement, ici vous feriez l'appel API pour envoyer les données
-      // const response = await fetch('/api/products', {
-      //   method: 'POST',
-      //   headers: {
-      //     Authorization: `Bearer ${authenticatedUser.token}`
-      //   },
-      //   body: formData
-      // })
+      // Création d'un objet conforme à l'interface NewBatch du fichier types.ts
+      const batchData: NewBatch = {
+        email: authenticatedUser.email,
+        productName: productName,
+        productType: productType,
+        productDescription: productDescription,
+        availabilityDate: availabilityDate?.format('YYYY-MM-DD') || '',
+        unitPrice: parseFloat(unitPrice),
+        saleUnit: unitType, // Utilisation de saleUnit au lieu de unitType
+        availableQuantity: parseInt(availableQuantity)
+      }
 
-      // Simulation d'un appel API réussi
-      console.log('Données du produit à envoyer:', {
-        productName,
-        productType,
-        productDescription, // Inclusion de la description
-        imageFile: productImage?.name,
-        availabilityDate,
-        availableQuantity,
-        unitPrice,
-        unitType,
-        producerId:
-          'id' in authenticatedUser ? authenticatedUser.id : undefined,
+      // Création d'un FormData pour l'envoi multipart
+      const formData = new FormData()
+      
+      // Ajouter le JSON comme blob dans une partie nommée "batch"
+      const batchBlob = new Blob([JSON.stringify(batchData)], {
+        type: 'application/json'
+      })
+      formData.append('batch', batchBlob)
+      
+      // Ajouter l'image dans une partie nommée "image"
+      formData.append('image', productImage)
+
+      // Envoi de la requête
+      const response = await fetch('/api/batches/createbatch', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${authenticatedUser.token}`
+        },
+        body: formData
       })
 
-      // Créons une nouvelle entrée de lot avec les données du formulaire
-      const newBatch = {
-        id: Math.floor(Math.random() * 10000), // ID temporaire pour la simulation
-        productName,
-        productType,
-        productDescription, // Inclusion de la description
-        imageUrl: imagePreview || 'https://via.placeholder.com/300', // Utiliser l'aperçu de l'image ou une image par défaut
-        availabilityDate: availabilityDate
-          ? availabilityDate.toISOString()
-          : new Date().toISOString(),
-        availableQuantity: Number(availableQuantity),
-        initialQuantity: Number(availableQuantity),
-        unitPrice: Number(unitPrice),
-        unitType,
-        producerId: 'id' in authenticatedUser ? authenticatedUser.id : 1,
-        createdAt: new Date().toISOString(),
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Erreur lors de la création du lot')
       }
 
-      // Stockons ce nouveau lot dans le localStorage pour le récupérer dans la page d'accueil
-      const existingBatches = localStorage.getItem('producerBatches')
-      const batches = existingBatches ? JSON.parse(existingBatches) : []
-      batches.push(newBatch)
-      localStorage.setItem('producerBatches', JSON.stringify(batches))
-
-      // Réinitialiser le formulaire après soumission réussie
+      // Réinitialiser le formulaire après succès
       setProductName('')
       setProductType('')
-      setProductDescription('') // Réinitialiser la description
+      setProductDescription('')
       setProductImage(null)
       setImagePreview(null)
       setAvailabilityDate(null)
@@ -242,7 +219,7 @@ const AddBatchPage = () => {
       setUnitPrice('')
       setUnitType('')
 
-      setSnackbarMessage('Produit ajouté avec succès!')
+      setSnackbarMessage('Lot ajouté avec succès! Il sera examiné par un gestionnaire.')
       setSnackbarSeverity('success')
       setOpenSnackbar(true)
 
@@ -251,8 +228,8 @@ const AddBatchPage = () => {
         navigate('/producer-dashboard')
       }, 2000)
     } catch (error) {
-      console.error("Erreur lors de l'ajout du produit:", error)
-      setSnackbarMessage("Erreur lors de l'ajout du produit")
+      console.error("Erreur lors de l'ajout du lot:", error)
+      setSnackbarMessage(error instanceof Error ? error.message : "Erreur lors de l'ajout du lot")
       setSnackbarSeverity('error')
       setOpenSnackbar(true)
     } finally {
