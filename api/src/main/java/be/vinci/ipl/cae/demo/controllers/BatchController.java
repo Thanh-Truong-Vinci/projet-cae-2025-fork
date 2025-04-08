@@ -41,6 +41,7 @@ public class BatchController {
    * @param batchService le service de gestion des lots injecté
    * @param productService le service de gestion des photos injecté
    * @param photoService le service de gestion des photos injecté
+   * @param productTypeRepository le repository de gestion des types de produits injecté
    */
   public BatchController(
       BatchService batchService,
@@ -65,6 +66,28 @@ public class BatchController {
   public Batch createBatch(
       @RequestPart("batch") NewBatch newBatch, @RequestPart("image") MultipartFile image) {
 
+        System.out.println("=== DÉBUT TRAITEMENT IMAGE ===");
+  System.out.println("Image reçue: " + image.getOriginalFilename());
+  System.out.println("Type de contenu: " + image.getContentType());
+  System.out.println("Taille: " + image.getSize() + " octets");
+  System.out.println("=== FIN TRAITEMENT IMAGE ===");
+
+    System.out.println(
+        "createBatch called"
+            + newBatch.getProductName()
+            + " "
+            + newBatch.getProductType()
+            + " "
+            + newBatch.getProductDescription()
+            + " "
+            + newBatch.getAvailabilityDate()
+            + " "
+            + newBatch.getUnitPrice()
+            + " "
+            + newBatch.getSaleUnit()
+            + " "
+            + newBatch.getAvailableQuantity());
+
     if (newBatch == null || image == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Données invalides");
     }
@@ -72,22 +95,20 @@ public class BatchController {
     try {
       // 1. Upload the photo and get its ID
       Photo photo = photoService.createPhoto(newBatch.getProductName(), image);
-      Long photoId = photo.getId();
 
       // 2. Get or create the product type and get its ID
       ProductType productType = productTypeRepository.findByTitle(newBatch.getProductType());
-      System.out.println("CACA 1");
+      System.out.println(" 1");
 
       // 3. Create the product and get its ID
-      Product product = productService.createProduct(
-          newBatch.getProductName(), productType, newBatch.getProductDescription(), photo);
-      System.out.println(product.getId() + " ICI");
-      Long productId = product.getId();
+      Product product =
+          productService.createProduct(
+              newBatch.getProductName(), productType, newBatch.getProductDescription(), photo);
 
-      System.out.println("CACA 2");
+      System.out.println(" 2");
 
       // 4. Create the batch with the IDs
-      return batchService.createBatch(newBatch, productId, photoId);
+      return batchService.createBatch(newBatch, product, photo);
     } catch (Exception e) {
       throw new ResponseStatusException(
           HttpStatus.INTERNAL_SERVER_ERROR,

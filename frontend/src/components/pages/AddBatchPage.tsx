@@ -28,11 +28,11 @@ import { BatchContext } from '../../contexts/BatchContext'
 import { NewBatch } from '../../types'
 
 type ProductType =
-  | 'Légume'
-  | 'Fruit'
+  | 'Légumes'
+  | 'Fruits'
   | 'Boulangerie'
   | 'Viande'
-  | 'Produit laitier'
+  | 'Produits laitiers'
   | 'Autre'
 
 interface FormErrors {
@@ -263,11 +263,11 @@ const AddBatchPage = () => {
                   label="Type de produit *"
                   onChange={handleTypeChange}
                 >
-                  <MenuItem value="Légume">Légume</MenuItem>
-                  <MenuItem value="Fruit">Fruit</MenuItem>
+                  <MenuItem value="Légumes">Légumes</MenuItem>
+                  <MenuItem value="Fruits">Fruits</MenuItem>
                   <MenuItem value="Boulangerie">Boulangerie</MenuItem>
                   <MenuItem value="Viande">Viande</MenuItem>
-                  <MenuItem value="Produit laitier">Produit laitier</MenuItem>
+                  <MenuItem value="Produits laitiers">Produits laitiers</MenuItem>
                   <MenuItem value="Autre">Autre</MenuItem>
                 </Select>
                 {errors.productType && (
