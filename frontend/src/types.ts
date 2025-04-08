@@ -121,13 +121,13 @@ export interface Batch {
 }
 
 export interface NewBatch {
-  email: string,
-  productName: string,
-  productType: string,
-  productDescription: string,
-  availabilityDate: string,
-  unitPrice: number,
-  saleUnit: string,
+  email: string
+  productName: string
+  productType: string
+  productDescription: string
+  availabilityDate: string
+  unitPrice: number
+  saleUnit: string
   availableQuantity: number
 }
 

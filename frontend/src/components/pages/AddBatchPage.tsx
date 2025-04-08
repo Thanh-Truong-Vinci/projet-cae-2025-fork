@@ -1,4 +1,5 @@
-import { useState, useContext, ChangeEvent, FormEvent, useEffect } from 'react'
+import { useState, useEffect, useContext, ChangeEvent, FormEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Typography,
   Box,
@@ -16,15 +17,14 @@ import {
   Snackbar,
   Alert,
 } from '@mui/material'
-import { UserContext } from '../../contexts/UserContext'
-import { BatchContext } from '../../contexts/BatchContext'
-import { useNavigate } from 'react-router-dom'
-import CloudUploadIcon from '@mui/icons-material/CloudUpload'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { Dayjs } from 'dayjs'
 import 'dayjs/locale/fr'
+import CloudUploadIcon from '@mui/icons-material/CloudUpload'
+import { UserContext } from '../../contexts/UserContext'
+import { BatchContext } from '../../contexts/BatchContext'
 import { NewBatch } from '../../types'
 
 type ProductType =
@@ -173,60 +173,6 @@ const AddBatchPage = () => {
         throw new Error("L'image du produit est requise")
       }
 
-      const compressImage = (file: File): Promise<File> => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = (event) => {
-            const img = new Image();
-            img.src = event.target?.result as string;
-            img.onload = () => {
-              const canvas = document.createElement('canvas');
-              let width = img.width;
-              let height = img.height;
-              
-              // Calculer les dimensions maximales (800px max)
-              const MAX_SIZE = 800;
-              if (width > height) {
-                if (width > MAX_SIZE) {
-                  height = Math.round((height * MAX_SIZE) / width);
-                  width = MAX_SIZE;
-                }
-              } else {
-                if (height > MAX_SIZE) {
-                  width = Math.round((width * MAX_SIZE) / height);
-                  height = MAX_SIZE;
-                }
-              }
-              
-              canvas.width = width;
-              canvas.height = height;
-              const ctx = canvas.getContext('2d');
-              ctx?.drawImage(img, 0, 0, width, height);
-              
-              // Convertir en blob avec compression
-              canvas.toBlob(
-                (blob) => {
-                  if (blob) {
-                    // Créer un nouveau fichier à partir du blob
-                    const compressedFile = new File([blob], file.name, {
-                      type: 'image/jpeg',
-                      lastModified: Date.now(),
-                    });
-                    resolve(compressedFile);
-                  } else {
-                    reject(new Error("Échec de compression de l'image"));
-                  }
-                },
-                'image/jpeg',
-                0.7  // Niveau de qualité: 0.7 = 70%
-              );
-            };
-          };
-          reader.onerror = (error) => reject(error);
-        });
-      };
-
       const batchData: NewBatch = {
         email: authenticatedUser.email,
         productName: productName,
@@ -239,7 +185,7 @@ const AddBatchPage = () => {
       }
 
       if (batchContext) {
-        await batchContext.createBatch(batchData, await compressImage(productImage))
+        await batchContext.createBatch(batchData, productImage)
       } else {
         throw new Error("Le contexte BatchContext n'est pas disponible")
       }
@@ -264,9 +210,9 @@ const AddBatchPage = () => {
         navigate('/producer-dashboard')
       }, 2000)
     } catch (error) {
-      console.error('Erreur lors de l\'ajout du lot:', error)
+      console.error("Erreur lors de l'ajout du lot:", error)
       setSnackbarMessage(
-        error instanceof Error ? error.message : 'Erreur lors de l\'ajout du lot'
+        error instanceof Error ? error.message : "Erreur lors de l'ajout du lot"
       )
       setSnackbarSeverity('error')
       setOpenSnackbar(true)

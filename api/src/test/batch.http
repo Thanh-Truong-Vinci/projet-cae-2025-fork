@@ -58,22 +58,25 @@ Content-Type: multipart/form-data; boundary=boundary
 Authorization: {{producerToken}}
 
 --boundary
+Content-Disposition: form-data; name="image"; filename="fraises.jpg"
+Content-Type: image/jpeg
+
+< ./fraises.jpg
+
+--boundary
 Content-Disposition: form-data; name="batch"
 Content-Type: application/json
 
+
 {
   "email": "producer@example.com",
-  "productName": "Fraises Bio",
+  "productName": "Fraises BioGRGrthtr",
   "productType": "Fruits",
-  "productDescription": "Fraises cultivées en agriculture biologique, variété Mara des Bois",
+  "productDescription": "Fraises cultgivées en agriculture biologique, variété Mara des Bois",
   "availabilityDate": "2025-05-15",
   "unitPrice": 4.50,
   "saleUnit": "barquette",
   "availableQuantity": 50
 }
---boundary
-Content-Disposition: form-data; name="image"; filename="fraises.jpg"
-Content-Type: image/jpeg
 
-< ./fraises.jpg
 --boundary--

@@ -67,7 +67,8 @@ VALUES ('tomate_bio', 'https://imagestoragecae09.blob.core.windows.net/dev/640b2
        ('poulet', 'https://imagestoragecae09.blob.core.windows.net/dev/601c557a-8862-410f-9d66-19c49f903e30'),
        ('yaourt', 'https://imagestoragecae09.blob.core.windows.net/dev/52205241-37f2-4631-a7e7-f967a65fbee8'),
        ('pomme_jonagold', 'https://imagestoragecae09.blob.core.windows.net/dev/758fcf0e-a66c-45e0-95ed-8f0aa6ecfd80'),
-       ('choufleur_cheddar', 'https://imagestoragecae09.blob.core.windows.net/dev/007d32fb-7c1d-45ca-a917-48ce9f0db3ae');
+       ('choufleur_cheddar',
+        'https://imagestoragecae09.blob.core.windows.net/dev/007d32fb-7c1d-45ca-a917-48ce9f0db3ae');
 
 -- Insérer des produits
 INSERT INTO products (id_product_type, name, description, photo_id)

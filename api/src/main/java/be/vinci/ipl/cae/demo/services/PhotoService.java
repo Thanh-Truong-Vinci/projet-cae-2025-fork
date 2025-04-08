@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 /** Service class for managing photos. */
@@ -49,8 +48,7 @@ public class PhotoService {
    * @param image the image file to be uploaded
    * @return the created Photo entity
    */
-  public Photo createPhoto(
-      @RequestPart("product") String product, @RequestPart("image") MultipartFile image) {
+  public Photo createPhoto(String product, MultipartFile image) {
     Photo photo = new Photo();
     photo.setProductName(product);
     if (image != null && !image.isEmpty()) {

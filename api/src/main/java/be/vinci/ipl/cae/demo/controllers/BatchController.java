@@ -12,7 +12,6 @@ import be.vinci.ipl.cae.demo.services.PhotoService;
 import be.vinci.ipl.cae.demo.services.ProductService;
 import java.util.List;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -42,7 +41,6 @@ public class BatchController {
    * @param batchService le service de gestion des lots injecté
    * @param productService le service de gestion des photos injecté
    * @param photoService le service de gestion des photos injecté
-   * @param productTypeService le service de gestion des types de produit injecté
    */
   public BatchController(
       BatchService batchService,
@@ -62,7 +60,7 @@ public class BatchController {
    * @param image le fichier image du produit
    * @return le lot créé
    */
-  @PostMapping(value = "/createbatch", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PostMapping("/createbatch")
   @PreAuthorize(SecurityConstants.HAS_ROLE_PRODUCER)
   public Batch createBatch(
       @RequestPart("batch") NewBatch newBatch, @RequestPart("image") MultipartFile image) {
@@ -78,11 +76,15 @@ public class BatchController {
 
       // 2. Get or create the product type and get its ID
       ProductType productType = productTypeRepository.findByTitle(newBatch.getProductType());
+      System.out.println("CACA 1");
 
       // 3. Create the product and get its ID
       Product product = productService.createProduct(
           newBatch.getProductName(), productType, newBatch.getProductDescription(), photo);
+      System.out.println(product.getId() + " ICI");
       Long productId = product.getId();
+
+      System.out.println("CACA 2");
 
       // 4. Create the batch with the IDs
       return batchService.createBatch(newBatch, productId, photoId);

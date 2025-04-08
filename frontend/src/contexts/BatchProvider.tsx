@@ -56,7 +56,9 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
       const data = await response.json()
       setApprovedBatches(data)
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Une erreur est survenue')
+      setError(
+        error instanceof Error ? error.message : 'Une erreur est survenue'
+      )
       console.error('Erreur lors de la récupération des lots approuvés:', error)
     } finally {
       setIsLoading(false)
@@ -98,43 +100,47 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
     }
   }
 
-  const createBatch = async (newBatch: NewBatch, image: File): Promise<void> => {
+  const createBatch = async (
+    newBatch: NewBatch,
+    image: File
+  ): Promise<void> => {
     try {
       if (!authenticatedUser) {
-        throw new Error("Vous devez être authentifié pour ajouter un lot")
+        throw new Error('Vous devez être authentifié pour ajouter un lot')
       }
-
-      // Préparation du FormData pour l'envoi multipart
       const formData = new FormData()
-
-      // Ajouter les données JSON sous forme de chaîne, mais avec le bon nom de fichier et type MIME
-      const batchBlob = new Blob([JSON.stringify(newBatch)], {
-        type: 'application/json'
-      });
-      formData.append('batch', batchBlob, 'batch.json');  // Ajout du nom de fichier
-
-      // Ajouter l'image
+      const batchToBeAdded = JSON.parse(JSON.stringify(newBatch))
       formData.append('image', image)
 
-      console.log('Envoi batch:', newBatch);
-      console.log('Envoi image:', image.name, image.type, image.size);
+      formData.append(
+        'batch',
+        new Blob([JSON.stringify(batchToBeAdded)], {
+          type: 'application/json',
+        })
+      )
 
-      // Envoi de la requête avec Axios
-      const response = await axios.post('/api/batches/createbatch', formData, {
+      const options = {
+        method: 'POST',
+        body: formData,
         headers: {
           Authorization: authenticatedUser.token,
-          // Ne pas définir Content-Type, Axios le fera automatiquement avec la boundary pour multipart/form-data
-        }
-      })
+        },
+      }
 
-      return response.data;
+      const response = await fetch('/api/batches/createbatch', options)
+
+      if (!response.ok)
+        throw new Error(
+          `fetch error : ${response.status} : ${response.statusText}`
+        )
+
+      return await response.json()
     } catch (err) {
       console.error('addBatch::error: ', err)
-      if (axios.isAxiosError(err)) {
-        console.error('Response data:', err.response?.data)
-        throw new Error(err.response?.data?.message || `Erreur: ${err.response?.status}`)
+      if (err instanceof Error) {
+        throw new Error(err.message || 'Erreur lors de la création du lot')
       }
-      throw err
+      throw new Error('Erreur inconnue lors de la création du lot')
     }
   }
 
@@ -152,7 +158,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
         error,
         fetchApprovedBatches,
         receiveBatch,
-        createBatch
+        createBatch,
       }}
     >
       {children}
