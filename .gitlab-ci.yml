@@ -120,8 +120,8 @@ deploy to production:
   stage: production
   environment: production
   variables:
-    AZURE_WEBAPP_NAME: cae-group09-production-app
-    BASE_URL: https://cae-group09-production-app-fzgbfwd3gsa8fgc3.centralus-01.azurewebsites.net/
+    AZURE_WEBAPP_NAME: cae-group-09-production-app
+    BASE_URL: https://cae-group-09-production-app-grd0backc3gnhecf.centralus-01.azurewebsites.net
     NODE_ENV: production
   extends: .deploy
   when: manual
