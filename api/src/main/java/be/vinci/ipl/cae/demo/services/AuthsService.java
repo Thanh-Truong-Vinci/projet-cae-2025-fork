@@ -11,13 +11,10 @@ import be.vinci.ipl.cae.demo.repositories.ProducerRepository;
 import be.vinci.ipl.cae.demo.repositories.UserRepository;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import java.util.Date;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Service for handling authentication-related operations.
@@ -55,7 +52,6 @@ public class AuthsService {
    *
    * @param email the email to include in the token
    * @return the generated JWT token
-   * @throws ResponseStatusException if token generation fails
    */
   @SuppressWarnings({
       "checkstyle:FileTabCharacter",
@@ -65,19 +61,15 @@ public class AuthsService {
   })
   public String createJwtToken(String email) {
     if (email == null || email.isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email cannot be null or empty");
+      return null;
     }
-    try {
-      return JWT.create()
-          .withIssuer("auth0")
-          .withClaim("email", email)
-          .withIssuedAt(new Date())
-          .withExpiresAt(new Date(System.currentTimeMillis() + LIFETIME_JWT))
-          .sign(algorithm);
-    } catch (JWTCreationException e) {
-      throw new ResponseStatusException(
-          HttpStatus.INTERNAL_SERVER_ERROR, "Token generation failed: " + e.getMessage(), e);
-    }
+    
+    return JWT.create()
+        .withIssuer("auth0")
+        .withClaim("email", email)
+        .withIssuedAt(new Date())
+        .withExpiresAt(new Date(System.currentTimeMillis() + LIFETIME_JWT))
+        .sign(algorithm);
   }
 
   /**
@@ -96,6 +88,7 @@ public class AuthsService {
     if (token == null || token.isBlank()) {
       return null;
     }
+    
     try {
       return JWT.require(algorithm)
           .withIssuer("auth0")
@@ -104,7 +97,6 @@ public class AuthsService {
           .getClaim("email")
           .asString();
     } catch (JWTVerificationException e) {
-      // Handle verification exceptions including token expiration
       return null;
     }
   }

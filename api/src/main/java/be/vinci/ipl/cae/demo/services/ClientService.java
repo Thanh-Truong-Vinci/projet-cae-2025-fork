@@ -6,7 +6,6 @@ import be.vinci.ipl.cae.demo.repositories.UserRepository;
 import java.time.LocalDate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Client service.
@@ -23,6 +22,7 @@ public class ClientService {
    *
    * @param clientRepository the client repository
    * @param userRepository   the user repository
+   * @param passwordEncoder  the password encoder
    */
   public ClientService(
       ClientRepository clientRepository,
@@ -47,8 +47,9 @@ public class ClientService {
    * @param city        the city
    * @param country     the country
    * @param phoneNumber the phone number (optional)
+   * @return the created client
    */
-  public void createClient(
+  public Client createClient(
       String name,
       String firstname,
       String email,
@@ -75,7 +76,7 @@ public class ClientService {
     client.setPhoneNumber(phoneNumber);
     client.setDateInscription(LocalDate.now());
 
-    clientRepository.save(client);
+    return clientRepository.save(client);
   }
 
   /**
@@ -93,7 +94,6 @@ public class ClientService {
    * @param country     the country
    * @param phoneNumber the phone number (optional)
    * @return true if the registration is successful, false otherwise
-   * @throws ResponseStatusException if validation fails
    */
   public boolean register(
       String name,
