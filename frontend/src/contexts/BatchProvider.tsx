@@ -108,20 +108,25 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
       if (!authenticatedUser) {
         throw new Error('Vous devez être authentifié pour ajouter un lot')
       }
-      
-      console.log('Création de lot:', newBatch.productName, 'avec image:', image.name)
-      
+
+      console.log(
+        'Création de lot:',
+        newBatch.productName,
+        'avec image:',
+        image.name
+      )
+
       console.log('Image à envoyer:', {
         nom: image.name,
         type: image.type,
-        taille: `${(image.size/1024).toFixed(2)}KB`
-      });
-      
+        taille: `${(image.size / 1024).toFixed(2)}KB`,
+      })
+
       const formData = new FormData()
-      
+
       // Ajouter l'image directement (sans transformation JSON qui cause l'erreur 413)
       formData.append('image', image)
-      
+
       // Ajouter les données du lot en JSON
       formData.append(
         'batch',
@@ -129,7 +134,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
           type: 'application/json',
         })
       )
-      
+
       const options = {
         method: 'POST',
         body: formData,
@@ -137,18 +142,18 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
           Authorization: authenticatedUser.token,
         },
       }
-      
+
       const response = await fetch('/api/batches/createbatch', options)
-      console.log('Statut de la réponse:', response.status);
-      
+      console.log('Statut de la réponse:', response.status)
+
       if (!response.ok)
         throw new Error(
           `fetch error : ${response.status} : ${response.statusText}`
         )
-        
+
       const createdBatch = await response.json()
       console.log('Lot créé avec succès:', createdBatch)
-      
+
       return createdBatch
     } catch (err) {
       console.error('addBatch::error: ', err)

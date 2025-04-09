@@ -267,7 +267,9 @@ const AddBatchPage = () => {
                   <MenuItem value="Fruits">Fruits</MenuItem>
                   <MenuItem value="Boulangerie">Boulangerie</MenuItem>
                   <MenuItem value="Viande">Viande</MenuItem>
-                  <MenuItem value="Produits laitiers">Produits laitiers</MenuItem>
+                  <MenuItem value="Produits laitiers">
+                    Produits laitiers
+                  </MenuItem>
                   <MenuItem value="Autre">Autre</MenuItem>
                 </Select>
                 {errors.productType && (
