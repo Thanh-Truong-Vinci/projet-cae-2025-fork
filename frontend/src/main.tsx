@@ -24,7 +24,7 @@ import { BatchProvider } from './contexts/BatchProvider.tsx'
 import ProfilePage from './components/pages/ProfilePage.tsx'
 import ManagerDashboardPage from './components/pages/ManagerDashboardPage.tsx'
 import VolunteerHomePage from './components/pages/VolunteerHomePage.tsx'
-import SimpleProtectedRoute from './components/SimpleProtectedRoute.tsx'
+import SimpleProtectedRoute from './components/simpleProtectedRoute.tsx'
 import IndexRoute from './components/IndexRoute.tsx'
 
 const router = createBrowserRouter([
