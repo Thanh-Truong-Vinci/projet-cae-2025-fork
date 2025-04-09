@@ -13,7 +13,8 @@ TRUNCATE TABLE users CASCADE;
 
 -- Insérer un administrateur
 INSERT INTO users (name, firstname, email, password, date_inscription)
-VALUES ('Admin', 'Admin', 'admin@example.com', '$2a$10$Gx8Kku6mS5PdMgiSne0neumKPPZWr28huUKo/joIs.79deMbi4M4i',
+VALUES ('Admin', 'Admin', 'admin@example.com',
+        '$2a$10$Gx8Kku6mS5PdMgiSne0neumKPPZWr28huUKo/joIs.79deMbi4M4i',
         '2001-01-01');
 
 -- Récupérer l'ID généré et insérer dans la table manager
@@ -24,11 +25,13 @@ WHERE email = 'admin@example.com';
 
 -- Créer un producteur de test
 INSERT INTO users (name, firstname, email, password, date_inscription)
-VALUES ('Dupont', 'Jean', 'producer@example.com', '$2a$10$8Cv0QyLMQ.dDlswhLhd8peiW6.KWnQLl0VmL5lw41/trJgprkg2vm',
+VALUES ('Dupont', 'Jean', 'producer@example.com',
+        '$2a$10$8Cv0QyLMQ.dDlswhLhd8peiW6.KWnQLl0VmL5lw41/trJgprkg2vm',
         '2024-01-15');
 
 -- Récupérer l'ID et créer l'adresse du producteur
-INSERT INTO user_with_address (id_user, street, number, box, postal_code, city, country, phone_number)
+INSERT INTO user_with_address (id_user, street, number, box, postal_code, city, country,
+                               phone_number)
 SELECT id_user,
        'Rue des Agriculteurs',
        '42',
@@ -58,15 +61,24 @@ VALUES ('Légumes'),
 
 -- Insérer quelques photos
 INSERT INTO photos (product_name, url)
-VALUES ('tomate_bio', 'https://imagestoragecae09.blob.core.windows.net/dev/640b2ba0-885c-4aa0-bff5-5f995f99e745'),
-       ('pomme_rouge', 'https://imagestoragecae09.blob.core.windows.net/dev/97912d63-b931-4a0f-acaa-f1632cd742ad'),
-       ('pain_artisanal', 'https://imagestoragecae09.blob.core.windows.net/dev/f2a0ec00-fc7e-45c5-9794-7320fc70c797'),
-       ('fromage', 'https://imagestoragecae09.blob.core.windows.net/dev/ff87dda5-99f9-4c96-a731-2c71dd884e2d'),
-       ('carottes', 'https://imagestoragecae09.blob.core.windows.net/dev/e9b1914d-343c-4b5f-b146-c8016f6e83ff'),
-       ('biere', 'https://imagestoragecae09.blob.core.windows.net/dev/f212f310-a62f-4ea6-be3a-e1ef2edf3321'),
-       ('poulet', 'https://imagestoragecae09.blob.core.windows.net/dev/601c557a-8862-410f-9d66-19c49f903e30'),
-       ('yaourt', 'https://imagestoragecae09.blob.core.windows.net/dev/52205241-37f2-4631-a7e7-f967a65fbee8'),
-       ('pomme_jonagold', 'https://imagestoragecae09.blob.core.windows.net/dev/758fcf0e-a66c-45e0-95ed-8f0aa6ecfd80'),
+VALUES ('tomate_bio',
+        'https://imagestoragecae09.blob.core.windows.net/dev/640b2ba0-885c-4aa0-bff5-5f995f99e745'),
+       ('pomme_rouge',
+        'https://imagestoragecae09.blob.core.windows.net/dev/97912d63-b931-4a0f-acaa-f1632cd742ad'),
+       ('pain_artisanal',
+        'https://imagestoragecae09.blob.core.windows.net/dev/f2a0ec00-fc7e-45c5-9794-7320fc70c797'),
+       ('fromage',
+        'https://imagestoragecae09.blob.core.windows.net/dev/ff87dda5-99f9-4c96-a731-2c71dd884e2d'),
+       ('carottes',
+        'https://imagestoragecae09.blob.core.windows.net/dev/e9b1914d-343c-4b5f-b146-c8016f6e83ff'),
+       ('biere',
+        'https://imagestoragecae09.blob.core.windows.net/dev/f212f310-a62f-4ea6-be3a-e1ef2edf3321'),
+       ('poulet',
+        'https://imagestoragecae09.blob.core.windows.net/dev/601c557a-8862-410f-9d66-19c49f903e30'),
+       ('yaourt',
+        'https://imagestoragecae09.blob.core.windows.net/dev/52205241-37f2-4631-a7e7-f967a65fbee8'),
+       ('pomme_jonagold',
+        'https://imagestoragecae09.blob.core.windows.net/dev/758fcf0e-a66c-45e0-95ed-8f0aa6ecfd80'),
        ('choufleur_cheddar',
         'https://imagestoragecae09.blob.core.windows.net/dev/007d32fb-7c1d-45ca-a917-48ce9f0db3ae');
 
@@ -82,7 +94,10 @@ WHERE pt.title = 'Légumes'
   AND p.product_name = 'tomate_bio';
 
 INSERT INTO products (id_product_type, name, description, photo_id)
-SELECT pt.id_product_type, 'Pommes Royal Gala', 'Pommes sucrées et croquantes, idéales comme collation.', p.id_photo
+SELECT pt.id_product_type,
+       'Pommes Royal Gala',
+       'Pommes sucrées et croquantes, idéales comme collation.',
+       p.id_photo
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Fruits'
@@ -99,7 +114,10 @@ WHERE pt.title = 'Boulangerie'
   AND p.product_name = 'pain_artisanal';
 
 INSERT INTO products (id_product_type, name, description, photo_id)
-SELECT pt.id_product_type, 'Fromage fermier', 'Fromage à pâte dure affiné pendant 6 mois.', p.id_photo
+SELECT pt.id_product_type,
+       'Fromage fermier',
+       'Fromage à pâte dure affiné pendant 6 mois.',
+       p.id_photo
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Produits laitiers'
@@ -167,7 +185,8 @@ WHERE pt.title = 'Légumes'
 
 -- Créer des lots pour chaque produit
 -- Fix all pending batches inserts
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -184,7 +203,8 @@ FROM products p
 ON p.photo_id = ph.id_photo
 WHERE p.name = 'Tomates Bio';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -201,7 +221,8 @@ FROM products p
 ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pommes Royal Gala';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -218,7 +239,8 @@ FROM products p
 ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pain au levain';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -235,7 +257,8 @@ FROM products p
 ON p.photo_id = ph.id_photo
 WHERE p.name = 'Fromage fermier';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -252,7 +275,8 @@ FROM products p
 ON p.photo_id = ph.id_photo
 WHERE p.name = 'Carottes Bio';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -269,7 +293,8 @@ FROM products p
 ON p.photo_id = ph.id_photo
 WHERE p.name = 'Bière artisanale';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -286,7 +311,8 @@ FROM products p
 ON p.photo_id = ph.id_photo
 WHERE p.name = 'Poulet fermier';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -304,7 +330,8 @@ ON p.photo_id = ph.id_photo
 WHERE p.name = 'Yaourt nature';
 
 -- Fix all approved batches inserts
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -321,7 +348,8 @@ FROM products p
 ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pomme Jonagold';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -338,7 +366,8 @@ FROM products p
 ON p.photo_id = ph.id_photo
 WHERE p.name = 'Chou-fleur cheddar';
 
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -361,7 +390,8 @@ WHERE email = 'admin@example.com';
 
 -- Ajouter l'utilisateur Volunteer
 INSERT INTO users (name, firstname, email, password, date_inscription)
-VALUES ('Volunteer', 'User', 'volunteer@example.com', '$2a$10$Gx8Kku6mS5PdMgiSne0neumKPPZWr28huUKo/joIs.79deMbi4M4i',
+VALUES ('Volunteer', 'User', 'volunteer@example.com',
+        '$2a$10$Gx8Kku6mS5PdMgiSne0neumKPPZWr28huUKo/joIs.79deMbi4M4i',
         '2001-01-01');
 
 INSERT INTO manager (id_user, manager)

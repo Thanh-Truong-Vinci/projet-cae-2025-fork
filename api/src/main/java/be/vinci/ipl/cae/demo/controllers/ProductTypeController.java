@@ -1,10 +1,9 @@
 package be.vinci.ipl.cae.demo.controllers;
 
-import be.vinci.ipl.cae.demo.exceptions.ResourceNotFoundException;
 import be.vinci.ipl.cae.demo.models.dtos.NewProductType;
 import be.vinci.ipl.cae.demo.models.entities.ProductType;
 import be.vinci.ipl.cae.demo.services.ProductTypeService;
-
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,8 +12,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
-/** Controller pour gérer les opérations sur les types de produits. */
+/**
+ * Controller pour gérer les opérations sur les types de produits.
+ */
 @RestController
 @RequestMapping("/product-types")
 public class ProductTypeController {
@@ -51,7 +53,7 @@ public class ProductTypeController {
   public ProductType getProductTypeById(@PathVariable long id) {
     ProductType productType = productTypeService.getProductTypeById(id);
     if (productType == null) {
-      throw new ResourceNotFoundException("Type de produit non trouvé");
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Type de produit non trouvé");
     }
     return productType;
   }
@@ -69,15 +71,18 @@ public class ProductTypeController {
     if (newProductType == null
         || newProductType.getTitle() == null
         || newProductType.getTitle().isBlank()) {
-      throw new ResourceNotFoundException("Données du type de produit invalides");
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Données du type de produit invalides");
     }
 
     try {
       return productTypeService.createProductType(newProductType.getTitle());
     } catch (IllegalArgumentException e) {
-      throw new ResourceNotFoundException(e.getMessage());
+      // Correction: ajouter "e" comme troisième paramètre
+      throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage(), e);
     } catch (Exception e) {
-      throw new ResourceNotFoundException("Message d'erreur");
+      // Cette ligne est correcte, pas besoin de la changer
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Message d'erreur", e);
     }
   }
 
@@ -93,9 +98,11 @@ public class ProductTypeController {
     try {
       productTypeService.deleteProductType(id);
     } catch (IllegalArgumentException e) {
-      throw new ResourceNotFoundException(e.getMessage());
+      // Correction: ajouter "e" comme troisième paramètre
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
     } catch (Exception e) {
-      throw new ResourceNotFoundException("Message d'erreur");
+      // Cette ligne est correcte, pas besoin de la changer
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Message d'erreur", e);
     }
   }
 }

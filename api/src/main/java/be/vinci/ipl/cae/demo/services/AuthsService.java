@@ -19,9 +19,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-/** Service for handling authentication-related operations. */
+/**
+ * Service for handling authentication-related operations.
+ */
 @Service
 public class AuthsService {
+
   private static final String JWT_SECRET = "JWT_SECRET";
   private static final long LIFETIME_JWT = 24 * 60 * 60 * 1000; // 24 hours
   private static final Algorithm algorithm = Algorithm.HMAC256(JWT_SECRET);
@@ -31,7 +34,9 @@ public class AuthsService {
   private final ProducerRepository producerRepository;
   private final BCryptPasswordEncoder passwordEncoder;
 
-  /** Service for handling authentication-related operations. */
+  /**
+   * Service for handling authentication-related operations.
+   */
   public AuthsService(
       UserRepository userRepository,
       ClientRepository clientRepository,
@@ -53,10 +58,10 @@ public class AuthsService {
    * @throws ResponseStatusException if token generation fails
    */
   @SuppressWarnings({
-    "checkstyle:FileTabCharacter",
-    "checkstyle:Indentation",
-    "checkstyle:LineLength",
-    "checkstyle:MissingJavadocMethod"
+      "checkstyle:FileTabCharacter",
+      "checkstyle:Indentation",
+      "checkstyle:LineLength",
+      "checkstyle:MissingJavadocMethod"
   })
   public String createJwtToken(String email) {
     if (email == null || email.isBlank()) {
@@ -82,10 +87,10 @@ public class AuthsService {
    * @return the email if the token is valid, null otherwise
    */
   @SuppressWarnings({
-    "checkstyle:FileTabCharacter",
-    "checkstyle:Indentation",
-    "checkstyle:LineLength",
-    "checkstyle:MissingJavadocMethod"
+      "checkstyle:FileTabCharacter",
+      "checkstyle:Indentation",
+      "checkstyle:LineLength",
+      "checkstyle:MissingJavadocMethod"
   })
   public String verifyJwtToken(String token) {
     if (token == null || token.isBlank()) {
@@ -172,7 +177,7 @@ public class AuthsService {
   /**
    * Login a client.
    *
-   * @param email the email
+   * @param email    the email
    * @param password the password
    * @return the authenticated user if the login is successful, null otherwise
    */
@@ -196,7 +201,9 @@ public class AuthsService {
     return authenticatedUser;
   }
 
-  /** Enum representing user roles in the system. */
+  /**
+   * Enum representing user roles in the system.
+   */
   public enum Role {
     CLIENT("Client"),
     MANAGER("Manager"),
@@ -220,14 +227,18 @@ public class AuthsService {
     }
   }
 
-  /** Security constants for PreAuthorize expressions. */
+  /**
+   * Security constants for PreAuthorize expressions.
+   */
   public static final class SecurityConstants {
+
     public static final String HAS_ROLE_CLIENT = "hasRole('ROLE_CLIENT')";
     public static final String HAS_ROLE_MANAGER = "hasRole('ROLE_MANAGER')";
     public static final String HAS_ROLE_PRODUCER = "hasRole('ROLE_PRODUCER')";
     public static final String HAS_ROLE_VOLUNTEER = "hasRole('ROLE_VOLUNTEER')";
     public static final String HAS_ROLE_ADMIN = "hasRole('ROLE_ADMIN')";
 
-    private SecurityConstants() {}
+    private SecurityConstants() {
+    }
   }
 }

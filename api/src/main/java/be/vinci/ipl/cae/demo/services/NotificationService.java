@@ -6,7 +6,9 @@ import be.vinci.ipl.cae.demo.repositories.NotificationRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
-/** Service class for managing notifications. */
+/**
+ * Service class for managing notifications.
+ */
 @Service
 public class NotificationService {
 

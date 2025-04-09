@@ -13,7 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-/** Service class for managing reservations. */
+/**
+ * Service class for managing reservations.
+ */
 @Service
 public class ReservationService {
 
@@ -25,8 +27,8 @@ public class ReservationService {
   /**
    * Constructs a new ReservationService with the specified repositories and services.
    *
-   * @param reservationRepository the repository for reservations
-   * @param batchRepository the repository for batches
+   * @param reservationRepository  the repository for reservations
+   * @param batchRepository        the repository for batches
    * @param reservationLineService the service for reservation lines
    */
   public ReservationService(
@@ -43,8 +45,8 @@ public class ReservationService {
   /**
    * Creates a new reservation for a client with the specified product and quantity.
    *
-   * @param client the client making the reservation
-   * @param product the product to reserve
+   * @param client   the client making the reservation
+   * @param product  the product to reserve
    * @param quantity the quantity of the product to reserve
    * @return the created reservation
    */
@@ -62,9 +64,9 @@ public class ReservationService {
   /**
    * Reserves a product for a client with the specified quantity.
    *
-   * @param client the client making the reservation
+   * @param client    the client making the reservation
    * @param productId the ID of the product to reserve
-   * @param quantity the quantity of the product to reserve
+   * @param quantity  the quantity of the product to reserve
    */
   public void reserveProduct(Client client, Long productId, int quantity) {
     Product product = productService.getProductById(productId);
@@ -109,7 +111,7 @@ public class ReservationService {
   /**
    * Cancels a reservation for a client by reservation ID.
    *
-   * @param client the client who made the reservation.
+   * @param client        the client who made the reservation.
    * @param reservationId the ID of the reservation to cancel.
    */
   public void cancelReservation(Client client, Long reservationId) {

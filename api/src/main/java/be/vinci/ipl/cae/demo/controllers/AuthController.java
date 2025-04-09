@@ -1,6 +1,5 @@
 package be.vinci.ipl.cae.demo.controllers;
 
-import be.vinci.ipl.cae.demo.exceptions.ResourceNotFoundException;
 import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedUser;
 import be.vinci.ipl.cae.demo.models.dtos.Credentials;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsProfile;
@@ -9,12 +8,16 @@ import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.ClientService;
 import be.vinci.ipl.cae.demo.services.ProfileService;
 import be.vinci.ipl.cae.demo.utils.ValidationUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
-/** AuthController to handle client authentication. */
+/**
+ * AuthController to handle client authentication.
+ */
 @RestController
 @RequestMapping("/auths")
 public class AuthController {
@@ -27,7 +30,7 @@ public class AuthController {
    * Constructor for AuthController.
    *
    * @param clientService the injected ClientService.
-   * @param authsService the injected AuthsService.
+   * @param authsService  the injected AuthsService.
    */
   public AuthController(
       ProfileService profileService, ClientService clientService, AuthsService authsService) {
@@ -40,7 +43,7 @@ public class AuthController {
    * Register a new manager.
    *
    * @param credentials the manager credentials from the request body.
-   * @throws ResourceNotFoundException if the credentials are invalid or the email is already in use.
+   * @throws ResponseStatusException if the credentials are invalid or the email is already in use.
    */
   @PostMapping("/register")
   public void register(@RequestBody CredentialsRegister credentials) {
@@ -60,7 +63,7 @@ public class AuthController {
             credentials.getPhoneNumber());
 
     if (!success) {
-      throw new ResourceNotFoundException("Email is already in use");
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
     }
   }
 
@@ -69,7 +72,7 @@ public class AuthController {
    *
    * @param credentials the client credentials from the request body.
    * @return the authenticated user.
-   * @throws ResourceNotFoundException if the credentials are invalid or the login fails.
+   * @throws ResponseStatusException if the credentials are invalid or the login fails.
    */
   @PostMapping("/login")
   public AuthenticatedUser login(@RequestBody Credentials credentials) {
@@ -78,7 +81,7 @@ public class AuthController {
     AuthenticatedUser user = authsService.login(credentials.getEmail(), credentials.getPassword());
 
     if (user == null) {
-      throw new ResourceNotFoundException("Invalid email or password");
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
     }
 
     return user;
@@ -90,18 +93,18 @@ public class AuthController {
    *
    * @param token the token request containing the token to verify.
    * @return a new token if verification is successful.
-   * @throws ResourceNotFoundException if the token is invalid or the verification fails.
+   * @throws ResponseStatusException if the token is invalid or the verification fails.
    */
   @PostMapping("/me")
   public String refreshToken(@RequestBody String token) {
     if (token == null || token.isBlank()) {
-      throw new ResourceNotFoundException("Token is required");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token is required");
     }
 
     String email = authsService.verifyJwtToken(token);
 
     if (email == null) {
-      throw new ResourceNotFoundException("Invalid or expired token");
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
     }
 
     return authsService.createJwtToken(email);
