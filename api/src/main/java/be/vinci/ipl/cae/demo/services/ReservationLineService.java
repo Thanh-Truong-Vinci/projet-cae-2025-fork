@@ -47,7 +47,7 @@ public class ReservationLineService {
    */
   public void addProduct(Reservation reservation, Product product, int quantity) {
     List<Batch> batches =
-            batchRepository.findByProductIdAndAvailableQuantityGreaterThan(product.getId(), 0);
+        batchRepository.findByProductIdAndAvailableQuantityGreaterThan(product.getId(), 0);
     int totalAvailableQuantity = batches.stream().mapToInt(Batch::getAvailableQuantity).sum();
 
     if (totalAvailableQuantity < quantity) {

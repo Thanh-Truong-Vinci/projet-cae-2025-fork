@@ -60,7 +60,10 @@ public class Batch {
 
   @Column(name = "notification_id", nullable = true)
   private Long notificationId;
-  
-  @Column(name = "deposit_date", nullable = false)
+
+  @Column(name = "deposit_date", nullable = true)
   private LocalDate depositDate;
+
+  @Column(name = "production_date", nullable = false)
+  private LocalDate productionDate;
 }

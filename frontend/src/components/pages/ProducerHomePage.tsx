@@ -22,23 +22,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
-
-// Type pour les lots de produits
-interface ProductBatch {
-  id: number
-  productName: string
-  productType: string
-  imageUrl: string
-  availabilityDate: string
-  availableQuantity: number
-  initialQuantity: number
-  unitPrice: number
-  unitType: string
-  producerId: number
-  createdAt: string
-  status?: 'pending' | 'approved' | 'rejected'
-  rejectionReason?: string
-}
+import { ProductBatch } from '../../types'
 
 const ProducerHomePage = () => {
   const navigate = useNavigate()
@@ -63,22 +47,13 @@ const ProducerHomePage = () => {
 
       setLoading(true)
       try {
-        // Récupérer les lots stockés dans localStorage
-        const savedBatches = localStorage.getItem('producerBatches')
 
         // Données par défaut/simulées si aucun lot n'est enregistré
         let batchData: ProductBatch[] = []
 
-        if (savedBatches) {
-          // Si des lots ont été enregistrés, les utiliser
-          batchData = JSON.parse(savedBatches)
+        const savedBatches = false; // Define savedBatches as false or replace with actual logic
 
-          // Ajouter un statut par défaut si non défini
-          batchData = batchData.map((batch) => ({
-            ...batch,
-            status: batch.status || 'approved',
-          }))
-        } else {
+        if (savedBatches) {
           // Données simulées pour l'exemple (première visite)
           batchData = [
             {
@@ -91,7 +66,6 @@ const ProducerHomePage = () => {
                 Date.now() + 3 * 24 * 60 * 60 * 1000
               ).toISOString(),
               availableQuantity: 25,
-              initialQuantity: 30,
               unitPrice: 3.5,
               unitType: 'kg',
               producerId:
@@ -111,7 +85,6 @@ const ProducerHomePage = () => {
                 Date.now() + 5 * 24 * 60 * 60 * 1000
               ).toISOString(),
               availableQuantity: 15,
-              initialQuantity: 20,
               unitPrice: 2.8,
               unitType: 'kg',
               producerId:
@@ -131,7 +104,6 @@ const ProducerHomePage = () => {
                 Date.now() + 1 * 24 * 60 * 60 * 1000
               ).toISOString(),
               availableQuantity: 0,
-              initialQuantity: 10,
               unitPrice: 4.2,
               unitType: 'pièce',
               producerId:
@@ -143,9 +115,6 @@ const ProducerHomePage = () => {
               rejectionReason: 'Photos non conformes, description insuffisante',
             },
           ]
-
-          // Sauvegarder les données simulées dans localStorage pour les futures visites
-          localStorage.setItem('producerBatches', JSON.stringify(batchData))
         }
 
         setProductBatches(batchData)
@@ -317,8 +286,7 @@ const ProducerHomePage = () => {
                           )}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          <strong>Quantité:</strong> {batch.availableQuantity}/
-                          {batch.initialQuantity} {batch.unitType}
+                          <strong>Quantité:</strong> {batch.availableQuantity} {batch.unitType}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                           <strong>Prix:</strong> {batch.unitPrice.toFixed(2)}€/
@@ -411,18 +379,6 @@ const ProducerHomePage = () => {
                 }
               </Typography>
               <Typography variant="body1">En attente</Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <Box sx={{ textAlign: 'center', p: 2 }}>
-              <Typography variant="h4" color="primary">
-                {productBatches.reduce(
-                  (sum, batch) =>
-                    sum + (batch.initialQuantity - batch.availableQuantity),
-                  0
-                )}
-              </Typography>
-              <Typography variant="body1">Unités vendues</Typography>
             </Box>
           </Grid>
         </Grid>

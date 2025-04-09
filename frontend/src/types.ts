@@ -131,6 +131,21 @@ export interface NewBatch {
   availableQuantity: number
 }
 
+export interface ProductBatch {
+  id: number
+  productName: string
+  productType: string
+  imageUrl: string
+  availabilityDate: string
+  availableQuantity: number
+  unitPrice: number
+  unitType: string
+  producerId: number
+  createdAt: string
+  status?: 'pending' | 'approved' | 'rejected'
+  rejectionReason?: string
+}
+
 export interface BatchContextType {
   approvedBatches: Batch[]
   isLoading: boolean

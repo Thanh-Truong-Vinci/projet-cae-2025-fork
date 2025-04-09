@@ -3,9 +3,11 @@ package be.vinci.ipl.cae.demo.controllers;
 import be.vinci.ipl.cae.demo.models.dtos.NewBatch;
 import be.vinci.ipl.cae.demo.models.entities.Batch;
 import be.vinci.ipl.cae.demo.models.entities.Photo;
+import be.vinci.ipl.cae.demo.models.entities.Producer;
 import be.vinci.ipl.cae.demo.models.entities.Product;
 import be.vinci.ipl.cae.demo.models.entities.ProductType;
 import be.vinci.ipl.cae.demo.repositories.ProductTypeRepository;
+import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.AuthsService.SecurityConstants;
 import be.vinci.ipl.cae.demo.services.BatchService;
 import be.vinci.ipl.cae.demo.services.PhotoService;
@@ -30,6 +32,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/batches")
 public class BatchController {
 
+  private final AuthsService authsService;
   private final BatchService batchService;
   private final ProductService productService;
   private final PhotoService photoService;
@@ -47,7 +50,9 @@ public class BatchController {
       BatchService batchService,
       ProductService productService,
       PhotoService photoService,
-      ProductTypeRepository productTypeRepository) {
+      ProductTypeRepository productTypeRepository,
+      AuthsService authsService) {
+    this.authsService = authsService;
     this.batchService = batchService;
     this.productService = productService;
     this.photoService = photoService;
@@ -66,11 +71,11 @@ public class BatchController {
   public Batch createBatch(
       @RequestPart("batch") NewBatch newBatch, @RequestPart("image") MultipartFile image) {
 
-        System.out.println("=== DÉBUT TRAITEMENT IMAGE ===");
-  System.out.println("Image reçue: " + image.getOriginalFilename());
-  System.out.println("Type de contenu: " + image.getContentType());
-  System.out.println("Taille: " + image.getSize() + " octets");
-  System.out.println("=== FIN TRAITEMENT IMAGE ===");
+    System.out.println("=== DÉBUT TRAITEMENT IMAGE ===");
+    System.out.println("Image reçue: " + image.getOriginalFilename());
+    System.out.println("Type de contenu: " + image.getContentType());
+    System.out.println("Taille: " + image.getSize() + " octets");
+    System.out.println("=== FIN TRAITEMENT IMAGE ===");
 
     System.out.println(
         "createBatch called"
@@ -115,6 +120,19 @@ public class BatchController {
           "Erreur lors de la création du lot: " + e.getMessage(),
           e);
     }
+  }
+
+  /**
+   * Affiche les lots d'un producteur dont la quantité est supérieur à 0.
+   *
+   * @param token le toke du producteur
+   * @return une liste des lots trouvés
+   */
+  @PostMapping("/mybatches")
+  @PreAuthorize(SecurityConstants.HAS_ROLE_PRODUCER)
+  public Iterable<Batch> myBatches(@RequestHeader("Authorization") String token) {
+    Producer producer = authsService.isValidProducerToken(token);
+    return batchService.getBatchesByProducer(producer.getId());
   }
 
   /**

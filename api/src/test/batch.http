@@ -80,3 +80,8 @@ Content-Type: application/json
 }
 
 --boundary--
+
+### Obtenir les batchs du producteur connecté
+POST {{baseUrl}}/batches/mybatches
+Content-Type: application/json
+Authorization: {{producerToken}}

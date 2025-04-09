@@ -51,7 +51,7 @@ public class BatchService {
     batch.setSaleUnit(newBatch.getSaleUnit());
     batch.setAvailableQuantity(newBatch.getAvailableQuantity());
     batch.setStatus(BatchStatus.PENDING);
-    batch.setDepositDate(LocalDate.now());
+    batch.setProductionDate(LocalDate.now());
 
     return batchRepository.save(batch);
   }
@@ -108,8 +108,10 @@ public class BatchService {
     Notification notification = new Notification();
     notification.setIsRead(false);
     notification.setMessage(message);
-    Producer producer = producerRepository.findById(batch.getProducer().getId())
-        .orElseThrow(() -> new RuntimeException("Producer not found"));
+    Producer producer =
+        producerRepository
+            .findById(batch.getProducer().getId())
+            .orElseThrow(() -> new RuntimeException("Producer not found"));
     notification.setProducer(producer);
     notification = notificationRepository.save(notification);
 
@@ -144,5 +146,17 @@ public class BatchService {
    */
   public List<Batch> getApprovedBatches() {
     return batchRepository.findByStatus(BatchStatus.APPROVED);
+  }
+
+  /**
+   * Récupère tous les lots ayant le statut APPROVED.
+   *
+   * @param producerId le producteur qui fait la requête
+   * @return la liste des lots d'un producteur ayant une quantité supérieur à 0
+   */
+  public Iterable<Batch> getBatchesByProducer(Long producerId) {
+
+    return batchRepository.findByProducerIdAndAvailableQuantityGreaterThanOrderByProductionDateAsc(
+        producerId, 0);
   }
 }
