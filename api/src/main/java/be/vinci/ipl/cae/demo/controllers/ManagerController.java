@@ -7,7 +7,6 @@ import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.AuthsService.SecurityConstants;
 import be.vinci.ipl.cae.demo.services.ManagerService;
 import be.vinci.ipl.cae.demo.services.ProducerService;
-import be.vinci.ipl.cae.demo.utils.ValidationUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -73,6 +72,7 @@ public class ManagerController {
    */
   @PostMapping("/registerproducer")
   @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
+  @SuppressWarnings("PMD.CPD")
   public void registerProducer(
       @RequestBody CredentialsProducer credentials, @RequestHeader("Authorization") String token) {
     boolean success =

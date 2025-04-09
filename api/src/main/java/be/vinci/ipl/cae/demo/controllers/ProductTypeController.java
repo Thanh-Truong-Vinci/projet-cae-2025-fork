@@ -4,6 +4,7 @@ import be.vinci.ipl.cae.demo.exceptions.ConflictException;
 import be.vinci.ipl.cae.demo.exceptions.ResourceNotFoundException;
 import be.vinci.ipl.cae.demo.models.dtos.NewProductType;
 import be.vinci.ipl.cae.demo.models.entities.ProductType;
+import be.vinci.ipl.cae.demo.services.AuthsService.SecurityConstants;
 import be.vinci.ipl.cae.demo.services.ProductTypeService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -65,7 +66,7 @@ public class ProductTypeController {
    * @return le type de produit créé
    */
   @PostMapping({"", "/"})
-  @PreAuthorize("hasRole('ROLE_ADMIN')")
+  @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
   public ProductType createProductType(@RequestBody NewProductType newProductType) {
     // TODO verify token if is a manager
     if (newProductType == null
@@ -74,14 +75,8 @@ public class ProductTypeController {
       throw new ConflictException("Données du type de produit invalides");
     }
 
-    try {
-      return productTypeService.createProductType(newProductType.getTitle());
-    } catch (IllegalArgumentException e) {
-      throw new ConflictException(e.getMessage());
-    } catch (Exception e) {
-      throw new ConflictException("Erreur lors de la création du type de produit: "
-            + e.getMessage());
-    }
+    // No try-catch, directly returning the service call result
+    return productTypeService.createProductType(newProductType.getTitle());
   }
 
   /**
@@ -90,16 +85,17 @@ public class ProductTypeController {
    * @param id l'identifiant du type de produit à supprimer
    */
   @DeleteMapping("/{id}")
-  @PreAuthorize("hasRole('ROLE_ADMIN')")
+  @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
   public void deleteProductType(@PathVariable long id) {
     // TODO verify token if is a manager
-    try {
-      productTypeService.deleteProductType(id);
-    } catch (IllegalArgumentException e) {
-      throw new ResourceNotFoundException(e.getMessage());
-    } catch (Exception e) {
-      throw new ConflictException("Erreur lors de la suppression du type de produit: "
-            + e.getMessage());
+    
+    // Check if product type exists before deletion
+    ProductType productType = productTypeService.getProductTypeById(id);
+    if (productType == null) {
+      throw new ResourceNotFoundException("Type de produit non trouvé");
     }
+    
+    // No try-catch, directly calling the service method
+    productTypeService.deleteProductType(id);
   }
 }

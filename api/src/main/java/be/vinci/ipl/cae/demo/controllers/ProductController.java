@@ -4,6 +4,7 @@ import be.vinci.ipl.cae.demo.exceptions.ConflictException;
 import be.vinci.ipl.cae.demo.exceptions.ResourceNotFoundException;
 import be.vinci.ipl.cae.demo.models.dtos.NewProduct;
 import be.vinci.ipl.cae.demo.models.entities.Product;
+import be.vinci.ipl.cae.demo.services.AuthsService.SecurityConstants;
 import be.vinci.ipl.cae.demo.services.ProductService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -67,7 +68,7 @@ public class ProductController {
    * @return the created Product.
    */
   @PostMapping({"", "/"})
-  @PreAuthorize("hasRole('ROLE_ADMIN')")
+  @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
   public Product addProduct(@RequestBody NewProduct newProduct) {
     if (newProduct == null
         || newProduct.getName() == null
@@ -87,7 +88,7 @@ public class ProductController {
    * @return the deleted Product.
    */
   @DeleteMapping("/{id}")
-  @PreAuthorize("hasRole('ROLE_ADMIN')")
+  @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
   public Product deleteProduct(@PathVariable long id) {
     // TODO verify token if is a manager
     Product product = productService.deleteProduct(id);
@@ -105,7 +106,7 @@ public class ProductController {
    * @return the updated Product.
    */
   @PatchMapping("/{id}")
-  @PreAuthorize("hasRole('ROLE_ADMIN')")
+  @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
   public Product updateProduct(@PathVariable long id, @RequestBody NewProduct newProduct) {
     // TODO verify token if is a manager
     if (newProduct == null

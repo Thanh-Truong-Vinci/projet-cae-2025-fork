@@ -47,23 +47,24 @@ public class AuthController {
    * @throws ResponseStatusException if the credentials are invalid or the email is already in use.
    */
   @PostMapping("/register")
+  @SuppressWarnings("PMD.CPD")
   public void register(@RequestBody CredentialsRegister credentials) {
     ValidationUtils.validateCredentialsRegister(credentials);
-    boolean success =
-        clientService.register(
-            credentials.getName(),
-            credentials.getFirstname(),
-            credentials.getEmail(),
-            credentials.getPassword(),
-            credentials.getCivility(),
-            credentials.getStreet(),
-            credentials.getNumber(),
-            credentials.getPostalCode(),
-            credentials.getCity(),
-            credentials.getCountry(),
-            credentials.getPhoneNumber());
+    
+    boolean registrationSuccessful = clientService.register(
+        credentials.getName(),
+        credentials.getFirstname(),
+        credentials.getEmail(),
+        credentials.getPassword(),
+        credentials.getCivility(),
+        credentials.getStreet(),
+        credentials.getNumber(),
+        credentials.getPostalCode(),
+        credentials.getCity(),
+        credentials.getCountry(),
+        credentials.getPhoneNumber());
 
-    if (!success) {
+    if (!registrationSuccessful) {
       throw new ConflictException("Email is already in use");
     }
   }

@@ -94,26 +94,34 @@ public class BatchController {
       throw new ConflictException("Données invalides");
     }
 
-    try {
-      // 1. Upload the photo and get its ID
-      Photo photo = photoService.createPhoto(newBatch.getProductName(), image);
-
-      // 2. Get or create the product type and get its ID
-      ProductType productType = productTypeRepository.findByTitle(newBatch.getProductType());
-      System.out.println(" 1");
-
-      // 3. Create the product and get its ID
-      Product product =
-          productService.createProduct(
-              newBatch.getProductName(), productType, newBatch.getProductDescription(), photo);
-
-      System.out.println(" 2");
-
-      // 4. Create the batch with the IDs
-      return batchService.createBatch(newBatch, product, photo);
-    } catch (Exception e) {
-      throw new ConflictException("Erreur lors de la création du lot: " + e.getMessage());
+    // 1. Upload the photo and get its ID
+    Photo photo = photoService.createPhoto(newBatch.getProductName(), image);
+    if (photo == null) {
+      throw new ConflictException("Échec de la création de la photo");
     }
+
+    // 2. Get or create the product type and get its ID
+    ProductType productType = productTypeRepository.findByTitle(newBatch.getProductType());
+    if (productType == null) {
+      throw new ConflictException("Type de produit non trouvé: " + newBatch.getProductType());
+    }
+    System.out.println(" 1");
+
+    // 3. Create the product and get its ID
+    Product product = productService.createProduct(
+        newBatch.getProductName(), productType, newBatch.getProductDescription(), photo);
+    if (product == null) {
+      throw new ConflictException("Échec de la création du produit");
+    }
+    System.out.println(" 2");
+
+    // 4. Create the batch with the IDs
+    Batch batch = batchService.createBatch(newBatch, product, photo);
+    if (batch == null) {
+      throw new ConflictException("Échec de la création du lot");
+    }
+    
+    return batch;
   }
 
   /**
@@ -150,7 +158,7 @@ public class BatchController {
    * @return le lot accepté
    */
   @PatchMapping("/{id}/accept")
-  @PreAuthorize("hasRole('ROLE_MANAGER')")
+  @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
   public Batch acceptBatch(@PathVariable long id) {
     // TODO verify token if is a manager
     Batch batch = batchService.acceptBatch(id);
@@ -189,15 +197,19 @@ public class BatchController {
   @PatchMapping("/{id}/receive")
   @PreAuthorize(SecurityConstants.HAS_ROLE_VOLUNTEER)
   public Batch receiveBatch(@PathVariable long id, @RequestHeader("Authorization") String token) {
-    try {
-      return batchService.receiveBatch(id);
-    } catch (RuntimeException e) {
-      if ("Batch not found".equals(e.getMessage())) {
-        throw new ResourceNotFoundException("Lot non trouvé");
-      } else {
-        throw new ConflictException(e.getMessage());
-      }
+    Batch batch = batchService.getBatchById(id);
+    
+    if (batch == null) {
+      throw new ResourceNotFoundException("Lot non trouvé");
     }
+    
+    // Attempt to mark the batch as received
+    batch = batchService.receiveBatch(id);
+    if (batch == null) {
+      throw new ConflictException("Impossible de marquer le lot comme reçu");
+    }
+    
+    return batch;
   }
 
   /**
