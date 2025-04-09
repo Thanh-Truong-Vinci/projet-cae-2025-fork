@@ -1,5 +1,7 @@
 package be.vinci.ipl.cae.demo.controllers;
 
+import be.vinci.ipl.cae.demo.exceptions.ConflictException;
+import be.vinci.ipl.cae.demo.exceptions.ResourceNotFoundException;
 import be.vinci.ipl.cae.demo.models.dtos.NewBatch;
 import be.vinci.ipl.cae.demo.models.entities.Batch;
 import be.vinci.ipl.cae.demo.models.entities.Photo;
@@ -11,7 +13,6 @@ import be.vinci.ipl.cae.demo.services.BatchService;
 import be.vinci.ipl.cae.demo.services.PhotoService;
 import be.vinci.ipl.cae.demo.services.ProductService;
 import java.util.List;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Controller pour gérer les opérations sur les lots.
@@ -91,7 +91,7 @@ public class BatchController {
             + newBatch.getAvailableQuantity());
 
     if (newBatch == null || image == null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Données invalides");
+      throw new ConflictException("Données invalides");
     }
 
     try {
@@ -112,10 +112,7 @@ public class BatchController {
       // 4. Create the batch with the IDs
       return batchService.createBatch(newBatch, product, photo);
     } catch (Exception e) {
-      throw new ResponseStatusException(
-          HttpStatus.INTERNAL_SERVER_ERROR,
-          "Erreur lors de la création du lot: " + e.getMessage(),
-          e);
+      throw new ConflictException("Erreur lors de la création du lot: " + e.getMessage());
     }
   }
 
@@ -141,7 +138,7 @@ public class BatchController {
     // TODO verify token if is a manager or owner of the batch producer
     Batch batch = batchService.getBatchById(id);
     if (batch == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lot non trouvé");
+      throw new ResourceNotFoundException("Lot non trouvé");
     }
     return batch;
   }
@@ -159,7 +156,7 @@ public class BatchController {
     Batch batch = batchService.acceptBatch(id);
     // TODO remove verification
     if (batch == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lot non trouvé");
+      throw new ResourceNotFoundException("Lot non trouvé");
     }
     return batch;
   }
@@ -178,7 +175,7 @@ public class BatchController {
     Batch batch = batchService.rejectBatch(id, message);
     // TODO remove verification
     if (batch == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lot non trouvé");
+      throw new ResourceNotFoundException("Lot non trouvé");
     }
     return batch;
   }
@@ -196,9 +193,9 @@ public class BatchController {
       return batchService.receiveBatch(id);
     } catch (RuntimeException e) {
       if ("Batch not found".equals(e.getMessage())) {
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Lot non trouvé", e);
+        throw new ResourceNotFoundException("Lot non trouvé");
       } else {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+        throw new ConflictException(e.getMessage());
       }
     }
   }

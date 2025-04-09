@@ -1,5 +1,6 @@
 package be.vinci.ipl.cae.demo.controllers;
 
+import be.vinci.ipl.cae.demo.exceptions.ResourceNotFoundException;
 import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedUser;
 import be.vinci.ipl.cae.demo.models.dtos.Credentials;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsProfile;
@@ -63,7 +64,7 @@ public class AuthController {
             credentials.getPhoneNumber());
 
     if (!success) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
+      throw new ConflictException("Email is already in use");
     }
   }
 
@@ -81,7 +82,7 @@ public class AuthController {
     AuthenticatedUser user = authsService.login(credentials.getEmail(), credentials.getPassword());
 
     if (user == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+      throw new ResourceNotFoundException("Invalid email or password");
     }
 
     return user;
@@ -98,13 +99,13 @@ public class AuthController {
   @PostMapping("/me")
   public String refreshToken(@RequestBody String token) {
     if (token == null || token.isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token is required");
+      throw new ResourceNotFoundException("Token is required");
     }
 
     String email = authsService.verifyJwtToken(token);
 
     if (email == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
+      throw new ResourceNotFoundException("Invalid or expired token");
     }
 
     return authsService.createJwtToken(email);

@@ -1,5 +1,6 @@
 package be.vinci.ipl.cae.demo.controllers;
 
+import be.vinci.ipl.cae.demo.exceptions.ConflictException;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsManager;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsProducer;
 import be.vinci.ipl.cae.demo.services.AuthsService;
@@ -7,14 +8,12 @@ import be.vinci.ipl.cae.demo.services.AuthsService.SecurityConstants;
 import be.vinci.ipl.cae.demo.services.ManagerService;
 import be.vinci.ipl.cae.demo.services.ProducerService;
 import be.vinci.ipl.cae.demo.utils.ValidationUtils;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Controller for managing manager and producer registrations.
@@ -46,7 +45,7 @@ public class ManagerController {
    *
    * @param credentials the manager credentials from the request body.
    * @param token       the authorization token from the request header.
-   * @throws ResponseStatusException if the credentials are invalid or the email is already in use.
+   * @throws ConflictException if the email is already in use.
    */
   @PostMapping("/registermanager")
   @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
@@ -59,7 +58,10 @@ public class ManagerController {
             credentials.getEmail(),
             credentials.getPassword(),
             authsService.verifyJwtToken(token));
-    ValidationUtils.ensureSuccess(success, HttpStatus.CONFLICT, "Email is already in use");
+    
+    if (!success) {
+      throw new ConflictException("Email is already in use");
+    }
   }
 
   /**
@@ -67,8 +69,7 @@ public class ManagerController {
    *
    * @param credentials the producer credentials from the request body.
    * @param token       the authorization token from the request header.
-   * @throws ResponseStatusException if the token is invalid or expired, or if email already
-   *                                 exists.
+   * @throws ConflictException if email already exists.
    */
   @PostMapping("/registerproducer")
   @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
@@ -88,6 +89,9 @@ public class ManagerController {
             credentials.getCity(),
             credentials.getCountry(),
             credentials.getPhoneNumber());
-    ValidationUtils.ensureSuccess(success, HttpStatus.CONFLICT, "Email is already in use");
+    
+    if (!success) {
+      throw new ConflictException("Email is already in use");
+    }
   }
 }
