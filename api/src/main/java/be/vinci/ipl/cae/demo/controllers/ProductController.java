@@ -1,5 +1,6 @@
 package be.vinci.ipl.cae.demo.controllers;
 
+import be.vinci.ipl.cae.demo.exceptions.ResourceNotFoundException;
 import be.vinci.ipl.cae.demo.models.dtos.NewProduct;
 import be.vinci.ipl.cae.demo.models.entities.Product;
 import be.vinci.ipl.cae.demo.services.ProductService;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.server.ResponseStatusException;
 
 /** ProductController to handle Product requests. */
@@ -53,7 +55,7 @@ public class ProductController {
   public Product getProduct(@PathVariable long id) {
     Product product = productService.getProductById(id);
     if (product == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
+      throw new ResourceNotFoundException("Product not found");
     }
     return product;
   }
@@ -90,7 +92,7 @@ public class ProductController {
     // TODO verify token if is a manager
     Product product = productService.deleteProduct(id);
     if (product == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
+      throw new ResourceNotFoundException("Product not found");
     }
     return product;
   }
@@ -114,7 +116,7 @@ public class ProductController {
 
     Product product = productService.updateProduct(id, newProduct);
     if (product == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
+      throw new ResourceNotFoundException("Product not found");
     }
     return product;
   }
