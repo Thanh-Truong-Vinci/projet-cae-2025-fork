@@ -79,7 +79,8 @@ public class ProductTypeController {
     } catch (IllegalArgumentException e) {
       throw new ConflictException(e.getMessage());
     } catch (Exception e) {
-      throw new ConflictException("Erreur lors de la création du type de produit: " + e.getMessage());
+      throw new ConflictException("Erreur lors de la création du type de produit: "
+            + e.getMessage());
     }
   }
 
@@ -97,7 +98,8 @@ public class ProductTypeController {
     } catch (IllegalArgumentException e) {
       throw new ResourceNotFoundException(e.getMessage());
     } catch (Exception e) {
-      throw new ConflictException("Erreur lors de la suppression du type de produit: " + e.getMessage());
+      throw new ConflictException("Erreur lors de la suppression du type de produit: "
+            + e.getMessage());
     }
   }
 }
