@@ -1,19 +1,18 @@
 package be.vinci.ipl.cae.demo.controllers;
 
+import be.vinci.ipl.cae.demo.exceptions.ResourceNotFoundException;
 import be.vinci.ipl.cae.demo.models.dtos.ReservationRequest;
 import be.vinci.ipl.cae.demo.models.entities.Client;
 import be.vinci.ipl.cae.demo.models.entities.Reservation;
 import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.ReservationService;
 import java.util.List;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 /** Controller for handling reservation-related operations. */
 @RestController
@@ -39,7 +38,7 @@ public class ReservationController {
    *
    * @param reservationRequest the reservation request containing product ID and quantity.
    * @param token the authorization token from the request header.
-   * @throws ResponseStatusException if the token is invalid or expired.
+   * @throws ResourceNotFoundException if the token is invalid or expired.
    */
   @PostMapping("/reserve")
   public void reserveProduct(
@@ -47,8 +46,7 @@ public class ReservationController {
       @RequestHeader("Authorization") String token) {
     Client client = authsService.isValidClientToken(token);
     if (client == null) {
-      throw new ResponseStatusException(
-          HttpStatus.UNAUTHORIZED, "Token not valid, expired or user is not client");
+      throw new ResourceNotFoundException("Token not valid, expired or user is not client");
     }
     reservationService.reserveProduct(
         client, reservationRequest.getProductId(), reservationRequest.getQuantity());
@@ -59,18 +57,17 @@ public class ReservationController {
    *
    * @param reservationId the ID of the reservation to cancel.
    * @param token the authorization token from the request header.
-   * @throws ResponseStatusException if the token is invalid or expired.
+   * @throws ResourceNotFoundException if the token is invalid or expired.
    */
   @PostMapping("/cancel")
   public void cancelReservation(
       @RequestBody Long reservationId, @RequestHeader("Authorization") String token) {
     Client client = authsService.isValidClientToken(token);
     if (client == null) {
-      throw new ResponseStatusException(
-          HttpStatus.UNAUTHORIZED, "Token not valid, expired or user is not client");
+      throw new ResourceNotFoundException("Token not valid, expired or user is not client");
     }
     if (reservationId == null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Reservation ID is required");
+      throw new ResourceNotFoundException("Reservation ID is required");
     }
     reservationService.cancelReservation(client, reservationId);
   }
@@ -80,14 +77,13 @@ public class ReservationController {
    *
    * @param token the authorization token from the request header.
    * @return a list of reservations for the client.
-   * @throws ResponseStatusException if the token is invalid or expired.
+   * @throws ResourceNotFoundException if the token is invalid or expired.
    */
   @GetMapping("/list")
   public List<Reservation> getReservations(@RequestHeader("Authorization") String token) {
     Client client = authsService.isValidClientToken(token);
     if (client == null) {
-      throw new ResponseStatusException(
-          HttpStatus.UNAUTHORIZED, "Token not valid, expired or user is not client");
+      throw new ResourceNotFoundException("Token not valid, expired or user is not client");
     }
     return reservationService.getReservations(client);
   }
