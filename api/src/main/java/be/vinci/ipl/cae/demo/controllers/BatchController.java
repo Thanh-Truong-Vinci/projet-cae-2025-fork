@@ -2,22 +2,27 @@ package be.vinci.ipl.cae.demo.controllers;
 
 import be.vinci.ipl.cae.demo.models.dtos.NewBatch;
 import be.vinci.ipl.cae.demo.models.entities.Batch;
+import be.vinci.ipl.cae.demo.models.entities.Photo;
+import be.vinci.ipl.cae.demo.models.entities.Product;
+import be.vinci.ipl.cae.demo.models.entities.ProductType;
+import be.vinci.ipl.cae.demo.repositories.ProductTypeRepository;
 import be.vinci.ipl.cae.demo.services.AuthsService.SecurityConstants;
 import be.vinci.ipl.cae.demo.services.BatchService;
-
+import be.vinci.ipl.cae.demo.services.PhotoService;
+import be.vinci.ipl.cae.demo.services.ProductService;
 import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 /** Controller pour gérer les opérations sur les lots. */
@@ -26,32 +31,90 @@ import org.springframework.web.server.ResponseStatusException;
 public class BatchController {
 
   private final BatchService batchService;
+  private final ProductService productService;
+  private final PhotoService photoService;
+  private final ProductTypeRepository productTypeRepository;
 
   /**
    * Constructeur du controller.
    *
    * @param batchService le service de gestion des lots injecté
+   * @param productService le service de gestion des photos injecté
+   * @param photoService le service de gestion des photos injecté
+   * @param productTypeRepository le repository de gestion des types de produits injecté
    */
-  public BatchController(BatchService batchService) {
+  public BatchController(
+      BatchService batchService,
+      ProductService productService,
+      PhotoService photoService,
+      ProductTypeRepository productTypeRepository) {
     this.batchService = batchService;
+    this.productService = productService;
+    this.photoService = photoService;
+    this.productTypeRepository = productTypeRepository;
   }
 
   /**
-   * Crée un nouveau lot.
+   * Crée un nouveau lot avec un produit et une photo associée.
    *
-   * @param newBatch les informations du lot à créer
+   * @param newBatch les informations du lot à créer (au format JSON)
+   * @param image le fichier image du produit
    * @return le lot créé
    */
-  @PostMapping({"", "/"})
-  @PreAuthorize("hasRole('ROLE_MANAGER')")
-  public Batch createBatch(@RequestBody NewBatch newBatch) {
-    // TODO verify token if is a producer
-    if (newBatch == null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Données du lot invalides");
+  @PostMapping("/createbatch")
+  @PreAuthorize(SecurityConstants.HAS_ROLE_PRODUCER)
+  public Batch createBatch(
+      @RequestPart("batch") NewBatch newBatch, @RequestPart("image") MultipartFile image) {
+
+        System.out.println("=== DÉBUT TRAITEMENT IMAGE ===");
+  System.out.println("Image reçue: " + image.getOriginalFilename());
+  System.out.println("Type de contenu: " + image.getContentType());
+  System.out.println("Taille: " + image.getSize() + " octets");
+  System.out.println("=== FIN TRAITEMENT IMAGE ===");
+
+    System.out.println(
+        "createBatch called"
+            + newBatch.getProductName()
+            + " "
+            + newBatch.getProductType()
+            + " "
+            + newBatch.getProductDescription()
+            + " "
+            + newBatch.getAvailabilityDate()
+            + " "
+            + newBatch.getUnitPrice()
+            + " "
+            + newBatch.getSaleUnit()
+            + " "
+            + newBatch.getAvailableQuantity());
+
+    if (newBatch == null || image == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Données invalides");
     }
 
-    // TODO call addBatch, not createBatch
-    return batchService.createBatch(newBatch);
+    try {
+      // 1. Upload the photo and get its ID
+      Photo photo = photoService.createPhoto(newBatch.getProductName(), image);
+
+      // 2. Get or create the product type and get its ID
+      ProductType productType = productTypeRepository.findByTitle(newBatch.getProductType());
+      System.out.println(" 1");
+
+      // 3. Create the product and get its ID
+      Product product =
+          productService.createProduct(
+              newBatch.getProductName(), productType, newBatch.getProductDescription(), photo);
+
+      System.out.println(" 2");
+
+      // 4. Create the batch with the IDs
+      return batchService.createBatch(newBatch, product, photo);
+    } catch (Exception e) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          "Erreur lors de la création du lot: " + e.getMessage(),
+          e);
+    }
   }
 
   /**

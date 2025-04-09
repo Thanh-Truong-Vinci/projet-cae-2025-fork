@@ -1,12 +1,16 @@
-import { useState, useEffect, useContext, ReactNode, useCallback } from 'react'
+import { useState, useEffect, useContext, ReactNode } from 'react'
 import axios from 'axios'
 import { BatchContext } from './BatchContext'
-import { Batch } from '../types'
+import { Batch, NewBatch } from '../types'
 import { UserContext } from './UserContext'
 
-export const BatchProvider = ({ children }: { children: ReactNode }) => {
+interface BatchProviderProps {
+  children: ReactNode
+}
+
+export const BatchProvider = ({ children }: BatchProviderProps) => {
   const [approvedBatches, setApprovedBatches] = useState<Batch[]>([])
-  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const { authenticatedUser } = useContext(UserContext)
 
@@ -26,7 +30,6 @@ export const BatchProvider = ({ children }: { children: ReactNode }) => {
       imageUrl: rawBatch.photo || 'https://via.placeholder.com/150',
       availabilityDate: rawBatch.availabilityDate || new Date().toISOString(),
       availableQuantity: rawBatch.availableQuantity || 0,
-      initialQuantity: rawBatch.availableQuantity || 0, // Assuming same value if not provided
       unitPrice: rawBatch.unitPrice || 0,
       unitType: rawBatch.saleUnit || 'unité',
       producerId: rawBatch.producer?.idUser || 0,
@@ -39,43 +42,30 @@ export const BatchProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
-  const fetchApprovedBatches = useCallback(async () => {
-    if (!authenticatedUser) return
+  const fetchApprovedBatches = async () => {
+    setIsLoading(true)
+    setError(null)
 
     try {
-      setIsLoading(true)
-      console.log('Auth token for fetch:', authenticatedUser.token)
-      const response = await axios.get('/api/batches/approved', {
-        headers: {
-          Authorization: authenticatedUser.token,
-        },
-      })
+      const response = await fetch('/api/batches/approved')
 
-      console.log('Approved batches response:', response.data)
-
-      // Transform the raw data to match the expected format
-      const formattedBatches = Array.isArray(response.data)
-        ? response.data.map(formatBatch)
-        : []
-
-      setApprovedBatches(formattedBatches)
-      setError(null)
-    } catch (err) {
-      console.error('Error fetching approved batches:', err)
-      if (axios.isAxiosError(err)) {
-        console.error('Response error:', err.response?.data)
-        setError(
-          `Failed to load batches: ${err.response?.status || ''} ${err.message}`
-        )
-      } else {
-        setError('Failed to load approved batches')
+      if (!response.ok) {
+        throw new Error(`Erreur: ${response.status}`)
       }
+
+      const data = await response.json()
+      setApprovedBatches(data)
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : 'Une erreur est survenue'
+      )
+      console.error('Erreur lors de la récupération des lots approuvés:', error)
     } finally {
       setIsLoading(false)
     }
-  }, [authenticatedUser])
+  }
 
-  const receiveBatch = async (batchId: number) => {
+  const receiveBatch = async (batchId: number): Promise<Batch | null> => {
     if (!authenticatedUser) return null
 
     try {
@@ -110,11 +100,75 @@ export const BatchProvider = ({ children }: { children: ReactNode }) => {
     }
   }
 
+  const createBatch = async (
+    newBatch: NewBatch,
+    image: File
+  ): Promise<void> => {
+    try {
+      if (!authenticatedUser) {
+        throw new Error('Vous devez être authentifié pour ajouter un lot')
+      }
+
+      console.log(
+        'Création de lot:',
+        newBatch.productName,
+        'avec image:',
+        image.name
+      )
+
+      console.log('Image à envoyer:', {
+        nom: image.name,
+        type: image.type,
+        taille: `${(image.size / 1024).toFixed(2)}KB`,
+      })
+
+      const formData = new FormData()
+
+      // Ajouter l'image directement (sans transformation JSON qui cause l'erreur 413)
+      formData.append('image', image)
+
+      // Ajouter les données du lot en JSON
+      formData.append(
+        'batch',
+        new Blob([JSON.stringify(newBatch)], {
+          type: 'application/json',
+        })
+      )
+
+      const options = {
+        method: 'POST',
+        body: formData,
+        headers: {
+          Authorization: authenticatedUser.token,
+        },
+      }
+
+      const response = await fetch('/api/batches/createbatch', options)
+      console.log('Statut de la réponse:', response.status)
+
+      if (!response.ok)
+        throw new Error(
+          `fetch error : ${response.status} : ${response.statusText}`
+        )
+
+      const createdBatch = await response.json()
+      console.log('Lot créé avec succès:', createdBatch)
+
+      return createdBatch
+    } catch (err) {
+      console.error('addBatch::error: ', err)
+      if (err instanceof Error) {
+        throw new Error(err.message || 'Erreur lors de la création du lot')
+      }
+      throw new Error('Erreur inconnue lors de la création du lot')
+    }
+  }
+
   useEffect(() => {
     if (authenticatedUser?.role === 'Volunteer') {
       fetchApprovedBatches()
     }
-  }, [authenticatedUser, fetchApprovedBatches])
+  }, [authenticatedUser])
 
   return (
     <BatchContext.Provider
@@ -124,6 +178,7 @@ export const BatchProvider = ({ children }: { children: ReactNode }) => {
         error,
         fetchApprovedBatches,
         receiveBatch,
+        createBatch,
       }}
     >
       {children}

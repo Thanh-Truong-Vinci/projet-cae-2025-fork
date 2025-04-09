@@ -145,7 +145,7 @@ describe('Main Application', () => {
           element: <div data-testid="profile-page">Profile Page</div>,
         },
         {
-          path: 'add-product',
+          path: 'add-batch',
           element: <div data-testid="add-batch-page">Add Batch Page</div>,
         },
         {
@@ -234,8 +234,8 @@ describe('Main Application', () => {
     expect(await screen.findByTestId('profile-page')).toBeTruthy()
   })
 
-  test('renders add batch page on /add-product path', async () => {
-    renderWithRouter('/add-product')
+  test('renders add batch page on /add-batch path', async () => {
+    renderWithRouter('/add-batch')
     expect(await screen.findByTestId('add-batch-page')).toBeTruthy()
   })
 

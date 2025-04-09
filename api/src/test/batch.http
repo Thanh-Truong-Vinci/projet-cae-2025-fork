@@ -1,5 +1,6 @@
 @baseUrl = http://localhost:3000
 @volunteerToken = {{login_volunteer.response.body.token}}
+@producerToken = {{login_producer.response.body.token}} 
 
 ### Login as a volunteer
 # @name login_volunteer
@@ -11,6 +12,16 @@ Content-Type: application/json
   "password": "Azqwazqw1@"
 }
 
+### Login en tant que producteur
+# @name login_producer
+POST {{baseUrl}}/auths/login
+Content-Type: application/json
+
+{
+  "email": "producer@example.com",
+  "password": "Azqwazqw1@"
+}
+
 ### Get all batches
 GET {{baseUrl}}/batches
 Content-Type: application/json
@@ -19,3 +30,53 @@ Content-Type: application/json
 PATCH {{baseUrl}}/batches/9/receive
 Content-Type: application/json
 Authorization: {{volunteerToken}}
+
+#### Create a pizza with the admin token and an image
+#### Create a photo with the admin token
+POST {{baseUrl}}/photo
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="product"
+Content-Type: application/json
+
+{
+  "product":"Magic Green"
+}
+--boundary
+Content-Disposition: form-data; name="image"; filename="unavailable-photographer-WY6OwvMJEn8-unsplash.png"
+Content-Type: image/jpg
+
+// The 'pizza.png' file will be uploaded
+< ./unavailable-photographer-WY6OwvMJEn8-unsplash.jpg
+
+--boundary--
+
+### Créer un nouveau batch avec image
+POST {{baseUrl}}/batches/createbatch
+Content-Type: multipart/form-data; boundary=boundary
+Authorization: {{producerToken}}
+
+--boundary
+Content-Disposition: form-data; name="image"; filename="fraises.jpg"
+Content-Type: image/jpeg
+
+< ./fraises.jpg
+
+--boundary
+Content-Disposition: form-data; name="batch"
+Content-Type: application/json
+
+
+{
+  "email": "producer@example.com",
+  "productName": "Fraises BioGRGrthtr",
+  "productType": "Fruits",
+  "productDescription": "Fraises cultgivées en agriculture biologique, variété Mara des Bois",
+  "availabilityDate": "2025-05-15",
+  "unitPrice": 4.50,
+  "saleUnit": "barquette",
+  "availableQuantity": 50
+}
+
+--boundary--

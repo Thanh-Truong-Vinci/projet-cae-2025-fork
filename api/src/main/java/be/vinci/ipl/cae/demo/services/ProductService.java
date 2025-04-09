@@ -43,16 +43,16 @@ public class ProductService {
    * @param name the name of the product
    * @param type the type of the product
    * @param description the description of the product
-   * @param photoId the ID of the photo associated with the product
+   * @param photo the photo associated with the product
    */
-  public void createProduct(String name, String type, String description, Long photoId) {
-    ProductType productType = productTypeRepository.findByTitle(type);
-    Photo photo = photoId != null ? photoRepository.findById(photoId).orElse(null) : null;
+  public Product createProduct(String name, ProductType type, String description, Photo photo) {
     Product product = new Product();
     product.setName(name);
-    product.setType(productType);
+    product.setType(type);
     product.setDescription(description);
     product.setPhoto(photo);
+
+    return productRepository.save(product);
   }
 
   /**

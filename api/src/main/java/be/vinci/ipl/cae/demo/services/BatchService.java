@@ -3,15 +3,13 @@ package be.vinci.ipl.cae.demo.services;
 import be.vinci.ipl.cae.demo.models.dtos.NewBatch;
 import be.vinci.ipl.cae.demo.models.entities.Batch;
 import be.vinci.ipl.cae.demo.models.entities.BatchStatus;
-import be.vinci.ipl.cae.demo.models.entities.Manager;
 import be.vinci.ipl.cae.demo.models.entities.Notification;
+import be.vinci.ipl.cae.demo.models.entities.Photo;
 import be.vinci.ipl.cae.demo.models.entities.Producer;
 import be.vinci.ipl.cae.demo.models.entities.Product;
 import be.vinci.ipl.cae.demo.repositories.BatchRepository;
-import be.vinci.ipl.cae.demo.repositories.ManagerRepository;
 import be.vinci.ipl.cae.demo.repositories.NotificationRepository;
 import be.vinci.ipl.cae.demo.repositories.ProducerRepository;
-import be.vinci.ipl.cae.demo.repositories.ProductRepository;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -21,52 +19,33 @@ import org.springframework.stereotype.Service;
 public class BatchService {
 
   private final BatchRepository batchRepository;
-  private final ManagerRepository managerRepository;
   private final ProducerRepository producerRepository;
-  private final ProductRepository productRepository;
   private final NotificationRepository notificationRepository;
 
   /** Constructeur du service. */
   public BatchService(
       BatchRepository batchRepository,
-      ManagerRepository managerRepository,
       ProducerRepository producerRepository,
-      ProductRepository productRepository,
       NotificationRepository notificationRepository) {
     this.batchRepository = batchRepository;
-    this.managerRepository = managerRepository;
     this.producerRepository = producerRepository;
-    this.productRepository = productRepository;
     this.notificationRepository = notificationRepository;
   }
 
   /**
-   * Crée un nouveau lot.
+   * Crée un nouveau lot de 0.
    *
    * @param newBatch les données du lot à créer
    * @return le lot créé
    */
-  public Batch createBatch(NewBatch newBatch) {
-    Manager manager =
-        managerRepository
-            .findById(newBatch.getManagerId())
-            .orElseThrow(() -> new IllegalArgumentException("Manager non trouvé"));
+  public Batch createBatch(NewBatch newBatch, Product product, Photo photo) {
 
-    Producer producer =
-        producerRepository
-            .findById(newBatch.getProducerId())
-            .orElseThrow(() -> new IllegalArgumentException("Producteur non trouvé"));
-
-    Product product =
-        productRepository
-            .findById(newBatch.getProductId())
-            .orElseThrow(() -> new IllegalArgumentException("Produit non trouvé"));
+    Producer producer = producerRepository.findByEmail(newBatch.getEmail());
 
     Batch batch = new Batch();
-    batch.setManager(manager);
     batch.setProducer(producer);
     batch.setProduct(product);
-    batch.setPhoto(newBatch.getPhoto());
+    batch.setPhoto(photo);
     batch.setAvailabilityDate(newBatch.getAvailabilityDate());
     batch.setUnitPrice(newBatch.getUnitPrice());
     batch.setSaleUnit(newBatch.getSaleUnit());
@@ -129,10 +108,12 @@ public class BatchService {
     Notification notification = new Notification();
     notification.setIsRead(false);
     notification.setMessage(message);
-    notification.setProducer(batch.getProducer());
+    Producer producer = producerRepository.findById(batch.getProducer().getId())
+        .orElseThrow(() -> new RuntimeException("Producer not found"));
+    notification.setProducer(producer);
     notification = notificationRepository.save(notification);
 
-    batch.setNotification(notification);
+    batch.setNotificationId(notification.getId());
 
     return batchRepository.save(batch);
   }
@@ -145,13 +126,13 @@ public class BatchService {
    * @throws RuntimeException si le lot n'est pas dans le statut APPROVED
    */
   public Batch receiveBatch(long id) {
-    Batch batch = 
+    Batch batch =
         batchRepository.findById(id).orElseThrow(() -> new RuntimeException("Batch not found"));
-    
+
     if (batch.getStatus() != BatchStatus.APPROVED) {
       throw new RuntimeException("Only approved batches can be marked as received");
     }
-    
+
     batch.setStatus(BatchStatus.RECEIVED);
     return batchRepository.save(batch);
   }

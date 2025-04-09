@@ -111,7 +111,6 @@ export interface Batch {
   imageUrl: string
   availabilityDate: string
   availableQuantity: number
-  initialQuantity: number
   unitPrice: number
   unitType: string
   producerId: number
@@ -121,12 +120,24 @@ export interface Batch {
   rejectionReason?: string
 }
 
+export interface NewBatch {
+  email: string
+  productName: string
+  productType: string
+  productDescription: string
+  availabilityDate: string
+  unitPrice: number
+  saleUnit: string
+  availableQuantity: number
+}
+
 export interface BatchContextType {
   approvedBatches: Batch[]
   isLoading: boolean
   error: string | null
   fetchApprovedBatches: () => Promise<void>
   receiveBatch: (batchId: number) => Promise<Batch | null>
+  createBatch: (newBatch: NewBatch, image: File) => Promise<void>
 }
 
 type MaybeAuthenticatedUser = AuthenticatedUser | undefined

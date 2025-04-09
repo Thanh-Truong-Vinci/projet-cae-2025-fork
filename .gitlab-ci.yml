@@ -3,16 +3,14 @@ stages:
   - build
   - staging
   - e2e
+  - production
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
   VERSION: $CI_PIPELINE_IID
-  REGISTRY: $CI_REGISTRY 
+  REGISTRY: $CI_REGISTRY
   REGISTRY_IMAGE_BASE_PATH: $REGISTRY/$CI_PROJECT_PATH
-  AZURE_WEBAPP_NAME: cae-group-09-staging-app # Remplacer par le nom de votre Web App Azure
-  AZURE_WEBAPP_RESOURCE_GROUP: caeGroupe09 # Remplacer par le nom de votre Resource Group Azure
-  BASE_URL: https://cae-group-09-staging-app-fhg0g0e3bzgudubp.centralus-01.azurewebsites.net/
-  NODE_ENV: staging
+  AZURE_WEBAPP_RESOURCE_GROUP: caeGroupe09
 
 api test:
   stage: test
@@ -67,11 +65,8 @@ build:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
 
-deploy:
-  stage: staging
+.deploy:
   image: mcr.microsoft.com/azure-cli
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
   script:
     - az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
     - az webapp stop --name $AZURE_WEBAPP_NAME --resource-group $AZURE_WEBAPP_RESOURCE_GROUP
@@ -91,9 +86,23 @@ deploy:
         echo "Azure Web App failed to become functional."
         exit 1
       fi
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
+
+deploy to staging:
+  stage: staging
+  environment: staging
+  variables:
+    AZURE_WEBAPP_NAME: cae-group-09-staging-app
+    BASE_URL: https://cae-group-09-staging-app-fhg0g0e3bzgudubp.centralus-01.azurewebsites.net/
+  extends: .deploy
 
 e2e tests:
   stage: e2e
+  environment: staging
+  variables:
+    BASE_URL: https://cae-group-09-staging-app-fhg0g0e3bzgudubp.centralus-01.azurewebsites.net/
+    NODE_ENV: staging
   image: mcr.microsoft.com/playwright:v1.51.0-jammy
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
@@ -106,3 +115,13 @@ e2e tests:
     paths:
       - e2e/playwright-report/
       - e2e/test-results/
+
+deploy to production:
+  stage: production
+  environment: production
+  variables:
+    AZURE_WEBAPP_NAME: cae-group-09-production-app
+    BASE_URL: https://cae-group-09-production-app-grd0backc3gnhecf.centralus-01.azurewebsites.net
+    NODE_ENV: production
+  extends: .deploy
+  when: manual

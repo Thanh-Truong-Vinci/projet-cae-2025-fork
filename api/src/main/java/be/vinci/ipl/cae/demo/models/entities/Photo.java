@@ -21,8 +21,9 @@ public class Photo {
   @Column(name = "id_photo")
   private Long id;
 
-  @Column(name = "product_name", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'default_product'")
+  @Column(name = "product_name", nullable = false)
   private String productName;
 
-  @Column(name = "url") private String imageLocation;
+  @Column(name = "url")
+  private String imageLocation;
 }

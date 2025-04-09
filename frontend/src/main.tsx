@@ -97,7 +97,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'add-product',
+        path: 'add-batch',
         element: (
           <SimpleProtectedRoute requiredRole="Producer">
             <AddBatchPage />

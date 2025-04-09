@@ -1,4 +1,5 @@
-import { useState, useContext, ChangeEvent, FormEvent, useEffect } from 'react'
+import { useState, useEffect, useContext, ChangeEvent, FormEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Typography,
   Box,
@@ -16,26 +17,28 @@ import {
   Snackbar,
   Alert,
 } from '@mui/material'
-import { UserContext } from '../../contexts/UserContext'
-import { useNavigate } from 'react-router-dom'
-import CloudUploadIcon from '@mui/icons-material/CloudUpload'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { Dayjs } from 'dayjs'
 import 'dayjs/locale/fr'
+import CloudUploadIcon from '@mui/icons-material/CloudUpload'
+import { UserContext } from '../../contexts/UserContext'
+import { BatchContext } from '../../contexts/BatchContext'
+import { NewBatch } from '../../types'
 
 type ProductType =
-  | 'Légume'
-  | 'Fruit'
+  | 'Légumes'
+  | 'Fruits'
   | 'Boulangerie'
   | 'Viande'
-  | 'Produit laitier'
+  | 'Produits laitiers'
   | 'Autre'
 
 interface FormErrors {
   productName?: string
   productType?: string
+  productDescription?: string
   productImage?: string
   availabilityDate?: string
   availableQuantity?: string
@@ -46,10 +49,12 @@ interface FormErrors {
 const AddBatchPage = () => {
   const navigate = useNavigate()
   const { authenticatedUser } = useContext(UserContext)
+  const batchContext = useContext(BatchContext)
 
   // États du formulaire
   const [productName, setProductName] = useState('')
   const [productType, setProductType] = useState<ProductType | ''>('')
+  const [productDescription, setProductDescription] = useState('')
   const [productImage, setProductImage] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [availabilityDate, setAvailabilityDate] = useState<Dayjs | null>(null)
@@ -64,7 +69,12 @@ const AddBatchPage = () => {
     'success'
   )
 
-  // Rediriger vers la page d'accueil si l'utilisateur n'est pas connecté ou n'est pas un producteur
+  useEffect(() => {
+    if (!batchContext) {
+      console.error("BatchContext n'est pas disponible")
+    }
+  }, [batchContext])
+
   useEffect(() => {
     if (!authenticatedUser) {
       navigate('/')
@@ -82,7 +92,6 @@ const AddBatchPage = () => {
     }
   }, [authenticatedUser, navigate])
 
-  // Si l'utilisateur n'est pas connecté ou n'est pas un producteur, ne pas rendre le formulaire
   if (!authenticatedUser || authenticatedUser.role !== 'Producer') {
     return (
       <Container maxWidth="md" sx={{ py: 4 }}>
@@ -109,7 +118,6 @@ const AddBatchPage = () => {
       const selectedFile = e.target.files[0]
       setProductImage(selectedFile)
 
-      // Créer une prévisualisation de l'image
       const reader = new FileReader()
       reader.onload = () => {
         setImagePreview(reader.result as string)
@@ -128,6 +136,10 @@ const AddBatchPage = () => {
     if (!productName.trim())
       newErrors.productName = 'Le nom du produit est requis'
     if (!productType) newErrors.productType = 'Le type de produit est requis'
+    if (productDescription && productDescription.length > 500) {
+      newErrors.productDescription =
+        'La description ne doit pas dépasser 500 caractères'
+    }
     if (!productImage) newErrors.productImage = 'Une image est requise'
     if (!availabilityDate)
       newErrors.availabilityDate = 'La date de disponibilité est requise'
@@ -157,73 +169,30 @@ const AddBatchPage = () => {
     setIsSubmitting(true)
 
     try {
-      // Création d'un objet FormData pour envoyer les données, y compris l'image
-      const formData = new FormData()
-      formData.append('productName', productName)
-      formData.append('productType', productType)
-      if (productImage) formData.append('productImage', productImage)
-      if (availabilityDate)
-        formData.append('availabilityDate', availabilityDate.toISOString())
-      formData.append('availableQuantity', availableQuantity)
-      formData.append('unitPrice', unitPrice)
-      formData.append('unitType', unitType)
-
-      // Ajout de l'ID du producteur
-      if (authenticatedUser && 'id' in authenticatedUser) {
-        formData.append(
-          'producerId',
-          (authenticatedUser as { id: number }).id.toString()
-        )
+      if (!productImage) {
+        throw new Error("L'image du produit est requise")
       }
 
-      // Normalement, ici vous feriez l'appel API pour envoyer les données
-      // const response = await fetch('/api/products', {
-      //   method: 'POST',
-      //   headers: {
-      //     Authorization: `Bearer ${authenticatedUser.token}`
-      //   },
-      //   body: formData
-      // })
-
-      // Simulation d'un appel API réussi
-      console.log('Données du produit à envoyer:', {
-        productName,
-        productType,
-        imageFile: productImage?.name,
-        availabilityDate,
-        availableQuantity,
-        unitPrice,
-        unitType,
-        producerId:
-          'id' in authenticatedUser ? authenticatedUser.id : undefined,
-      })
-
-      // Créons une nouvelle entrée de lot avec les données du formulaire
-      const newBatch = {
-        id: Math.floor(Math.random() * 10000), // ID temporaire pour la simulation
-        productName,
-        productType,
-        imageUrl: imagePreview || 'https://via.placeholder.com/300', // Utiliser l'aperçu de l'image ou une image par défaut
-        availabilityDate: availabilityDate
-          ? availabilityDate.toISOString()
-          : new Date().toISOString(),
-        availableQuantity: Number(availableQuantity),
-        initialQuantity: Number(availableQuantity),
-        unitPrice: Number(unitPrice),
-        unitType,
-        producerId: 'id' in authenticatedUser ? authenticatedUser.id : 1,
-        createdAt: new Date().toISOString(),
+      const batchData: NewBatch = {
+        email: authenticatedUser.email,
+        productName: productName,
+        productType: productType,
+        productDescription: productDescription,
+        availabilityDate: availabilityDate?.format('YYYY-MM-DD') || '',
+        unitPrice: parseFloat(unitPrice),
+        saleUnit: unitType,
+        availableQuantity: parseInt(availableQuantity),
       }
 
-      // Stockons ce nouveau lot dans le localStorage pour le récupérer dans la page d'accueil
-      const existingBatches = localStorage.getItem('producerBatches')
-      const batches = existingBatches ? JSON.parse(existingBatches) : []
-      batches.push(newBatch)
-      localStorage.setItem('producerBatches', JSON.stringify(batches))
+      if (batchContext) {
+        await batchContext.createBatch(batchData, productImage)
+      } else {
+        throw new Error("Le contexte BatchContext n'est pas disponible")
+      }
 
-      // Réinitialiser le formulaire après soumission réussie
       setProductName('')
       setProductType('')
+      setProductDescription('')
       setProductImage(null)
       setImagePreview(null)
       setAvailabilityDate(null)
@@ -231,17 +200,20 @@ const AddBatchPage = () => {
       setUnitPrice('')
       setUnitType('')
 
-      setSnackbarMessage('Produit ajouté avec succès!')
+      setSnackbarMessage(
+        'Lot ajouté avec succès! Il sera examiné par un gestionnaire.'
+      )
       setSnackbarSeverity('success')
       setOpenSnackbar(true)
 
-      // Rediriger vers le tableau de bord producteur après un court délai
       setTimeout(() => {
         navigate('/producer-dashboard')
       }, 2000)
     } catch (error) {
-      console.error("Erreur lors de l'ajout du produit:", error)
-      setSnackbarMessage("Erreur lors de l'ajout du produit")
+      console.error("Erreur lors de l'ajout du lot:", error)
+      setSnackbarMessage(
+        error instanceof Error ? error.message : "Erreur lors de l'ajout du lot"
+      )
       setSnackbarSeverity('error')
       setOpenSnackbar(true)
     } finally {
@@ -291,17 +263,33 @@ const AddBatchPage = () => {
                   label="Type de produit *"
                   onChange={handleTypeChange}
                 >
-                  <MenuItem value="Légume">Légume</MenuItem>
-                  <MenuItem value="Fruit">Fruit</MenuItem>
+                  <MenuItem value="Légumes">Légumes</MenuItem>
+                  <MenuItem value="Fruits">Fruits</MenuItem>
                   <MenuItem value="Boulangerie">Boulangerie</MenuItem>
                   <MenuItem value="Viande">Viande</MenuItem>
-                  <MenuItem value="Produit laitier">Produit laitier</MenuItem>
+                  <MenuItem value="Produits laitiers">
+                    Produits laitiers
+                  </MenuItem>
                   <MenuItem value="Autre">Autre</MenuItem>
                 </Select>
                 {errors.productType && (
                   <FormHelperText>{errors.productType}</FormHelperText>
                 )}
               </FormControl>
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Description du produit"
+                placeholder="Ajoutez une description (max 500 caractères)"
+                value={productDescription}
+                onChange={(e) => setProductDescription(e.target.value)}
+                error={!!errors.productDescription}
+                helperText={errors.productDescription}
+                multiline
+                rows={4}
+              />
             </Grid>
 
             <Grid item xs={12}>

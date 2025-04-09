@@ -21,6 +21,6 @@ public class ProductType {
   @Column(name = "id_product_type")
   private Long id;
 
-  @Column(name = "title", nullable = false)
+  @Column(name = "title", nullable = false, unique = true)
   private String title;
 }

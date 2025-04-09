@@ -27,7 +27,7 @@ public class Batch {
   private Long id;
 
   @ManyToOne
-  @JoinColumn(name = "manager_id", nullable = false)
+  @JoinColumn(name = "manager_id", nullable = true)
   private Manager manager;
 
   @ManyToOne
@@ -38,8 +38,9 @@ public class Batch {
   @JoinColumn(name = "product_id", nullable = false)
   private Product product;
 
-  @Column(name = "photo_url")
-  private String photo;
+  @ManyToOne
+  @JoinColumn(name = "photo_id", nullable = true)
+  private Photo photo;
 
   @Column(name = "availability_date", nullable = false)
   private LocalDate availabilityDate;
@@ -57,10 +58,9 @@ public class Batch {
   @Enumerated(EnumType.STRING)
   private BatchStatus status;
 
-  @ManyToOne
-  @JoinColumn(name = "notification_id")
-  private Notification notification;
-
+  @Column(name = "notification_id", nullable = true)
+  private Long notificationId;
+  
   @Column(name = "deposit_date", nullable = false)
   private LocalDate depositDate;
 }
