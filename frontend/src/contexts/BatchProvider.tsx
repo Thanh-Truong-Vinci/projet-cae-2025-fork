@@ -42,6 +42,49 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
     }
   }
 
+  const fetchMyBatches = async () => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      if (!authenticatedUser) {
+        throw new Error('Vous devez être authentifié pour accéder à vos lots')
+      }
+
+      // Utilisation de fetch avec méthode GET
+      const response = await fetch('/api/batches/mybatches', {
+        method: 'GET',
+        headers: {
+          'Authorization': authenticatedUser.token,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      // Vérification de la réponse
+      if (!response.ok) {
+        throw new Error(`Erreur: ${response.status} ${response.statusText}`)
+      }
+
+      const data = await response.json();
+      console.log('Réponse API batches:', data)
+
+      // Utiliser la fonction formatBatch existante pour transformer les données brutes
+      const formattedBatches = Array.isArray(data)
+        ? data.map((rawBatch) => formatBatch(rawBatch))
+        : []
+
+    } catch (err) {
+      console.error('Erreur lors de la récupération des lots:', err)
+      if (err instanceof Error) {
+        setError(`Impossible de charger vos lots: ${err.message}`)
+      } else {
+        setError('Impossible de charger vos lots')
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const fetchApprovedBatches = async () => {
     setIsLoading(true)
     setError(null)
@@ -177,6 +220,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
         isLoading,
         error,
         fetchApprovedBatches,
+        fetchMyBatches,
         receiveBatch,
         createBatch,
       }}

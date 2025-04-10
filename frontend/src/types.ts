@@ -150,6 +150,7 @@ export interface BatchContextType {
   approvedBatches: Batch[]
   isLoading: boolean
   error: string | null
+  fetchMyBatches: () => Promise<void>
   fetchApprovedBatches: () => Promise<void>
   receiveBatch: (batchId: number) => Promise<Batch | null>
   createBatch: (newBatch: NewBatch, image: File) => Promise<void>

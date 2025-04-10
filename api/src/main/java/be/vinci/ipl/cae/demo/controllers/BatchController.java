@@ -128,7 +128,7 @@ public class BatchController {
    * @param token le toke du producteur
    * @return une liste des lots trouvés
    */
-  @PostMapping("/mybatches")
+  @GetMapping("/mybatches")
   @PreAuthorize(SecurityConstants.HAS_ROLE_PRODUCER)
   public Iterable<Batch> myBatches(@RequestHeader("Authorization") String token) {
     Producer producer = authsService.isValidProducerToken(token);
