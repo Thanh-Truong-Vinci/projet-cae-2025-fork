@@ -81,6 +81,8 @@ const ProducerHomePage = () => {
         return { label: 'En attente', color: 'warning' as const }
       case 'REJECTED':
         return { label: 'Refusé', color: 'error' as const }
+      case 'RECEIVED':
+        return { label: 'Reçu', color: 'info' as const }
       default:
         return { label: 'Indéterminé', color: 'default' as const }
     }
