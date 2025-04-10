@@ -9,6 +9,7 @@ interface BatchProviderProps {
 }
 
 export const BatchProvider = ({ children }: BatchProviderProps) => {
+  const [myBatches, setMyBatches] = useState<Batch[]>([])
   const [approvedBatches, setApprovedBatches] = useState<Batch[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
@@ -22,12 +23,8 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
       id: rawBatch.idBatch || rawBatch.id,
       productName: rawBatch.product?.name || 'Produit inconnu',
       productType:
-        rawBatch.product?.type?.title
-          ?.toLowerCase()
-          .normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '')
-          .replace(/\s+/g, '_') || 'autres',
-      imageUrl: rawBatch.photo || 'https://via.placeholder.com/150',
+        rawBatch.product?.type?.title,
+      imageUrl: rawBatch.photo?.imageLocation || 'https://via.placeholder.com/150',
       availabilityDate: rawBatch.availabilityDate || new Date().toISOString(),
       availableQuantity: rawBatch.availableQuantity || 0,
       unitPrice: rawBatch.unitPrice || 0,
@@ -37,7 +34,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
         rawBatch.producer?.user?.firstname +
           ' ' +
           rawBatch.producer?.user?.name || 'Producteur inconnu',
-      createdAt: rawBatch.depositDate || new Date().toISOString(),
+      createdAt: rawBatch.productionDate || new Date().toISOString(),
       status: rawBatch.status || 'APPROVED',
     }
   }
@@ -67,11 +64,13 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
 
       const data = await response.json();
       console.log('Réponse API batches:', data)
-
-      // Utiliser la fonction formatBatch existante pour transformer les données brutes
-      const formattedBatches = Array.isArray(data)
-        ? data.map((rawBatch) => formatBatch(rawBatch))
-        : []
+      
+      // Formater les données reçues avant de les stocker dans l'état
+      const formattedBatches = Array.isArray(data) 
+        ? data.map(rawBatch => formatBatch(rawBatch)) 
+        : [];
+      
+      setMyBatches(formattedBatches);
 
     } catch (err) {
       console.error('Erreur lors de la récupération des lots:', err)
@@ -216,6 +215,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
   return (
     <BatchContext.Provider
       value={{
+        myBatches,
         approvedBatches,
         isLoading,
         error,

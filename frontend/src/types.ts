@@ -147,6 +147,7 @@ export interface ProductBatch {
 }
 
 export interface BatchContextType {
+  myBatches: Batch[]
   approvedBatches: Batch[]
   isLoading: boolean
   error: string | null
