@@ -53,7 +53,7 @@ const ProducerHomePage = () => {
         )
       })
     }
-  }, [authenticatedUser]) // Retirez fetchMyBatches des dépendances
+  }, [authenticatedUser, fetchMyBatches]) // Ajout de fetchMyBatches comme dépendance
 
   const handleAddBatch = () => {
     navigate('/add-batch')

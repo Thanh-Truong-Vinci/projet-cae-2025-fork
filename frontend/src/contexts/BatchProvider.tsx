@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, ReactNode } from 'react'
+import { useState, useEffect, useContext, ReactNode, useCallback } from 'react'
 import axios from 'axios'
 import { BatchContext } from './BatchContext'
 import { Batch, NewBatch } from '../types'
@@ -39,7 +39,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
     }
   }
 
-  const fetchMyBatches = async () => {
+  const fetchMyBatches = useCallback(async () => {
     setIsLoading(true)
     setError(null)
 
@@ -81,7 +81,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [authenticatedUser])
 
   const fetchApprovedBatches = async () => {
     setIsLoading(true)
