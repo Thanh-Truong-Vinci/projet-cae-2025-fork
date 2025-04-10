@@ -22,9 +22,9 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
     return {
       id: rawBatch.idBatch || rawBatch.id,
       productName: rawBatch.product?.name || 'Produit inconnu',
-      productType:
-        rawBatch.product?.type?.title,
-      imageUrl: rawBatch.photo?.imageLocation || 'https://via.placeholder.com/150',
+      productType: rawBatch.product?.type?.title,
+      imageUrl:
+        rawBatch.photo?.imageLocation || 'https://via.placeholder.com/150',
       availabilityDate: rawBatch.availabilityDate || new Date().toISOString(),
       availableQuantity: rawBatch.availableQuantity || 0,
       unitPrice: rawBatch.unitPrice || 0,
@@ -52,26 +52,25 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
       const response = await fetch('/api/batches/mybatches', {
         method: 'GET',
         headers: {
-          'Authorization': authenticatedUser.token,
-          'Content-Type': 'application/json'
-        }
-      });
+          Authorization: authenticatedUser.token,
+          'Content-Type': 'application/json',
+        },
+      })
 
       // Vérification de la réponse
       if (!response.ok) {
         throw new Error(`Erreur: ${response.status} ${response.statusText}`)
       }
 
-      const data = await response.json();
+      const data = await response.json()
       console.log('Réponse API batches:', data)
-      
-      // Formater les données reçues avant de les stocker dans l'état
-      const formattedBatches = Array.isArray(data) 
-        ? data.map(rawBatch => formatBatch(rawBatch)) 
-        : [];
-      
-      setMyBatches(formattedBatches);
 
+      // Formater les données reçues avant de les stocker dans l'état
+      const formattedBatches = Array.isArray(data)
+        ? data.map((rawBatch) => formatBatch(rawBatch))
+        : []
+
+      setMyBatches(formattedBatches)
     } catch (err) {
       console.error('Erreur lors de la récupération des lots:', err)
       if (err instanceof Error) {

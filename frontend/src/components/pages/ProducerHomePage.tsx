@@ -25,7 +25,12 @@ import { BatchContext } from '../../contexts/BatchContext'
 
 const ProducerHomePage = () => {
   const navigate = useNavigate()
-  const { fetchMyBatches, myBatches, isLoading, error: batchError } = useContext(BatchContext)!
+  const {
+    fetchMyBatches,
+    myBatches,
+    isLoading,
+    error: batchError,
+  } = useContext(BatchContext)!
   const { authenticatedUser } = useContext(UserContext)
   const [error, setError] = useState<string | null>(null)
 
@@ -41,7 +46,7 @@ const ProducerHomePage = () => {
   // Récupérer les lots du producteur
   useEffect(() => {
     if (authenticatedUser?.role === 'Producer') {
-      fetchMyBatches().catch(err => {
+      fetchMyBatches().catch((err) => {
         console.error('Erreur lors de la récupération des lots:', err)
         setError(
           'Impossible de récupérer vos lots. Veuillez réessayer plus tard.'
@@ -204,7 +209,8 @@ const ProducerHomePage = () => {
                           )}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          <strong>Quantité:</strong> {batch.availableQuantity} {batch.unitType}
+                          <strong>Quantité:</strong> {batch.availableQuantity}{' '}
+                          {batch.unitType}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                           <strong>Prix:</strong> {batch.unitPrice.toFixed(2)}€/
@@ -267,7 +273,15 @@ const ProducerHomePage = () => {
         </Typography>
         <Grid container spacing={3} justifyContent="center" sx={{ mt: 2 }}>
           <Grid item xs={12} sm={4} md={3}>
-            <Box sx={{ textAlign: 'center', p: 2, bgcolor: 'background.paper', borderRadius: 2, boxShadow: 1 }}>
+            <Box
+              sx={{
+                textAlign: 'center',
+                p: 2,
+                bgcolor: 'background.paper',
+                borderRadius: 2,
+                boxShadow: 1,
+              }}
+            >
               <Typography variant="h4" color="primary">
                 {myBatches.length}
               </Typography>
@@ -275,7 +289,15 @@ const ProducerHomePage = () => {
             </Box>
           </Grid>
           <Grid item xs={12} sm={4} md={3}>
-            <Box sx={{ textAlign: 'center', p: 2, bgcolor: 'background.paper', borderRadius: 2, boxShadow: 1 }}>
+            <Box
+              sx={{
+                textAlign: 'center',
+                p: 2,
+                bgcolor: 'background.paper',
+                borderRadius: 2,
+                boxShadow: 1,
+              }}
+            >
               <Typography variant="h4" color="success.main">
                 {
                   myBatches.filter(
@@ -288,12 +310,17 @@ const ProducerHomePage = () => {
             </Box>
           </Grid>
           <Grid item xs={12} sm={4} md={3}>
-            <Box sx={{ textAlign: 'center', p: 2, bgcolor: 'background.paper', borderRadius: 2, boxShadow: 1 }}>
+            <Box
+              sx={{
+                textAlign: 'center',
+                p: 2,
+                bgcolor: 'background.paper',
+                borderRadius: 2,
+                boxShadow: 1,
+              }}
+            >
               <Typography variant="h4" color="warning.main">
-                {
-                  myBatches.filter((batch) => batch.status === 'PENDING')
-                    .length
-                }
+                {myBatches.filter((batch) => batch.status === 'PENDING').length}
               </Typography>
               <Typography variant="body1">En attente</Typography>
             </Box>
