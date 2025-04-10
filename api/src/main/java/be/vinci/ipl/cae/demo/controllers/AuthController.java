@@ -1,5 +1,7 @@
 package be.vinci.ipl.cae.demo.controllers;
 
+import be.vinci.ipl.cae.demo.exceptions.ConflictException;
+import be.vinci.ipl.cae.demo.exceptions.ResourceNotFoundException;
 import be.vinci.ipl.cae.demo.models.dtos.AuthenticatedUser;
 import be.vinci.ipl.cae.demo.models.dtos.Credentials;
 import be.vinci.ipl.cae.demo.models.dtos.CredentialsProfile;
@@ -8,14 +10,15 @@ import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.ClientService;
 import be.vinci.ipl.cae.demo.services.ProfileService;
 import be.vinci.ipl.cae.demo.utils.ValidationUtils;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-/** AuthController to handle client authentication. */
+/**
+ * AuthController to handle client authentication.
+ */
 @RestController
 @RequestMapping("/auths")
 public class AuthController {
@@ -28,7 +31,7 @@ public class AuthController {
    * Constructor for AuthController.
    *
    * @param clientService the injected ClientService.
-   * @param authsService the injected AuthsService.
+   * @param authsService  the injected AuthsService.
    */
   public AuthController(
       ProfileService profileService, ClientService clientService, AuthsService authsService) {
@@ -44,24 +47,25 @@ public class AuthController {
    * @throws ResponseStatusException if the credentials are invalid or the email is already in use.
    */
   @PostMapping("/register")
+  @SuppressWarnings("PMD.CPD")
   public void register(@RequestBody CredentialsRegister credentials) {
     ValidationUtils.validateCredentialsRegister(credentials);
-    boolean success =
-        clientService.register(
-            credentials.getName(),
-            credentials.getFirstname(),
-            credentials.getEmail(),
-            credentials.getPassword(),
-            credentials.getCivility(),
-            credentials.getStreet(),
-            credentials.getNumber(),
-            credentials.getPostalCode(),
-            credentials.getCity(),
-            credentials.getCountry(),
-            credentials.getPhoneNumber());
+    
+    boolean registrationSuccessful = clientService.register(
+        credentials.getName(),
+        credentials.getFirstname(),
+        credentials.getEmail(),
+        credentials.getPassword(),
+        credentials.getCivility(),
+        credentials.getStreet(),
+        credentials.getNumber(),
+        credentials.getPostalCode(),
+        credentials.getCity(),
+        credentials.getCountry(),
+        credentials.getPhoneNumber());
 
-    if (!success) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already in use");
+    if (!registrationSuccessful) {
+      throw new ConflictException("Email is already in use");
     }
   }
 
@@ -79,7 +83,7 @@ public class AuthController {
     AuthenticatedUser user = authsService.login(credentials.getEmail(), credentials.getPassword());
 
     if (user == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+      throw new ResourceNotFoundException("Invalid email or password");
     }
 
     return user;
@@ -96,13 +100,13 @@ public class AuthController {
   @PostMapping("/me")
   public String refreshToken(@RequestBody String token) {
     if (token == null || token.isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token is required");
+      throw new ResourceNotFoundException("Token is required");
     }
 
     String email = authsService.verifyJwtToken(token);
 
     if (email == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
+      throw new ResourceNotFoundException("Invalid or expired token");
     }
 
     return authsService.createJwtToken(email);

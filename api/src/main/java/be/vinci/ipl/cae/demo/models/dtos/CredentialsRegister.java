@@ -4,11 +4,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-/** CredentialsRegister DTO. */
+/**
+ * CredentialsRegister DTO.
+ */
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 public class CredentialsRegister extends Credentials {
+
   private String name;
   private String firstname;
   private String civility;

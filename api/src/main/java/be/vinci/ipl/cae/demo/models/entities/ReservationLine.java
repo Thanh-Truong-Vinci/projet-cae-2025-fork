@@ -11,7 +11,9 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** ReservationLine entity representing individual items in a reservation. */
+/**
+ * ReservationLine entity representing individual items in a reservation.
+ */
 @Entity
 @Table(name = "reservation_lines")
 @Data

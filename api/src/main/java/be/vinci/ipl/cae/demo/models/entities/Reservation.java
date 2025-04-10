@@ -15,11 +15,14 @@ import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** Represents a reservation made by a client. */
+/**
+ * Represents a reservation made by a client.
+ */
 @Entity
 @Data
 @NoArgsConstructor
 public class Reservation {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id_reservation")

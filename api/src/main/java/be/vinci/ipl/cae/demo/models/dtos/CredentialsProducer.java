@@ -4,11 +4,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-/** CredentialsProducer DTO. */
+/**
+ * CredentialsProducer DTO.
+ */
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 public class CredentialsProducer extends Credentials {
+
   private String name;
   private String firstname;
   private String company;

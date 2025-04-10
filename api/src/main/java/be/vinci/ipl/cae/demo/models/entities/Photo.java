@@ -9,7 +9,9 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** Photo entity representing product photos. */
+/**
+ * Photo entity representing product photos.
+ */
 @Entity
 @Table(name = "photos")
 @Data

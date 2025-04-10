@@ -4,7 +4,9 @@ import be.vinci.ipl.cae.demo.models.entities.Producer;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-/** Producer repository. */
+/**
+ * Producer repository.
+ */
 @Repository
 public interface ProducerRepository extends CrudRepository<Producer, Long> {
 

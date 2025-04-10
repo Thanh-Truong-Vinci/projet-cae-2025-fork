@@ -4,10 +4,13 @@ import java.time.LocalDate;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** DTO pour la création des lots. */
+/**
+ * DTO pour la création des lots.
+ */
 @Data
 @NoArgsConstructor
 public class NewBatch {
+
   // Informations du producteur
   private String email;
 

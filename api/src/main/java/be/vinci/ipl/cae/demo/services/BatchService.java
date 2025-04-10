@@ -14,7 +14,9 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
-/** Service class for managing batches. */
+/**
+ * Service class for managing batches.
+ */
 @Service
 public class BatchService {
 
@@ -22,7 +24,9 @@ public class BatchService {
   private final ProducerRepository producerRepository;
   private final NotificationRepository notificationRepository;
 
-  /** Constructeur du service. */
+  /**
+   * Constructeur du service.
+   */
   public BatchService(
       BatchRepository batchRepository,
       ProducerRepository producerRepository,
@@ -39,7 +43,6 @@ public class BatchService {
    * @return le lot créé
    */
   public Batch createBatch(NewBatch newBatch, Product product, Photo photo) {
-
     Producer producer = producerRepository.findByEmail(newBatch.getEmail());
 
     Batch batch = new Batch();
@@ -55,8 +58,6 @@ public class BatchService {
 
     return batchRepository.save(batch);
   }
-
-  // TODO addBatch
 
   /**
    * Récupère tous les lots.
@@ -84,39 +85,44 @@ public class BatchService {
    * @return le lot accepté ou null si non trouvé
    */
   public Batch acceptBatch(long id) {
-    Batch batch =
-        batchRepository.findById(id).orElseThrow(() -> new RuntimeException("Batch not found"));
+    Batch batch = batchRepository.findById(id).orElse(null);
+    if (batch == null) {
+      return null;
+    }
 
     batch.setStatus(BatchStatus.APPROVED);
-
     return batchRepository.save(batch);
   }
 
   /**
    * Rejette un lot avec un message.
    *
-   * @param id l'ID du lot à rejeter
+   * @param id      l'ID du lot à rejeter
    * @param message le message de rejet
    * @return le lot rejeté ou null si non trouvé
    */
   public Batch rejectBatch(long id, String message) {
-    Batch batch =
-        batchRepository.findById(id).orElseThrow(() -> new RuntimeException("Batch not found"));
+    Batch batch = batchRepository.findById(id).orElse(null);
+    if (batch == null) {
+      return null;
+    }
+
     batch.setStatus(BatchStatus.REJECTED);
 
     // Création de la notification
     Notification notification = new Notification();
     notification.setIsRead(false);
     notification.setMessage(message);
-    Producer producer =
-        producerRepository
-            .findById(batch.getProducer().getId())
-            .orElseThrow(() -> new RuntimeException("Producer not found"));
+    
+    Producer producer = producerRepository.findById(batch.getProducer().getId()).orElse(null);
+    if (producer == null) {
+      return null;
+    }
+    
     notification.setProducer(producer);
     notification = notificationRepository.save(notification);
 
     batch.setNotificationId(notification.getId());
-
     return batchRepository.save(batch);
   }
 
@@ -124,15 +130,16 @@ public class BatchService {
    * Marque un lot comme reçu.
    *
    * @param id l'ID du lot à marquer comme reçu
-   * @return le lot mis à jour ou null si non trouvé
-   * @throws RuntimeException si le lot n'est pas dans le statut APPROVED
+   * @return le lot mis à jour ou null si non trouvé ou status incorrect
    */
   public Batch receiveBatch(long id) {
-    Batch batch =
-        batchRepository.findById(id).orElseThrow(() -> new RuntimeException("Batch not found"));
+    Batch batch = batchRepository.findById(id).orElse(null);
+    if (batch == null) {
+      return null;
+    }
 
     if (batch.getStatus() != BatchStatus.APPROVED) {
-      throw new RuntimeException("Only approved batches can be marked as received");
+      return null;
     }
 
     batch.setStatus(BatchStatus.RECEIVED);
