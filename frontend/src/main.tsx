@@ -26,6 +26,7 @@ import ManagerDashboardPage from './components/pages/ManagerDashboardPage.tsx'
 import VolunteerHomePage from './components/pages/VolunteerHomePage.tsx'
 import SimpleProtectedRoute from './components/SimpleProtectedRoute.tsx'
 import IndexRoute from './components/IndexRoute.tsx'
+import { PhotoProvider } from './contexts/PhotoProvider.tsx'
 
 const router = createBrowserRouter([
   {
@@ -136,9 +137,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <UserContextProvider>
         <ProductProvider>
           <BatchProvider>
-            <CartProvider>
-              <RouterProvider router={router} />
-            </CartProvider>
+            <PhotoProvider>
+              <CartProvider>
+                <RouterProvider router={router} />
+              </CartProvider>
+            </PhotoProvider>
           </BatchProvider>
         </ProductProvider>
       </UserContextProvider>

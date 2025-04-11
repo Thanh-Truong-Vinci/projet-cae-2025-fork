@@ -159,6 +159,18 @@ export interface BatchContextType {
   updateBatchImageById: (batchId: number, imageId: number) => Promise<Batch | null>
 }
 
+export interface Photo {
+  id: number;
+  imageLocation: string;
+}
+
+export interface PhotoContextType {
+  photos: Photo[];
+  isLoading: boolean;
+  error: string | null;
+  fetchAllPhotos: () => Promise<void>;
+}
+
 type MaybeAuthenticatedUser = AuthenticatedUser | undefined
 
 export type {
