@@ -1,16 +1,20 @@
 package be.vinci.ipl.cae.demo.services;
 
-import be.vinci.ipl.cae.demo.models.entities.Photo;
-import be.vinci.ipl.cae.demo.repositories.PhotoRepository;
-import com.azure.storage.blob.BlobClientBuilder;
-import com.azure.storage.blob.models.BlobHttpHeaders;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.azure.storage.blob.BlobClientBuilder;
+import com.azure.storage.blob.models.BlobHttpHeaders;
+
+import be.vinci.ipl.cae.demo.models.entities.Photo;
+import be.vinci.ipl.cae.demo.repositories.PhotoRepository;
 
 /**
  * Service class for managing photos.
@@ -44,6 +48,15 @@ public class PhotoService {
   }
 
   /**
+   * Retrieve all photos from the database.
+   *
+   * @return a list of all photos
+   */
+  public List<Photo> getAllPhotos() {
+    return (List<Photo>) photoRepository.findAll();
+  }
+
+  /**
    * Create a photo entry and upload the image to Azure Blob storage.
    *
    * @param product the product name associated with the photo
@@ -61,8 +74,10 @@ public class PhotoService {
   }
 
   /**
-   * Upload an image to a blob on Azure storage with a generated UUID as filename. The image is
-   * uploaded to the "images" folder. The original filename is stored in the metadata.
+   * Upload an image to a blob on Azure storage with a generated UUID as filename.
+   * The image is
+   * uploaded to the "images" folder. The original filename is stored in the
+   * metadata.
    *
    * @param image the image file to be uploaded
    * @return the blob URL of the uploaded image
@@ -72,12 +87,11 @@ public class PhotoService {
     Map<String, String> metadata = new HashMap<>();
 
     metadata.put("originalFileName", image.getOriginalFilename());
-    BlobClientBuilder blobClientBuilder =
-        new BlobClientBuilder()
-            .endpoint(blobServiceEndpoint)
-            .sasToken(sasToken)
-            .containerName(containerName)
-            .blobName(imageUuid);
+    BlobClientBuilder blobClientBuilder = new BlobClientBuilder()
+        .endpoint(blobServiceEndpoint)
+        .sasToken(sasToken)
+        .containerName(containerName)
+        .blobName(imageUuid);
 
     try {
       blobClientBuilder.buildClient().upload(image.getInputStream(), image.getSize(), true);
