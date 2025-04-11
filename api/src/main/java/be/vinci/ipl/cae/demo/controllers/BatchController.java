@@ -239,4 +239,14 @@ public class BatchController {
   public List<Batch> getApprovedBatches() {
     return batchService.getApprovedBatches();
   }
+
+  /**
+   * Récupère tous les lots reçus.
+   *
+   * @return la liste des lots avec le statut RECEIVED
+   */
+  @GetMapping("/received")
+  public List<Batch> getReceivedBatches() {
+    return batchService.getReceivedBatches();
+  }
 }
