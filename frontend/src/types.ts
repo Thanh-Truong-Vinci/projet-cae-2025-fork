@@ -149,10 +149,12 @@ export interface ProductBatch {
 export interface BatchContextType {
   myBatches: Batch[]
   approvedBatches: Batch[]
+  receivedBatches: Batch[] // Added receivedBatches state
   isLoading: boolean
   error: string | null
   fetchMyBatches: () => Promise<void>
   fetchApprovedBatches: () => Promise<void>
+  fetchReceivedBatches: () => Promise<Batch[]> // Added fetch method for received batches
   receiveBatch: (batchId: number) => Promise<Batch | null>
   createBatch: (newBatch: NewBatch, image: File) => Promise<void>
   updateBatchImage: (batchId: number, image: File) => Promise<Batch | null>

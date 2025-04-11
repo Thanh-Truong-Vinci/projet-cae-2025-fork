@@ -152,6 +152,15 @@ public class BatchService {
   }
 
   /**
+   * Récupère tous les lots ayant le statut RECEIVED.
+   *
+   * @return la liste des lots reçus
+   */
+  public List<Batch> getReceivedBatches() {
+    return batchRepository.findByStatus(BatchStatus.RECEIVED);
+  }
+
+  /**
    * Récupère tous les lots ayant le statut APPROVED.
    *
    * @param producerId le producteur qui fait la requête

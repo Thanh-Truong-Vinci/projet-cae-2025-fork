@@ -11,14 +11,24 @@ interface BatchProviderProps {
 export const BatchProvider = ({ children }: BatchProviderProps) => {
   const [myBatches, setMyBatches] = useState<Batch[]>([])
   const [approvedBatches, setApprovedBatches] = useState<Batch[]>([])
+  const [receivedBatches, setReceivedBatches] = useState<Batch[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const { authenticatedUser } = useContext(UserContext)
 
-  // Transform raw backend batch data to match the frontend Batch interface
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const formatBatch = (rawBatch: any): Batch => {
     console.log('Raw batch data:', rawBatch)
+
+    let producerName = 'Producteur inconnu'
+    if (rawBatch.producer) {
+      const firstName = rawBatch.producer.firstname || ''
+      const lastName = rawBatch.producer.name || ''
+      if (firstName || lastName) {
+        producerName = `${firstName} ${lastName}`.trim()
+      }
+    }
+
     return {
       id: rawBatch.idBatch || rawBatch.id,
       productName: rawBatch.product?.name || 'Produit inconnu',
@@ -29,11 +39,8 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
       availableQuantity: rawBatch.availableQuantity || 0,
       unitPrice: rawBatch.unitPrice || 0,
       unitType: rawBatch.saleUnit || 'unité',
-      producerId: rawBatch.producer?.idUser || 0,
-      producerName:
-        rawBatch.producer?.user?.firstname +
-          ' ' +
-          rawBatch.producer?.user?.name || 'Producteur inconnu',
+      producerId: rawBatch.producer?.id || 0,
+      producerName: producerName,
       createdAt: rawBatch.productionDate || new Date().toISOString(),
       status: rawBatch.status || 'APPROVED',
     }
@@ -105,6 +112,35 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
         error instanceof Error ? error.message : 'Une erreur est survenue'
       )
       console.error('Erreur lors de la récupération des lots approuvés:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }, []) // No dependencies needed since formatBatch doesn't depend on any props or state
+
+  const fetchReceivedBatches = useCallback(async () => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/batches/received')
+
+      if (!response.ok) {
+        throw new Error(`Erreur: ${response.status}`)
+      }
+
+      const data = await response.json()
+      // Format the data before setting state
+      const formattedBatches = Array.isArray(data)
+        ? data.map((rawBatch) => formatBatch(rawBatch))
+        : []
+      setReceivedBatches(formattedBatches)
+      return formattedBatches
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : 'Une erreur est survenue'
+      )
+      console.error('Erreur lors de la récupération des lots reçus:', error)
+      return []
     } finally {
       setIsLoading(false)
     }
@@ -348,10 +384,12 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
       value={{
         myBatches,
         approvedBatches,
+        receivedBatches,
         isLoading,
         error,
         fetchApprovedBatches,
         fetchMyBatches,
+        fetchReceivedBatches,
         receiveBatch,
         createBatch,
         updateBatchImage,

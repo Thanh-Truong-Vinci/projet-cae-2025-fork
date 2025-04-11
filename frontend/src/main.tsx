@@ -27,6 +27,7 @@ import VolunteerHomePage from './components/pages/VolunteerHomePage.tsx'
 import SimpleProtectedRoute from './components/SimpleProtectedRoute.tsx'
 import IndexRoute from './components/IndexRoute.tsx'
 import { PhotoProvider } from './contexts/PhotoProvider.tsx'
+import ReceivedProductsPage from './components/pages/ReceivedProductsPage.tsx'
 
 const router = createBrowserRouter([
   {
@@ -118,6 +119,14 @@ const router = createBrowserRouter([
         element: (
           <SimpleProtectedRoute requiredRole="Volunteer">
             <VolunteerHomePage />
+          </SimpleProtectedRoute>
+        ),
+      },
+      {
+        path: 'received-products',
+        element: (
+          <SimpleProtectedRoute requiredRole="Manager">
+            <ReceivedProductsPage />
           </SimpleProtectedRoute>
         ),
       },
