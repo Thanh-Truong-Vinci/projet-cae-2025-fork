@@ -209,6 +209,96 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
     }
   }
 
+  const updateBatchImage = async (
+    batchId: number,
+    image: File
+  ): Promise<Batch | null> => {
+    try {
+      if (!authenticatedUser) {
+        throw new Error('Vous devez être authentifié pour modifier une image')
+      }
+
+      const formData = new FormData()
+      formData.append('image', image)
+
+      const options = {
+        method: 'PATCH',
+        body: formData,
+        headers: {
+          Authorization: authenticatedUser.token,
+        },
+      }
+
+      const response = await fetch(`/api/batches/${batchId}/updateImage`, options)
+      
+      if (!response.ok) {
+        throw new Error(`Erreur: ${response.status} ${response.statusText}`)
+      }
+
+      const updatedBatch = await response.json()
+      console.log('Image du lot mise à jour avec succès:', updatedBatch)
+
+      // Update the batch in the local state
+      setMyBatches((prevBatches) =>
+        prevBatches.map((batch) => 
+          batch.id === batchId ? formatBatch(updatedBatch) : batch
+        )
+      )
+
+      return formatBatch(updatedBatch)
+    } catch (err) {
+      console.error('updateBatchImage::error: ', err)
+      if (err instanceof Error) {
+        throw new Error(err.message || 'Erreur lors de la mise à jour de l\'image')
+      }
+      throw new Error('Erreur inconnue lors de la mise à jour de l\'image')
+    }
+  }
+
+  const updateBatchImageById = async (
+    batchId: number,
+    imageId: number
+  ): Promise<Batch | null> => {
+    try {
+      if (!authenticatedUser) {
+        throw new Error('Vous devez être authentifié pour modifier une image')
+      }
+
+      const options = {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: authenticatedUser.token,
+        },
+        body: JSON.stringify({ imageId }),
+      }
+
+      const response = await fetch(`/api/batches/${batchId}/updateImageById`, options)
+      
+      if (!response.ok) {
+        throw new Error(`Erreur: ${response.status} ${response.statusText}`)
+      }
+
+      const updatedBatch = await response.json()
+      console.log('Image du lot mise à jour avec succès:', updatedBatch)
+
+      // Update the batch in the local state
+      setMyBatches((prevBatches) =>
+        prevBatches.map((batch) => 
+          batch.id === batchId ? formatBatch(updatedBatch) : batch
+        )
+      )
+
+      return formatBatch(updatedBatch)
+    } catch (err) {
+      console.error('updateBatchImageById::error: ', err)
+      if (err instanceof Error) {
+        throw new Error(err.message || 'Erreur lors de la mise à jour de l\'image')
+      }
+      throw new Error('Erreur inconnue lors de la mise à jour de l\'image')
+    }
+  }
+
   useEffect(() => {
     if (authenticatedUser?.role === 'Volunteer') {
       fetchApprovedBatches()
@@ -226,6 +316,8 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
         fetchMyBatches,
         receiveBatch,
         createBatch,
+        updateBatchImage,
+        updateBatchImageById,
       }}
     >
       {children}
