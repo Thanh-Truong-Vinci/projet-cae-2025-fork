@@ -85,7 +85,7 @@ const ProducerHomePage = () => {
         return { label: 'Reçu', color: 'info' as const }
       default:
         return { label: 'Indéterminé', color: 'default' as const }
-    }zzz
+    }
   }
 
   // Si l'utilisateur n'est pas connecté ou n'est pas un producteur, ne pas rendre la page
