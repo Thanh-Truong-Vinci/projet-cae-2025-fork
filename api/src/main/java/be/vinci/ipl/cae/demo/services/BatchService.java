@@ -162,4 +162,21 @@ public class BatchService {
     return batchRepository.findByProducerIdAndAvailableQuantityGreaterThanOrderByProductionDateAsc(
         producerId, 0);
   }
+
+  /**
+   * Updates the photo of a batch with a new uploaded image.
+   *
+   * @param batchId the ID of the batch to update
+   * @param photo the new photo entity
+   * @return the updated batch or null if the batch was not found
+   */
+  public Batch updateBatchPhoto(long batchId, Photo photo) {
+    Batch batch = batchRepository.findById(batchId).orElse(null);
+    if (batch == null) {
+      return null;
+    }
+
+    batch.setPhoto(photo);
+    return batchRepository.save(batch);
+  }
 }

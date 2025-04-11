@@ -15,11 +15,13 @@ import be.vinci.ipl.cae.demo.services.BatchService;
 import be.vinci.ipl.cae.demo.services.PhotoService;
 import be.vinci.ipl.cae.demo.services.ProductService;
 import java.util.List;
+import java.util.Map;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,10 +43,11 @@ public class BatchController {
   /**
    * Constructeur du controller.
    *
-   * @param batchService le service de gestion des lots injecté
-   * @param productService le service de gestion des photos injecté
-   * @param photoService le service de gestion des photos injecté
-   * @param productTypeRepository le repository de gestion des types de produits injecté
+   * @param batchService          le service de gestion des lots injecté
+   * @param productService        le service de gestion des photos injecté
+   * @param photoService          le service de gestion des photos injecté
+   * @param productTypeRepository le repository de gestion des types de produits
+   *                              injecté
    */
   public BatchController(
       BatchService batchService,
@@ -63,7 +66,7 @@ public class BatchController {
    * Crée un nouveau lot avec un produit et une photo associée.
    *
    * @param newBatch les informations du lot à créer (au format JSON)
-   * @param image le fichier image du produit
+   * @param image    le fichier image du produit
    * @return le lot créé
    */
   @PostMapping("/createbatch")
@@ -111,9 +114,8 @@ public class BatchController {
     System.out.println(" 1");
 
     // 3. Create the product and get its ID
-    Product product =
-        productService.createProduct(
-            newBatch.getProductName(), productType, newBatch.getProductDescription(), photo);
+    Product product = productService.createProduct(
+        newBatch.getProductName(), productType, newBatch.getProductDescription(), photo);
     if (product == null) {
       throw new ConflictException("Échec de la création du produit");
     }
@@ -146,7 +148,7 @@ public class BatchController {
    *
    * @return la liste des lots
    */
-  @GetMapping({"", "/"})
+  @GetMapping({ "", "/" })
   public Iterable<Batch> getAllBatches() {
     // TODO verify token if is a manager
     return batchService.getAllBatches();
@@ -189,7 +191,7 @@ public class BatchController {
   /**
    * Rejette un lot avec un message de notification.
    *
-   * @param id l'identifiant du lot à rejeter
+   * @param id      l'identifiant du lot à rejeter
    * @param message le message expliquant le rejet
    * @return le lot rejeté
    */
@@ -224,6 +226,107 @@ public class BatchController {
     batch = batchService.receiveBatch(id);
     if (batch == null) {
       throw new ConflictException("Impossible de marquer le lot comme reçu");
+    }
+
+    return batch;
+  }
+
+  /**
+   * Met à jour l'image d'un lot avec une nouvelle image téléchargée.
+   *
+   * @param id    l'identifiant du lot à mettre à jour
+   * @param image le fichier image à utiliser
+   * @return le lot mis à jour
+   */
+  @PatchMapping("/{id}/updateImage")
+  @PreAuthorize(SecurityConstants.HAS_ROLE_PRODUCER)
+  public Batch updateBatchImage(
+      @PathVariable long id,
+      @RequestPart("image") MultipartFile image,
+      @RequestHeader("Authorization") String token) {
+
+    // Mettre à jour la photo
+    Batch batch = verifyBatchOwnership(id, token);
+    String productName = batch.getProduct().getName();
+
+    Photo photo = photoService.createPhoto(productName, image);
+    if (photo == null) {
+      throw new ConflictException("Échec de la mise à jour de la photo");
+    }
+
+    return updateBatchWithPhoto(id, photo);
+  }
+
+  /**
+   * Met à jour l'image d'un lot avec une image existante par ID.
+   *
+   * @param id          l'identifiant du lot à mettre à jour
+   * @param requestBody contient l'identifiant de l'image à utiliser
+   * @return le lot mis à jour
+   */
+  @PatchMapping("/{id}/updateImageById")
+  @PreAuthorize(SecurityConstants.HAS_ROLE_PRODUCER)
+  public Batch updateBatchImageById(
+      @PathVariable long id,
+      @RequestBody Map<String, Long> requestBody,
+      @RequestHeader("Authorization") String token) {
+
+    // Extraire l'imageId du corps de la requête
+    Long imageId = requestBody.get("imageId");
+    if (imageId == null) {
+      throw new ConflictException("L'identifiant de l'image est requis");
+    }
+
+    // Verify ownership
+    verifyBatchOwnership(id, token);
+
+    // Récupérer la photo existante par ID
+    Photo photo = photoService.getPhotoById(imageId);
+    if (photo == null) {
+      throw new ResourceNotFoundException("Image non trouvée");
+    }
+
+    return updateBatchWithPhoto(id, photo);
+  }
+
+  /**
+   * Vérifie que le producteur est propriétaire du lot.
+   * 
+   * @param batchId l'identifiant du lot
+   * @param token   le token d'authentification
+   * @return le lot si l'utilisateur est autorisé
+   * @throws ResourceNotFoundException si le lot n'existe pas
+   * @throws ConflictException         si l'utilisateur n'est pas autorisé
+   */
+  private Batch verifyBatchOwnership(long batchId, String token) {
+    // Vérifier que l'utilisateur est le producteur du lot
+    Producer producer = authsService.isValidProducerToken(token);
+    Batch batch = batchService.getBatchById(batchId);
+
+    if (batch == null) {
+      throw new ResourceNotFoundException("Lot non trouvé");
+    }
+
+    if (!batch.getProducer().getId().equals(producer.getId())) {
+      throw new ConflictException("Vous n'êtes pas autorisé à modifier ce lot");
+    }
+
+    return batch;
+  }
+
+  /**
+   * Met à jour un lot avec une nouvelle photo.
+   *
+   * @param batchId l'identifiant du lot
+   * @param photo   la photo à associer
+   * @return le lot mis à jour
+   * @throws ConflictException si la mise à jour échoue
+   */
+  private Batch updateBatchWithPhoto(long batchId, Photo photo) {
+    // Mettre à jour le lot avec la photo
+    Batch batch = batchService.updateBatchPhoto(batchId, photo);
+    if (batch == null) {
+      throw new ConflictException("Échec de la mise à jour du lot");
     }
 
     return batch;

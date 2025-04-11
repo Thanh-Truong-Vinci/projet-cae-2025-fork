@@ -52,6 +52,16 @@ public class PhotoService {
   }
 
   /**
+   * Retrieve a photo by its ID.
+   *
+   * @param id the ID of the photo to retrieve
+   * @return the photo if found, null otherwise
+   */
+  public Photo getPhotoById(Long id) {
+    return photoRepository.findById(id).orElse(null);
+  }
+
+  /**
    * Create a photo entry and upload the image to Azure Blob storage.
    *
    * @param product the product name associated with the photo
@@ -100,4 +110,3 @@ public class PhotoService {
     return blobClientBuilder.buildClient().getBlobUrl();
   }
 }
-

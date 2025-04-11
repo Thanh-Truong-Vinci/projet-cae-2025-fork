@@ -1,0 +1,3 @@
+### Get all photos (no trailing slash)
+GET http://localhost:3000/photo
+Accept: application/json

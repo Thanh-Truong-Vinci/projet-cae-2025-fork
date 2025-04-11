@@ -218,40 +218,45 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
         throw new Error('Vous devez être authentifié pour modifier une image')
       }
 
+      console.log(`Updating batch ${batchId} with image: ${image.name} (${image.size} bytes)`)
+
       const formData = new FormData()
       formData.append('image', image)
 
-      const options = {
-        method: 'PATCH',
-        body: formData,
+      // Use axios instead of fetch for better multipart form handling
+      const response = await axios.patch(`/api/batches/${batchId}/updateImage`, formData, {
         headers: {
           Authorization: authenticatedUser.token,
-        },
-      }
+          'Content-Type': 'multipart/form-data',
+        }
+      })
 
-      const response = await fetch(
-        `/api/batches/${batchId}/updateImage`,
-        options
-      )
+      console.log('Image update response:', response.data)
 
-      if (!response.ok) {
-        throw new Error(`Erreur: ${response.status} ${response.statusText}`)
-      }
+      if (response.status >= 200 && response.status < 300) {
+        const updatedBatch = response.data
+        console.log('Image du lot mise à jour avec succès:', updatedBatch)
 
-      const updatedBatch = await response.json()
-      console.log('Image du lot mise à jour avec succès:', updatedBatch)
-
-      // Update the batch in the local state
-      setMyBatches((prevBatches) =>
-        prevBatches.map((batch) =>
-          batch.id === batchId ? formatBatch(updatedBatch) : batch
+        // Update the batch in the local state
+        setMyBatches((prevBatches) =>
+          prevBatches.map((batch) =>
+            batch.id === batchId ? formatBatch(updatedBatch) : batch
+          )
         )
-      )
 
-      return formatBatch(updatedBatch)
+        return formatBatch(updatedBatch)
+      } else {
+        throw new Error(`Error status: ${response.status}`)
+      }
     } catch (err) {
       console.error('updateBatchImage::error: ', err)
-      if (err instanceof Error) {
+      if (axios.isAxiosError(err)) {
+        console.error('Response data:', err.response?.data)
+        console.error('Response status:', err.response?.status)
+        throw new Error(
+          err.response?.data?.message || "Erreur lors de la mise à jour de l'image"
+        )
+      } else if (err instanceof Error) {
         throw new Error(
           err.message || "Erreur lors de la mise à jour de l'image"
         )
@@ -269,43 +274,51 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
         throw new Error('Vous devez être authentifié pour modifier une image')
       }
 
-      const options = {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: authenticatedUser.token,
-        },
-        body: JSON.stringify({ imageId }),
-      }
+      console.log(`Updating batch ${batchId} with existing image id: ${imageId}`)
 
-      const response = await fetch(
+      // Usa axios per coerenza con updateBatchImage e per une meilleure gestion des erreurs
+      const response = await axios.patch(
         `/api/batches/${batchId}/updateImageById`,
-        options
+        { imageId },
+        {
+          headers: {
+            Authorization: authenticatedUser.token,
+            'Content-Type': 'application/json',
+          }
+        }
       )
 
-      if (!response.ok) {
-        throw new Error(`Erreur: ${response.status} ${response.statusText}`)
-      }
+      console.log('Image update by ID response:', response.data)
 
-      const updatedBatch = await response.json()
-      console.log('Image du lot mise à jour avec succès:', updatedBatch)
+      if (response.status >= 200 && response.status < 300) {
+        const updatedBatch = response.data
+        console.log('Image du lot mise à jour avec succès par ID:', updatedBatch)
 
-      // Update the batch in the local state
-      setMyBatches((prevBatches) =>
-        prevBatches.map((batch) =>
-          batch.id === batchId ? formatBatch(updatedBatch) : batch
+        // Update the batch in the local state
+        setMyBatches((prevBatches) =>
+          prevBatches.map((batch) =>
+            batch.id === batchId ? formatBatch(updatedBatch) : batch
+          )
         )
-      )
 
-      return formatBatch(updatedBatch)
+        return formatBatch(updatedBatch)
+      } else {
+        throw new Error(`Error status: ${response.status}`)
+      }
     } catch (err) {
       console.error('updateBatchImageById::error: ', err)
-      if (err instanceof Error) {
+      if (axios.isAxiosError(err)) {
+        console.error('Response data:', err.response?.data)
+        console.error('Response status:', err.response?.status)
         throw new Error(
-          err.message || "Erreur lors de la mise à jour de l'image"
+          err.response?.data?.message || "Erreur lors de la mise à jour de l'image par ID"
+        )
+      } else if (err instanceof Error) {
+        throw new Error(
+          err.message || "Erreur lors de la mise à jour de l'image par ID"
         )
       }
-      throw new Error("Erreur inconnue lors de la mise à jour de l'image")
+      throw new Error("Erreur inconnue lors de la mise à jour de l'image par ID")
     }
   }
 
