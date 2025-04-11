@@ -27,9 +27,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- * Controller pour gérer les opérations sur les lots.
- */
+/** Controller pour gérer les opérations sur les lots. */
 @RestController
 @RequestMapping("/batches")
 public class BatchController {
@@ -43,9 +41,9 @@ public class BatchController {
   /**
    * Constructeur du controller.
    *
-   * @param batchService          le service de gestion des lots injecté
-   * @param productService        le service de gestion des photos injecté
-   * @param photoService          le service de gestion des photos injecté
+   * @param batchService le service de gestion des lots injecté
+   * @param productService le service de gestion des photos injecté
+   * @param photoService le service de gestion des photos injecté
    * @param productTypeRepository le repository de gestion des types de produits injecté
    */
   public BatchController(
@@ -65,7 +63,7 @@ public class BatchController {
    * Crée un nouveau lot avec un produit et une photo associée.
    *
    * @param newBatch les informations du lot à créer (au format JSON)
-   * @param image    le fichier image du produit
+   * @param image le fichier image du produit
    * @return le lot créé
    */
   @PostMapping("/createbatch")
@@ -113,8 +111,9 @@ public class BatchController {
     System.out.println(" 1");
 
     // 3. Create the product and get its ID
-    Product product = productService.createProduct(
-        newBatch.getProductName(), productType, newBatch.getProductDescription(), photo);
+    Product product =
+        productService.createProduct(
+            newBatch.getProductName(), productType, newBatch.getProductDescription(), photo);
     if (product == null) {
       throw new ConflictException("Échec de la création du produit");
     }
@@ -125,7 +124,7 @@ public class BatchController {
     if (batch == null) {
       throw new ConflictException("Échec de la création du lot");
     }
-    
+
     return batch;
   }
 
@@ -190,7 +189,7 @@ public class BatchController {
   /**
    * Rejette un lot avec un message de notification.
    *
-   * @param id      l'identifiant du lot à rejeter
+   * @param id l'identifiant du lot à rejeter
    * @param message le message expliquant le rejet
    * @return le lot rejeté
    */
@@ -216,17 +215,17 @@ public class BatchController {
   @PreAuthorize(SecurityConstants.HAS_ROLE_VOLUNTEER)
   public Batch receiveBatch(@PathVariable long id, @RequestHeader("Authorization") String token) {
     Batch batch = batchService.getBatchById(id);
-    
+
     if (batch == null) {
       throw new ResourceNotFoundException("Lot non trouvé");
     }
-    
+
     // Attempt to mark the batch as received
     batch = batchService.receiveBatch(id);
     if (batch == null) {
       throw new ConflictException("Impossible de marquer le lot comme reçu");
     }
-    
+
     return batch;
   }
 

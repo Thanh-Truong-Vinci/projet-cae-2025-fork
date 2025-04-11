@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * AuthController to handle client authentication.
- */
+/** AuthController to handle client authentication. */
 @RestController
 @RequestMapping("/auths")
 public class AuthController {
@@ -31,7 +29,7 @@ public class AuthController {
    * Constructor for AuthController.
    *
    * @param clientService the injected ClientService.
-   * @param authsService  the injected AuthsService.
+   * @param authsService the injected AuthsService.
    */
   public AuthController(
       ProfileService profileService, ClientService clientService, AuthsService authsService) {
@@ -50,19 +48,20 @@ public class AuthController {
   @SuppressWarnings("PMD.CPD")
   public void register(@RequestBody CredentialsRegister credentials) {
     ValidationUtils.validateCredentialsRegister(credentials);
-    
-    boolean registrationSuccessful = clientService.register(
-        credentials.getName(),
-        credentials.getFirstname(),
-        credentials.getEmail(),
-        credentials.getPassword(),
-        credentials.getCivility(),
-        credentials.getStreet(),
-        credentials.getNumber(),
-        credentials.getPostalCode(),
-        credentials.getCity(),
-        credentials.getCountry(),
-        credentials.getPhoneNumber());
+
+    boolean registrationSuccessful =
+        clientService.register(
+            credentials.getName(),
+            credentials.getFirstname(),
+            credentials.getEmail(),
+            credentials.getPassword(),
+            credentials.getCivility(),
+            credentials.getStreet(),
+            credentials.getNumber(),
+            credentials.getPostalCode(),
+            credentials.getCity(),
+            credentials.getCountry(),
+            credentials.getPhoneNumber());
 
     if (!registrationSuccessful) {
       throw new ConflictException("Email is already in use");

@@ -7,9 +7,7 @@ import be.vinci.ipl.cae.demo.models.dtos.CredentialsRegister;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * Utility class for validating credentials.
- */
+/** Utility class for validating credentials. */
 public final class ValidationUtils {
 
   private ValidationUtils() {
@@ -163,7 +161,7 @@ public final class ValidationUtils {
    * Checks if an operation was successful and throws an appropriate exception if not.
    *
    * @param success the result of the operation
-   * @param status  the HTTP status to use if unsuccessful
+   * @param status the HTTP status to use if unsuccessful
    * @param message the error message to include
    * @throws ResponseStatusException if the operation was not successful
    */

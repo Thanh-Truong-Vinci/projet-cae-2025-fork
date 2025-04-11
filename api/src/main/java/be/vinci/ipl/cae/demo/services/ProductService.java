@@ -13,9 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.springframework.stereotype.Service;
 
-/**
- * Service class for managing products.
- */
+/** Service class for managing products. */
 @Service
 public class ProductService {
 
@@ -26,9 +24,9 @@ public class ProductService {
   /**
    * Constructs a new ProductService with the specified repositories.
    *
-   * @param productRepository     the repository for products
+   * @param productRepository the repository for products
    * @param productTypeRepository the repository for product types
-   * @param photoRepository       the repository for photos
+   * @param photoRepository the repository for photos
    */
   public ProductService(
       ProductRepository productRepository,
@@ -42,10 +40,10 @@ public class ProductService {
   /**
    * Creates a new product with the specified details.
    *
-   * @param name        the name of the product
-   * @param type        the type of the product
+   * @param name the name of the product
+   * @param type the type of the product
    * @param description the description of the product
-   * @param photo       the photo associated with the product
+   * @param photo the photo associated with the product
    */
   public Product createProduct(String name, ProductType type, String description, Photo photo) {
     Product product = new Product();
@@ -93,7 +91,7 @@ public class ProductService {
    * Retrieves a list of products based on search criteria and type.
    *
    * @param search the search term for product name or description
-   * @param type   the type of product
+   * @param type the type of product
    * @return a list of products matching the criteria
    */
   public List<Product> getProducts(String search, String type) {
@@ -101,8 +99,8 @@ public class ProductService {
         .filter(
             product ->
                 (search == null
-                    || product.getName().contains(search)
-                    || product.getDescription().contains(search))
+                        || product.getName().contains(search)
+                        || product.getDescription().contains(search))
                     && (type == null || product.getType().getTitle().equalsIgnoreCase(type)))
         .collect(Collectors.toList());
   }
@@ -155,7 +153,7 @@ public class ProductService {
   /**
    * Updates an existing product.
    *
-   * @param id         the ID of the product to update
+   * @param id the ID of the product to update
    * @param newProduct the DTO containing updated product information
    * @return the updated product if found, null otherwise
    */

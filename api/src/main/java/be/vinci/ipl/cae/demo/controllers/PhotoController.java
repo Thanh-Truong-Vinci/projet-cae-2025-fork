@@ -1,18 +1,16 @@
 package be.vinci.ipl.cae.demo.controllers;
 
+import be.vinci.ipl.cae.demo.exceptions.ConflictException;
+import be.vinci.ipl.cae.demo.models.dtos.NewPhoto;
+import be.vinci.ipl.cae.demo.models.entities.Photo;
+import be.vinci.ipl.cae.demo.services.PhotoService;
 import java.util.List;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import be.vinci.ipl.cae.demo.exceptions.ConflictException;
-import be.vinci.ipl.cae.demo.models.dtos.NewPhoto;
-import be.vinci.ipl.cae.demo.models.entities.Photo;
-import be.vinci.ipl.cae.demo.services.PhotoService;
 
 /**
  * Controller to upload an image.

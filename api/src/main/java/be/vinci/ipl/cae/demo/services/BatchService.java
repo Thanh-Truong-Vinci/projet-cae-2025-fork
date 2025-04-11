@@ -14,9 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
-/**
- * Service class for managing batches.
- */
+/** Service class for managing batches. */
 @Service
 public class BatchService {
 
@@ -24,9 +22,7 @@ public class BatchService {
   private final ProducerRepository producerRepository;
   private final NotificationRepository notificationRepository;
 
-  /**
-   * Constructeur du service.
-   */
+  /** Constructeur du service. */
   public BatchService(
       BatchRepository batchRepository,
       ProducerRepository producerRepository,
@@ -97,7 +93,7 @@ public class BatchService {
   /**
    * Rejette un lot avec un message.
    *
-   * @param id      l'ID du lot à rejeter
+   * @param id l'ID du lot à rejeter
    * @param message le message de rejet
    * @return le lot rejeté ou null si non trouvé
    */
@@ -113,12 +109,12 @@ public class BatchService {
     Notification notification = new Notification();
     notification.setIsRead(false);
     notification.setMessage(message);
-    
+
     Producer producer = producerRepository.findById(batch.getProducer().getId()).orElse(null);
     if (producer == null) {
       return null;
     }
-    
+
     notification.setProducer(producer);
     notification = notificationRepository.save(notification);
 

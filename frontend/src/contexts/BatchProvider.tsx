@@ -229,8 +229,11 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
         },
       }
 
-      const response = await fetch(`/api/batches/${batchId}/updateImage`, options)
-      
+      const response = await fetch(
+        `/api/batches/${batchId}/updateImage`,
+        options
+      )
+
       if (!response.ok) {
         throw new Error(`Erreur: ${response.status} ${response.statusText}`)
       }
@@ -240,7 +243,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
 
       // Update the batch in the local state
       setMyBatches((prevBatches) =>
-        prevBatches.map((batch) => 
+        prevBatches.map((batch) =>
           batch.id === batchId ? formatBatch(updatedBatch) : batch
         )
       )
@@ -249,9 +252,11 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
     } catch (err) {
       console.error('updateBatchImage::error: ', err)
       if (err instanceof Error) {
-        throw new Error(err.message || 'Erreur lors de la mise à jour de l\'image')
+        throw new Error(
+          err.message || "Erreur lors de la mise à jour de l'image"
+        )
       }
-      throw new Error('Erreur inconnue lors de la mise à jour de l\'image')
+      throw new Error("Erreur inconnue lors de la mise à jour de l'image")
     }
   }
 
@@ -273,8 +278,11 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
         body: JSON.stringify({ imageId }),
       }
 
-      const response = await fetch(`/api/batches/${batchId}/updateImageById`, options)
-      
+      const response = await fetch(
+        `/api/batches/${batchId}/updateImageById`,
+        options
+      )
+
       if (!response.ok) {
         throw new Error(`Erreur: ${response.status} ${response.statusText}`)
       }
@@ -284,7 +292,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
 
       // Update the batch in the local state
       setMyBatches((prevBatches) =>
-        prevBatches.map((batch) => 
+        prevBatches.map((batch) =>
           batch.id === batchId ? formatBatch(updatedBatch) : batch
         )
       )
@@ -293,9 +301,11 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
     } catch (err) {
       console.error('updateBatchImageById::error: ', err)
       if (err instanceof Error) {
-        throw new Error(err.message || 'Erreur lors de la mise à jour de l\'image')
+        throw new Error(
+          err.message || "Erreur lors de la mise à jour de l'image"
+        )
       }
-      throw new Error('Erreur inconnue lors de la mise à jour de l\'image')
+      throw new Error("Erreur inconnue lors de la mise à jour de l'image")
     }
   }
 

@@ -19,9 +19,9 @@ export const PhotoProvider = ({ children }: PhotoProviderProps) => {
 
     try {
       const response = await fetch('/api/photos', {
-        headers: authenticatedUser?.token 
+        headers: authenticatedUser?.token
           ? { Authorization: authenticatedUser.token }
-          : {}
+          : {},
       })
 
       if (!response.ok) {
@@ -35,7 +35,7 @@ export const PhotoProvider = ({ children }: PhotoProviderProps) => {
       const formattedPhotos = Array.isArray(data)
         ? data.map((photo) => ({
             id: photo.id || photo.idPhoto,
-            imageLocation: photo.imageLocation || photo.imageUrl || ''
+            imageLocation: photo.imageLocation || photo.imageUrl || '',
           }))
         : []
 

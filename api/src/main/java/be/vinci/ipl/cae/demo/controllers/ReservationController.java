@@ -15,9 +15,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Controller for handling reservation-related operations.
- */
+/** Controller for handling reservation-related operations. */
 @RestController
 @RequestMapping("/reservation")
 public class ReservationController {
@@ -28,7 +26,7 @@ public class ReservationController {
   /**
    * Constructs a ReservationController with the specified AuthsService and ReservationService.
    *
-   * @param authsService       the authentication service.
+   * @param authsService the authentication service.
    * @param reservationService the reservation service.
    */
   public ReservationController(AuthsService authsService, ReservationService reservationService) {
@@ -40,7 +38,7 @@ public class ReservationController {
    * Reserves a product for a client.
    *
    * @param reservationRequest the reservation request containing product ID and quantity.
-   * @param token              the authorization token from the request header.
+   * @param token the authorization token from the request header.
    * @throws ResourceNotFoundException if the token is invalid or expired.
    */
   @PostMapping("/reserve")
@@ -59,7 +57,7 @@ public class ReservationController {
    * Cancels a reservation for a client.
    *
    * @param reservationId the ID of the reservation to cancel.
-   * @param token         the authorization token from the request header.
+   * @param token the authorization token from the request header.
    * @throws ResourceNotFoundException if the token is invalid or expired.
    * @throws ConflictException if the reservation ID is missing.
    */

@@ -9,18 +9,14 @@ import be.vinci.ipl.cae.demo.repositories.ReservationLineRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
-/**
- * Service class for managing reservation lines.
- */
+/** Service class for managing reservation lines. */
 @Service
 public class ReservationLineService {
 
   private final BatchRepository batchRepository;
   private final ReservationLineRepository reservationLineRepository;
 
-  /**
-   * Default constructor for ReservationLineService.
-   */
+  /** Default constructor for ReservationLineService. */
   public ReservationLineService(
       BatchRepository batchRepository, ReservationLineRepository reservationLineRepository) {
     this.batchRepository = batchRepository;
@@ -31,8 +27,8 @@ public class ReservationLineService {
    * Creates a new reservation line with the specified details.
    *
    * @param reservation the reservation to add the line to
-   * @param batch       the batch of the product
-   * @param quantity    the quantity of the product
+   * @param batch the batch of the product
+   * @param quantity the quantity of the product
    */
   public void createReservationLine(Reservation reservation, Batch batch, int quantity) {
     ReservationLine reservationLine = new ReservationLine();
@@ -46,8 +42,8 @@ public class ReservationLineService {
    * Adds a product to a reservation with the specified quantity.
    *
    * @param reservation the reservation to add the product to
-   * @param product     the product to add
-   * @param quantity    the quantity of the product to add
+   * @param product the product to add
+   * @param quantity the quantity of the product to add
    */
   public void addProduct(Reservation reservation, Product product, int quantity) {
     List<Batch> batches =
