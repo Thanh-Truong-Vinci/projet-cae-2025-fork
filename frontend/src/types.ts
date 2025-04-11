@@ -165,6 +165,7 @@ export interface BatchContextType {
 export interface Photo {
   id: number
   imageLocation: string
+  productName: string
 }
 
 export interface PhotoContextType {

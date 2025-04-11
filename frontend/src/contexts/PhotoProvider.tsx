@@ -36,6 +36,7 @@ export const PhotoProvider = ({ children }: PhotoProviderProps) => {
         ? data.map((photo) => ({
             id: photo.id || photo.idPhoto,
             imageLocation: photo.imageLocation || photo.imageUrl || '',
+            productName: photo.productName || 'Produit inconnu',
           }))
         : []
 
