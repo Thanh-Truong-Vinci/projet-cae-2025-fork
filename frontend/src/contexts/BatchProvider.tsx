@@ -83,7 +83,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
     }
   }, [authenticatedUser])
 
-  const fetchApprovedBatches = async () => {
+  const fetchApprovedBatches = useCallback(async () => {
     setIsLoading(true)
     setError(null)
 
@@ -108,7 +108,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, []) // No dependencies needed since formatBatch doesn't depend on any props or state
 
   const receiveBatch = async (batchId: number): Promise<Batch | null> => {
     if (!authenticatedUser) return null
@@ -213,7 +213,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
     if (authenticatedUser?.role === 'Volunteer') {
       fetchApprovedBatches()
     }
-  }, [authenticatedUser])
+  }, [authenticatedUser, fetchApprovedBatches])
 
   return (
     <BatchContext.Provider

@@ -40,7 +40,6 @@ const VolunteerHomePage = () => {
     )
   }
 
-
   const { approvedBatches, isLoading, error, receiveBatch } = batchContext
 
   const [openDialog, setOpenDialog] = useState(false)
