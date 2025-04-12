@@ -221,6 +221,8 @@ export interface ReservationContextType {
   error: string | null;
   fetchReservations: () => Promise<Reservation[]>;
   createReservation: (productId: number, quantity: number) => Promise<void>;
+  toPendingReservation: (reservationId: number) => Promise<void>;
+  toConfirmReservation: (reservationId: number) => Promise<void>;
   cancelReservation: (reservationId: number) => Promise<void>;
 }
 
