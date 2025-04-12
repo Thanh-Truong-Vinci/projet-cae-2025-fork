@@ -21,21 +21,12 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart'
 import { CartContext } from '../../contexts/CartContext'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { ProductContext } from '../../contexts/ProductContext'
-import { Product } from '../../types'
+import { Product, ProductType } from '../../types'
 
 const HomePage = () => {
-  // Définition des catégories de produits pour le filtre
-  const productCategories = [
-    { value: 'fruits', label: 'Fruits' },
-    { value: 'legumes', label: 'Légumes' },
-    { value: 'viandes', label: 'Viandes' },
-    { value: 'fromages', label: 'Fromages' },
-    { value: 'produits_laitiers', label: 'Produits laitiers' },
-    { value: 'boissons', label: 'Boissons' },
-    { value: 'epicerie', label: 'Épicerie' },
-    { value: 'conserves', label: 'Conserves' },
-    { value: 'autres', label: 'Autres' },
-  ]
+  const [productTypes, setProductTypes] = useState<ProductType[]>([])
+  const [loadingTypes, setLoadingTypes] = useState<boolean>(false)
+  const [typeError, setTypeError] = useState<string | null>(null)
 
   // Utilisation sécurisée du ProductContext
   const productContext = useContext(ProductContext)
@@ -46,16 +37,8 @@ const HomePage = () => {
     )
   }
 
-  // Maintenant vous pouvez déstructurer sans risque d'erreur
-  const {
-    products,
-    getCategoryLabel,
-    getProductsByCategory,
-    isLoading,
-    error,
-  } = productContext
+  const { products, getCategoryLabel, isLoading, error } = productContext
 
-  // Même chose pour CartContext
   const cartContext = useContext(CartContext)
 
   if (!cartContext) {
@@ -83,6 +66,31 @@ const HomePage = () => {
 
   // Nouvel état pour les produits aléatoires "plus vendus"
   const [topProducts, setTopProducts] = useState<Product[]>([])
+
+  // Ajouter un useEffect pour charger les types depuis l'API
+  useEffect(() => {
+    const fetchProductTypes = async () => {
+      setLoadingTypes(true)
+      setTypeError(null)
+
+      try {
+        const response = await fetch('/api/product-types')
+        if (!response.ok) {
+          throw new Error(`Erreur: ${response.status}`)
+        }
+
+        const data = await response.json()
+        setProductTypes(data)
+      } catch (error) {
+        console.error('Erreur lors du chargement des types de produits:', error)
+        setTypeError('Impossible de charger les types de produits')
+      } finally {
+        setLoadingTypes(false)
+      }
+    }
+
+    fetchProductTypes()
+  }, [])
 
   // Générer des produits aléatoires pour les "plus vendus" à partir des produits existants
   useEffect(() => {
@@ -144,8 +152,11 @@ const HomePage = () => {
     let results = [...products]
 
     if (type) {
-      // Utiliser la fonction du contexte
-      results = getProductsByCategory(type)
+      results = products.filter(
+        (product) =>
+          product.category === type ||
+          (product.productType && product.productType.title === type)
+      )
     }
 
     if (productName.trim()) {
@@ -339,13 +350,20 @@ const HomePage = () => {
             fullWidth
             size="small"
             sx={{ my: 2, bgcolor: 'white' }}
+            disabled={loadingTypes}
           >
             <MenuItem value="">Filtrer par type</MenuItem>
-            {productCategories.map((category) => (
-              <MenuItem key={category.value} value={category.value}>
-                {category.label}
-              </MenuItem>
-            ))}
+            {loadingTypes ? (
+              <MenuItem disabled>Chargement...</MenuItem>
+            ) : typeError ? (
+              <MenuItem disabled>Erreur de chargement</MenuItem>
+            ) : (
+              productTypes.map((productType) => (
+                <MenuItem key={productType.id} value={productType.title}>
+                  {productType.title}
+                </MenuItem>
+              ))
+            )}
           </Select>
           <TextField
             placeholder="Nom du produit"
