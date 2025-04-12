@@ -25,15 +25,10 @@ import 'dayjs/locale/fr'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'
 import { UserContext } from '../../contexts/UserContext'
 import { BatchContext } from '../../contexts/BatchContext'
+import { useProductType } from '../../contexts/ProductTypeContext'
 import { NewBatch } from '../../types'
 
-type ProductType =
-  | 'Légumes'
-  | 'Fruits'
-  | 'Boulangerie'
-  | 'Viande'
-  | 'Produits laitiers'
-  | 'Autre'
+type ProductType = string
 
 interface FormErrors {
   productName?: string
@@ -50,6 +45,7 @@ const AddBatchPage = () => {
   const navigate = useNavigate()
   const { authenticatedUser } = useContext(UserContext)
   const batchContext = useContext(BatchContext)
+  const { productTypes, loading: loadingTypes } = useProductType()
 
   // États du formulaire
   const [productName, setProductName] = useState('')
@@ -262,15 +258,17 @@ const AddBatchPage = () => {
                   value={productType}
                   label="Type de produit *"
                   onChange={handleTypeChange}
+                  disabled={loadingTypes}
                 >
-                  <MenuItem value="Légumes">Légumes</MenuItem>
-                  <MenuItem value="Fruits">Fruits</MenuItem>
-                  <MenuItem value="Boulangerie">Boulangerie</MenuItem>
-                  <MenuItem value="Viande">Viande</MenuItem>
-                  <MenuItem value="Produits laitiers">
-                    Produits laitiers
-                  </MenuItem>
-                  <MenuItem value="Autre">Autre</MenuItem>
+                  {loadingTypes ? (
+                    <MenuItem disabled>Chargement des types...</MenuItem>
+                  ) : (
+                    productTypes.map((type) => (
+                      <MenuItem key={type.id} value={type.title}>
+                        {type.title}
+                      </MenuItem>
+                    ))
+                  )}
                 </Select>
                 {errors.productType && (
                   <FormHelperText>{errors.productType}</FormHelperText>
