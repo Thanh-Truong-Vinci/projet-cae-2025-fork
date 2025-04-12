@@ -26,8 +26,8 @@ import ManagerDashboardPage from './components/pages/ManagerDashboardPage.tsx'
 import VolunteerHomePage from './components/pages/VolunteerHomePage.tsx'
 import SimpleProtectedRoute from './components/SimpleProtectedRoute.tsx'
 import IndexRoute from './components/IndexRoute.tsx'
-import { PhotoProvider } from './contexts/PhotoProvider.tsx'
 import ReceivedProductsPage from './components/pages/ReceivedProductsPage.tsx'
+import { PhotoProvider } from './contexts/PhotoProvider.tsx'
 
 const router = createBrowserRouter([
   {
