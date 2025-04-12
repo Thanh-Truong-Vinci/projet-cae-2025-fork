@@ -218,18 +218,24 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
         throw new Error('Vous devez être authentifié pour modifier une image')
       }
 
-      console.log(`Updating batch ${batchId} with image: ${image.name} (${image.size} bytes)`)
+      console.log(
+        `Updating batch ${batchId} with image: ${image.name} (${image.size} bytes)`
+      )
 
       const formData = new FormData()
       formData.append('image', image)
 
       // Use axios instead of fetch for better multipart form handling
-      const response = await axios.patch(`/api/batches/${batchId}/updateImage`, formData, {
-        headers: {
-          Authorization: authenticatedUser.token,
-          'Content-Type': 'multipart/form-data',
+      const response = await axios.patch(
+        `/api/batches/${batchId}/updateImage`,
+        formData,
+        {
+          headers: {
+            Authorization: authenticatedUser.token,
+            'Content-Type': 'multipart/form-data',
+          },
         }
-      })
+      )
 
       console.log('Image update response:', response.data)
 
@@ -254,7 +260,8 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
         console.error('Response data:', err.response?.data)
         console.error('Response status:', err.response?.status)
         throw new Error(
-          err.response?.data?.message || "Erreur lors de la mise à jour de l'image"
+          err.response?.data?.message ||
+            "Erreur lors de la mise à jour de l'image"
         )
       } else if (err instanceof Error) {
         throw new Error(
@@ -274,7 +281,9 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
         throw new Error('Vous devez être authentifié pour modifier une image')
       }
 
-      console.log(`Updating batch ${batchId} with existing image id: ${imageId}`)
+      console.log(
+        `Updating batch ${batchId} with existing image id: ${imageId}`
+      )
 
       // Usa axios per coerenza con updateBatchImage e per une meilleure gestion des erreurs
       const response = await axios.patch(
@@ -284,7 +293,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
           headers: {
             Authorization: authenticatedUser.token,
             'Content-Type': 'application/json',
-          }
+          },
         }
       )
 
@@ -292,7 +301,10 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
 
       if (response.status >= 200 && response.status < 300) {
         const updatedBatch = response.data
-        console.log('Image du lot mise à jour avec succès par ID:', updatedBatch)
+        console.log(
+          'Image du lot mise à jour avec succès par ID:',
+          updatedBatch
+        )
 
         // Update the batch in the local state
         setMyBatches((prevBatches) =>
@@ -311,14 +323,17 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
         console.error('Response data:', err.response?.data)
         console.error('Response status:', err.response?.status)
         throw new Error(
-          err.response?.data?.message || "Erreur lors de la mise à jour de l'image par ID"
+          err.response?.data?.message ||
+            "Erreur lors de la mise à jour de l'image par ID"
         )
       } else if (err instanceof Error) {
         throw new Error(
           err.message || "Erreur lors de la mise à jour de l'image par ID"
         )
       }
-      throw new Error("Erreur inconnue lors de la mise à jour de l'image par ID")
+      throw new Error(
+        "Erreur inconnue lors de la mise à jour de l'image par ID"
+      )
     }
   }
 

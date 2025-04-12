@@ -42,7 +42,11 @@ const ProducerHomePage = () => {
     updateBatchImageById,
   } = useContext(BatchContext)!
   const { authenticatedUser } = useContext(UserContext)
-  const { photos, isLoading: isLoadingPhotos, fetchAllPhotos } = useContext(PhotoContext)!
+  const {
+    photos,
+    isLoading: isLoadingPhotos,
+    fetchAllPhotos,
+  } = useContext(PhotoContext)!
   const [error, setError] = useState<string | null>(null)
 
   // Image editing states
@@ -83,13 +87,13 @@ const ProducerHomePage = () => {
     setUploadedImage(null)
     setSearchQuery('')
     setIsImageModalOpen(true)
-    fetchAllPhotos().catch(err => {
+    fetchAllPhotos().catch((err) => {
       console.error('Erreur lors de la récupération des photos:', err)
     })
   }
 
   // Filter photos based on search query
-  const filteredPhotos = photos.filter(photo =>
+  const filteredPhotos = photos.filter((photo) =>
     photo.productName.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
@@ -110,18 +114,20 @@ const ProducerHomePage = () => {
   // Handle image update submission
   const handleUpdateImage = async () => {
     if (!selectedBatch) return
-    
+
     setError(null) // Clear any previous errors
-    
+
     try {
       if (uploadedImage) {
-        console.log(`Uploading new image: ${uploadedImage.name} (${uploadedImage.size} bytes)`)
+        console.log(
+          `Uploading new image: ${uploadedImage.name} (${uploadedImage.size} bytes)`
+        )
         await updateBatchImage(selectedBatch.id, uploadedImage)
       } else if (selectedImage) {
         console.log(`Selecting existing image with ID: ${selectedImage.id}`)
         await updateBatchImageById(selectedBatch.id, selectedImage.id)
       }
-      
+
       setIsImageModalOpen(false)
       await fetchMyBatches()
     } catch (err) {
@@ -129,7 +135,7 @@ const ProducerHomePage = () => {
       if (err instanceof Error) {
         setError(`Erreur lors de la mise à jour de l'image: ${err.message}`)
       } else {
-        setError('Erreur inconnue lors de la mise à jour de l\'image')
+        setError("Erreur inconnue lors de la mise à jour de l'image")
       }
     }
   }
@@ -179,7 +185,14 @@ const ProducerHomePage = () => {
           outline: 'none',
         }}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mb: 2,
+          }}
+        >
           <Typography variant="h6" id="image-edit-modal">
             Changer l'image du lot: {selectedBatch?.productName}
           </Typography>
@@ -220,14 +233,21 @@ const ProducerHomePage = () => {
               <CircularProgress />
             </Box>
           ) : (
-            <Grid container spacing={2} sx={{ maxHeight: '300px', overflow: 'auto' }}>
+            <Grid
+              container
+              spacing={2}
+              sx={{ maxHeight: '300px', overflow: 'auto' }}
+            >
               {filteredPhotos.map((photo) => (
                 <Grid item xs={6} sm={4} md={3} key={photo.id}>
                   <Card
                     onClick={() => handleImageSelect(photo)}
                     sx={{
                       cursor: 'pointer',
-                      border: selectedImage?.id === photo.id ? '2px solid #1976d2' : 'none',
+                      border:
+                        selectedImage?.id === photo.id
+                          ? '2px solid #1976d2'
+                          : 'none',
                       transition: '0.3s',
                       '&:hover': { transform: 'scale(1.03)' },
                     }}
@@ -276,17 +296,19 @@ const ProducerHomePage = () => {
             />
           </Button>
           {uploadedImage && (
-            <Typography variant="caption" sx={{ display: 'block', textAlign: 'center' }}>
+            <Typography
+              variant="caption"
+              sx={{ display: 'block', textAlign: 'center' }}
+            >
               Fichier sélectionné: {uploadedImage.name}
             </Typography>
           )}
         </Box>
 
-        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-          <Button
-            onClick={() => setIsImageModalOpen(false)}
-            variant="outlined"
-          >
+        <Box
+          sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}
+        >
+          <Button onClick={() => setIsImageModalOpen(false)} variant="outlined">
             Annuler
           </Button>
           <Button
