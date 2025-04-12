@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useContext, ReactNode } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  ReactNode,
+  useCallback,
+} from 'react'
 import { ProductType } from '../types'
 import { UserContext } from './UserContext'
 import {
@@ -18,26 +24,45 @@ export const ProductTypeProvider: React.FC<ProductTypeProviderProps> = ({
   const [error, setError] = useState<string | null>(null)
   const { authenticatedUser } = useContext(UserContext)
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const formatProductType = (rawProductType: any): ProductType => {
+    return {
+      id: rawProductType.id,
+      title: rawProductType.title || 'Sans titre',
+    }
+  }
+
   // Fonction pour récupérer tous les types de produits
-  const fetchProductTypes = async () => {
+  const fetchProductTypes = useCallback(async () => {
     setLoading(true)
     setError(null)
 
     try {
       const response = await fetch('/api/product-types')
+
       if (!response.ok) {
-        throw new Error(`Erreur: ${response.status}`)
+        throw new Error(`Erreur: ${response.status} ${response.statusText}`)
       }
 
       const data = await response.json()
-      setProductTypes(data)
-    } catch (error) {
-      console.error('Erreur lors du chargement des types de produits:', error)
-      setError('Impossible de charger les types de produits')
+      console.log('Réponse API product-types:', data)
+
+      const formattedTypes = Array.isArray(data)
+        ? data.map((rawType) => formatProductType(rawType))
+        : []
+
+      setProductTypes(formattedTypes)
+    } catch (err) {
+      console.error('Erreur lors du chargement des types de produits:', err)
+      if (err instanceof Error) {
+        setError(`Impossible de charger les types de produits: ${err.message}`)
+      } else {
+        setError('Impossible de charger les types de produits')
+      }
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   // Fonction pour ajouter un type de produit
   const addProductType = async (title: string): Promise<boolean> => {
@@ -47,32 +72,42 @@ export const ProductTypeProvider: React.FC<ProductTypeProviderProps> = ({
     }
 
     try {
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      }
-
-      if (authenticatedUser?.token) {
-        headers.Authorization = `Bearer ${authenticatedUser.token}`
+      if (!authenticatedUser) {
+        throw new Error(
+          'Vous devez être authentifié pour ajouter un type de produit'
+        )
       }
 
       const response = await fetch('/api/product-types/', {
         method: 'POST',
-        headers,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: authenticatedUser.token,
+        },
         body: JSON.stringify({ title }),
       })
 
       if (!response.ok) {
-        const errorText = await response.text()
-        console.error('Erreur de réponse:', response.status, errorText)
-        throw new Error(`Erreur: ${response.status}`)
+        const errorData = await response.text()
+        console.error('Erreur de réponse:', response.status, errorData)
+        throw new Error(`Erreur: ${response.status} ${response.statusText}`)
       }
+
+      const data = await response.json()
+      console.log('Type de produit créé avec succès:', data)
 
       // Recharger la liste après l'ajout
       await fetchProductTypes()
       return true
-    } catch (error) {
-      console.error("Erreur lors de l'ajout du type:", error)
-      setError("Impossible d'ajouter le type de produit")
+    } catch (err) {
+      console.error("Erreur lors de l'ajout du type:", err)
+
+      if (err instanceof Error) {
+        setError(`Impossible d'ajouter le type de produit: ${err.message}`)
+      } else {
+        setError("Impossible d'ajouter le type de produit")
+      }
+
       return false
     }
   }
@@ -80,26 +115,37 @@ export const ProductTypeProvider: React.FC<ProductTypeProviderProps> = ({
   // Fonction pour supprimer un type de produit
   const deleteProductType = async (id: number): Promise<boolean> => {
     try {
-      const headers: Record<string, string> = {}
-
-      if (authenticatedUser?.token) {
-        headers.Authorization = `Bearer ${authenticatedUser.token}`
+      if (!authenticatedUser) {
+        throw new Error(
+          'Vous devez être authentifié pour supprimer un type de produit'
+        )
       }
 
       const response = await fetch(`/api/product-types/${id}`, {
         method: 'DELETE',
-        headers,
+        headers: {
+          Authorization: authenticatedUser.token,
+        },
       })
 
       if (!response.ok) {
-        throw new Error(`Erreur: ${response.status}`)
+        const errorData = await response.text()
+        console.error('Erreur de réponse:', response.status, errorData)
+        throw new Error(`Erreur: ${response.status} ${response.statusText}`)
       }
 
+      console.log('Type de produit supprimé avec succès:', id)
       setProductTypes(productTypes.filter((type) => type.id !== id))
       return true
-    } catch (error) {
-      console.error('Erreur lors de la suppression du type:', error)
-      setError('Impossible de supprimer le type de produit')
+    } catch (err) {
+      console.error('Erreur lors de la suppression du type:', err)
+
+      if (err instanceof Error) {
+        setError(`Impossible de supprimer le type de produit: ${err.message}`)
+      } else {
+        setError('Impossible de supprimer le type de produit')
+      }
+
       return false
     }
   }
@@ -107,7 +153,7 @@ export const ProductTypeProvider: React.FC<ProductTypeProviderProps> = ({
   // Charger les types de produits au montage du composant
   useEffect(() => {
     fetchProductTypes()
-  }, [])
+  }, [fetchProductTypes])
 
   const value: ProductTypeContextType = {
     productTypes,
