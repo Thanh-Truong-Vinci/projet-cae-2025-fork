@@ -36,4 +36,15 @@ public interface BatchRepository extends CrudRepository<Batch, Long> {
    */
   List<Batch> findByProducerIdAndAvailableQuantityGreaterThanOrderByProductionDateAsc(
       Long producerId, int quantity);
+
+  /**
+   * Finds batches with RECEIVED status and available quantity greater than zero,
+   * sorted by production date in ascending order.
+   *
+   * @param status the RECEIVED status
+   * @param quantity minimum quantity (0)
+   * @return the list of received batches with available quantity, sorted by production date
+   */
+  List<Batch> findByStatusAndAvailableQuantityGreaterThan(
+      BatchStatus status, int quantity);
 }

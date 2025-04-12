@@ -1,6 +1,7 @@
 package be.vinci.ipl.cae.demo.services;
 
 import be.vinci.ipl.cae.demo.models.dtos.NewBatch;
+import be.vinci.ipl.cae.demo.models.dtos.views.BatchView;
 import be.vinci.ipl.cae.demo.models.entities.Batch;
 import be.vinci.ipl.cae.demo.models.entities.BatchStatus;
 import be.vinci.ipl.cae.demo.models.entities.Notification;
@@ -11,7 +12,11 @@ import be.vinci.ipl.cae.demo.repositories.BatchRepository;
 import be.vinci.ipl.cae.demo.repositories.NotificationRepository;
 import be.vinci.ipl.cae.demo.repositories.ProducerRepository;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.stereotype.Service;
 
 /** Service class for managing batches. */
@@ -187,5 +192,60 @@ public class BatchService {
 
     batch.setPhoto(photo);
     return batchRepository.save(batch);
+  }
+
+  /**
+   * Récupère tous les lots ayant le statut RECEIVED et une quantité disponible supérieure à 0,
+   * fusionnés par produit/prix/unité et triés par date de production.
+   *
+   * @return la liste des BatchView fusionnés avec quantités additionnées
+   */
+  public List<BatchView> getReceivedBatchesWithAvailableQuantity() {
+    // Récupérer les lots RECEIVED avec quantité > 0
+    List<Batch> batches = batchRepository.findByStatusAndAvailableQuantityGreaterThan(
+        BatchStatus.RECEIVED, 0);
+    
+    // Map pour regrouper les lots par productId + unitPrice + saleUnit
+    Map<String, BatchView> batchViewMap = new HashMap<>();
+    
+    for (Batch batch : batches) {
+      // Clé composite pour regroupement
+      String key = batch.getProduct().getId() + "_" + batch.getUnitPrice() + "_" + batch.getSaleUnit();
+      
+      if (batchViewMap.containsKey(key)) {
+        // Lot similaire trouvé, fusionner
+        BatchView existingView = batchViewMap.get(key);
+        existingView.setTotalQuantity(existingView.getTotalQuantity() + batch.getAvailableQuantity());
+        existingView.getBatchIds().add(batch.getId());
+        existingView.getBatchQuantities().add(batch.getAvailableQuantity());
+        
+        // Garder la date la plus ancienne pour le tri FIFO
+        if (batch.getProductionDate().isBefore(existingView.getEarliestProductionDate())) {
+          existingView.setEarliestProductionDate(batch.getProductionDate());
+        }
+      } else {
+        // Nouveau groupe, créer un BatchView
+        BatchView batchView = new BatchView();
+        batchView.setProductId(batch.getProduct().getId());
+        batchView.setProductName(batch.getProduct().getName());
+        batchView.setProductType(batch.getProduct().getType().getTitle());
+        batchView.setUnitPrice(batch.getUnitPrice());
+        batchView.setSaleUnit(batch.getSaleUnit());
+        batchView.setTotalQuantity(batch.getAvailableQuantity());
+        batchView.setImageLocation(batch.getPhoto() != null ? batch.getPhoto().getImageLocation() : null);
+        batchView.setCompanyName(batch.getProducer().getCompany());
+        batchView.setEarliestProductionDate(batch.getProductionDate());
+        batchView.getBatchIds().add(batch.getId());
+        batchView.getBatchQuantities().add(batch.getAvailableQuantity());
+        
+        batchViewMap.put(key, batchView);
+      }
+    }
+    
+    // Convertir la map en liste et trier par date de production
+    List<BatchView> result = new ArrayList<>(batchViewMap.values());
+    result.sort(Comparator.comparing(BatchView::getEarliestProductionDate));
+    
+    return result;
   }
 }
