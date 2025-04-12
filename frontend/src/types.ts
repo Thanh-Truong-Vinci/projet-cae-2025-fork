@@ -93,12 +93,13 @@ export interface CartItem {
   quantity: number
   unitType: string
   category: string
+  batchIds: number[]
 }
 
 export interface ProductContextType {
-  products: Product[]
-  getProductById: (id: number) => Product | undefined
-  getProductsByCategory: (category: string) => Product[]
+  products: ProductBatch[]
+  getProductById: (id: number) => ProductBatch | undefined
+  getProductsByCategory: (category: string) => ProductBatch[]
   getCategoryLabel: (category: string) => string
   isLoading: boolean
   error: string | null
@@ -132,18 +133,18 @@ export interface NewBatch {
 }
 
 export interface ProductBatch {
-  id: number
-  productName: string
-  productType: string
-  imageUrl: string
-  availabilityDate: string
-  availableQuantity: number
-  unitPrice: number
-  unitType: string
-  producerId: number
-  createdAt: string
-  status?: 'pending' | 'approved' | 'rejected'
-  rejectionReason?: string
+  productId: number;
+  productName: string;
+  productType: string;
+  description: string;
+  unitPrice: number;
+  saleUnit: string;
+  totalQuantity: number;
+  imageLocation: string;
+  companyName: string;
+  earliestProductionDate: string;
+  batchIds: number[];
+  batchQuantities: number[];
 }
 
 export interface BatchContextType {

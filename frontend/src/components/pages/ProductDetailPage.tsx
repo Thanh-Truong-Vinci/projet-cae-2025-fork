@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import {
   Box,
   Typography,
@@ -11,63 +11,60 @@ import {
   Grid,
   Breadcrumbs,
   Link,
+  CircularProgress,
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { CartContext } from '../../contexts/CartContext'
-import { Product } from '../../types'
+import { ProductBatch } from '../../types'
+import { ProductContext } from '../../contexts/ProductContext'
 
 const ProductDetailPage = () => {
   const { productId } = useParams<{ productId: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
   const { addToCart } = useContext(CartContext)
+  const { getProductById } = useContext(ProductContext)!
   const [quantity, setQuantity] = useState(1)
-  const [product, setProduct] = useState<Product | null>(null)
+  const [product, setProduct] = useState<ProductBatch | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    // Obtenir les données du produit
+    const loadProduct = () => {
       try {
         setLoading(true)
-
-        // Appel à l'API pour récupérer les détails du produit
-        const response = await fetch(`/api/products/${productId}`)
-
-        if (!response.ok) {
-          throw new Error('Produit non trouvé')
+        
+        // Vérifier si le produit est passé via l'état de navigation
+        if (location.state?.product) {
+          setProduct(location.state.product)
+          return
         }
-
-        const productData = await response.json()
-        console.log('Données reçues:', productData) // Ajout d'un log pour déboguer
-
-        // Transformer les données de l'API pour correspondre à votre interface Product
-        const formattedProduct: Product = {
-          id: productData.id, // Utiliser id au lieu de idProduct
-          name: productData.name,
-          price: `10.00€`, // Utiliser une valeur fixe car price n'existe pas dans votre modèle
-          image: productData.photo?.url || 'https://via.placeholder.com/300',
-          description: productData.description,
-          unitType: productData.unitType || 'unité',
-          category: productData.type?.title,
+        
+        // Sinon, utiliser getProductById du contexte
+        if (productId) {
+          const foundProduct = getProductById(parseInt(productId))
+          if (foundProduct) {
+            setProduct(foundProduct)
+          } else {
+            setError('Produit non trouvé')
+          }
+        } else {
+          setError('ID de produit invalide')
         }
-
-        setProduct(formattedProduct)
-        setError(null)
       } catch (err) {
+        console.error('Erreur lors du chargement du produit:', err)
         setError('Impossible de charger les détails du produit')
-        console.error(err)
       } finally {
         setLoading(false)
       }
     }
 
-    if (productId) {
-      fetchProduct()
-    }
-  }, [productId])
+    loadProduct();
+  }, [productId, location.state, getProductById])
 
   const handleQuantityChange = (change: number) => {
     setQuantity((prev) => Math.max(1, prev + change))
@@ -76,45 +73,33 @@ const ProductDetailPage = () => {
   const handleAddToCart = () => {
     if (product) {
       addToCart({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        image: product.image,
+        id: product.productId,
+        name: product.productName,
+        price: `${product.unitPrice} € / ${product.saleUnit}`,
+        image: product.imageLocation || '/placeholder.jpg',
         quantity: quantity,
-        unitType: product.unitType,
-        category: product.category || 'autres', // Ajout de la propriété category
-      })
-      // Vous pourriez aussi rediriger vers le panier ou afficher une notification
+        unitType: product.saleUnit,
+        category: product.productType,
+        batchIds: product.batchIds
+      });
     }
   }
 
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
-        <Typography>Chargement...</Typography>
+        <CircularProgress />
       </Box>
     )
   }
 
   if (error || !product) {
     return (
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          p: 5,
-        }}
-      >
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 5 }}>
         <Typography variant="h6" color="error">
           {error || 'Produit non trouvé'}
         </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => navigate('/')}
-          sx={{ mt: 2 }}
-        >
+        <Button variant="contained" color="primary" onClick={() => navigate('/')} sx={{ mt: 2 }}>
           Retour à l'accueil
         </Button>
       </Box>
@@ -132,7 +117,7 @@ const ProductDetailPage = () => {
         >
           Accueil
         </Link>
-        <Typography color="text.primary">{product.name}</Typography>
+        <Typography color="text.primary">{product.productName}</Typography>
       </Breadcrumbs>
 
       {/* Bouton Retour */}
@@ -152,8 +137,8 @@ const ProductDetailPage = () => {
           <Grid item xs={12} md={6}>
             <CardMedia
               component="img"
-              image={product.image}
-              alt={product.name}
+              image={product.imageLocation || '/placeholder.jpg'}
+              alt={product.productName}
               sx={{
                 borderRadius: 1,
                 maxHeight: 400,
@@ -166,18 +151,37 @@ const ProductDetailPage = () => {
           {/* Informations produit */}
           <Grid item xs={12} md={6}>
             <Typography variant="h4" gutterBottom>
-              {product.name}
+              {product.productName}
             </Typography>
 
             <Typography variant="h5" color="primary" sx={{ mb: 2 }}>
-              {product.price}
+              {`${product.unitPrice} € / ${product.saleUnit}`}
             </Typography>
 
-            <Typography variant="body1" sx={{ mb: 3 }}>
-              {product.description}
+            <Typography variant="body1" sx={{ mb: 1 }}>
+              Producteur: {product.companyName}
+            </Typography>
+            
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Type: {product.productType}
             </Typography>
 
             <Divider sx={{ my: 2 }} />
+
+            {product.description && (
+              <Box sx={{ my: 2 }}>
+                <Typography variant="subtitle1" gutterBottom>
+                  Description:
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {product.description}
+                </Typography>
+              </Box>
+            )}
+
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Disponible: {product.totalQuantity} {product.saleUnit}
+            </Typography>
 
             {/* Sélecteur de quantité */}
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>

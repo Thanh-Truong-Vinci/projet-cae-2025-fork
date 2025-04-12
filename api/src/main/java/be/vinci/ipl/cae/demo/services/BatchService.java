@@ -202,23 +202,25 @@ public class BatchService {
    */
   public List<BatchView> getReceivedBatchesWithAvailableQuantity() {
     // Récupérer les lots RECEIVED avec quantité > 0
-    List<Batch> batches = batchRepository.findByStatusAndAvailableQuantityGreaterThan(
-        BatchStatus.RECEIVED, 0);
-    
+    List<Batch> batches =
+        batchRepository.findByStatusAndAvailableQuantityGreaterThan(BatchStatus.RECEIVED, 0);
+
     // Map pour regrouper les lots par productId + unitPrice + saleUnit
     Map<String, BatchView> batchViewMap = new HashMap<>();
-    
+
     for (Batch batch : batches) {
       // Clé composite pour regroupement
-      String key = batch.getProduct().getId() + "_" + batch.getUnitPrice() + "_" + batch.getSaleUnit();
-      
+      String key =
+          batch.getProduct().getId() + "_" + batch.getUnitPrice() + "_" + batch.getSaleUnit();
+
       if (batchViewMap.containsKey(key)) {
         // Lot similaire trouvé, fusionner
         BatchView existingView = batchViewMap.get(key);
-        existingView.setTotalQuantity(existingView.getTotalQuantity() + batch.getAvailableQuantity());
+        existingView.setTotalQuantity(
+            existingView.getTotalQuantity() + batch.getAvailableQuantity());
         existingView.getBatchIds().add(batch.getId());
         existingView.getBatchQuantities().add(batch.getAvailableQuantity());
-        
+
         // Garder la date la plus ancienne pour le tri FIFO
         if (batch.getProductionDate().isBefore(existingView.getEarliestProductionDate())) {
           existingView.setEarliestProductionDate(batch.getProductionDate());
@@ -229,23 +231,25 @@ public class BatchService {
         batchView.setProductId(batch.getProduct().getId());
         batchView.setProductName(batch.getProduct().getName());
         batchView.setProductType(batch.getProduct().getType().getTitle());
+        batchView.setDescription(batch.getProduct().getDescription());
         batchView.setUnitPrice(batch.getUnitPrice());
         batchView.setSaleUnit(batch.getSaleUnit());
         batchView.setTotalQuantity(batch.getAvailableQuantity());
-        batchView.setImageLocation(batch.getPhoto() != null ? batch.getPhoto().getImageLocation() : null);
+        batchView.setImageLocation(
+            batch.getPhoto() != null ? batch.getPhoto().getImageLocation() : null);
         batchView.setCompanyName(batch.getProducer().getCompany());
         batchView.setEarliestProductionDate(batch.getProductionDate());
         batchView.getBatchIds().add(batch.getId());
         batchView.getBatchQuantities().add(batch.getAvailableQuantity());
-        
+
         batchViewMap.put(key, batchView);
       }
     }
-    
+
     // Convertir la map en liste et trier par date de production
     List<BatchView> result = new ArrayList<>(batchViewMap.values());
     result.sort(Comparator.comparing(BatchView::getEarliestProductionDate));
-    
+
     return result;
   }
 }

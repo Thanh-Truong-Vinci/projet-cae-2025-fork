@@ -24,10 +24,10 @@ import { fr } from 'date-fns/locale'
 import { ProductContext } from '../../contexts/ProductContext'
 import { BatchContext } from '../../contexts/BatchContext'
 import { UserContext } from '../../contexts/UserContext'
-import { Batch, Product } from '../../types'
+import { Batch, ProductBatch } from '../../types'
 import { useNavigate } from 'react-router-dom'
 
-interface ProductWithBatches extends Product {
+interface ProductWithBatches extends ProductBatch {
   batches: Batch[]
 }
 
@@ -86,7 +86,7 @@ const ReceivedProductsPage = () => {
       const productMap = new Map<string, ProductWithBatches>()
 
       products.forEach((product) => {
-        productMap.set(product.name.toLowerCase(), {
+        productMap.set(product.productName.toLowerCase(), {
           ...product,
           batches: [],
         })
@@ -147,7 +147,7 @@ const ReceivedProductsPage = () => {
       ) : (
         <Grid container spacing={4}>
           {productsWithBatches.map((product) => (
-            <Grid item xs={12} key={product.id}>
+            <Grid item xs={12} key={product.productId}>
               <Card
                 elevation={3}
                 sx={{
@@ -162,8 +162,8 @@ const ReceivedProductsPage = () => {
                     height: { xs: 200, md: 'auto' },
                     objectFit: 'cover',
                   }}
-                  image={product.image || 'https://via.placeholder.com/150'}
-                  alt={product.name}
+                  image={product.imageLocation || 'https://via.placeholder.com/150'}
+                  alt={product.productName}
                 />
                 <Box
                   sx={{
@@ -183,10 +183,10 @@ const ReceivedProductsPage = () => {
                     >
                       <Box>
                         <Typography variant="h5" component="h2">
-                          {product.name}
+                          {product.productName}
                         </Typography>
                         <Chip
-                          label={product.category}
+                          label={product.productType}
                           color="primary"
                           variant="outlined"
                           size="small"

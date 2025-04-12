@@ -39,7 +39,8 @@ describe('CartPage', () => {
       image: 'https://example.com/apple.jpg',
       quantity: 2,
       category: 'fruits',
-      unitType: 'kg', // Add the missing unitType property
+      unitType: 'kg',
+      batchIds: [101], // Add missing property
     },
     {
       id: 2,
@@ -48,7 +49,8 @@ describe('CartPage', () => {
       image: 'https://example.com/carrot.jpg',
       quantity: 1,
       category: 'légumes',
-      unitType: 'kg', // Add the missing unitType property
+      unitType: 'kg',
+      batchIds: [102], // Add missing property
     },
   ]
 

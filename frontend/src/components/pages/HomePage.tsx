@@ -21,46 +21,36 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart'
 import { CartContext } from '../../contexts/CartContext'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { ProductContext } from '../../contexts/ProductContext'
-import { Product } from '../../types'
+import { ProductBatch } from '../../types'
 
 const HomePage = () => {
   // Définition des catégories de produits pour le filtre
   const productCategories = [
-    { value: 'fruits', label: 'Fruits' },
-    { value: 'legumes', label: 'Légumes' },
-    { value: 'viandes', label: 'Viandes' },
-    { value: 'fromages', label: 'Fromages' },
-    { value: 'produits_laitiers', label: 'Produits laitiers' },
-    { value: 'boissons', label: 'Boissons' },
-    { value: 'epicerie', label: 'Épicerie' },
-    { value: 'conserves', label: 'Conserves' },
-    { value: 'autres', label: 'Autres' },
+    { value: 'Légumes', label: 'Légumes' },
+    { value: 'Fruits', label: 'Fruits' },
+    { value: 'Viande', label: 'Viande' },
+    { value: 'Produits laitiers', label: 'Produits laitiers' },
+    { value: 'Boissons', label: 'Boissons' },
+    { value: 'Autres', label: 'Autres' },
   ]
 
-  // Utilisation sécurisée du ProductContext
+  // Utilisation du ProductContext
   const productContext = useContext(ProductContext)
 
   if (!productContext) {
     throw new Error(
-      'ProductContext doit être utilisé à l intérieur d un ProductProvider'
+      'ProductContext doit être utilisé à l\'intérieur d\'un ProductProvider'
     )
   }
 
-  // Maintenant vous pouvez déstructurer sans risque d'erreur
-  const {
-    products,
-    getCategoryLabel,
-    getProductsByCategory,
-    isLoading,
-    error,
-  } = productContext
+  const { products, isLoading, error, getProductsByCategory } = productContext
 
-  // Même chose pour CartContext
+  // CartContext
   const cartContext = useContext(CartContext)
 
   if (!cartContext) {
     throw new Error(
-      'CartContext doit être utilisé à l intérieur d un CartProvider'
+      'CartContext doit être utilisé à l\'intérieur d\'un CartProvider'
     )
   }
 
@@ -78,62 +68,57 @@ const HomePage = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false)
   const [message, setMessage] = useState('')
 
-  // Nouvel état pour les produits filtrés, initialisé avec les produits du contexte
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
+  // Produits filtrés
+  const [filteredProducts, setFilteredProducts] = useState<ProductBatch[]>([])
 
-  // Nouvel état pour les produits aléatoires "plus vendus"
-  const [topProducts, setTopProducts] = useState<Product[]>([])
+  // Produits aléatoires "plus vendus"
+  const [topProducts, setTopProducts] = useState<ProductBatch[]>([])
 
-  // Générer des produits aléatoires pour les "plus vendus" à partir des produits existants
+  // Générer des produits aléatoires pour les "plus vendus"
   useEffect(() => {
     if (products.length > 0) {
-      // Si on a moins de 3 produits, on les utilise tous
+      // Si moins de 3 produits, tous les utiliser
       if (products.length <= 3) {
-        setTopProducts(products.slice())
+        setTopProducts([...products])
       } else {
-        // Sinon, on en sélectionne 3 aléatoirement
+        // Sinon, sélectionner 3 aléatoirement
         const shuffledProducts = [...products].sort(() => 0.5 - Math.random())
         setTopProducts(shuffledProducts.slice(0, 3))
       }
     }
   }, [products])
 
-  // Initialize quantities state for all products
+  // Initialiser les quantités
   useEffect(() => {
     const initialQuantities: { [key: number]: number } = {}
     products.forEach((product) => {
-      initialQuantities[product.id] = 1
-    })
-    topProducts.forEach((product) => {
-      initialQuantities[product.id] = 1
+      initialQuantities[product.productId] = 1
     })
     setQuantities(initialQuantities)
-  }, [products, topProducts])
+  }, [products])
 
+  // Carousel
   useEffect(() => {
-    // Ne démarrer le carousel que si nous avons des produits à afficher
     if (topProducts.length > 0) {
       const interval = setInterval(() => {
         setCurrentProductIndex(
           (prevIndex) => (prevIndex + 1) % topProducts.length
         )
-      }, 4000) // Transition plus lente (8 secondes au lieu de 4)
+      }, 4000)
       return () => clearInterval(interval)
     }
   }, [topProducts.length])
 
+  // Vérifier les messages de confirmation
   useEffect(() => {
-    // Vérifier s'il y a un message de confirmation de réservation
     if (location.state && location.state.message) {
       setMessage(location.state.message)
       setOpenSnackbar(true)
-
-      // Nettoyer l'état de la route pour éviter d'afficher le message à nouveau lors des rafraîchissements
       window.history.replaceState({}, document.title)
     }
   }, [location])
 
-  // Mettre à jour filteredProducts quand products change
+  // Mettre à jour filteredProducts
   useEffect(() => {
     if (products) {
       setFilteredProducts(products)
@@ -144,14 +129,13 @@ const HomePage = () => {
     let results = [...products]
 
     if (type) {
-      // Utiliser la fonction du contexte
       results = getProductsByCategory(type)
     }
 
     if (productName.trim()) {
       const searchTerm = productName.toLowerCase().trim()
       results = results.filter((product) =>
-        product.name.toLowerCase().includes(searchTerm)
+        product.productName.toLowerCase().includes(searchTerm)
       )
     }
 
@@ -166,20 +150,21 @@ const HomePage = () => {
     }))
   }
 
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart = (product: ProductBatch) => {
     addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image,
-      quantity: quantities[product.id] || 1,
-      unitType: product.unitType,
-      category: product.category || 'autres', // Ajout de la propriété category
+      id: product.productId,
+      name: product.productName,
+      price: `${product.unitPrice} € / ${product.saleUnit}`,
+      image: product.imageLocation || '/placeholder.jpg',
+      quantity: quantities[product.productId] || 1,
+      unitType: product.saleUnit,
+      category: product.productType,
+      batchIds: product.batchIds,
     })
   }
 
-  const handleProductClick = (productId: number) => {
-    navigate(`/products/${productId}`)
+  const handleProductClick = (product: ProductBatch) => {
+    navigate(`/products/${product.productId}`, { state: { product } })
   }
 
   const handleCloseSnackbar = () => {
@@ -188,14 +173,7 @@ const HomePage = () => {
 
   if (isLoading) {
     return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '50vh',
-        }}
-      >
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
         <CircularProgress />
       </Box>
     )
@@ -203,14 +181,7 @@ const HomePage = () => {
 
   if (error) {
     return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '50vh',
-        }}
-      >
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
         <Typography color="error">{error}</Typography>
       </Box>
     )
@@ -219,76 +190,47 @@ const HomePage = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
       {/* Carrousel des produits les plus vendus */}
-      <Box
-        sx={{
-          width: '100%',
-          backgroundColor: '#ddd',
-          p: 5,
-          textAlign: 'center',
-        }}
-      >
-        <Typography variant="h5">Produits les plus vendus</Typography>
-        {topProducts.length > 0 ? (
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              mt: 2,
-              px: 4,
-            }}
-          >
-            {/* Informations du produit à gauche */}
-            <Box
-              sx={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                justifyContent: 'center',
-                pr: 4,
-                textAlign: 'left',
-                cursor: 'pointer', // Ajout du curseur pointer
-              }}
-              onClick={() =>
-                handleProductClick(topProducts[currentProductIndex].id)
-              }
+      {topProducts.length > 0 && (
+        <Box sx={{ width: '100%', backgroundColor: '#ddd', p: 5, textAlign: 'center' }}>
+          <Typography variant="h5">Produits les plus vendus</Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 2, px: 4 }}>
+            {/* Informations du produit */}
+            <Box 
+              sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', pr: 4, textAlign: 'left', cursor: 'pointer' }}
+              onClick={() => handleProductClick(topProducts[currentProductIndex])}
             >
               <Typography variant="h6" sx={{ mb: 1 }}>
-                {topProducts[currentProductIndex].name}
+                {topProducts[currentProductIndex].productName}
               </Typography>
-              <Typography variant="body1" sx={{ mb: 2 }}>
-                Prix: {topProducts[currentProductIndex].price}
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                Prix: {topProducts[currentProductIndex].unitPrice} € / {topProducts[currentProductIndex].saleUnit}
               </Typography>
-
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                Producteur: {topProducts[currentProductIndex].companyName}
+              </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <IconButton
                   onClick={(e) => {
                     e.stopPropagation()
-                    handleQuantityChange(
-                      topProducts[currentProductIndex].id,
-                      -1
-                    )
+                    handleQuantityChange(topProducts[currentProductIndex].productId, -1)
                   }}
                   size="small"
                 >
                   <RemoveIcon />
                 </IconButton>
                 <Typography sx={{ mx: 1 }}>
-                  {quantities[topProducts[currentProductIndex].id] || 1}
+                  {quantities[topProducts[currentProductIndex].productId] || 1}
                 </Typography>
                 <IconButton
                   onClick={(e) => {
                     e.stopPropagation()
-                    handleQuantityChange(topProducts[currentProductIndex].id, 1)
+                    handleQuantityChange(topProducts[currentProductIndex].productId, 1)
                   }}
                   size="small"
                 >
                   <AddIcon />
                 </IconButton>
               </Box>
-
               <Button
                 variant="contained"
                 color="success"
@@ -301,35 +243,22 @@ const HomePage = () => {
                 Ajouter au panier
               </Button>
             </Box>
-
-            {/* Image du produit à droite */}
+            {/* Image du produit */}
             <Box sx={{ flex: 1 }}>
               <img
-                src={topProducts[currentProductIndex].image}
-                alt={topProducts[currentProductIndex].name}
-                style={{
-                  width: 300,
-                  height: 200,
-                  objectFit: 'cover',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-                  cursor: 'pointer', // Ajout du curseur pointer
-                }}
-                onClick={() =>
-                  handleProductClick(topProducts[currentProductIndex].id)
-                }
+                src={topProducts[currentProductIndex].imageLocation || '/placeholder.jpg'}
+                alt={topProducts[currentProductIndex].productName}
+                style={{ width: 300, height: 200, objectFit: 'cover', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)', cursor: 'pointer' }}
+                onClick={() => handleProductClick(topProducts[currentProductIndex])}
               />
             </Box>
           </Box>
-        ) : (
-          <Typography variant="body1" sx={{ mt: 2 }}>
-            Aucun produit disponible pour le moment.
-          </Typography>
-        )}
-      </Box>
+        </Box>
+      )}
 
-      {/* Sidebar */}
+      {/* Section filtre et produits */}
       <Box sx={{ display: 'flex', width: '100%' }}>
+        {/* Sidebar avec filtres */}
         <Box sx={{ width: 350, backgroundColor: '#f0f0f0', p: 2 }}>
           <Typography variant="h6">Filtrer</Typography>
           <Select
@@ -366,66 +295,53 @@ const HomePage = () => {
         </Box>
 
         {/* Liste des produits */}
-        <Box
-          sx={{
-            flex: 1,
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 2,
-            p: 2,
-            justifyContent: 'center',
-          }}
-        >
+        <Box sx={{ flex: 1, display: 'flex', flexWrap: 'wrap', gap: 2, p: 2, justifyContent: 'center' }}>
           {filteredProducts.length > 0 ? (
             filteredProducts.slice(0, visibleProducts).map((product) => (
               <Card
-                key={product.id}
-                sx={{ width: 250, height: 'auto', mb: 2, cursor: 'pointer' }} // Ajout du curseur pointer
-                onClick={() => handleProductClick(product.id)}
+                key={`${product.productId}-${product.unitPrice}`}
+                sx={{ width: 250, height: 'auto', mb: 2, cursor: 'pointer' }}
+                onClick={() => handleProductClick(product)}
               >
                 <CardMedia
                   component="img"
                   height="140"
-                  image={product.image}
-                  alt={product.name}
+                  image={product.imageLocation || '/placeholder.jpg'}
+                  alt={product.productName}
                 />
                 <CardContent>
                   <Typography gutterBottom variant="h6" component="div">
-                    {product.name}
+                    {product.productName}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Prix: {product.price}
+                    Prix: {product.unitPrice} € / {product.saleUnit}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Catégorie: {getCategoryLabel(product.category || '')}
+                    Producteur: {product.companyName}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Disponible: {product.totalQuantity} {product.saleUnit}
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      width: '100%',
-                      justifyContent: 'space-between',
-                    }}
-                  >
+                  <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <IconButton
                         onClick={(e) => {
                           e.stopPropagation()
-                          handleQuantityChange(product.id, -1)
+                          handleQuantityChange(product.productId, -1)
                         }}
                         size="small"
                       >
                         <RemoveIcon />
                       </IconButton>
                       <Typography sx={{ mx: 1 }}>
-                        {quantities[product.id] || 1}
+                        {quantities[product.productId] || 1}
                       </Typography>
                       <IconButton
                         onClick={(e) => {
                           e.stopPropagation()
-                          handleQuantityChange(product.id, 1)
+                          handleQuantityChange(product.productId, 1)
                         }}
                         size="small"
                       >
@@ -456,25 +372,17 @@ const HomePage = () => {
       </Box>
 
       {/* Bouton Voir Plus */}
-      {visibleProducts < filteredProducts.length ? (
+      {visibleProducts < filteredProducts.length && (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 3 }}>
           <Button
             variant="contained"
-            onClick={() =>
-              setVisibleProducts((prev) =>
-                Math.min(prev + productsPerLoad, filteredProducts.length)
-              )
-            }
+            onClick={() => setVisibleProducts((prev) => 
+              Math.min(prev + productsPerLoad, filteredProducts.length)
+            )}
           >
             Voir plus
           </Button>
         </Box>
-      ) : (
-        <Typography variant="body1" sx={{ textAlign: 'center', mt: 2, mb: 3 }}>
-          {filteredProducts.length > 0
-            ? "Il n'y a plus de produits à afficher."
-            : ''}
-        </Typography>
       )}
 
       <Snackbar
@@ -483,11 +391,7 @@ const HomePage = () => {
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity="success"
-          sx={{ width: '100%' }}
-        >
+        <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
           {message}
         </Alert>
       </Snackbar>
