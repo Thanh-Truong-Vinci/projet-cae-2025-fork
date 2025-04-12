@@ -24,7 +24,7 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
         throw new Error('Vous devez être authentifié pour accéder à vos réservations')
       }
 
-      const response = await fetch('/reservation/list', {
+      const response = await fetch('/api/reservation/list', {
         method: 'GET',
         headers: {
           Authorization: authenticatedUser.token,
@@ -81,7 +81,7 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
         quantity,
       }
 
-      const response = await axios.post('/reservation/reserve', reservationRequest, {
+      const response = await axios.post('/api/reservation/reserve', reservationRequest, {
         headers: {
           Authorization: authenticatedUser.token,
           'Content-Type': 'application/json',
@@ -110,7 +110,89 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
     }
   }
 
-  // Cancel a reservation
+  // Set a reservation to PENDING status
+  const toPendingReservation = async (reservationId: number): Promise<void> => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      if (!authenticatedUser) {
+        throw new Error('Vous devez être authentifié pour modifier une réservation')
+      }
+
+      const response = await axios.post(
+        '/api/reservation/toPending',
+        reservationId,
+        {
+          headers: {
+            Authorization: authenticatedUser.token,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (response.status >= 200 && response.status < 300) {
+        console.log('Réservation mise en attente avec succès')
+        // Update local state or refetch
+        await fetchReservations()
+      } else {
+        throw new Error(`Erreur lors du changement de statut de la réservation: ${response.status}`)
+      }
+    } catch (err) {
+      console.error('Erreur lors de la mise en attente de la réservation:', err)
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || 'Erreur lors de la mise en attente de la réservation')
+      } else if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError('Erreur inconnue lors de la mise en attente de la réservation')
+      }
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Set a reservation to CONFIRMED status
+  const toConfirmReservation = async (reservationId: number): Promise<void> => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const response = await axios.post(
+        '/api/reservation/toConfirm',
+        reservationId,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (response.status >= 200 && response.status < 300) {
+        console.log('Réservation confirmée avec succès')
+        // Update local state if needed
+        if (authenticatedUser) {
+          await fetchReservations()
+        }
+      } else {
+        throw new Error(`Erreur lors de la confirmation de la réservation: ${response.status}`)
+      }
+    } catch (err) {
+      console.error('Erreur lors de la confirmation de la réservation:', err)
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || 'Erreur lors de la confirmation de la réservation')
+      } else if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError('Erreur inconnue lors de la confirmation de la réservation')
+      }
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const cancelReservation = async (reservationId: number): Promise<void> => {
     setIsLoading(true)
     setError(null)
@@ -121,7 +203,7 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
       }
 
       const response = await axios.post(
-        '/reservation/cancel',
+        '/api/reservation/toCancel',
         reservationId,
         {
           headers: {
@@ -134,10 +216,8 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
       if (response.status >= 200 && response.status < 300) {
         console.log('Réservation annulée avec succès')
         
-        // Update the local state by removing the canceled reservation
-        setReservations((prevReservations) =>
-          prevReservations.filter((reservation) => reservation.id !== reservationId)
-        )
+        // Update the local state by fetching the updated list
+        await fetchReservations()
       } else {
         throw new Error(`Erreur lors de l'annulation de la réservation: ${response.status}`)
       }
@@ -171,6 +251,8 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
         error,
         fetchReservations,
         createReservation,
+        toPendingReservation,
+        toConfirmReservation,
         cancelReservation,
       }}
     >
