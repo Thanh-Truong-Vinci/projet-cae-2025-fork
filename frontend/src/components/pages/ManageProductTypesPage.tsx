@@ -36,6 +36,7 @@ const ManageProductTypesPage = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false)
   const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [warningMessage, setWarningMessage] = useState<string | null>(null)
 
   useEffect(() => {
     if (!authenticatedUser) {
@@ -58,11 +59,21 @@ const ManageProductTypesPage = () => {
   const handleDeleteType = async () => {
     if (selectedTypeId === null) return
 
-    const success = await deleteProductType(selectedTypeId)
-    if (success) {
+    // Clear any previous messages
+    setWarningMessage(null)
+
+    const result = await deleteProductType(selectedTypeId)
+
+    if (result.success) {
       setOpenDeleteDialog(false)
       setSuccessMessage('Type supprimé avec succès')
       setTimeout(() => setSuccessMessage(null), 3000)
+    } else if (result.constraintViolation) {
+      setOpenDeleteDialog(false)
+      setWarningMessage(
+        'Ce type de produit ne peut pas être supprimé car il est actuellement utilisé par des produits'
+      )
+      setTimeout(() => setWarningMessage(null), 5000)
     }
   }
 
@@ -79,6 +90,15 @@ const ManageProductTypesPage = () => {
       {error && (
         <Alert severity="error" sx={{ mb: 3 }}>
           {error}
+        </Alert>
+      )}
+
+      {warningMessage && (
+        <Alert
+          severity="warning"
+          sx={{ mb: 3, backgroundColor: '#fff3e0', color: '#e65100' }}
+        >
+          {warningMessage}
         </Alert>
       )}
 

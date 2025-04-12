@@ -96,7 +96,6 @@ export const ProductTypeProvider: React.FC<ProductTypeProviderProps> = ({
       const data = await response.json()
       console.log('Type de produit créé avec succès:', data)
 
-      // Recharger la liste après l'ajout
       await fetchProductTypes()
       return true
     } catch (err) {
@@ -113,7 +112,9 @@ export const ProductTypeProvider: React.FC<ProductTypeProviderProps> = ({
   }
 
   // Fonction pour supprimer un type de produit
-  const deleteProductType = async (id: number): Promise<boolean> => {
+  const deleteProductType = async (
+    id: number
+  ): Promise<{ success: boolean; constraintViolation?: boolean }> => {
     try {
       if (!authenticatedUser) {
         throw new Error(
@@ -121,22 +122,35 @@ export const ProductTypeProvider: React.FC<ProductTypeProviderProps> = ({
         )
       }
 
+      console.log(`Tentative de suppression du type de produit avec ID: ${id}`)
+
       const response = await fetch(`/api/product-types/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: authenticatedUser.token,
+          'Content-Type': 'application/json',
         },
       })
 
       if (!response.ok) {
         const errorData = await response.text()
         console.error('Erreur de réponse:', response.status, errorData)
+
+        if (
+          response.status === 500 &&
+          errorData.includes('foreign key constraint') &&
+          errorData.includes('products')
+        ) {
+          setError(null)
+          return { success: false, constraintViolation: true }
+        }
+
         throw new Error(`Erreur: ${response.status} ${response.statusText}`)
       }
 
       console.log('Type de produit supprimé avec succès:', id)
-      setProductTypes(productTypes.filter((type) => type.id !== id))
-      return true
+      setProductTypes((prevTypes) => prevTypes.filter((type) => type.id !== id))
+      return { success: true }
     } catch (err) {
       console.error('Erreur lors de la suppression du type:', err)
 
@@ -146,7 +160,7 @@ export const ProductTypeProvider: React.FC<ProductTypeProviderProps> = ({
         setError('Impossible de supprimer le type de produit')
       }
 
-      return false
+      return { success: false }
     }
   }
 
