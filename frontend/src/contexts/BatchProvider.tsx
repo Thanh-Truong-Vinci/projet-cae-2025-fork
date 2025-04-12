@@ -11,14 +11,24 @@ interface BatchProviderProps {
 export const BatchProvider = ({ children }: BatchProviderProps) => {
   const [myBatches, setMyBatches] = useState<Batch[]>([])
   const [approvedBatches, setApprovedBatches] = useState<Batch[]>([])
+  const [receivedBatches, setReceivedBatches] = useState<Batch[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const { authenticatedUser } = useContext(UserContext)
 
-  // Transform raw backend batch data to match the frontend Batch interface
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const formatBatch = (rawBatch: any): Batch => {
     console.log('Raw batch data:', rawBatch)
+
+    let producerName = 'Producteur inconnu'
+    if (rawBatch.producer) {
+      const firstName = rawBatch.producer.firstname || ''
+      const lastName = rawBatch.producer.name || ''
+      if (firstName || lastName) {
+        producerName = `${firstName} ${lastName}`.trim()
+      }
+    }
+
     return {
       id: rawBatch.idBatch || rawBatch.id,
       productName: rawBatch.product?.name || 'Produit inconnu',
@@ -29,11 +39,8 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
       availableQuantity: rawBatch.availableQuantity || 0,
       unitPrice: rawBatch.unitPrice || 0,
       unitType: rawBatch.saleUnit || 'unité',
-      producerId: rawBatch.producer?.idUser || 0,
-      producerName:
-        rawBatch.producer?.user?.firstname +
-          ' ' +
-          rawBatch.producer?.user?.name || 'Producteur inconnu',
+      producerId: rawBatch.producer?.id || 0,
+      producerName: producerName,
       createdAt: rawBatch.productionDate || new Date().toISOString(),
       status: rawBatch.status || 'APPROVED',
     }
@@ -83,7 +90,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
     }
   }, [authenticatedUser])
 
-  const fetchApprovedBatches = async () => {
+  const fetchApprovedBatches = useCallback(async () => {
     setIsLoading(true)
     setError(null)
 
@@ -95,7 +102,11 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
       }
 
       const data = await response.json()
-      setApprovedBatches(data)
+      // Format the data before setting state
+      const formattedBatches = Array.isArray(data)
+        ? data.map((rawBatch) => formatBatch(rawBatch))
+        : []
+      setApprovedBatches(formattedBatches)
     } catch (error) {
       setError(
         error instanceof Error ? error.message : 'Une erreur est survenue'
@@ -104,7 +115,36 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, []) // No dependencies needed since formatBatch doesn't depend on any props or state
+
+  const fetchReceivedBatches = useCallback(async () => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/batches/received')
+
+      if (!response.ok) {
+        throw new Error(`Erreur: ${response.status}`)
+      }
+
+      const data = await response.json()
+      // Format the data before setting state
+      const formattedBatches = Array.isArray(data)
+        ? data.map((rawBatch) => formatBatch(rawBatch))
+        : []
+      setReceivedBatches(formattedBatches)
+      return formattedBatches
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : 'Une erreur est survenue'
+      )
+      console.error('Erreur lors de la récupération des lots reçus:', error)
+      return []
+    } finally {
+      setIsLoading(false)
+    }
+  }, []) // No dependencies needed since formatBatch doesn't depend on any props or state
 
   const receiveBatch = async (batchId: number): Promise<Batch | null> => {
     if (!authenticatedUser) return null
@@ -205,23 +245,155 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
     }
   }
 
+  const updateBatchImage = async (
+    batchId: number,
+    image: File
+  ): Promise<Batch | null> => {
+    try {
+      if (!authenticatedUser) {
+        throw new Error('Vous devez être authentifié pour modifier une image')
+      }
+
+      console.log(
+        `Updating batch ${batchId} with image: ${image.name} (${image.size} bytes)`
+      )
+
+      const formData = new FormData()
+      formData.append('image', image)
+
+      // Use axios instead of fetch for better multipart form handling
+      const response = await axios.patch(
+        `/api/batches/${batchId}/updateImage`,
+        formData,
+        {
+          headers: {
+            Authorization: authenticatedUser.token,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      )
+
+      console.log('Image update response:', response.data)
+
+      if (response.status >= 200 && response.status < 300) {
+        const updatedBatch = response.data
+        console.log('Image du lot mise à jour avec succès:', updatedBatch)
+
+        // Update the batch in the local state
+        setMyBatches((prevBatches) =>
+          prevBatches.map((batch) =>
+            batch.id === batchId ? formatBatch(updatedBatch) : batch
+          )
+        )
+
+        return formatBatch(updatedBatch)
+      } else {
+        throw new Error(`Error status: ${response.status}`)
+      }
+    } catch (err) {
+      console.error('updateBatchImage::error: ', err)
+      if (axios.isAxiosError(err)) {
+        console.error('Response data:', err.response?.data)
+        console.error('Response status:', err.response?.status)
+        throw new Error(
+          err.response?.data?.message ||
+            "Erreur lors de la mise à jour de l'image"
+        )
+      } else if (err instanceof Error) {
+        throw new Error(
+          err.message || "Erreur lors de la mise à jour de l'image"
+        )
+      }
+      throw new Error("Erreur inconnue lors de la mise à jour de l'image")
+    }
+  }
+
+  const updateBatchImageById = async (
+    batchId: number,
+    imageId: number
+  ): Promise<Batch | null> => {
+    try {
+      if (!authenticatedUser) {
+        throw new Error('Vous devez être authentifié pour modifier une image')
+      }
+
+      console.log(
+        `Updating batch ${batchId} with existing image id: ${imageId}`
+      )
+
+      // Usa axios per coerenza con updateBatchImage e per une meilleure gestion des erreurs
+      const response = await axios.patch(
+        `/api/batches/${batchId}/updateImageById`,
+        { imageId },
+        {
+          headers: {
+            Authorization: authenticatedUser.token,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      console.log('Image update by ID response:', response.data)
+
+      if (response.status >= 200 && response.status < 300) {
+        const updatedBatch = response.data
+        console.log(
+          'Image du lot mise à jour avec succès par ID:',
+          updatedBatch
+        )
+
+        // Update the batch in the local state
+        setMyBatches((prevBatches) =>
+          prevBatches.map((batch) =>
+            batch.id === batchId ? formatBatch(updatedBatch) : batch
+          )
+        )
+
+        return formatBatch(updatedBatch)
+      } else {
+        throw new Error(`Error status: ${response.status}`)
+      }
+    } catch (err) {
+      console.error('updateBatchImageById::error: ', err)
+      if (axios.isAxiosError(err)) {
+        console.error('Response data:', err.response?.data)
+        console.error('Response status:', err.response?.status)
+        throw new Error(
+          err.response?.data?.message ||
+            "Erreur lors de la mise à jour de l'image par ID"
+        )
+      } else if (err instanceof Error) {
+        throw new Error(
+          err.message || "Erreur lors de la mise à jour de l'image par ID"
+        )
+      }
+      throw new Error(
+        "Erreur inconnue lors de la mise à jour de l'image par ID"
+      )
+    }
+  }
+
   useEffect(() => {
     if (authenticatedUser?.role === 'Volunteer') {
       fetchApprovedBatches()
     }
-  }, [authenticatedUser])
+  }, [authenticatedUser, fetchApprovedBatches])
 
   return (
     <BatchContext.Provider
       value={{
         myBatches,
         approvedBatches,
+        receivedBatches,
         isLoading,
         error,
         fetchApprovedBatches,
         fetchMyBatches,
+        fetchReceivedBatches,
         receiveBatch,
         createBatch,
+        updateBatchImage,
+        updateBatchImageById,
       }}
     >
       {children}

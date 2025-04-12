@@ -15,9 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Controller pour gérer les opérations sur les types de produits.
- */
+/** Controller pour gérer les opérations sur les types de produits. */
 @RestController
 @RequestMapping("/product-types")
 public class ProductTypeController {
@@ -88,13 +86,13 @@ public class ProductTypeController {
   @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
   public void deleteProductType(@PathVariable long id) {
     // TODO verify token if is a manager
-    
+
     // Check if product type exists before deletion
     ProductType productType = productTypeService.getProductTypeById(id);
     if (productType == null) {
       throw new ResourceNotFoundException("Type de produit non trouvé");
     }
-    
+
     // No try-catch, directly calling the service method
     productTypeService.deleteProductType(id);
   }

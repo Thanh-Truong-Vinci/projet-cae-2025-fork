@@ -14,9 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
-/**
- * Service class for managing batches.
- */
+/** Service class for managing batches. */
 @Service
 public class BatchService {
 
@@ -24,9 +22,7 @@ public class BatchService {
   private final ProducerRepository producerRepository;
   private final NotificationRepository notificationRepository;
 
-  /**
-   * Constructeur du service.
-   */
+  /** Constructeur du service. */
   public BatchService(
       BatchRepository batchRepository,
       ProducerRepository producerRepository,
@@ -97,7 +93,7 @@ public class BatchService {
   /**
    * Rejette un lot avec un message.
    *
-   * @param id      l'ID du lot à rejeter
+   * @param id l'ID du lot à rejeter
    * @param message le message de rejet
    * @return le lot rejeté ou null si non trouvé
    */
@@ -113,12 +109,12 @@ public class BatchService {
     Notification notification = new Notification();
     notification.setIsRead(false);
     notification.setMessage(message);
-    
+
     Producer producer = producerRepository.findById(batch.getProducer().getId()).orElse(null);
     if (producer == null) {
       return null;
     }
-    
+
     notification.setProducer(producer);
     notification = notificationRepository.save(notification);
 
@@ -156,6 +152,15 @@ public class BatchService {
   }
 
   /**
+   * Récupère tous les lots ayant le statut RECEIVED.
+   *
+   * @return la liste des lots reçus
+   */
+  public List<Batch> getReceivedBatches() {
+    return batchRepository.findByStatus(BatchStatus.RECEIVED);
+  }
+
+  /**
    * Récupère tous les lots ayant le statut APPROVED.
    *
    * @param producerId le producteur qui fait la requête
@@ -165,5 +170,22 @@ public class BatchService {
 
     return batchRepository.findByProducerIdAndAvailableQuantityGreaterThanOrderByProductionDateAsc(
         producerId, 0);
+  }
+
+  /**
+   * Updates the photo of a batch with a new uploaded image.
+   *
+   * @param batchId the ID of the batch to update
+   * @param photo the new photo entity
+   * @return the updated batch or null if the batch was not found
+   */
+  public Batch updateBatchPhoto(long batchId, Photo photo) {
+    Batch batch = batchRepository.findById(batchId).orElse(null);
+    if (batch == null) {
+      return null;
+    }
+
+    batch.setPhoto(photo);
+    return batchRepository.save(batch);
   }
 }

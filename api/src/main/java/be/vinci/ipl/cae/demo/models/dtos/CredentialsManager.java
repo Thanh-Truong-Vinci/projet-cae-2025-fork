@@ -4,9 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-/**
- * CredentialsManager DTO.
- */
+/** CredentialsManager DTO. */
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor

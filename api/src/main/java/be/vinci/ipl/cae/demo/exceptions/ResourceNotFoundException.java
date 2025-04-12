@@ -1,13 +1,9 @@
 package be.vinci.ipl.cae.demo.exceptions;
 
-/**
- * ResourceNotFoundException to handle resource not found exceptions.
- */
+/** ResourceNotFoundException to handle resource not found exceptions. */
 public class ResourceNotFoundException extends RuntimeException {
 
-  /**
-   * Constructor for ResourceNotFoundException.
-   */
+  /** Constructor for ResourceNotFoundException. */
   public ResourceNotFoundException() {
     super();
   }

@@ -7,9 +7,7 @@ import java.time.LocalDate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-/**
- * Service class for managing managers.
- */
+/** Service class for managing managers. */
 @Service
 public class ManagerService {
 
@@ -34,10 +32,10 @@ public class ManagerService {
   /**
    * Create a new Manager.
    *
-   * @param name      the last name
+   * @param name the last name
    * @param firstname the first name
-   * @param email     the email
-   * @param password  the password
+   * @param email the email
+   * @param password the password
    */
   public void createManager(
       String name, String firstname, String email, String password, String requesterEmail) {
@@ -56,10 +54,10 @@ public class ManagerService {
   /**
    * Register a new manager.
    *
-   * @param name      the last name
+   * @param name the last name
    * @param firstname the first name
-   * @param email     the email
-   * @param password  the password
+   * @param email the email
+   * @param password the password
    * @return true if the registration is successful, false otherwise
    */
   public boolean register(

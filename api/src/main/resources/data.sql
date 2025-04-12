@@ -12,7 +12,8 @@ TRUNCATE TABLE user_with_address CASCADE;
 TRUNCATE TABLE users CASCADE;
 
 -- Ajouter la colonne production_date à la table batches
-ALTER TABLE batches ADD COLUMN IF NOT EXISTS production_date DATE;
+ALTER TABLE batches
+    ADD COLUMN IF NOT EXISTS production_date DATE;
 
 -- Insérer un administrateur
 INSERT INTO users (name, firstname, email, password, date_inscription)
@@ -248,10 +249,10 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        50,
        'PENDING',
        '2025-03-20',
-       '2025-03-10'  -- Date de production (antérieure à la date de dépôt)
+       '2025-03-10' -- Date de production (antérieure à la date de dépôt)
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Tomates Bio';
 
 -- Pour le lot des Pommes Royal Gala
@@ -267,10 +268,10 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        75,
        'PENDING',
        '2025-03-15',
-       '2025-03-05'  -- 10 jours avant le dépôt
+       '2025-03-05' -- 10 jours avant le dépôt
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pommes Royal Gala';
 
 -- Pour le lot de Pain au levain
@@ -286,10 +287,10 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        30,
        'PENDING',
        '2025-03-25',
-       '2025-03-24'  -- 1 jour avant (pain frais)
+       '2025-03-24' -- 1 jour avant (pain frais)
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pain au levain';
 
 -- Pour le lot de Fromage fermier
@@ -305,10 +306,10 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        25,
        'PENDING',
        '2025-03-18',
-       '2025-01-18'  -- 2 mois avant (fromage affiné)
+       '2025-01-18' -- 2 mois avant (fromage affiné)
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Fromage fermier';
 
 -- Pour le lot de Carottes Bio
@@ -324,10 +325,10 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        60,
        'PENDING',
        '2025-03-22',
-       '2025-03-15'  -- 7 jours avant la récolte
+       '2025-03-15' -- 7 jours avant la récolte
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Carottes Bio';
 
 -- Pour le lot de Bière artisanale
@@ -343,10 +344,10 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        45,
        'PENDING',
        '2025-03-21',
-       '2025-02-21'  -- 1 mois avant (temps de fermentation)
+       '2025-02-21' -- 1 mois avant (temps de fermentation)
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Bière artisanale';
 
 -- Pour le lot de Poulet fermier
@@ -362,10 +363,10 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        20,
        'PENDING',
        '2025-03-19',
-       '2025-03-18'  -- 1 jour avant (fraîcheur)
+       '2025-03-18' -- 1 jour avant (fraîcheur)
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Poulet fermier';
 
 -- Pour le lot de Yaourt nature
@@ -381,17 +382,19 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        40,
        'PENDING',
        '2025-03-16',
-       '2025-03-14'  -- 2 jours avant
+       '2025-03-14' -- 2 jours avant
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Yaourt nature';
 
 -- Créer un lot pour ce nouveau producteur
 INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
-       (SELECT id_user FROM producer WHERE id_user = (SELECT id_user FROM users WHERE email = 'sophie.martin@example.com')),
+       (SELECT id_user
+        FROM producer
+        WHERE id_user = (SELECT id_user FROM users WHERE email = 'sophie.martin@example.com')),
        p.id_product,
        ph.id_photo,
        '2025-05-20',
@@ -400,17 +403,19 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        30,
        'PENDING',
        '2025-03-25',
-       '2025-02-15'  -- Production antérieure (vin qui a besoin d'être vieilli)
+       '2025-02-15' -- Production antérieure (vin qui a besoin d'être vieilli)
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Bière artisanale';
 
 -- Créer un lot pour ce nouveau producteur
 INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
-       (SELECT id_user FROM producer WHERE id_user = (SELECT id_user FROM users WHERE email = 'marie.dubois@example.com')),
+       (SELECT id_user
+        FROM producer
+        WHERE id_user = (SELECT id_user FROM users WHERE email = 'marie.dubois@example.com')),
        p.id_product,
        ph.id_photo,
        '2025-05-10',
@@ -419,10 +424,10 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        40,
        'PENDING',
        '2025-03-28',
-       '2025-03-20'  -- Production récente pour fruits frais
+       '2025-03-20' -- Production récente pour fruits frais
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pommes Royal Gala';
 
 -- Fix all approved batches inserts
@@ -439,10 +444,10 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        45,
        'APPROVED',
        '2025-03-10',
-       '2025-03-01'  -- 9 jours avant
+       '2025-03-01' -- 9 jours avant
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pomme Jonagold';
 
 -- Pour le lot de Chou-fleur cheddar (APPROVED)
@@ -458,10 +463,10 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        35,
        'APPROVED',
        '2025-03-12',
-       '2025-03-05'  -- 7 jours avant
+       '2025-03-05' -- 7 jours avant
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Chou-fleur cheddar';
 
 -- Pour le lot de Fromage fermier (APPROVED)
@@ -477,10 +482,10 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        30,
        'APPROVED',
        '2025-03-18',
-       '2025-01-18'  -- 2 mois avant (fromage affiné)
+       '2025-01-18' -- 2 mois avant (fromage affiné)
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Fromage fermier';
 
 SELECT id_user, NULL

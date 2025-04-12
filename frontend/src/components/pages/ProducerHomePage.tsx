@@ -14,14 +14,22 @@ import {
   CircularProgress,
   Paper,
   Alert,
+  Modal,
+  TextField,
+  IconButton,
 } from '@mui/material'
 import { UserContext } from '../../contexts/UserContext'
 import { useNavigate } from 'react-router-dom'
 import EditIcon from '@mui/icons-material/Edit'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import CloudUploadIcon from '@mui/icons-material/CloudUpload'
+import SearchIcon from '@mui/icons-material/Search'
+import CloseIcon from '@mui/icons-material/Close'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { BatchContext } from '../../contexts/BatchContext'
+import { PhotoContext } from '../../contexts/PhotoContext'
+import { Batch, Photo } from '../../types'
 
 const ProducerHomePage = () => {
   const navigate = useNavigate()
@@ -30,9 +38,23 @@ const ProducerHomePage = () => {
     myBatches,
     isLoading,
     error: batchError,
+    updateBatchImage,
+    updateBatchImageById,
   } = useContext(BatchContext)!
   const { authenticatedUser } = useContext(UserContext)
+  const {
+    photos,
+    isLoading: isLoadingPhotos,
+    fetchAllPhotos,
+  } = useContext(PhotoContext)!
   const [error, setError] = useState<string | null>(null)
+
+  // Image editing states
+  const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null)
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedImage, setSelectedImage] = useState<Photo | null>(null)
+  const [uploadedImage, setUploadedImage] = useState<File | null>(null)
 
   // Rediriger si l'utilisateur n'est pas connecté ou n'est pas un producteur
   useEffect(() => {
@@ -53,15 +75,69 @@ const ProducerHomePage = () => {
         )
       })
     }
-  }, [authenticatedUser, fetchMyBatches]) // Ajout de fetchMyBatches comme dépendance
+  }, [authenticatedUser, fetchMyBatches])
 
   const handleAddBatch = () => {
     navigate('/add-batch')
   }
 
-  const handleEditBatch = (batchId: number) => {
-    console.log(`Éditer le lot ${batchId}`)
-    // Implémentation future: navigate(`/edit-batch/${batchId}`)
+  const handleEditBatch = (batch: Batch) => {
+    setSelectedBatch(batch)
+    setSelectedImage(null)
+    setUploadedImage(null)
+    setSearchQuery('')
+    setIsImageModalOpen(true)
+    fetchAllPhotos().catch((err) => {
+      console.error('Erreur lors de la récupération des photos:', err)
+    })
+  }
+
+  // Filter photos based on search query
+  const filteredPhotos = photos.filter((photo) =>
+    photo.productName.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  // Handle selecting an image from the gallery
+  const handleImageSelect = (photo: Photo) => {
+    setSelectedImage(photo)
+    setUploadedImage(null)
+  }
+
+  // Handle uploading a new image
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setUploadedImage(e.target.files[0])
+      setSelectedImage(null)
+    }
+  }
+
+  // Handle image update submission
+  const handleUpdateImage = async () => {
+    if (!selectedBatch) return
+
+    setError(null) // Clear any previous errors
+
+    try {
+      if (uploadedImage) {
+        console.log(
+          `Uploading new image: ${uploadedImage.name} (${uploadedImage.size} bytes)`
+        )
+        await updateBatchImage(selectedBatch.id, uploadedImage)
+      } else if (selectedImage) {
+        console.log(`Selecting existing image with ID: ${selectedImage.id}`)
+        await updateBatchImageById(selectedBatch.id, selectedImage.id)
+      }
+
+      setIsImageModalOpen(false)
+      await fetchMyBatches()
+    } catch (err) {
+      console.error('Error updating batch image:', err)
+      if (err instanceof Error) {
+        setError(`Erreur lors de la mise à jour de l'image: ${err.message}`)
+      } else {
+        setError("Erreur inconnue lors de la mise à jour de l'image")
+      }
+    }
   }
 
   // Fonction pour obtenir le libellé et la couleur du statut
@@ -81,10 +157,171 @@ const ProducerHomePage = () => {
         return { label: 'En attente', color: 'warning' as const }
       case 'REJECTED':
         return { label: 'Refusé', color: 'error' as const }
+      case 'RECEIVED':
+        return { label: 'Reçu', color: 'info' as const }
       default:
         return { label: 'Indéterminé', color: 'default' as const }
     }
   }
+
+  // Image Edit Modal Component
+  const ImageEditModal = () => (
+    <Modal
+      open={isImageModalOpen}
+      onClose={() => setIsImageModalOpen(false)}
+      aria-labelledby="image-edit-modal"
+    >
+      <Paper
+        sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '90%',
+          maxWidth: 800,
+          maxHeight: '90vh',
+          overflow: 'auto',
+          p: 4,
+          outline: 'none',
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mb: 2,
+          }}
+        >
+          <Typography variant="h6" id="image-edit-modal">
+            Changer l'image du lot: {selectedBatch?.productName}
+          </Typography>
+          <IconButton onClick={() => setIsImageModalOpen(false)}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="subtitle1">Image actuelle:</Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
+            <img
+              src={selectedBatch?.imageUrl}
+              alt={selectedBatch?.productName}
+              style={{ maxHeight: '200px', objectFit: 'contain' }}
+            />
+          </Box>
+        </Box>
+
+        <Box sx={{ mb: 3 }}>
+          <TextField
+            label="Rechercher une image"
+            fullWidth
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            InputProps={{
+              endAdornment: <SearchIcon />,
+            }}
+            sx={{ mb: 2 }}
+          />
+
+          <Typography variant="subtitle1" sx={{ mb: 1 }}>
+            Images disponibles:
+          </Typography>
+
+          {isLoadingPhotos ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <Grid
+              container
+              spacing={2}
+              sx={{ maxHeight: '300px', overflow: 'auto' }}
+            >
+              {filteredPhotos.map((photo) => (
+                <Grid item xs={6} sm={4} md={3} key={photo.id}>
+                  <Card
+                    onClick={() => handleImageSelect(photo)}
+                    sx={{
+                      cursor: 'pointer',
+                      border:
+                        selectedImage?.id === photo.id
+                          ? '2px solid #1976d2'
+                          : 'none',
+                      transition: '0.3s',
+                      '&:hover': { transform: 'scale(1.03)' },
+                    }}
+                  >
+                    <CardMedia
+                      component="img"
+                      height="100"
+                      image={photo.imageLocation}
+                      alt={photo.productName}
+                    />
+                    <CardContent sx={{ p: 1 }}>
+                      <Typography variant="caption" noWrap>
+                        {photo.productName}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+              {filteredPhotos.length === 0 && (
+                <Box sx={{ p: 2, width: '100%', textAlign: 'center' }}>
+                  <Typography variant="body2" color="text.secondary">
+                    Aucune image ne correspond à votre recherche
+                  </Typography>
+                </Box>
+              )}
+            </Grid>
+          )}
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
+        <Box sx={{ mt: 2 }}>
+          <Button
+            variant="outlined"
+            component="label"
+            startIcon={<CloudUploadIcon />}
+            fullWidth
+            sx={{ mb: 1 }}
+          >
+            Télécharger une image personnalisée
+            <input
+              type="file"
+              hidden
+              accept="image/*"
+              onChange={handleImageUpload}
+            />
+          </Button>
+          {uploadedImage && (
+            <Typography
+              variant="caption"
+              sx={{ display: 'block', textAlign: 'center' }}
+            >
+              Fichier sélectionné: {uploadedImage.name}
+            </Typography>
+          )}
+        </Box>
+
+        <Box
+          sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}
+        >
+          <Button onClick={() => setIsImageModalOpen(false)} variant="outlined">
+            Annuler
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleUpdateImage}
+            disabled={!selectedImage && !uploadedImage}
+          >
+            Confirmer
+          </Button>
+        </Box>
+      </Paper>
+    </Modal>
+  )
 
   // Si l'utilisateur n'est pas connecté ou n'est pas un producteur, ne pas rendre la page
   if (!authenticatedUser || authenticatedUser.role !== 'Producer') {
@@ -252,7 +489,7 @@ const ProducerHomePage = () => {
                         <Button
                           size="small"
                           startIcon={<EditIcon />}
-                          onClick={() => handleEditBatch(batch.id)}
+                          onClick={() => handleEditBatch(batch)}
                           disabled={batch.availableQuantity === 0}
                         >
                           Modifier
@@ -327,6 +564,9 @@ const ProducerHomePage = () => {
           </Grid>
         </Grid>
       </Paper>
+
+      {/* Render the image edit modal */}
+      <ImageEditModal />
     </Container>
   )
 }

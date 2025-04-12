@@ -21,32 +21,24 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  CardMedia,
 } from '@mui/material'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import DoneIcon from '@mui/icons-material/Done'
 import { BatchContext } from '../../contexts/BatchContext'
 import { UserContext } from '../../contexts/UserContext'
-import { ProductContext } from '../../contexts/ProductContext'
-import { categoryLabels } from '../../types'
 
 const VolunteerHomePage = () => {
   const navigate = useNavigate()
   const { authenticatedUser } = useContext(UserContext)
   const batchContext = useContext(BatchContext)
-  const productContext = useContext(ProductContext)
 
   if (!batchContext) {
     throw new Error(
       'BatchContext doit être utilisé à l intérieur d un BatchProvider'
     )
   }
-
-  // Get product context for category labels (optional)
-  const getCategoryLabel =
-    productContext?.getCategoryLabel ||
-    ((category: string) =>
-      categoryLabels[category as keyof typeof categoryLabels] || category)
 
   const { approvedBatches, isLoading, error, receiveBatch } = batchContext
 
@@ -149,9 +141,9 @@ const VolunteerHomePage = () => {
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         {/* Image handling similar to HomePage */}
-                        <Box
+                        <CardMedia
                           component="img"
-                          src={
+                          image={
                             batch.imageUrl || 'https://via.placeholder.com/150'
                           }
                           alt={batch.productName}
@@ -173,7 +165,7 @@ const VolunteerHomePage = () => {
                     <TableCell>
                       {/* Product type with category formatting like in HomePage */}
                       <Chip
-                        label={getCategoryLabel(batch.productType)}
+                        label={batch.productType}
                         size="small"
                         color="primary"
                         variant="outlined"
