@@ -178,15 +178,15 @@ export interface PhotoContextType {
 }
 
 export interface Photo {
-  id: number;
-  imageLocation: string;
+  id: number
+  imageLocation: string
 }
 
 export interface PhotoContextType {
-  photos: Photo[];
-  isLoading: boolean;
-  error: string | null;
-  fetchAllPhotos: () => Promise<void>;
+  photos: Photo[]
+  isLoading: boolean
+  error: string | null
+  fetchAllPhotos: () => Promise<void>
 }
 
 type MaybeAuthenticatedUser = AuthenticatedUser | undefined
