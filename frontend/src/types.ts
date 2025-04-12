@@ -189,6 +189,41 @@ export interface PhotoContextType {
   fetchAllPhotos: () => Promise<void>
 }
 
+// Reservation interfaces
+export interface Reservation {
+  id: number;
+  client?: {
+    id: number;
+    name: string;
+    firstname: string;
+  };
+  status: string;
+  reservationDate: string;
+  saleDate?: string;
+  price: number;
+  reservationLines: ReservationLine[];
+}
+
+export interface ReservationLine {
+  id: number;
+  quantity: number;
+  batch: Batch;
+}
+
+export interface ReservationRequest {
+  productId: number;
+  quantity: number;
+}
+
+export interface ReservationContextType {
+  reservations: Reservation[];
+  isLoading: boolean;
+  error: string | null;
+  fetchReservations: () => Promise<Reservation[]>;
+  createReservation: (productId: number, quantity: number) => Promise<void>;
+  cancelReservation: (reservationId: number) => Promise<void>;
+}
+
 type MaybeAuthenticatedUser = AuthenticatedUser | undefined
 
 export type {
