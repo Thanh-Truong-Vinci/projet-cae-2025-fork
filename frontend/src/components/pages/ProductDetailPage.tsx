@@ -37,13 +37,13 @@ const ProductDetailPage = () => {
     const loadProduct = () => {
       try {
         setLoading(true)
-        
+
         // Vérifier si le produit est passé via l'état de navigation
         if (location.state?.product) {
           setProduct(location.state.product)
           return
         }
-        
+
         // Sinon, utiliser getProductById du contexte
         if (productId) {
           const foundProduct = getProductById(parseInt(productId))
@@ -63,7 +63,7 @@ const ProductDetailPage = () => {
       }
     }
 
-    loadProduct();
+    loadProduct()
   }, [productId, location.state, getProductById])
 
   const handleQuantityChange = (change: number) => {
@@ -80,8 +80,8 @@ const ProductDetailPage = () => {
         quantity: quantity,
         unitType: product.saleUnit,
         category: product.productType,
-        batchIds: product.batchIds
-      });
+        batchIds: product.batchIds,
+      })
     }
   }
 
@@ -95,11 +95,23 @@ const ProductDetailPage = () => {
 
   if (error || !product) {
     return (
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 5 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          p: 5,
+        }}
+      >
         <Typography variant="h6" color="error">
           {error || 'Produit non trouvé'}
         </Typography>
-        <Button variant="contained" color="primary" onClick={() => navigate('/')} sx={{ mt: 2 }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate('/')}
+          sx={{ mt: 2 }}
+        >
           Retour à l'accueil
         </Button>
       </Box>
@@ -141,9 +153,12 @@ const ProductDetailPage = () => {
               alt={product.productName}
               sx={{
                 borderRadius: 1,
-                maxHeight: 400,
+                height: { xs: 250, sm: 300, md: 400 }, // Responsive height
                 width: '100%',
-                objectFit: 'cover',
+                objectFit: 'contain', // Changed from 'cover' to maintain aspect ratio
+                backgroundColor: '#f5f5f5', // Light background for transparent images
+                display: 'block',
+                margin: '0 auto', // Center the image
               }}
             />
           </Grid>
@@ -161,7 +176,7 @@ const ProductDetailPage = () => {
             <Typography variant="body1" sx={{ mb: 1 }}>
               Producteur: {product.companyName}
             </Typography>
-            
+
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
               Type: {product.productType}
             </Typography>

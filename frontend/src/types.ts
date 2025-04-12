@@ -133,18 +133,18 @@ export interface NewBatch {
 }
 
 export interface ProductBatch {
-  productId: number;
-  productName: string;
-  productType: string;
-  description: string;
-  unitPrice: number;
-  saleUnit: string;
-  totalQuantity: number;
-  imageLocation: string;
-  companyName: string;
-  earliestProductionDate: string;
-  batchIds: number[];
-  batchQuantities: number[];
+  productId: number
+  productName: string
+  productType: string
+  description: string
+  unitPrice: number
+  saleUnit: string
+  totalQuantity: number
+  imageLocation: string
+  companyName: string
+  earliestProductionDate: string
+  batchIds: number[]
+  batchQuantities: number[]
 }
 
 export interface BatchContextType {

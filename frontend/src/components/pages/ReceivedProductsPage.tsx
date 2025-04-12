@@ -162,7 +162,9 @@ const ReceivedProductsPage = () => {
                     height: { xs: 200, md: 'auto' },
                     objectFit: 'cover',
                   }}
-                  image={product.imageLocation || 'https://via.placeholder.com/150'}
+                  image={
+                    product.imageLocation || 'https://via.placeholder.com/150'
+                  }
                   alt={product.productName}
                 />
                 <Box

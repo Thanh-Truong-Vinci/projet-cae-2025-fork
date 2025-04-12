@@ -39,7 +39,7 @@ const HomePage = () => {
 
   if (!productContext) {
     throw new Error(
-      'ProductContext doit être utilisé à l\'intérieur d\'un ProductProvider'
+      "ProductContext doit être utilisé à l'intérieur d'un ProductProvider"
     )
   }
 
@@ -50,7 +50,7 @@ const HomePage = () => {
 
   if (!cartContext) {
     throw new Error(
-      'CartContext doit être utilisé à l\'intérieur d\'un CartProvider'
+      "CartContext doit être utilisé à l'intérieur d'un CartProvider"
     )
   }
 
@@ -173,7 +173,14 @@ const HomePage = () => {
 
   if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '50vh',
+        }}
+      >
         <CircularProgress />
       </Box>
     )
@@ -181,7 +188,14 @@ const HomePage = () => {
 
   if (error) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '50vh',
+        }}
+      >
         <Typography color="error">{error}</Typography>
       </Box>
     )
@@ -191,19 +205,45 @@ const HomePage = () => {
     <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
       {/* Carrousel des produits les plus vendus */}
       {topProducts.length > 0 && (
-        <Box sx={{ width: '100%', backgroundColor: '#ddd', p: 5, textAlign: 'center' }}>
+        <Box
+          sx={{
+            width: '100%',
+            backgroundColor: '#ddd',
+            p: 5,
+            textAlign: 'center',
+          }}
+        >
           <Typography variant="h5">Produits les plus vendus</Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 2, px: 4 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              mt: 2,
+              px: 4,
+            }}
+          >
             {/* Informations du produit */}
-            <Box 
-              sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', pr: 4, textAlign: 'left', cursor: 'pointer' }}
-              onClick={() => handleProductClick(topProducts[currentProductIndex])}
+            <Box
+              sx={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                pr: 4,
+                textAlign: 'left',
+                cursor: 'pointer',
+              }}
+              onClick={() =>
+                handleProductClick(topProducts[currentProductIndex])
+              }
             >
               <Typography variant="h6" sx={{ mb: 1 }}>
                 {topProducts[currentProductIndex].productName}
               </Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
-                Prix: {topProducts[currentProductIndex].unitPrice} € / {topProducts[currentProductIndex].saleUnit}
+                Prix: {topProducts[currentProductIndex].unitPrice} € /{' '}
+                {topProducts[currentProductIndex].saleUnit}
               </Typography>
               <Typography variant="body2" sx={{ mb: 1 }}>
                 Producteur: {topProducts[currentProductIndex].companyName}
@@ -212,7 +252,10 @@ const HomePage = () => {
                 <IconButton
                   onClick={(e) => {
                     e.stopPropagation()
-                    handleQuantityChange(topProducts[currentProductIndex].productId, -1)
+                    handleQuantityChange(
+                      topProducts[currentProductIndex].productId,
+                      -1
+                    )
                   }}
                   size="small"
                 >
@@ -224,7 +267,10 @@ const HomePage = () => {
                 <IconButton
                   onClick={(e) => {
                     e.stopPropagation()
-                    handleQuantityChange(topProducts[currentProductIndex].productId, 1)
+                    handleQuantityChange(
+                      topProducts[currentProductIndex].productId,
+                      1
+                    )
                   }}
                   size="small"
                 >
@@ -246,10 +292,22 @@ const HomePage = () => {
             {/* Image du produit */}
             <Box sx={{ flex: 1 }}>
               <img
-                src={topProducts[currentProductIndex].imageLocation || '/placeholder.jpg'}
+                src={
+                  topProducts[currentProductIndex].imageLocation ||
+                  '/placeholder.jpg'
+                }
                 alt={topProducts[currentProductIndex].productName}
-                style={{ width: 300, height: 200, objectFit: 'cover', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)', cursor: 'pointer' }}
-                onClick={() => handleProductClick(topProducts[currentProductIndex])}
+                style={{
+                  width: 300,
+                  height: 200,
+                  objectFit: 'cover',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                  cursor: 'pointer',
+                }}
+                onClick={() =>
+                  handleProductClick(topProducts[currentProductIndex])
+                }
               />
             </Box>
           </Box>
@@ -295,7 +353,16 @@ const HomePage = () => {
         </Box>
 
         {/* Liste des produits */}
-        <Box sx={{ flex: 1, display: 'flex', flexWrap: 'wrap', gap: 2, p: 2, justifyContent: 'center' }}>
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 2,
+            p: 2,
+            justifyContent: 'center',
+          }}
+        >
           {filteredProducts.length > 0 ? (
             filteredProducts.slice(0, visibleProducts).map((product) => (
               <Card
@@ -324,7 +391,14 @@ const HomePage = () => {
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      width: '100%',
+                      justifyContent: 'space-between',
+                    }}
+                  >
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <IconButton
                         onClick={(e) => {
@@ -376,9 +450,11 @@ const HomePage = () => {
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 3 }}>
           <Button
             variant="contained"
-            onClick={() => setVisibleProducts((prev) => 
-              Math.min(prev + productsPerLoad, filteredProducts.length)
-            )}
+            onClick={() =>
+              setVisibleProducts((prev) =>
+                Math.min(prev + productsPerLoad, filteredProducts.length)
+              )
+            }
           >
             Voir plus
           </Button>
@@ -391,7 +467,11 @@ const HomePage = () => {
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-        <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="success"
+          sx={{ width: '100%' }}
+        >
           {message}
         </Alert>
       </Snackbar>

@@ -13,14 +13,14 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
         setIsLoading(true)
         // Use the updated endpoint path that matches your backend
         const response = await fetch('/api/batches/received/available-view')
-        
+
         if (!response.ok) {
           throw new Error(`Error ${response.status}: ${response.statusText}`)
         }
-        
+
         const data = await response.json()
         console.log('Données reçues du backend:', data)
-        
+
         setProducts(data)
         setError(null)
       } catch (err) {
@@ -31,7 +31,7 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
         setIsLoading(false)
       }
     }
-    
+
     fetchProducts()
   }, [])
 
@@ -60,7 +60,7 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
         error,
         getProductById,
         getProductsByCategory,
-        getCategoryLabel
+        getCategoryLabel,
       }}
     >
       {children}
