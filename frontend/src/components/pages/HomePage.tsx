@@ -148,15 +148,30 @@ const HomePage = () => {
     }
   }, [products])
 
+  // ça va nous permettre de ne pas avoir soucis de différence de casse, d'espaces ou d'accents
+  const normalizeString = (str: string | undefined): string => {
+    return (str || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+  }
+
   const handleFilter = () => {
     let results = [...products]
 
     if (type) {
-      results = products.filter(
-        (product) =>
-          product.category === type ||
-          (product.productType && product.productType.title === type)
-      )
+      const normalizedType = normalizeString(type)
+
+      results = products.filter((product) => {
+        const normalizedCategory = normalizeString(product.category)
+        const normalizedTypeTitle = normalizeString(product.productType?.title)
+
+        return (
+          normalizedCategory === normalizedType ||
+          normalizedTypeTitle === normalizedType
+        )
+      })
     }
 
     if (productName.trim()) {

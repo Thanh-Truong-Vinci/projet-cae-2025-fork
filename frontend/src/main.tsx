@@ -28,6 +28,8 @@ import SimpleProtectedRoute from './components/SimpleProtectedRoute.tsx'
 import IndexRoute from './components/IndexRoute.tsx'
 import ReceivedProductsPage from './components/pages/ReceivedProductsPage.tsx'
 import { PhotoProvider } from './contexts/PhotoProvider.tsx'
+import ManageProductTypesPage from './components/pages/ManageProductTypesPage.tsx'
+import { ProductTypeProvider } from './contexts/ProductTypeProvider.tsx'
 
 const router = createBrowserRouter([
   {
@@ -130,6 +132,14 @@ const router = createBrowserRouter([
           </SimpleProtectedRoute>
         ),
       },
+      {
+        path: 'manage-product-types',
+        element: (
+          <SimpleProtectedRoute requiredRole="Manager">
+            <ManageProductTypesPage />
+          </SimpleProtectedRoute>
+        ),
+      },
       // Route de secours pour toutes les autres URL
       {
         path: '*',
@@ -144,15 +154,17 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <UserContextProvider>
-        <ProductProvider>
-          <BatchProvider>
-            <PhotoProvider>
-              <CartProvider>
-                <RouterProvider router={router} />
-              </CartProvider>
-            </PhotoProvider>
-          </BatchProvider>
-        </ProductProvider>
+        <ProductTypeProvider>
+          <ProductProvider>
+            <BatchProvider>
+              <PhotoProvider>
+                <CartProvider>
+                  <RouterProvider router={router} />
+                </CartProvider>
+              </PhotoProvider>
+            </BatchProvider>
+          </ProductProvider>
+        </ProductTypeProvider>
       </UserContextProvider>
     </ThemeProvider>
   </React.StrictMode>
