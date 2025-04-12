@@ -81,7 +81,14 @@ public class ReservationController {
   @PostMapping("/toPending")
   public void toPending(
       @RequestBody Long reservationId, @RequestHeader("Authorization") String token) {
-    validateAndChangeStatus(reservationId, token, ReservationStatus.PENDING);
+    Client client = authsService.isValidClientToken(token);
+    if (client == null) {
+      throw new ResourceNotFoundException("Token not valid, expired or user is not client");
+    }
+    if (reservationId == null) {
+      throw new ConflictException("Reservation ID is required");
+    }
+    reservationService.changeStatus(reservationId, ReservationStatus.PENDING);
   }
 
   /**
@@ -111,19 +118,6 @@ public class ReservationController {
   @PostMapping("/toCancel")
   public void toCancel(
       @RequestBody Long reservationId, @RequestHeader("Authorization") String token) {
-    validateAndChangeStatus(reservationId, token, ReservationStatus.CANCELLED);
-  }
-  
-  /**
-   * Validates client token and reservation ID, then changes reservation status.
-   *
-   * @param reservationId the ID of the reservation to update.
-   * @param token the authorization token from the request header.
-   * @param status the new status to set.
-   * @throws ResourceNotFoundException if the token is invalid or expired.
-   * @throws ConflictException if the reservation ID is missing.
-   */
-  private void validateAndChangeStatus(Long reservationId, String token, ReservationStatus status) {
     Client client = authsService.isValidClientToken(token);
     if (client == null) {
       throw new ResourceNotFoundException("Token not valid, expired or user is not client");
@@ -131,7 +125,6 @@ public class ReservationController {
     if (reservationId == null) {
       throw new ConflictException("Reservation ID is required");
     }
-    reservationService.changeStatus(reservationId, status);
+    reservationService.changeStatus(reservationId, ReservationStatus.CANCELLED);
   }
 }
-
