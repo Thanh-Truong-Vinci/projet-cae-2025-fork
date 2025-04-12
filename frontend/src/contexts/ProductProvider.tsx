@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, ReactNode } from 'react'
 import axios from 'axios'
 import { ProductContext } from './ProductContext'
-import { categoryLabels } from './categoryLabels'
 import { Product } from '../types'
 
 export const ProductProvider = ({ children }: { children: ReactNode }) => {
@@ -15,9 +14,6 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
         setIsLoading(true)
         const response = await axios.get('/api/products')
 
-        // Log pour déboguer la réponse
-        console.log('Réponse API:', response.data)
-
         const formattedProducts = response.data.map(
           (item: {
             id: number
@@ -27,7 +23,7 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
               productName: string
               imageLocation: string
             }
-            type?: { title: string }
+            type?: { title: string; id: number }
             description?: string
           }) => ({
             id: item.id,
@@ -35,13 +31,16 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
             price: '10.00€',
             image:
               item.photo?.imageLocation || 'https://via.placeholder.com/150',
-            category:
-              item.type?.title
-                ?.toLowerCase()
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '') // Supprimer les accents
-                .replace(/\s+/g, '_') || 'autres',
+            // Ne pas transformer la catégorie
+            category: item.type?.title || 'Autres',
             description: item.description || '',
+            // Stocker également le productType pour le filtrage
+            productType: item.type
+              ? {
+                  id: item.type.id,
+                  title: item.type.title,
+                }
+              : undefined,
           })
         )
 
@@ -76,11 +75,34 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     [products]
   )
 
+  // Version simplifiée sans dépendance à categoryLabels
   const getCategoryLabel = useCallback(
-    (category: string) =>
-      categoryLabels[category as keyof typeof categoryLabels] || category,
-    []
+    (category: string) => {
+      // Vérifier si un produit avec cette catégorie existe et a un type
+      const matchingProduct = products.find(
+        (product) =>
+          normalizeString(product.category) === normalizeString(category)
+      )
+
+      // Si on trouve un produit correspondant avec un type, utiliser son titre
+      if (matchingProduct?.productType?.title) {
+        return matchingProduct.productType.title
+      }
+
+      // Sinon retourner la catégorie telle quelle (avec première lettre majuscule)
+      return category.charAt(0).toUpperCase() + category.slice(1)
+    },
+    [products]
   )
+
+  // Fonction utilitaire pour normaliser les chaînes (pour comparaison)
+  const normalizeString = (str: string): string => {
+    return str
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+  }
 
   return (
     <ProductContext.Provider
