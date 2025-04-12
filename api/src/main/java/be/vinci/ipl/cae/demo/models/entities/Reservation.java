@@ -3,6 +3,8 @@ package be.vinci.ipl.cae.demo.models.entities;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,8 +32,9 @@ public class Reservation {
   @JoinColumn(name = "client", nullable = true)
   private Client client;
 
-  @Column(name = "status", nullable = false) // TODO : Enum
-  private String status;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "status", nullable = false)
+  private ReservationStatus status;
 
   @Column(name = "reservation_date", nullable = false)
   private LocalDate reservationDate;

@@ -5,6 +5,7 @@ import be.vinci.ipl.cae.demo.models.entities.Client;
 import be.vinci.ipl.cae.demo.models.entities.Product;
 import be.vinci.ipl.cae.demo.models.entities.Reservation;
 import be.vinci.ipl.cae.demo.models.entities.ReservationLine;
+import be.vinci.ipl.cae.demo.models.entities.ReservationStatus;
 import be.vinci.ipl.cae.demo.repositories.BatchRepository;
 import be.vinci.ipl.cae.demo.repositories.ReservationRepository;
 import java.time.LocalDate;
@@ -51,7 +52,7 @@ public class ReservationService {
     Reservation reservation = new Reservation();
     reservation.setClient(client);
     reservation.setPrice(0.0);
-    reservation.setStatus("pending");
+    reservation.setStatus(ReservationStatus.PENDING);
     reservation.setReservationDate(LocalDate.now());
     reservationLineService.addProduct(reservation, product, quantity);
     return reservationRepository.save(reservation);
@@ -73,7 +74,7 @@ public class ReservationService {
 
     Reservation reservation =
         reservationRepository
-            .findByClientAndStatus(client, "pending")
+            .findByClientAndStatus(client, ReservationStatus.PENDING)
             .orElseGet(() -> createReservation(client, product, quantity));
 
     reservationLineService.addProduct(reservation, product, quantity);
@@ -91,46 +92,33 @@ public class ReservationService {
   }
 
   /**
-   * Completes a reservation.
+   * Changes the status of a reservation.
    *
-   * @param reservationId the ID of reservation to complete
-   * @return the completed reservation or null if not found
+   * @param reservationId the ID of the reservation to update
+   * @param newStatus the new status for the reservation
+   * @return the updated reservation, or null if the reservation was not found
    */
-  public Reservation completeReservation(Long reservationId) {
+  public Reservation changeStatus(Long reservationId, ReservationStatus newStatus) {
     Reservation reservation = reservationRepository.findById(reservationId).orElse(null);
     if (reservation == null) {
       return null;
     }
-
-    reservation.setStatus("completed");
-    reservation.setSaleDate(LocalDate.now());
-    return reservationRepository.save(reservation);
-  }
-
-  /**
-   * Cancels a reservation for a client by reservation ID.
-   *
-   * @param client the client who made the reservation
-   * @param reservationId the ID of the reservation to cancel
-   * @return the canceled reservation, null if not found or if doesn't belong to client
-   */
-  public Reservation cancelReservation(Client client, Long reservationId) {
-    Reservation reservation = reservationRepository.findById(reservationId).orElse(null);
-    if (reservation == null) {
-      return null;
+    
+    // If changing to CANCELLED status, return items to stock
+    if (newStatus == ReservationStatus.CANCELLED && reservation.getStatus() != ReservationStatus.CANCELLED) {
+      for (ReservationLine line : reservation.getReservationLines()) {
+        Batch batch = line.getBatch();
+        batch.setAvailableQuantity(batch.getAvailableQuantity() + line.getQuantity());
+        batchRepository.save(batch);
+      }
     }
-
-    if (!reservation.getClient().equals(client)) {
-      return null;
+    
+    // If confirming a reservation, set the sale date
+    if (newStatus == ReservationStatus.CONFIRMED) {
+      reservation.setSaleDate(LocalDate.now());
     }
-
-    reservation.setStatus("canceled");
-    for (ReservationLine line : reservation.getReservationLines()) {
-      Batch batch = line.getBatch();
-      batch.setAvailableQuantity(batch.getAvailableQuantity() + line.getQuantity());
-      batchRepository.save(batch);
-    }
-
+    
+    reservation.setStatus(newStatus);
     return reservationRepository.save(reservation);
   }
 
