@@ -202,8 +202,8 @@ const HomePage = () => {
   }
 
   return (
-    <Box 
-      sx={{ 
+    <Box
+      sx={{
         display: 'flex',
         width: '100%',
         height: 'auto',
@@ -213,14 +213,18 @@ const HomePage = () => {
       }}
     >
       {/* Sidebar avec filtres */}
-      <Box sx={{ 
-        width: 300, 
-        backgroundColor: '#f0f0f0', 
-        p: 2,
-        height: '100%', // MODIFIÉ: prend toute la hauteur
-        overflowY: 'auto'
-      }}>
-        <Typography variant="h6" sx={{ mb: 3 }}>Filtrer</Typography>
+      <Box
+        sx={{
+          width: 300,
+          backgroundColor: '#f0f0f0',
+          p: 2,
+          height: '100%', // MODIFIÉ: prend toute la hauteur
+          overflowY: 'auto',
+        }}
+      >
+        <Typography variant="h6" sx={{ mb: 3 }}>
+          Filtrer
+        </Typography>
         <Select
           value={type}
           onChange={(e) => setType(e.target.value)}
@@ -255,8 +259,8 @@ const HomePage = () => {
       </Box>
 
       {/* Partie droite contenant le carrousel et la liste des produits */}
-      <Box 
-        sx={{ 
+      <Box
+        sx={{
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
@@ -324,7 +328,8 @@ const HomePage = () => {
                     <RemoveIcon />
                   </IconButton>
                   <Typography sx={{ mx: 1 }}>
-                    {quantities[topProducts[currentProductIndex].productId] || 1}
+                    {quantities[topProducts[currentProductIndex].productId] ||
+                      1}
                   </Typography>
                   <IconButton
                     onClick={(e) => {
@@ -393,13 +398,13 @@ const HomePage = () => {
             filteredProducts.slice(0, visibleProducts).map((product) => (
               <Card
                 key={`${product.productId}-${product.unitPrice}`}
-                sx={{ 
-                  width: 220, 
-                  height: 340, 
+                sx={{
+                  width: 220,
+                  height: 340,
                   mb: 2,
                   display: 'flex',
                   flexDirection: 'column',
-                  cursor: 'pointer' 
+                  cursor: 'pointer',
                 }}
                 onClick={() => handleProductClick(product)}
               >
@@ -411,11 +416,11 @@ const HomePage = () => {
                   sx={{ objectFit: 'cover' }}
                 />
                 <CardContent sx={{ flexGrow: 1, py: 1 }}>
-                  <Typography 
-                    gutterBottom 
-                    variant="h6" 
+                  <Typography
+                    gutterBottom
+                    variant="h6"
                     component="div"
-                    sx={{ 
+                    sx={{
                       fontSize: '1rem',
                       height: '2.5rem',
                       overflow: 'hidden',
@@ -423,22 +428,26 @@ const HomePage = () => {
                       display: '-webkit-box',
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: 'vertical',
-                      mb: 1
+                      mb: 1,
                     }}
                   >
                     {product.productName}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 0.5 }}
+                  >
                     {product.unitPrice} € / {product.saleUnit}
                   </Typography>
-                  <Typography 
-                    variant="body2" 
+                  <Typography
+                    variant="body2"
                     color="text.secondary"
-                    sx={{ 
+                    sx={{
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
-                      mb: 0.5
+                      mb: 0.5,
                     }}
                   >
                     {product.companyName}
@@ -466,7 +475,14 @@ const HomePage = () => {
                       >
                         <RemoveIcon fontSize="small" />
                       </IconButton>
-                      <Typography variant="body2" sx={{ mx: 0.5, minWidth: '1.5rem', textAlign: 'center' }}>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          mx: 0.5,
+                          minWidth: '1.5rem',
+                          textAlign: 'center',
+                        }}
+                      >
                         {quantities[product.productId] || 1}
                       </Typography>
                       <IconButton

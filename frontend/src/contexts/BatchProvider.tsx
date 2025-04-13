@@ -190,7 +190,12 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
         throw new Error('Vous devez être authentifié pour ajouter un lot')
       }
 
-      console.log('Création de lot:', newBatch.productName, 'avec image:', image.name)
+      console.log(
+        'Création de lot:',
+        newBatch.productName,
+        'avec image:',
+        image.name
+      )
 
       const formData = new FormData()
 
@@ -201,7 +206,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
           type: 'application/json',
         })
       )
-      
+
       // Then add the image (order matters in some server implementations)
       formData.append('image', image)
 
@@ -215,9 +220,11 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
       }
 
       const response = await fetch('/api/batches/createbatch', options)
-      
+
       if (!response.ok)
-        throw new Error(`fetch error : ${response.status} : ${response.statusText}`)
+        throw new Error(
+          `fetch error : ${response.status} : ${response.statusText}`
+        )
 
       const createdBatch = await response.json()
       console.log('Lot créé avec succès:', createdBatch)
@@ -225,7 +232,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
       return createdBatch
     } catch (err) {
       console.error('addBatch::error: ', err)
-      throw err instanceof Error 
+      throw err instanceof Error
         ? new Error(err.message || 'Erreur lors de la création du lot')
         : new Error('Erreur inconnue lors de la création du lot')
     }
