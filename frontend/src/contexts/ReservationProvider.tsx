@@ -24,19 +24,14 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
         throw new Error('Vous devez être authentifié pour accéder à vos réservations')
       }
 
-      const response = await fetch('/api/reservation/list', {
-        method: 'GET',
+      const response = await axios.get('/reservation/list', { // TODO why doesn't it work with /api/reservation/list
         headers: {
           Authorization: authenticatedUser.token,
           'Content-Type': 'application/json',
         },
-      })
+      });
 
-      if (!response.ok) {
-        throw new Error(`Erreur: ${response.status} ${response.statusText}`)
-      }
-
-      const data = await response.json()
+      const data = response.data;
       console.log('Réservations récupérées:', data)
       
       // Format dates and ensure consistency

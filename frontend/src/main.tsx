@@ -30,6 +30,7 @@ import ReceivedProductsPage from './components/pages/ReceivedProductsPage.tsx'
 import { PhotoProvider } from './contexts/PhotoProvider.tsx'
 import ManageProductTypesPage from './components/pages/ManageProductTypesPage.tsx'
 import { ProductTypeProvider } from './contexts/ProductTypeProvider.tsx'
+import { ReservationProvider } from './contexts/ReservationProvider'
 
 const router = createBrowserRouter([
   {
@@ -159,7 +160,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <BatchProvider>
               <PhotoProvider>
                 <CartProvider>
+                    <ReservationProvider>
                   <RouterProvider router={router} />
+                    </ReservationProvider>
                 </CartProvider>
               </PhotoProvider>
             </BatchProvider>

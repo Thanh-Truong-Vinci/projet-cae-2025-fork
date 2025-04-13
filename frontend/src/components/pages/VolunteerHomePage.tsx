@@ -28,11 +28,21 @@ import { fr } from 'date-fns/locale'
 import DoneIcon from '@mui/icons-material/Done'
 import { BatchContext } from '../../contexts/BatchContext'
 import { UserContext } from '../../contexts/UserContext'
+import { ReservationContext } from '../../contexts/ReservationContext'
 
 const VolunteerHomePage = () => {
   const navigate = useNavigate()
   const { authenticatedUser } = useContext(UserContext)
   const batchContext = useContext(BatchContext)
+  const reservationContext = useContext(ReservationContext)
+
+  if (!reservationContext) {
+    throw new Error(
+      'ReservationContext must be used within a ReservationProvider'
+    )
+  }
+
+  const { reservations, toConfirmReservation } = reservationContext
 
   if (!batchContext) {
     throw new Error(
@@ -49,6 +59,24 @@ const VolunteerHomePage = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>(
     'success'
   )
+
+  // Filter reservations to only include those in 'Pending' state
+  let pendingReservations = reservations.filter(
+    (reservation) => reservation.status === 'Pending'
+  )
+
+  if (pendingReservations.length == 0) { // TODO remove this after adding the add reservation functionality
+    pendingReservations = [
+      {
+        id: 0,
+        client: { id: 0, firstname: '', name: '' },
+        reservationDate: new Date().toISOString(),
+        price: 0,
+        status: 'Pending',
+        reservationLines: [],
+      },
+    ]
+  }
 
   // Redirect if not authenticated or not a volunteer
   useEffect(() => {
@@ -82,6 +110,24 @@ const VolunteerHomePage = () => {
       setSnackbarSeverity('error')
     } finally {
       setOpenDialog(false)
+      setOpenSnackbar(true)
+    }
+  }
+
+  // Handle confirm button click for reservations
+  const handleConfirmReservation = async (reservationId: number) => {
+    try {
+      await toConfirmReservation(reservationId)
+      setSnackbarMessage('Réservation confirmée avec succès')
+      setSnackbarSeverity('success')
+    } catch (error) {
+      setSnackbarMessage(
+        error instanceof Error
+          ? error.message
+          : 'Erreur lors de la confirmation de la réservation'
+      )
+      setSnackbarSeverity('error')
+    } finally {
       setOpenSnackbar(true)
     }
   }
@@ -199,6 +245,69 @@ const VolunteerHomePage = () => {
                         sx={{ whiteSpace: 'nowrap' }}
                       >
                         Recevoir
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </Paper>
+
+      <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
+        <Typography variant="h5" component="h2" gutterBottom>
+          Réservations en attente
+        </Typography>
+
+        {isLoading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        ) : pendingReservations.length === 0 ? (
+          <Box sx={{ p: 4, textAlign: 'center' }}>
+            <Typography variant="body1" color="textSecondary">
+              Aucune réservation en attente pour le moment. {reservations.length}
+            </Typography>
+          </Box>
+        ) : (
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Client</TableCell>
+                  <TableCell>Date de réservation</TableCell>
+                  <TableCell>Prix</TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {pendingReservations.map((reservation) => (
+                  <TableRow key={reservation.id}>
+                    <TableCell>
+                      {reservation.client?.firstname} {reservation.client?.name}
+                    </TableCell>
+                    <TableCell>
+                      {format(
+                        new Date(reservation.reservationDate),
+                        'dd MMMM yyyy',
+                        {
+                          locale: fr,
+                        }
+                      )}
+                    </TableCell>
+                    <TableCell>{reservation.price.toFixed(2)}€</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleConfirmReservation(reservation.id)}
+                      >
+                        Confirmer
                       </Button>
                     </TableCell>
                   </TableRow>
