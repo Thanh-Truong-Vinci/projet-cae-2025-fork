@@ -122,6 +122,21 @@ const NavBar = () => {
           >
             Nouveau Producteur
           </Button>
+          <Button
+            variant="outlined"
+            sx={{
+              color: 'green',
+              borderColor: 'green',
+              '&:hover': {
+                borderColor: 'darkgreen',
+                backgroundColor: 'rgba(0, 128, 0, 0.04)',
+              },
+              mr: 1,
+            }}
+            onClick={() => navigate('/manage-product-types')}
+          >
+            Gérer les Types
+          </Button>
           {/* Add link to received products page */}
           <IconButton
             onClick={() => navigate('/received-products')}

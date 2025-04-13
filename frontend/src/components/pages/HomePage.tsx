@@ -21,18 +21,13 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart'
 import { CartContext } from '../../contexts/CartContext'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { ProductContext } from '../../contexts/ProductContext'
+import { Product, ProductType } from '../../types'
 import { ProductBatch } from '../../types'
 
 const HomePage = () => {
-  // Définition des catégories de produits pour le filtre
-  const productCategories = [
-    { value: 'Légumes', label: 'Légumes' },
-    { value: 'Fruits', label: 'Fruits' },
-    { value: 'Viande', label: 'Viande' },
-    { value: 'Produits laitiers', label: 'Produits laitiers' },
-    { value: 'Boissons', label: 'Boissons' },
-    { value: 'Autres', label: 'Autres' },
-  ]
+  const [productTypes, setProductTypes] = useState<ProductType[]>([])
+  const [loadingTypes, setLoadingTypes] = useState<boolean>(false)
+  const [typeError, setTypeError] = useState<string | null>(null)
 
   // Utilisation du ProductContext
   const productContext = useContext(ProductContext)
@@ -43,9 +38,8 @@ const HomePage = () => {
     )
   }
 
-  const { products, isLoading, error, getProductsByCategory } = productContext
+  const { products, getCategoryLabel, isLoading, error } = productContext
 
-  // CartContext
   const cartContext = useContext(CartContext)
 
   if (!cartContext) {
@@ -71,6 +65,33 @@ const HomePage = () => {
   // Produits filtrés
   const [filteredProducts, setFilteredProducts] = useState<ProductBatch[]>([])
 
+  // Nouvel état pour les produits aléatoires "plus vendus"
+  const [topProducts, setTopProducts] = useState<Product[]>([])
+
+  // Ajouter un useEffect pour charger les types depuis l'API
+  useEffect(() => {
+    const fetchProductTypes = async () => {
+      setLoadingTypes(true)
+      setTypeError(null)
+
+      try {
+        const response = await fetch('/api/product-types')
+        if (!response.ok) {
+          throw new Error(`Erreur: ${response.status}`)
+        }
+
+        const data = await response.json()
+        setProductTypes(data)
+      } catch (error) {
+        console.error('Erreur lors du chargement des types de produits:', error)
+        setTypeError('Impossible de charger les types de produits')
+      } finally {
+        setLoadingTypes(false)
+      }
+    }
+
+    fetchProductTypes()
+  }, [])
   // Produits aléatoires "plus vendus"
   const [topProducts, setTopProducts] = useState<ProductBatch[]>([])
 
@@ -125,11 +146,30 @@ const HomePage = () => {
     }
   }, [products])
 
+  // ça va nous permettre de ne pas avoir soucis de différence de casse, d'espaces ou d'accents
+  const normalizeString = (str: string | undefined): string => {
+    return (str || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+  }
+
   const handleFilter = () => {
     let results = [...products]
 
     if (type) {
-      results = getProductsByCategory(type)
+      const normalizedType = normalizeString(type)
+
+      results = products.filter((product) => {
+        const normalizedCategory = normalizeString(product.category)
+        const normalizedTypeTitle = normalizeString(product.productType?.title)
+
+        return (
+          normalizedCategory === normalizedType ||
+          normalizedTypeTitle === normalizedType
+        )
+      })
     }
 
     if (productName.trim()) {
@@ -257,6 +297,156 @@ const HomePage = () => {
           CONFIRMER
         </Button>
       </Box>
+          width: '100%',
+          backgroundColor: '#ddd',
+          p: 5,
+          textAlign: 'center',
+        }}
+      >
+        <Typography variant="h5">Produits les plus vendus</Typography>
+        {topProducts.length > 0 ? (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              mt: 2,
+              px: 4,
+            }}
+          >
+            {/* Informations du produit à gauche */}
+            <Box
+              sx={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                justifyContent: 'center',
+                pr: 4,
+                textAlign: 'left',
+                cursor: 'pointer', // Ajout du curseur pointer
+              }}
+              onClick={() =>
+                handleProductClick(topProducts[currentProductIndex].id)
+              }
+            >
+              <Typography variant="h6" sx={{ mb: 1 }}>
+                {topProducts[currentProductIndex].name}
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 2 }}>
+                Prix: {topProducts[currentProductIndex].price}
+              </Typography>
+
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <IconButton
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleQuantityChange(
+                      topProducts[currentProductIndex].id,
+                      -1
+                    )
+                  }}
+                  size="small"
+                >
+                  <RemoveIcon />
+                </IconButton>
+                <Typography sx={{ mx: 1 }}>
+                  {quantities[topProducts[currentProductIndex].id] || 1}
+                </Typography>
+                <IconButton
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleQuantityChange(topProducts[currentProductIndex].id, 1)
+                  }}
+                  size="small"
+                >
+                  <AddIcon />
+                </IconButton>
+              </Box>
+
+              <Button
+                variant="contained"
+                color="success"
+                startIcon={<AddShoppingCartIcon />}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleAddToCart(topProducts[currentProductIndex])
+                }}
+              >
+                Ajouter au panier
+              </Button>
+            </Box>
+
+            {/* Image du produit à droite */}
+            <Box sx={{ flex: 1 }}>
+              <img
+                src={topProducts[currentProductIndex].image}
+                alt={topProducts[currentProductIndex].name}
+                style={{
+                  width: 300,
+                  height: 200,
+                  objectFit: 'cover',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                  cursor: 'pointer', // Ajout du curseur pointer
+                }}
+                onClick={() =>
+                  handleProductClick(topProducts[currentProductIndex].id)
+                }
+              />
+            </Box>
+          </Box>
+        ) : (
+          <Typography variant="body1" sx={{ mt: 2 }}>
+            Aucun produit disponible pour le moment.
+          </Typography>
+        )}
+      </Box>
+
+      {/* Sidebar */}
+      <Box sx={{ display: 'flex', width: '100%' }}>
+        <Box sx={{ width: 350, backgroundColor: '#f0f0f0', p: 2 }}>
+          <Typography variant="h6">Filtrer</Typography>
+          <Select
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            displayEmpty
+            fullWidth
+            size="small"
+            sx={{ my: 2, bgcolor: 'white' }}
+            disabled={loadingTypes}
+          >
+            <MenuItem value="">Filtrer par type</MenuItem>
+            {loadingTypes ? (
+              <MenuItem disabled>Chargement...</MenuItem>
+            ) : typeError ? (
+              <MenuItem disabled>Erreur de chargement</MenuItem>
+            ) : (
+              productTypes.map((productType) => (
+                <MenuItem key={productType.id} value={productType.title}>
+                  {productType.title}
+                </MenuItem>
+              ))
+            )}
+          </Select>
+          <TextField
+            placeholder="Nom du produit"
+            value={productName}
+            onChange={(e) => setProductName(e.target.value)}
+            fullWidth
+            size="small"
+            sx={{ mb: 2, bgcolor: 'white' }}
+          />
+          <Button
+            variant="contained"
+            color="success"
+            fullWidth
+            onClick={handleFilter}
+          >
+            CONFIRMER
+          </Button>
+        </Box>
 
       {/* Partie droite contenant le carrousel et la liste des produits */}
       <Box

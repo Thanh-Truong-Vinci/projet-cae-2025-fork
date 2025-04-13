@@ -73,6 +73,12 @@ export interface Product {
   category: string
   description: string
   unitType: string
+  productType?: ProductType
+}
+
+export interface ProductType {
+  id: number
+  title: string
 }
 
 export const categoryLabels: { [key: string]: string } = {

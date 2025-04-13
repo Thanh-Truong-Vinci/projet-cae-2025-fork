@@ -1,5 +1,6 @@
 import { useState, useEffect, ReactNode, useCallback } from 'react'
 import { ProductContext } from './ProductContext'
+import { Product } from '../types'
 import { ProductBatch, categoryLabels } from '../types'
 
 export const ProductProvider = ({ children }: { children: ReactNode }) => {
@@ -46,11 +47,34 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     [products]
   )
 
+  // Version simplifiée sans dépendance à categoryLabels
   const getCategoryLabel = useCallback(
-    (category: string) =>
-      categoryLabels[category as keyof typeof categoryLabels] || category,
-    []
+    (category: string) => {
+      // Vérifier si un produit avec cette catégorie existe et a un type
+      const matchingProduct = products.find(
+        (product) =>
+          normalizeString(product.category) === normalizeString(category)
+      )
+
+      // Si on trouve un produit correspondant avec un type, utiliser son titre
+      if (matchingProduct?.productType?.title) {
+        return matchingProduct.productType.title
+      }
+
+      // Sinon retourner la catégorie telle quelle (avec première lettre majuscule)
+      return category.charAt(0).toUpperCase() + category.slice(1)
+    },
+    [products]
   )
+
+  // Fonction utilitaire pour normaliser les chaînes (pour comparaison)
+  const normalizeString = (str: string): string => {
+    return str
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+  }
 
   return (
     <ProductContext.Provider
