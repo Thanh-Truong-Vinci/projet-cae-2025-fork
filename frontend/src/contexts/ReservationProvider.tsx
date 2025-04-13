@@ -21,27 +21,31 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
 
     try {
       if (!authenticatedUser) {
-        throw new Error('Vous devez être authentifié pour accéder à vos réservations')
+        throw new Error(
+          'Vous devez être authentifié pour accéder à vos réservations'
+        )
       }
 
-      const response = await axios.get('/reservation/list', { // TODO why doesn't it work with /api/reservation/list
+      const response = await axios.get('/reservation/list', {
+        // TODO why doesn't it work with /api/reservation/list
         headers: {
           Authorization: authenticatedUser.token,
           'Content-Type': 'application/json',
         },
-      });
+      })
 
-      const data = response.data;
+      const data = response.data
       console.log('Réservations récupérées:', data)
-      
+
       // Format dates and ensure consistency
       const formattedReservations = Array.isArray(data)
         ? data.map((reservation: any) => ({
             ...reservation,
-            reservationDate: reservation.reservationDate || new Date().toISOString(),
+            reservationDate:
+              reservation.reservationDate || new Date().toISOString(),
             saleDate: reservation.saleDate || null,
-            reservationLines: Array.isArray(reservation.reservationLines) 
-              ? reservation.reservationLines 
+            reservationLines: Array.isArray(reservation.reservationLines)
+              ? reservation.reservationLines
               : [],
           }))
         : []
@@ -62,13 +66,18 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
   }, [authenticatedUser])
 
   // Create a new reservation
-  const createReservation = async (productId: number, quantity: number): Promise<void> => {
+  const createReservation = async (
+    productId: number,
+    quantity: number
+  ): Promise<void> => {
     setIsLoading(true)
     setError(null)
 
     try {
       if (!authenticatedUser) {
-        throw new Error('Vous devez être authentifié pour créer une réservation')
+        throw new Error(
+          'Vous devez être authentifié pour créer une réservation'
+        )
       }
 
       const reservationRequest: ReservationRequest = {
@@ -76,24 +85,33 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
         quantity,
       }
 
-      const response = await axios.post('/api/reservation/reserve', reservationRequest, {
-        headers: {
-          Authorization: authenticatedUser.token,
-          'Content-Type': 'application/json',
-        },
-      })
+      const response = await axios.post(
+        '/api/reservation/reserve',
+        reservationRequest,
+        {
+          headers: {
+            Authorization: authenticatedUser.token,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
 
       if (response.status >= 200 && response.status < 300) {
         console.log('Réservation créée avec succès')
         // Refresh the reservations list
         await fetchReservations()
       } else {
-        throw new Error(`Erreur lors de la création de la réservation: ${response.status}`)
+        throw new Error(
+          `Erreur lors de la création de la réservation: ${response.status}`
+        )
       }
     } catch (err) {
       console.error('Erreur lors de la création de la réservation:', err)
       if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || 'Erreur lors de la création de la réservation')
+        setError(
+          err.response?.data?.message ||
+            'Erreur lors de la création de la réservation'
+        )
       } else if (err instanceof Error) {
         setError(err.message)
       } else {
@@ -112,7 +130,9 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
 
     try {
       if (!authenticatedUser) {
-        throw new Error('Vous devez être authentifié pour modifier une réservation')
+        throw new Error(
+          'Vous devez être authentifié pour modifier une réservation'
+        )
       }
 
       const response = await axios.post(
@@ -131,12 +151,17 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
         // Update local state or refetch
         await fetchReservations()
       } else {
-        throw new Error(`Erreur lors du changement de statut de la réservation: ${response.status}`)
+        throw new Error(
+          `Erreur lors du changement de statut de la réservation: ${response.status}`
+        )
       }
     } catch (err) {
       console.error('Erreur lors de la mise en attente de la réservation:', err)
       if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || 'Erreur lors de la mise en attente de la réservation')
+        setError(
+          err.response?.data?.message ||
+            'Erreur lors de la mise en attente de la réservation'
+        )
       } else if (err instanceof Error) {
         setError(err.message)
       } else {
@@ -171,12 +196,17 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
           await fetchReservations()
         }
       } else {
-        throw new Error(`Erreur lors de la confirmation de la réservation: ${response.status}`)
+        throw new Error(
+          `Erreur lors de la confirmation de la réservation: ${response.status}`
+        )
       }
     } catch (err) {
       console.error('Erreur lors de la confirmation de la réservation:', err)
       if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || 'Erreur lors de la confirmation de la réservation')
+        setError(
+          err.response?.data?.message ||
+            'Erreur lors de la confirmation de la réservation'
+        )
       } else if (err instanceof Error) {
         setError(err.message)
       } else {
@@ -194,7 +224,9 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
 
     try {
       if (!authenticatedUser) {
-        throw new Error('Vous devez être authentifié pour annuler une réservation')
+        throw new Error(
+          'Vous devez être authentifié pour annuler une réservation'
+        )
       }
 
       const response = await axios.post(
@@ -210,20 +242,25 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
 
       if (response.status >= 200 && response.status < 300) {
         console.log('Réservation annulée avec succès')
-        
+
         // Update the local state by fetching the updated list
         await fetchReservations()
       } else {
-        throw new Error(`Erreur lors de l'annulation de la réservation: ${response.status}`)
+        throw new Error(
+          `Erreur lors de l'annulation de la réservation: ${response.status}`
+        )
       }
     } catch (err) {
-      console.error('Erreur lors de l\'annulation de la réservation:', err)
+      console.error("Erreur lors de l'annulation de la réservation:", err)
       if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || 'Erreur lors de l\'annulation de la réservation')
+        setError(
+          err.response?.data?.message ||
+            "Erreur lors de l'annulation de la réservation"
+        )
       } else if (err instanceof Error) {
         setError(err.message)
       } else {
-        setError('Erreur inconnue lors de l\'annulation de la réservation')
+        setError("Erreur inconnue lors de l'annulation de la réservation")
       }
       throw err
     } finally {

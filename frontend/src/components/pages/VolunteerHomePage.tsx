@@ -65,7 +65,8 @@ const VolunteerHomePage = () => {
     (reservation) => reservation.status === 'Pending'
   )
 
-  if (pendingReservations.length == 0) { // TODO remove this after adding the add reservation functionality
+  if (pendingReservations.length == 0) {
+    // TODO remove this after adding the add reservation functionality
     pendingReservations = [
       {
         id: 0,
@@ -271,7 +272,8 @@ const VolunteerHomePage = () => {
         ) : pendingReservations.length === 0 ? (
           <Box sx={{ p: 4, textAlign: 'center' }}>
             <Typography variant="body1" color="textSecondary">
-              Aucune réservation en attente pour le moment. {reservations.length}
+              Aucune réservation en attente pour le moment.{' '}
+              {reservations.length}
             </Typography>
           </Box>
         ) : (
