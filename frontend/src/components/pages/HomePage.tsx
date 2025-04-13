@@ -202,157 +202,181 @@ const HomePage = () => {
   }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-      {/* Carrousel des produits les plus vendus */}
-      {topProducts.length > 0 && (
-        <Box
-          sx={{
-            width: '100%',
-            backgroundColor: '#ddd',
-            p: 5,
-            textAlign: 'center',
-          }}
+    <Box 
+      sx={{ 
+        display: 'flex',
+        width: '100%',
+        height: 'auto',
+        overflow: 'hidden',
+        mb: 10, // AJOUT: Marge en bas pour laisser de l'espace au footer
+        position: 'relative',
+      }}
+    >
+      {/* Sidebar avec filtres */}
+      <Box sx={{ 
+        width: 300, 
+        backgroundColor: '#f0f0f0', 
+        p: 2,
+        height: '100%', // MODIFIÉ: prend toute la hauteur
+        overflowY: 'auto'
+      }}>
+        <Typography variant="h6" sx={{ mb: 3 }}>Filtrer</Typography>
+        <Select
+          value={type}
+          onChange={(e) => setType(e.target.value)}
+          displayEmpty
+          fullWidth
+          size="small"
+          sx={{ my: 2, bgcolor: 'white' }}
         >
-          <Typography variant="h5">Produits les plus vendus</Typography>
+          <MenuItem value="">Filtrer par type</MenuItem>
+          {productCategories.map((category) => (
+            <MenuItem key={category.value} value={category.value}>
+              {category.label}
+            </MenuItem>
+          ))}
+        </Select>
+        <TextField
+          placeholder="Nom du produit"
+          value={productName}
+          onChange={(e) => setProductName(e.target.value)}
+          fullWidth
+          size="small"
+          sx={{ mb: 2, bgcolor: 'white' }}
+        />
+        <Button
+          variant="contained"
+          color="success"
+          fullWidth
+          onClick={handleFilter}
+        >
+          CONFIRMER
+        </Button>
+      </Box>
+
+      {/* Partie droite contenant le carrousel et la liste des produits */}
+      <Box 
+        sx={{ 
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%', // AJOUT: assure que la boîte prend toute la hauteur
+          overflow: 'hidden', // MODIFIÉ: pour gérer le défilement correctement
+        }}
+      >
+        {/* Carrousel - hauteur fixe */}
+        {topProducts.length > 0 && (
           <Box
             sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              mt: 2,
-              px: 4,
+              width: '100%',
+              backgroundColor: '#ddd',
+              p: 2, // MODIFIÉ: réduit davantage le padding
+              textAlign: 'center',
+              flexShrink: 0, // AJOUT: empêche le rétrécissement
             }}
           >
-            {/* Informations du produit */}
+            <Typography variant="h5">Produits les plus vendus</Typography>
             <Box
               sx={{
-                flex: 1,
                 display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                pr: 4,
-                textAlign: 'left',
-                cursor: 'pointer',
+                justifyContent: 'center',
+                alignItems: 'center',
+                mt: 2,
+                px: 4,
               }}
-              onClick={() =>
-                handleProductClick(topProducts[currentProductIndex])
-              }
             >
-              <Typography variant="h6" sx={{ mb: 1 }}>
-                {topProducts[currentProductIndex].productName}
-              </Typography>
-              <Typography variant="body1" sx={{ mb: 1 }}>
-                Prix: {topProducts[currentProductIndex].unitPrice} € /{' '}
-                {topProducts[currentProductIndex].saleUnit}
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 1 }}>
-                Producteur: {topProducts[currentProductIndex].companyName}
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <IconButton
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleQuantityChange(
-                      topProducts[currentProductIndex].productId,
-                      -1
-                    )
-                  }}
-                  size="small"
-                >
-                  <RemoveIcon />
-                </IconButton>
-                <Typography sx={{ mx: 1 }}>
-                  {quantities[topProducts[currentProductIndex].productId] || 1}
-                </Typography>
-                <IconButton
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleQuantityChange(
-                      topProducts[currentProductIndex].productId,
-                      1
-                    )
-                  }}
-                  size="small"
-                >
-                  <AddIcon />
-                </IconButton>
-              </Box>
-              <Button
-                variant="contained"
-                color="success"
-                startIcon={<AddShoppingCartIcon />}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handleAddToCart(topProducts[currentProductIndex])
-                }}
-              >
-                Ajouter au panier
-              </Button>
-            </Box>
-            {/* Image du produit */}
-            <Box sx={{ flex: 1 }}>
-              <img
-                src={
-                  topProducts[currentProductIndex].imageLocation ||
-                  '/placeholder.jpg'
-                }
-                alt={topProducts[currentProductIndex].productName}
-                style={{
-                  width: 300,
-                  height: 200,
-                  objectFit: 'cover',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+              {/* Informations du produit */}
+              <Box
+                sx={{
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  pr: 4,
+                  textAlign: 'left',
                   cursor: 'pointer',
                 }}
                 onClick={() =>
                   handleProductClick(topProducts[currentProductIndex])
                 }
-              />
+              >
+                <Typography variant="h6" sx={{ mb: 1 }}>
+                  {topProducts[currentProductIndex].productName}
+                </Typography>
+                <Typography variant="body1" sx={{ mb: 1 }}>
+                  Prix: {topProducts[currentProductIndex].unitPrice} € /{' '}
+                  {topProducts[currentProductIndex].saleUnit}
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  Producteur: {topProducts[currentProductIndex].companyName}
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <IconButton
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleQuantityChange(
+                        topProducts[currentProductIndex].productId,
+                        -1
+                      )
+                    }}
+                    size="small"
+                  >
+                    <RemoveIcon />
+                  </IconButton>
+                  <Typography sx={{ mx: 1 }}>
+                    {quantities[topProducts[currentProductIndex].productId] || 1}
+                  </Typography>
+                  <IconButton
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleQuantityChange(
+                        topProducts[currentProductIndex].productId,
+                        1
+                      )
+                    }}
+                    size="small"
+                  >
+                    <AddIcon />
+                  </IconButton>
+                </Box>
+                <Button
+                  variant="contained"
+                  color="success"
+                  startIcon={<AddShoppingCartIcon />}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleAddToCart(topProducts[currentProductIndex])
+                  }}
+                >
+                  Ajouter au panier
+                </Button>
+              </Box>
+              {/* Image du produit */}
+              <Box sx={{ flex: 1 }}>
+                <img
+                  src={
+                    topProducts[currentProductIndex].imageLocation ||
+                    '/placeholder.jpg'
+                  }
+                  alt={topProducts[currentProductIndex].productName}
+                  style={{
+                    width: 300,
+                    height: 200,
+                    objectFit: 'cover',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() =>
+                    handleProductClick(topProducts[currentProductIndex])
+                  }
+                />
+              </Box>
             </Box>
           </Box>
-        </Box>
-      )}
+        )}
 
-      {/* Section filtre et produits */}
-      <Box sx={{ display: 'flex', width: '100%' }}>
-        {/* Sidebar avec filtres */}
-        <Box sx={{ width: 350, backgroundColor: '#f0f0f0', p: 2 }}>
-          <Typography variant="h6">Filtrer</Typography>
-          <Select
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-            displayEmpty
-            fullWidth
-            size="small"
-            sx={{ my: 2, bgcolor: 'white' }}
-          >
-            <MenuItem value="">Filtrer par type</MenuItem>
-            {productCategories.map((category) => (
-              <MenuItem key={category.value} value={category.value}>
-                {category.label}
-              </MenuItem>
-            ))}
-          </Select>
-          <TextField
-            placeholder="Nom du produit"
-            value={productName}
-            onChange={(e) => setProductName(e.target.value)}
-            fullWidth
-            size="small"
-            sx={{ mb: 2, bgcolor: 'white' }}
-          />
-          <Button
-            variant="contained"
-            color="success"
-            fullWidth
-            onClick={handleFilter}
-          >
-            CONFIRMER
-          </Button>
-        </Box>
-
-        {/* Liste des produits */}
+        {/* Liste des produits - avec défilement propre */}
         <Box
           sx={{
             flex: 1,
@@ -361,36 +385,69 @@ const HomePage = () => {
             gap: 2,
             p: 2,
             justifyContent: 'center',
+            overflowY: 'auto', // Permet le défilement interne
+            height: '100%', // AJOUT: utilise l'espace restant
           }}
         >
           {filteredProducts.length > 0 ? (
             filteredProducts.slice(0, visibleProducts).map((product) => (
               <Card
                 key={`${product.productId}-${product.unitPrice}`}
-                sx={{ width: 250, height: 'auto', mb: 2, cursor: 'pointer' }}
+                sx={{ 
+                  width: 220, 
+                  height: 340, 
+                  mb: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  cursor: 'pointer' 
+                }}
                 onClick={() => handleProductClick(product)}
               >
                 <CardMedia
                   component="img"
-                  height="140"
+                  height="120"
                   image={product.imageLocation || '/placeholder.jpg'}
                   alt={product.productName}
+                  sx={{ objectFit: 'cover' }}
                 />
-                <CardContent>
-                  <Typography gutterBottom variant="h6" component="div">
+                <CardContent sx={{ flexGrow: 1, py: 1 }}>
+                  <Typography 
+                    gutterBottom 
+                    variant="h6" 
+                    component="div"
+                    sx={{ 
+                      fontSize: '1rem',
+                      height: '2.5rem',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      mb: 1
+                    }}
+                  >
                     {product.productName}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Prix: {product.unitPrice} € / {product.saleUnit}
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                    {product.unitPrice} € / {product.saleUnit}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Producteur: {product.companyName}
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary"
+                    sx={{ 
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      mb: 0.5
+                    }}
+                  >
+                    {product.companyName}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Disponible: {product.totalQuantity} {product.saleUnit}
                   </Typography>
                 </CardContent>
-                <CardActions>
+                <CardActions sx={{ p: 1, pt: 0, mt: 'auto' }}>
                   <Box
                     sx={{
                       display: 'flex',
@@ -407,9 +464,9 @@ const HomePage = () => {
                         }}
                         size="small"
                       >
-                        <RemoveIcon />
+                        <RemoveIcon fontSize="small" />
                       </IconButton>
-                      <Typography sx={{ mx: 1 }}>
+                      <Typography variant="body2" sx={{ mx: 0.5, minWidth: '1.5rem', textAlign: 'center' }}>
                         {quantities[product.productId] || 1}
                       </Typography>
                       <IconButton
@@ -419,7 +476,7 @@ const HomePage = () => {
                         }}
                         size="small"
                       >
-                        <AddIcon />
+                        <AddIcon fontSize="small" />
                       </IconButton>
                     </Box>
                     <Button
@@ -430,8 +487,9 @@ const HomePage = () => {
                         e.stopPropagation()
                         handleAddToCart(product)
                       }}
+                      sx={{ minWidth: 'unset', px: 1 }}
                     >
-                      <AddShoppingCartIcon />
+                      <AddShoppingCartIcon fontSize="small" />
                     </Button>
                   </Box>
                 </CardActions>
@@ -443,23 +501,23 @@ const HomePage = () => {
             </Typography>
           )}
         </Box>
-      </Box>
 
-      {/* Bouton Voir Plus */}
-      {visibleProducts < filteredProducts.length && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 3 }}>
-          <Button
-            variant="contained"
-            onClick={() =>
-              setVisibleProducts((prev) =>
-                Math.min(prev + productsPerLoad, filteredProducts.length)
-              )
-            }
-          >
-            Voir plus
-          </Button>
-        </Box>
-      )}
+        {/* Bouton Voir Plus */}
+        {visibleProducts < filteredProducts.length && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 3 }}>
+            <Button
+              variant="contained"
+              onClick={() =>
+                setVisibleProducts((prev) =>
+                  Math.min(prev + productsPerLoad, filteredProducts.length)
+                )
+              }
+            >
+              Voir plus
+            </Button>
+          </Box>
+        )}
+      </Box>
 
       <Snackbar
         open={openSnackbar}

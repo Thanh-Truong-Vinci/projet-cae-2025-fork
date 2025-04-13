@@ -190,32 +190,22 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
         throw new Error('Vous devez être authentifié pour ajouter un lot')
       }
 
-      console.log(
-        'Création de lot:',
-        newBatch.productName,
-        'avec image:',
-        image.name
-      )
-
-      console.log('Image à envoyer:', {
-        nom: image.name,
-        type: image.type,
-        taille: `${(image.size / 1024).toFixed(2)}KB`,
-      })
+      console.log('Création de lot:', newBatch.productName, 'avec image:', image.name)
 
       const formData = new FormData()
 
-      // Ajouter l'image directement (sans transformation JSON qui cause l'erreur 413)
-      formData.append('image', image)
-
-      // Ajouter les données du lot en JSON
+      // Important: Add batch data first
       formData.append(
         'batch',
         new Blob([JSON.stringify(newBatch)], {
           type: 'application/json',
         })
       )
+      
+      // Then add the image (order matters in some server implementations)
+      formData.append('image', image)
 
+      // DON'T set Content-Type header - let browser set it with boundary
       const options = {
         method: 'POST',
         body: formData,
@@ -225,12 +215,9 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
       }
 
       const response = await fetch('/api/batches/createbatch', options)
-      console.log('Statut de la réponse:', response.status)
-
+      
       if (!response.ok)
-        throw new Error(
-          `fetch error : ${response.status} : ${response.statusText}`
-        )
+        throw new Error(`fetch error : ${response.status} : ${response.statusText}`)
 
       const createdBatch = await response.json()
       console.log('Lot créé avec succès:', createdBatch)
@@ -238,10 +225,9 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
       return createdBatch
     } catch (err) {
       console.error('addBatch::error: ', err)
-      if (err instanceof Error) {
-        throw new Error(err.message || 'Erreur lors de la création du lot')
-      }
-      throw new Error('Erreur inconnue lors de la création du lot')
+      throw err instanceof Error 
+        ? new Error(err.message || 'Erreur lors de la création du lot')
+        : new Error('Erreur inconnue lors de la création du lot')
     }
   }
 
