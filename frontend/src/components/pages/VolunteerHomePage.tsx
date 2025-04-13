@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Typography,
@@ -26,8 +26,6 @@ import {
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import DoneIcon from '@mui/icons-material/Done'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import { BatchContext } from '../../contexts/BatchContext'
 import { UserContext } from '../../contexts/UserContext'
 import { ReservationContext } from '../../contexts/ReservationContext'
@@ -61,43 +59,21 @@ const VolunteerHomePage = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>(
     'success'
   )
-  const [expandedReservationId, setExpandedReservationId] = useState<
-    number | null
-  >(null)
 
   // Filter reservations to only include those in 'Pending' state
   let pendingReservations = reservations.filter(
     (reservation) => reservation.status === 'Pending'
   )
 
-  if (pendingReservations.length == 0) {
-    // TODO remove this after adding the add reservation functionality
+  if (pendingReservations.length == 0) { // TODO remove this after adding the add reservation functionality
     pendingReservations = [
       {
         id: 0,
         client: { id: 0, firstname: '', name: '' },
         reservationDate: new Date().toISOString(),
-        price: 10,
+        price: 0,
         status: 'Pending',
-        reservationLines: [
-          {
-            id: 0,
-            batch: {
-              id: 0,
-              productName: 'Produit de test',
-              productType: 'Type de test',
-              unitPrice: 10,
-              unitType: 'kg',
-              availableQuantity: 100,
-              availabilityDate: new Date().toISOString(),
-              imageUrl: 'https://via.placeholder.com/150',
-              producerId: 1,
-              createdAt: new Date().toISOString(),
-              status: 'APPROVED',
-            },
-            quantity: 1,
-          },
-        ],
+        reservationLines: [],
       },
     ]
   }
@@ -156,12 +132,6 @@ const VolunteerHomePage = () => {
     }
   }
 
-  const handleToggleExpand = (reservationId: number) => {
-    setExpandedReservationId(
-      expandedReservationId === reservationId ? null : reservationId
-    )
-  }
-
   // If not authenticated or not a volunteer, don't render content
   if (!authenticatedUser || authenticatedUser.role !== 'Volunteer') {
     return null
@@ -209,7 +179,6 @@ const VolunteerHomePage = () => {
                   <TableCell>Prix unitaire</TableCell>
                   <TableCell>Disponible le</TableCell>
                   <TableCell>Actions</TableCell>
-                  <TableCell></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -302,8 +271,7 @@ const VolunteerHomePage = () => {
         ) : pendingReservations.length === 0 ? (
           <Box sx={{ p: 4, textAlign: 'center' }}>
             <Typography variant="body1" color="textSecondary">
-              Aucune réservation en attente pour le moment.{' '}
-              {reservations.length}
+              Aucune réservation en attente pour le moment. {reservations.length}
             </Typography>
           </Box>
         ) : (
@@ -314,124 +282,35 @@ const VolunteerHomePage = () => {
                   <TableCell>Client</TableCell>
                   <TableCell>Date de réservation</TableCell>
                   <TableCell>Prix</TableCell>
-                  <TableCell></TableCell>
                   <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {pendingReservations.map((reservation) => (
-                  <React.Fragment key={reservation.id}>
-                    <TableRow>
-                      <TableCell>
-                        {reservation.client?.firstname}{' '}
-                        {reservation.client?.name}
-                      </TableCell>
-                      <TableCell>
-                        {format(
-                          new Date(reservation.reservationDate),
-                          'dd MMMM yyyy',
-                          {
-                            locale: fr,
-                          }
-                        )}
-                      </TableCell>
-                      <TableCell>{reservation.price.toFixed(2)}€</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="text"
-                          color="secondary"
-                          onClick={() => handleToggleExpand(reservation.id)}
-                          startIcon={
-                            expandedReservationId === reservation.id ? (
-                              <ExpandLessIcon />
-                            ) : (
-                              <ExpandMoreIcon />
-                            )
-                          }
-                        >
-                          {expandedReservationId === reservation.id
-                            ? 'Cacher'
-                            : 'Détails'}
-                        </Button>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={() =>
-                            handleConfirmReservation(reservation.id)
-                          }
-                        >
-                          Confirmer
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                    {expandedReservationId === reservation.id && (
-                      <TableRow>
-                        <TableCell colSpan={4}>
-                          <Box
-                            sx={{
-                              p: 2,
-                              backgroundColor: '#f9f9f9',
-                              borderRadius: 1,
-                            }}
-                          >
-                            <Typography variant="h6" gutterBottom>
-                              Lignes de réservation
-                            </Typography>
-                            {reservation.reservationLines.length > 0 ? (
-                              <Table size="small">
-                                <TableHead>
-                                  <TableRow>
-                                    <TableCell>Image</TableCell>
-                                    <TableCell>Nom du produit</TableCell>
-                                    <TableCell>Quantité</TableCell>
-                                    <TableCell>Prix</TableCell>
-                                  </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                  {reservation.reservationLines.map((line) => (
-                                    <TableRow key={line.id}>
-                                      <TableCell>
-                                        <CardMedia
-                                          component="img"
-                                          image={
-                                            line.batch.imageUrl ||
-                                            'https://via.placeholder.com/150'
-                                          }
-                                          alt={line.batch.productName}
-                                          sx={{
-                                            width: 60,
-                                            height: 60,
-                                            objectFit: 'cover',
-                                            borderRadius: 1,
-                                          }}
-                                        />
-                                      </TableCell>
-                                      <TableCell>
-                                        {line.batch.productName}
-                                      </TableCell>
-                                      <TableCell>{line.quantity}</TableCell>
-                                      <TableCell>
-                                        {(
-                                          line.quantity * line.batch.unitPrice
-                                        ).toFixed(2)}
-                                        €
-                                      </TableCell>
-                                    </TableRow>
-                                  ))}
-                                </TableBody>
-                              </Table>
-                            ) : (
-                              <Typography>
-                                Aucune ligne de réservation disponible.
-                              </Typography>
-                            )}
-                          </Box>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </React.Fragment>
+                  <TableRow key={reservation.id}>
+                    <TableCell>
+                      {reservation.client?.firstname} {reservation.client?.name}
+                    </TableCell>
+                    <TableCell>
+                      {format(
+                        new Date(reservation.reservationDate),
+                        'dd MMMM yyyy',
+                        {
+                          locale: fr,
+                        }
+                      )}
+                    </TableCell>
+                    <TableCell>{reservation.price.toFixed(2)}€</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleConfirmReservation(reservation.id)}
+                      >
+                        Confirmer
+                      </Button>
+                    </TableCell>
+                  </TableRow>
                 ))}
               </TableBody>
             </Table>
