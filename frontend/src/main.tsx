@@ -28,6 +28,7 @@ import SimpleProtectedRoute from './components/SimpleProtectedRoute.tsx'
 import IndexRoute from './components/IndexRoute.tsx'
 import ReceivedProductsPage from './components/pages/ReceivedProductsPage.tsx'
 import { PhotoProvider } from './contexts/PhotoProvider.tsx'
+import { ReservationProvider } from './contexts/ReservationProvider'
 
 const router = createBrowserRouter([
   {
@@ -148,7 +149,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <BatchProvider>
             <PhotoProvider>
               <CartProvider>
-                <RouterProvider router={router} />
+                <ReservationProvider>
+                  <RouterProvider router={router} />
+                </ReservationProvider>
               </CartProvider>
             </PhotoProvider>
           </BatchProvider>
