@@ -196,7 +196,7 @@ public class BatchService {
 
   /**
    * Récupère tous les lots ayant le statut RECEIVED et une quantité disponible supérieure à 0,
-   * fusionnés par produit/prix/unité et triés par date de production.
+   * fusionnés par produit/prix/unité/photo et triés par date de production.
    *
    * @return la liste des BatchView fusionnés avec quantités additionnées
    */
@@ -205,13 +205,26 @@ public class BatchService {
     List<Batch> batches =
         batchRepository.findByStatusAndAvailableQuantityGreaterThan(BatchStatus.RECEIVED, 0);
 
-    // Map pour regrouper les lots par productId + unitPrice + saleUnit
+    // Map pour regrouper les lots par productId + unitPrice + saleUnit + photoId + companyName
     Map<String, BatchView> batchViewMap = new HashMap<>();
 
     for (Batch batch : batches) {
-      // Clé composite pour regroupement
+      // Clé composite pour regroupement incluant l'ID de la photo et le nom d'entreprise
+      String photoIdentifier =
+          batch.getPhoto() != null ? String.valueOf(batch.getPhoto().getId()) : "null";
+      String companyName =
+          batch.getProducer().getCompany() != null ? batch.getProducer().getCompany() : "unknown";
+
       String key =
-          batch.getProduct().getId() + "_" + batch.getUnitPrice() + "_" + batch.getSaleUnit();
+          batch.getProduct().getId()
+              + "_"
+              + batch.getUnitPrice()
+              + "_"
+              + batch.getSaleUnit()
+              + "_"
+              + photoIdentifier
+              + "_"
+              + companyName; // MODIFIÉ: Utilisation du nom d'entreprise au lieu de l'ID
 
       if (batchViewMap.containsKey(key)) {
         // Lot similaire trouvé, fusionner
