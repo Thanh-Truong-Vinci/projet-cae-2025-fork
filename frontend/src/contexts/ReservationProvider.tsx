@@ -39,7 +39,7 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
 
       // Format dates and ensure consistency
       const formattedReservations = Array.isArray(data)
-        ? data.map((reservation: any) => ({
+        ? data.map((reservation: Reservation) => ({
             ...reservation,
             reservationDate:
               reservation.reservationDate || new Date().toISOString(),
