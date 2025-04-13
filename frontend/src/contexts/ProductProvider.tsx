@@ -1,7 +1,6 @@
 import { useState, useEffect, ReactNode, useCallback } from 'react'
 import { ProductContext } from './ProductContext'
-import { Product } from '../types'
-import { ProductBatch, categoryLabels } from '../types'
+import { ProductBatch } from '../types'
 
 export const ProductProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<ProductBatch[]>([])
@@ -53,12 +52,12 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
       // Vérifier si un produit avec cette catégorie existe et a un type
       const matchingProduct = products.find(
         (product) =>
-          normalizeString(product.category) === normalizeString(category)
+          normalizeString(product.productType) === normalizeString(category)
       )
 
       // Si on trouve un produit correspondant avec un type, utiliser son titre
-      if (matchingProduct?.productType?.title) {
-        return matchingProduct.productType.title
+      if (matchingProduct?.productType) {
+        return matchingProduct.productType
       }
 
       // Sinon retourner la catégorie telle quelle (avec première lettre majuscule)

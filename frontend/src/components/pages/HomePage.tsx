@@ -21,7 +21,7 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart'
 import { CartContext } from '../../contexts/CartContext'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { ProductContext } from '../../contexts/ProductContext'
-import { Product, ProductType } from '../../types'
+import { ProductType } from '../../types'
 import { ProductBatch } from '../../types'
 
 const HomePage = () => {
@@ -38,7 +38,7 @@ const HomePage = () => {
     )
   }
 
-  const { products, getCategoryLabel, isLoading, error } = productContext
+  const { products, isLoading, error } = productContext
 
   const cartContext = useContext(CartContext)
 
@@ -64,9 +64,9 @@ const HomePage = () => {
 
   // Produits filtrés
   const [filteredProducts, setFilteredProducts] = useState<ProductBatch[]>([])
-
-  // Nouvel état pour les produits aléatoires "plus vendus"
-  const [topProducts, setTopProducts] = useState<Product[]>([])
+  
+  // Produits aléatoires "plus vendus"
+  const [topProducts, setTopProducts] = useState<ProductBatch[]>([])
 
   // Ajouter un useEffect pour charger les types depuis l'API
   useEffect(() => {
@@ -92,8 +92,6 @@ const HomePage = () => {
 
     fetchProductTypes()
   }, [])
-  // Produits aléatoires "plus vendus"
-  const [topProducts, setTopProducts] = useState<ProductBatch[]>([])
 
   // Générer des produits aléatoires pour les "plus vendus"
   useEffect(() => {
@@ -162,13 +160,9 @@ const HomePage = () => {
       const normalizedType = normalizeString(type)
 
       results = products.filter((product) => {
-        const normalizedCategory = normalizeString(product.category)
-        const normalizedTypeTitle = normalizeString(product.productType?.title)
-
-        return (
-          normalizedCategory === normalizedType ||
-          normalizedTypeTitle === normalizedType
-        )
+        const normalizedCategory = normalizeString(product.productType)
+        
+        return normalizedCategory === normalizedType
       })
     }
 
@@ -258,7 +252,7 @@ const HomePage = () => {
           width: 300,
           backgroundColor: '#f0f0f0',
           p: 2,
-          height: '100%', // MODIFIÉ: prend toute la hauteur
+          height: '100%',
           overflowY: 'auto',
         }}
       >
@@ -272,13 +266,20 @@ const HomePage = () => {
           fullWidth
           size="small"
           sx={{ my: 2, bgcolor: 'white' }}
+          disabled={loadingTypes}
         >
           <MenuItem value="">Filtrer par type</MenuItem>
-          {productCategories.map((category) => (
-            <MenuItem key={category.value} value={category.value}>
-              {category.label}
-            </MenuItem>
-          ))}
+          {loadingTypes ? (
+            <MenuItem disabled>Chargement...</MenuItem>
+          ) : typeError ? (
+            <MenuItem disabled>Erreur de chargement</MenuItem>
+          ) : (
+            productTypes.map((productType) => (
+              <MenuItem key={productType.id} value={productType.title}>
+                {productType.title}
+              </MenuItem>
+            ))
+          )}
         </Select>
         <TextField
           placeholder="Nom du produit"
@@ -297,156 +298,6 @@ const HomePage = () => {
           CONFIRMER
         </Button>
       </Box>
-          width: '100%',
-          backgroundColor: '#ddd',
-          p: 5,
-          textAlign: 'center',
-        }}
-      >
-        <Typography variant="h5">Produits les plus vendus</Typography>
-        {topProducts.length > 0 ? (
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              mt: 2,
-              px: 4,
-            }}
-          >
-            {/* Informations du produit à gauche */}
-            <Box
-              sx={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                justifyContent: 'center',
-                pr: 4,
-                textAlign: 'left',
-                cursor: 'pointer', // Ajout du curseur pointer
-              }}
-              onClick={() =>
-                handleProductClick(topProducts[currentProductIndex].id)
-              }
-            >
-              <Typography variant="h6" sx={{ mb: 1 }}>
-                {topProducts[currentProductIndex].name}
-              </Typography>
-              <Typography variant="body1" sx={{ mb: 2 }}>
-                Prix: {topProducts[currentProductIndex].price}
-              </Typography>
-
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <IconButton
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleQuantityChange(
-                      topProducts[currentProductIndex].id,
-                      -1
-                    )
-                  }}
-                  size="small"
-                >
-                  <RemoveIcon />
-                </IconButton>
-                <Typography sx={{ mx: 1 }}>
-                  {quantities[topProducts[currentProductIndex].id] || 1}
-                </Typography>
-                <IconButton
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleQuantityChange(topProducts[currentProductIndex].id, 1)
-                  }}
-                  size="small"
-                >
-                  <AddIcon />
-                </IconButton>
-              </Box>
-
-              <Button
-                variant="contained"
-                color="success"
-                startIcon={<AddShoppingCartIcon />}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handleAddToCart(topProducts[currentProductIndex])
-                }}
-              >
-                Ajouter au panier
-              </Button>
-            </Box>
-
-            {/* Image du produit à droite */}
-            <Box sx={{ flex: 1 }}>
-              <img
-                src={topProducts[currentProductIndex].image}
-                alt={topProducts[currentProductIndex].name}
-                style={{
-                  width: 300,
-                  height: 200,
-                  objectFit: 'cover',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-                  cursor: 'pointer', // Ajout du curseur pointer
-                }}
-                onClick={() =>
-                  handleProductClick(topProducts[currentProductIndex].id)
-                }
-              />
-            </Box>
-          </Box>
-        ) : (
-          <Typography variant="body1" sx={{ mt: 2 }}>
-            Aucun produit disponible pour le moment.
-          </Typography>
-        )}
-      </Box>
-
-      {/* Sidebar */}
-      <Box sx={{ display: 'flex', width: '100%' }}>
-        <Box sx={{ width: 350, backgroundColor: '#f0f0f0', p: 2 }}>
-          <Typography variant="h6">Filtrer</Typography>
-          <Select
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-            displayEmpty
-            fullWidth
-            size="small"
-            sx={{ my: 2, bgcolor: 'white' }}
-            disabled={loadingTypes}
-          >
-            <MenuItem value="">Filtrer par type</MenuItem>
-            {loadingTypes ? (
-              <MenuItem disabled>Chargement...</MenuItem>
-            ) : typeError ? (
-              <MenuItem disabled>Erreur de chargement</MenuItem>
-            ) : (
-              productTypes.map((productType) => (
-                <MenuItem key={productType.id} value={productType.title}>
-                  {productType.title}
-                </MenuItem>
-              ))
-            )}
-          </Select>
-          <TextField
-            placeholder="Nom du produit"
-            value={productName}
-            onChange={(e) => setProductName(e.target.value)}
-            fullWidth
-            size="small"
-            sx={{ mb: 2, bgcolor: 'white' }}
-          />
-          <Button
-            variant="contained"
-            color="success"
-            fullWidth
-            onClick={handleFilter}
-          >
-            CONFIRMER
-          </Button>
-        </Box>
 
       {/* Partie droite contenant le carrousel et la liste des produits */}
       <Box
@@ -454,8 +305,8 @@ const HomePage = () => {
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
-          height: '100%', // AJOUT: assure que la boîte prend toute la hauteur
-          overflow: 'hidden', // MODIFIÉ: pour gérer le défilement correctement
+          height: '100%',
+          overflow: 'hidden',
         }}
       >
         {/* Carrousel - hauteur fixe */}
@@ -464,9 +315,9 @@ const HomePage = () => {
             sx={{
               width: '100%',
               backgroundColor: '#ddd',
-              p: 2, // MODIFIÉ: réduit davantage le padding
+              p: 2,
               textAlign: 'center',
-              flexShrink: 0, // AJOUT: empêche le rétrécissement
+              flexShrink: 0,
             }}
           >
             <Typography variant="h5">Produits les plus vendus</Typography>
@@ -580,8 +431,8 @@ const HomePage = () => {
             gap: 2,
             p: 2,
             justifyContent: 'center',
-            overflowY: 'auto', // Permet le défilement interne
-            height: '100%', // AJOUT: utilise l'espace restant
+            overflowY: 'auto',
+            height: '100%',
           }}
         >
           {filteredProducts.length > 0 ? (
