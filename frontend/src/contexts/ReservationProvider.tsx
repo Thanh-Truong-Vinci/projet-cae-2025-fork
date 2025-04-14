@@ -43,7 +43,7 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
             ...reservation,
             reservationDate:
               reservation.reservationDate || new Date().toISOString(),
-            saleDate: reservation.saleDate || null,
+            saleDate: reservation.saleDate || undefined,
             reservationLines: Array.isArray(reservation.reservationLines)
               ? reservation.reservationLines
               : [],
