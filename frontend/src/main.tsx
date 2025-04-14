@@ -160,9 +160,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             <BatchProvider>
               <PhotoProvider>
                 <CartProvider>
-                    <ReservationProvider>
-                  <RouterProvider router={router} />
-                    </ReservationProvider>
+                  <ReservationProvider>
+                    <RouterProvider router={router} />
+                  </ReservationProvider>
                 </CartProvider>
               </PhotoProvider>
             </BatchProvider>
