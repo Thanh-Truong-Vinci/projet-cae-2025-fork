@@ -1,26 +1,28 @@
 package be.vinci.ipl.cae.demo.models.dtos.views;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
-/** BatchView DTO pour l'affichage fusionné des lots avec même produit et prix. */
+/**
+ * DTO représentant les informations d'un lot pour l'affichage.
+ */
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class BatchView {
-  private Long productId;
-  private String productName;
-  private String productType;
-  private String description;
-  private Double unitPrice;
-  private String saleUnit;
-  private Integer totalQuantity;
-  private String imageLocation;
-  private String companyName;
-  private LocalDate earliestProductionDate; // Pour le tri
-  private List<Long> batchIds = new ArrayList<>();
-  private List<Integer> batchQuantities =
-      new ArrayList<>(); // Quantités correspondant à chaque batch
+    private Long id;
+    private String productName;
+    private String productType;
+    private String imageUrl;
+    private LocalDate availabilityDate;
+    private Integer availableQuantity;
+    private Double unitPrice;
+    private String unitType;
+    private Long producerId;
+    private String producerName;
+    private LocalDate createdAt;
+    private String status;
+    private String rejectionReason;
 }

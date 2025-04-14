@@ -4,6 +4,7 @@ import be.vinci.ipl.cae.demo.exceptions.ConflictException;
 import be.vinci.ipl.cae.demo.exceptions.ResourceNotFoundException;
 import be.vinci.ipl.cae.demo.models.dtos.NewBatch;
 import be.vinci.ipl.cae.demo.models.dtos.views.BatchView;
+import be.vinci.ipl.cae.demo.models.dtos.views.ProductBatchView;
 import be.vinci.ipl.cae.demo.models.entities.Batch;
 import be.vinci.ipl.cae.demo.models.entities.Photo;
 import be.vinci.ipl.cae.demo.models.entities.Producer;
@@ -349,7 +350,7 @@ public class BatchController {
    * @return la liste des lots avec le statut RECEIVED
    */
   @GetMapping("/received")
-  public List<Batch> getReceivedBatches() {
+  public List<BatchView> getReceivedBatches() {
     return batchService.getReceivedBatches();
   }
 
@@ -359,7 +360,7 @@ public class BatchController {
    * @return la liste des BatchView fusionnés
    */
   @GetMapping("/received/available-view")
-  public List<BatchView> getReceivedBatchViewsWithAvailableQuantity() {
+  public List<ProductBatchView> getReceivedBatchViewsWithAvailableQuantity() {
     return batchService.getReceivedBatchesWithAvailableQuantity();
   }
 }

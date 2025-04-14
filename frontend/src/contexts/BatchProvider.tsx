@@ -129,12 +129,8 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
       }
 
       const data = await response.json()
-      // Format the data before setting state
-      const formattedBatches = Array.isArray(data)
-        ? data.map((rawBatch) => formatBatch(rawBatch))
-        : []
-      setReceivedBatches(formattedBatches)
-      return formattedBatches
+      setReceivedBatches(data)
+      return data
     } catch (error) {
       setError(
         error instanceof Error ? error.message : 'Une erreur est survenue'
