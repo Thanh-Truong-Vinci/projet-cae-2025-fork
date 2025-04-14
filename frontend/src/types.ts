@@ -198,39 +198,37 @@ export interface PhotoContextType {
 
 // Reservation interfaces
 export interface Reservation {
-  id: number
+  id: number;
   client?: {
-    id: number
-    name: string
-    firstname: string
-  }
-  status: string
-  reservationDate: string
-  saleDate?: string
-  price: number
-  reservationLines: ReservationLine[]
+    id: number;
+    name: string;
+    firstname: string;
+  };
+  status: string;
+  reservationDate: string;
+  saleDate?: string;
+  price: number;
+  reservationLines: ReservationLine[];
 }
 
 export interface ReservationLine {
-  id: number
-  quantity: number
-  batch: Batch
+  id: number;
+  quantity: number;
+  batch: Batch;
 }
 
 export interface ReservationRequest {
-  productId: number
-  quantity: number
+  productId: number;
+  quantity: number;
 }
 
 export interface ReservationContextType {
-  reservations: Reservation[]
-  isLoading: boolean
-  error: string | null
-  fetchReservations: () => Promise<Reservation[]>
-  createReservation: (productId: number, quantity: number) => Promise<void>
-  toPendingReservation: (reservationId: number) => Promise<void>
-  toConfirmReservation: (reservationId: number) => Promise<void>
-  cancelReservation: (reservationId: number) => Promise<void>
+  reservations: Reservation[];
+  isLoading: boolean;
+  error: string | null;
+  fetchReservations: () => Promise<Reservation[]>;
+  createReservation: (productId: number, quantity: number) => Promise<void>;
+  cancelReservation: (reservationId: number) => Promise<void>;
 }
 
 type MaybeAuthenticatedUser = AuthenticatedUser | undefined
