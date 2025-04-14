@@ -266,48 +266,49 @@ public class BatchService {
   public List<BatchView> getReceivedBatches() {
     List<Batch> batches = batchRepository.findByStatus(BatchStatus.RECEIVED);
     List<BatchView> batchViews = new ArrayList<>();
-    
+
     for (Batch batch : batches) {
-        BatchView view = new BatchView();
-        // Informations de base du lot
-        view.setId(batch.getId());
-        view.setAvailabilityDate(batch.getAvailabilityDate());
-        view.setAvailableQuantity(batch.getAvailableQuantity());
-        view.setUnitPrice(batch.getUnitPrice());
-        view.setUnitType(batch.getSaleUnit());
-        view.setStatus(batch.getStatus().toString());
-        view.setCreatedAt(batch.getProductionDate());
-        
-        // Informations du produit
-        if (batch.getProduct() != null) {
-            view.setProductName(batch.getProduct().getName());
-            if (batch.getProduct().getType() != null) {
-                view.setProductType(batch.getProduct().getType().getTitle());
-            }
+      BatchView view = new BatchView();
+      // Informations de base du lot
+      view.setId(batch.getId());
+      view.setAvailabilityDate(batch.getAvailabilityDate());
+      view.setAvailableQuantity(batch.getAvailableQuantity());
+      view.setUnitPrice(batch.getUnitPrice());
+      view.setUnitType(batch.getSaleUnit());
+      view.setStatus(batch.getStatus().toString());
+      view.setCreatedAt(batch.getProductionDate());
+
+      // Informations du produit
+      if (batch.getProduct() != null) {
+        view.setProductName(batch.getProduct().getName());
+        if (batch.getProduct().getType() != null) {
+          view.setProductType(batch.getProduct().getType().getTitle());
         }
-        
-        // Informations de l'image
-        if (batch.getPhoto() != null) {
-            view.setImageUrl(batch.getPhoto().getImageLocation());
+      }
+
+      // Informations de l'image
+      if (batch.getPhoto() != null) {
+        view.setImageUrl(batch.getPhoto().getImageLocation());
+      }
+
+      // Informations du producteur
+      if (batch.getProducer() != null) {
+        view.setProducerId(batch.getProducer().getId());
+        view.setProducerName(batch.getProducer().getCompany());
+      }
+
+      // Informations de rejet si présent
+      if (batch.getNotificationId() != null) {
+        Notification notification =
+            notificationRepository.findById(batch.getNotificationId()).orElse(null);
+        if (notification != null) {
+          view.setRejectionReason(notification.getMessage());
         }
-        
-        // Informations du producteur
-        if (batch.getProducer() != null) {
-            view.setProducerId(batch.getProducer().getId());
-            view.setProducerName(batch.getProducer().getCompany());
-        }
-        
-        // Informations de rejet si présent
-        if (batch.getNotificationId() != null) {
-            Notification notification = notificationRepository.findById(batch.getNotificationId()).orElse(null);
-            if (notification != null) {
-                view.setRejectionReason(notification.getMessage());
-            }
-        }
-        
-        batchViews.add(view);
+      }
+
+      batchViews.add(view);
     }
-    
+
     return batchViews;
   }
 }

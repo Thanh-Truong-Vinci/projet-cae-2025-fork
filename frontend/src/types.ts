@@ -159,7 +159,7 @@ export interface ProductBatch {
   companyName: string
   earliestProductionDate: string
   batchIds: number[]
-  batchQuantities: number[]
+  batchQuantities: number[]   
 }
 
 export interface BatchContextType {
