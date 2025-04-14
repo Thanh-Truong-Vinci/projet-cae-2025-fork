@@ -64,7 +64,7 @@ const HomePage = () => {
 
   // Produits filtrés
   const [filteredProducts, setFilteredProducts] = useState<ProductBatch[]>([])
-  
+
   // Produits aléatoires "plus vendus"
   const [topProducts, setTopProducts] = useState<ProductBatch[]>([])
 
@@ -161,7 +161,7 @@ const HomePage = () => {
 
       results = products.filter((product) => {
         const normalizedCategory = normalizeString(product.productType)
-        
+
         return normalizedCategory === normalizedType
       })
     }
