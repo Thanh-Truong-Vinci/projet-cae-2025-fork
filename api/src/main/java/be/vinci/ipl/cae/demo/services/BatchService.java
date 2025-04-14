@@ -2,6 +2,7 @@ package be.vinci.ipl.cae.demo.services;
 
 import be.vinci.ipl.cae.demo.models.dtos.NewBatch;
 import be.vinci.ipl.cae.demo.models.dtos.views.BatchView;
+import be.vinci.ipl.cae.demo.models.dtos.views.ProductBatchView;
 import be.vinci.ipl.cae.demo.models.entities.Batch;
 import be.vinci.ipl.cae.demo.models.entities.BatchStatus;
 import be.vinci.ipl.cae.demo.models.entities.Notification;
@@ -157,15 +158,6 @@ public class BatchService {
   }
 
   /**
-   * Récupère tous les lots ayant le statut RECEIVED.
-   *
-   * @return la liste des lots reçus
-   */
-  public List<Batch> getReceivedBatches() {
-    return batchRepository.findByStatus(BatchStatus.RECEIVED);
-  }
-
-  /**
    * Récupère tous les lots ayant le statut APPROVED.
    *
    * @param producerId le producteur qui fait la requête
@@ -200,13 +192,13 @@ public class BatchService {
    *
    * @return la liste des BatchView fusionnés avec quantités additionnées
    */
-  public List<BatchView> getReceivedBatchesWithAvailableQuantity() {
+  public List<ProductBatchView> getReceivedBatchesWithAvailableQuantity() {
     // Récupérer les lots RECEIVED avec quantité > 0
     List<Batch> batches =
         batchRepository.findByStatusAndAvailableQuantityGreaterThan(BatchStatus.RECEIVED, 0);
 
     // Map pour regrouper les lots par productId + unitPrice + saleUnit + photoId + companyName
-    Map<String, BatchView> batchViewMap = new HashMap<>();
+    Map<String, ProductBatchView> batchViewMap = new HashMap<>();
 
     for (Batch batch : batches) {
       // Clé composite pour regroupement incluant l'ID de la photo et le nom d'entreprise
@@ -228,7 +220,7 @@ public class BatchService {
 
       if (batchViewMap.containsKey(key)) {
         // Lot similaire trouvé, fusionner
-        BatchView existingView = batchViewMap.get(key);
+        ProductBatchView existingView = batchViewMap.get(key);
         existingView.setTotalQuantity(
             existingView.getTotalQuantity() + batch.getAvailableQuantity());
         existingView.getBatchIds().add(batch.getId());
@@ -240,7 +232,7 @@ public class BatchService {
         }
       } else {
         // Nouveau groupe, créer un BatchView
-        BatchView batchView = new BatchView();
+        ProductBatchView batchView = new ProductBatchView();
         batchView.setProductId(batch.getProduct().getId());
         batchView.setProductName(batch.getProduct().getName());
         batchView.setProductType(batch.getProduct().getType().getTitle());
@@ -260,9 +252,62 @@ public class BatchService {
     }
 
     // Convertir la map en liste et trier par date de production
-    List<BatchView> result = new ArrayList<>(batchViewMap.values());
-    result.sort(Comparator.comparing(BatchView::getEarliestProductionDate));
+    List<ProductBatchView> result = new ArrayList<>(batchViewMap.values());
+    result.sort(Comparator.comparing(ProductBatchView::getEarliestProductionDate));
 
     return result;
+  }
+
+  /**
+   * Récupère tous les lots ayant le statut RECEIVED et les convertit en DTO BatchView.
+   *
+   * @return la liste des lots reçus au format BatchView
+   */
+  public List<BatchView> getReceivedBatches() {
+    List<Batch> batches = batchRepository.findByStatus(BatchStatus.RECEIVED);
+    List<BatchView> batchViews = new ArrayList<>();
+    
+    for (Batch batch : batches) {
+        BatchView view = new BatchView();
+        // Informations de base du lot
+        view.setId(batch.getId());
+        view.setAvailabilityDate(batch.getAvailabilityDate());
+        view.setAvailableQuantity(batch.getAvailableQuantity());
+        view.setUnitPrice(batch.getUnitPrice());
+        view.setUnitType(batch.getSaleUnit());
+        view.setStatus(batch.getStatus().toString());
+        view.setCreatedAt(batch.getProductionDate());
+        
+        // Informations du produit
+        if (batch.getProduct() != null) {
+            view.setProductName(batch.getProduct().getName());
+            if (batch.getProduct().getType() != null) {
+                view.setProductType(batch.getProduct().getType().getTitle());
+            }
+        }
+        
+        // Informations de l'image
+        if (batch.getPhoto() != null) {
+            view.setImageUrl(batch.getPhoto().getImageLocation());
+        }
+        
+        // Informations du producteur
+        if (batch.getProducer() != null) {
+            view.setProducerId(batch.getProducer().getId());
+            view.setProducerName(batch.getProducer().getCompany());
+        }
+        
+        // Informations de rejet si présent
+        if (batch.getNotificationId() != null) {
+            Notification notification = notificationRepository.findById(batch.getNotificationId()).orElse(null);
+            if (notification != null) {
+                view.setRejectionReason(notification.getMessage());
+            }
+        }
+        
+        batchViews.add(view);
+    }
+    
+    return batchViews;
   }
 }
