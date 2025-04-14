@@ -137,15 +137,6 @@ const NavBar = () => {
           >
             Gérer les Types
           </Button>
-          {/* Add link to received products page */}
-          <IconButton
-            onClick={() => navigate('/received-products')}
-            sx={{ mr: 1 }}
-            aria-label="produits-recus"
-            title="Produits reçus"
-          >
-            <InventoryIcon />
-          </IconButton>
         </>
       )}
 

@@ -103,21 +103,22 @@ public class ReservationService {
     if (reservation == null) {
       return null;
     }
-    
+
     // If changing to CANCELLED status, return items to stock
-    if (newStatus == ReservationStatus.CANCELLED && reservation.getStatus() != ReservationStatus.CANCELLED) {
+    if (newStatus == ReservationStatus.CANCELLED
+        && reservation.getStatus() != ReservationStatus.CANCELLED) {
       for (ReservationLine line : reservation.getReservationLines()) {
         Batch batch = line.getBatch();
         batch.setAvailableQuantity(batch.getAvailableQuantity() + line.getQuantity());
         batchRepository.save(batch);
       }
     }
-    
+
     // If confirming a reservation, set the sale date
     if (newStatus == ReservationStatus.CONFIRMED) {
       reservation.setSaleDate(LocalDate.now());
     }
-    
+
     reservation.setStatus(newStatus);
     return reservationRepository.save(reservation);
   }

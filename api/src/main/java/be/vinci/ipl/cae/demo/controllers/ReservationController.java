@@ -92,8 +92,7 @@ public class ReservationController {
    * @throws ConflictException if the reservation ID is missing.
    */
   @PostMapping("/toConfirm")
-  public void toConfirm(
-      @RequestBody Long reservationId) {
+  public void toConfirm(@RequestBody Long reservationId) {
     if (reservationId == null) {
       throw new ConflictException("Reservation ID is required");
     }
@@ -113,7 +112,7 @@ public class ReservationController {
       @RequestBody Long reservationId, @RequestHeader("Authorization") String token) {
     validateAndChangeStatus(reservationId, token, ReservationStatus.CANCELLED);
   }
-  
+
   /**
    * Validates client token and reservation ID, then changes reservation status.
    *
@@ -134,4 +133,3 @@ public class ReservationController {
     reservationService.changeStatus(reservationId, status);
   }
 }
-
