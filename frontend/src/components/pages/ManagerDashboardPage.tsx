@@ -46,7 +46,7 @@ const ReceivedProductsPage = () => {
     error: batchesError,
   } = useContext(BatchContext)!
 
-  const { authenticatedUser } = useContext(UserContext)!
+  const { authenticatedUser } = useContext(UserContext)
   const [productsWithBatches, setProductsWithBatches] = useState<
     ProductWithBatches[]
   >([])

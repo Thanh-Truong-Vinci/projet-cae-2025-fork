@@ -29,7 +29,6 @@ const HomePage = () => {
   const [loadingTypes, setLoadingTypes] = useState<boolean>(false)
   const [typeError, setTypeError] = useState<string | null>(null)
 
-  // Utilisation du ProductContext
   const productContext = useContext(ProductContext)
 
   if (!productContext) {

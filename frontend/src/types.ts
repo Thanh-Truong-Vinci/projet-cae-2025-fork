@@ -153,22 +153,39 @@ export interface ProductBatch {
   batchQuantities: number[]   
 }
 
+export interface ManagerBatch {
+  id: number
+  productName: string
+  productType: string
+  imageLocation: string
+  description: string
+  availabilityDate: string
+  availableQuantity: number
+  unitPrice: number
+  unitType: string
+  producerId: number
+  producerName: string
+  createdAt:  string
+  status: string
+  }
+
 export interface BatchContextType {
   myBatches: Batch[]
+  managerBatches: ManagerBatch[]
   approvedBatches: Batch[]
-  receivedBatches: Batch[] // Added receivedBatches state
+  receivedBatches: Batch[]
   isLoading: boolean
   error: string | null
   fetchMyBatches: () => Promise<void>
+  fetchManagerBatches: () => Promise<void>
   fetchApprovedBatches: () => Promise<void>
-  fetchReceivedBatches: () => Promise<Batch[]> // Added fetch method for received batches
+  fetchReceivedBatches: () => Promise<Batch[]>
   receiveBatch: (batchId: number) => Promise<Batch | null>
   createBatch: (newBatch: NewBatch, image: File) => Promise<void>
   updateBatchImage: (batchId: number, image: File) => Promise<Batch | null>
-  updateBatchImageById: (
-    batchId: number,
-    imageId: number
-  ) => Promise<Batch | null>
+  updateBatchImageById: (batchId: number, imageId: number) => Promise<Batch | null>
+  acceptBatch: (batchId: number) => Promise<void>
+  rejectBatch: (batchId: number, rejectionReason: string) => Promise<void>
 }
 
 export interface Photo {

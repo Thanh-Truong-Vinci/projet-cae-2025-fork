@@ -4,6 +4,7 @@ import be.vinci.ipl.cae.demo.exceptions.ConflictException;
 import be.vinci.ipl.cae.demo.exceptions.ResourceNotFoundException;
 import be.vinci.ipl.cae.demo.models.dtos.NewBatch;
 import be.vinci.ipl.cae.demo.models.dtos.views.BatchView;
+import be.vinci.ipl.cae.demo.models.dtos.views.ManagerBatchView;
 import be.vinci.ipl.cae.demo.models.dtos.views.ProductBatchView;
 import be.vinci.ipl.cae.demo.models.entities.Batch;
 import be.vinci.ipl.cae.demo.models.entities.Photo;
@@ -362,5 +363,16 @@ public class BatchController {
   @GetMapping("/received/available-view")
   public List<ProductBatchView> getReceivedBatchViewsWithAvailableQuantity() {
     return batchService.getReceivedBatchesWithAvailableQuantity();
+  }
+
+  /**
+   * Récupère tous les lots en attente.
+   *
+   * @return la liste des lots avec le statut PENDING
+   */
+  @GetMapping("/pending")
+  @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
+  public List<ManagerBatchView> getManagerBatches() {
+    return batchService.getManagerBatches();
   }
 }

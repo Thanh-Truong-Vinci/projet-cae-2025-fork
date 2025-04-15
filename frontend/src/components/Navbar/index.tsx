@@ -5,6 +5,8 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import ReceiptIcon from '@mui/icons-material/Receipt'
 import AddBoxIcon from '@mui/icons-material/AddBox'
 import PersonIcon from '@mui/icons-material/Person'
+import AssignmentIcon from '@mui/icons-material/Assignment'
+import { Link } from 'react-router-dom'
 import { UserContext } from '../../contexts/UserContext'
 import { UserContextType } from '../../types'
 import { CartContext } from '../../contexts/CartContext'
@@ -135,6 +137,14 @@ const NavBar = () => {
             onClick={() => navigate('/manage-product-types')}
           >
             Gérer les Types
+          </Button>
+          <Button
+            color="inherit"
+            component={Link}
+            to="/pending-batches"
+            startIcon={<AssignmentIcon />}
+          >
+            Lots en attente
           </Button>
         </>
       )}
