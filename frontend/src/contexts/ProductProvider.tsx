@@ -39,13 +39,13 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchAllProducts = useCallback(async () => {
     try {
-      setLoadingAllProducts(true);
-      const response = await fetch('/api/products');
+      setLoadingAllProducts(true)
+      const response = await fetch('/api/products')
       if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
+        throw new Error(`Error ${response.status}: ${response.statusText}`)
       }
-      const data = await response.json();
-      
+      const data = await response.json()
+
       // Map the API response to match our Product interface
       const mappedProducts = data.map((item: any) => ({
         id: item.id,
@@ -54,19 +54,19 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
         productType: item.type, // Keep the whole type object
         image: item.photo?.imageLocation || '',
         type: item.type,
-        photo: item.photo
-      }));
-      
-      setAllProducts(mappedProducts);
-      return mappedProducts;
+        photo: item.photo,
+      }))
+
+      setAllProducts(mappedProducts)
+      return mappedProducts
     } catch (error) {
-      console.error('Error fetching all products:', error);
-      setError('Failed to load all products');
-      return [];
+      console.error('Error fetching all products:', error)
+      setError('Failed to load all products')
+      return []
     } finally {
-      setLoadingAllProducts(false);
+      setLoadingAllProducts(false)
     }
-  }, []);
+  }, [])
 
   const getProductById = useCallback(
     (id: number) => products.find((product) => product.productId === id),
@@ -118,7 +118,7 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
         getProductById,
         getProductsByCategory,
         getCategoryLabel,
-        fetchAllProducts
+        fetchAllProducts,
       }}
     >
       {children}

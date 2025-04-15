@@ -195,12 +195,15 @@ const AddBatchPage = () => {
   }
 
   const handleProductNameChange = (value: string) => {
-    setProductName(value);
-    
+    setProductName(value)
+
     // If fields are locked and the name doesn't match any product in the list, unlock them
-    if (fieldsLocked && productContext && 
-        !productContext.allProducts.some(p => p.name === value)) {
-      setFieldsLocked(false);
+    if (
+      fieldsLocked &&
+      productContext &&
+      !productContext.allProducts.some((p) => p.name === value)
+    ) {
+      setFieldsLocked(false)
     }
   }
 
@@ -263,11 +266,8 @@ const AddBatchPage = () => {
         if (productImage) {
           await batchContext.createBatch(batchData, productImage)
         } else if (imagePreview) {
-          await batchContext.createBatch(
-            batchData,
-            new File([], 'placeholder')
-          )
-          throw new Error("Using existing product images is not yet supported")
+          await batchContext.createBatch(batchData, new File([], 'placeholder'))
+          throw new Error('Using existing product images is not yet supported')
         } else {
           throw new Error("L'image du produit est requise")
         }
@@ -295,9 +295,9 @@ const AddBatchPage = () => {
         navigate('/producer-dashboard')
       }, 2000)
     } catch (error) {
-      console.error('Erreur lors de l\'ajout du lot:', error)
+      console.error("Erreur lors de l'ajout du lot:", error)
       setSnackbarMessage(
-        error instanceof Error ? error.message : 'Erreur lors de l\'ajout du lot'
+        error instanceof Error ? error.message : "Erreur lors de l'ajout du lot"
       )
       setSnackbarSeverity('error')
       setOpenSnackbar(true)
@@ -329,7 +329,9 @@ const AddBatchPage = () => {
               <Autocomplete
                 id="product-name-autocomplete"
                 options={productContext ? productContext.allProducts : []}
-                loading={productContext ? productContext.loadingAllProducts : false}
+                loading={
+                  productContext ? productContext.loadingAllProducts : false
+                }
                 getOptionLabel={(option: Product | string) => {
                   return typeof option === 'string' ? option : option.name
                 }}
@@ -355,8 +357,9 @@ const AddBatchPage = () => {
                 freeSolo
                 onInputChange={(_, value) => handleProductNameChange(value)}
                 value={
-                  productContext?.allProducts.find((p) => p.name === productName) ||
-                  null
+                  productContext?.allProducts.find(
+                    (p) => p.name === productName
+                  ) || null
                 }
               />
             </Grid>
