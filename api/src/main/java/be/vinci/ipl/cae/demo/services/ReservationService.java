@@ -22,12 +22,13 @@ public class ReservationService {
   private final ProductService productService;
 
   /**
-   * Constructs a new ReservationService with the specified repositories and services.
+   * Constructs a new ReservationService with the specified repositories and
+   * services.
    *
-   * @param reservationRepository the repository for reservations
-   * @param batchRepository the repository for batches
+   * @param reservationRepository  the repository for reservations
+   * @param batchRepository        the repository for batches
    * @param reservationLineService the service for reservation lines
-   * @param productService the service for products
+   * @param productService         the service for products
    */
   public ReservationService(
       ReservationRepository reservationRepository,
@@ -41,10 +42,11 @@ public class ReservationService {
   }
 
   /**
-   * Creates a new reservation for a client with the specified product and quantity.
+   * Creates a new reservation for a client with the specified product and
+   * quantity.
    *
-   * @param client the client making the reservation
-   * @param product the product to reserve
+   * @param client   the client making the reservation
+   * @param product  the product to reserve
    * @param quantity the quantity of the product to reserve
    * @return the created reservation
    */
@@ -52,18 +54,22 @@ public class ReservationService {
     Reservation reservation = new Reservation();
     reservation.setClient(client);
     reservation.setPrice(0.0);
-    reservation.setStatus(ReservationStatus.BUILDING);
+    reservation.setStatus(ReservationStatus.PENDING);
     reservation.setReservationDate(LocalDate.now());
+
+    // Save the reservation first to avoid transient property issues
+    reservation = reservationRepository.save(reservation);
+
     reservationLineService.addProduct(reservation, product, quantity);
-    return reservationRepository.save(reservation);
+    return reservation;
   }
 
   /**
    * Reserves a product for a client with the specified quantity.
    *
-   * @param client the client making the reservation
+   * @param client    the client making the reservation
    * @param productId the ID of the product to reserve
-   * @param quantity the quantity of the product to reserve
+   * @param quantity  the quantity of the product to reserve
    * @return the updated reservation or null if product not found
    */
   public Reservation reserveProduct(Client client, Long productId, int quantity) {
@@ -72,10 +78,17 @@ public class ReservationService {
       return null;
     }
 
-    Reservation reservation =
-        reservationRepository
-            .findByClientAndStatus(client, ReservationStatus.BUILDING.name())
-            .orElseGet(() -> createReservation(client, product, quantity));
+    Reservation reservation = reservationRepository
+        .findByClientAndStatus(client, ReservationStatus.PENDING)
+        .orElseGet(() -> {
+          // Create and save the reservation first
+          Reservation newReservation = new Reservation();
+          newReservation.setClient(client);
+          newReservation.setPrice(0.0);
+          newReservation.setStatus(ReservationStatus.PENDING);
+          newReservation.setReservationDate(LocalDate.now());
+          return reservationRepository.save(newReservation);
+        });
 
     reservationLineService.addProduct(reservation, product, quantity);
     return reservationRepository.save(reservation);
@@ -95,7 +108,7 @@ public class ReservationService {
    * Changes the status of a reservation.
    *
    * @param reservationId the ID of the reservation to update
-   * @param newStatus the new status for the reservation
+   * @param newStatus     the new status for the reservation
    * @return the updated reservation, or null if the reservation was not found
    */
   public Reservation changeStatus(Long reservationId, ReservationStatus newStatus) {
@@ -105,8 +118,7 @@ public class ReservationService {
     }
 
     // If changing to CANCELLED status, return items to stock
-    if (newStatus == ReservationStatus.CANCELLED
-        && reservation.getStatus() != ReservationStatus.CANCELLED) {
+    if (newStatus == ReservationStatus.CANCELLED && reservation.getStatus() != ReservationStatus.CANCELLED) {
       for (ReservationLine line : reservation.getReservationLines()) {
         Batch batch = line.getBatch();
         batch.setAvailableQuantity(batch.getAvailableQuantity() + line.getQuantity());
