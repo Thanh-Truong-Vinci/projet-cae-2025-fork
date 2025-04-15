@@ -18,7 +18,7 @@ import {
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart'
-import { CartContext } from '../../contexts/CartContext'
+import { ReservationContext } from '../../contexts/ReservationContext'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { ProductContext } from '../../contexts/ProductContext'
 import { ProductType } from '../../types'
@@ -40,15 +40,15 @@ const HomePage = () => {
 
   const { products, isLoading, error } = productContext
 
-  const cartContext = useContext(CartContext)
+  const reservationContext = useContext(ReservationContext)
 
-  if (!cartContext) {
+  if (!reservationContext) {
     throw new Error(
-      "CartContext doit être utilisé à l'intérieur d'un CartProvider"
+      "ReservationContext doit être utilisé à l'intérieur d'un ReservationProvider"
     )
   }
 
-  const { addToCart } = cartContext
+  const { createReservation } = reservationContext
 
   const [type, setType] = useState('')
   const [productName, setProductName] = useState('')
@@ -184,17 +184,8 @@ const HomePage = () => {
     }))
   }
 
-  const handleAddToCart = (product: ProductBatch) => {
-    addToCart({
-      id: product.productId,
-      name: product.productName,
-      price: `${product.unitPrice} € / ${product.saleUnit}`,
-      image: product.imageLocation || '/placeholder.jpg',
-      quantity: quantities[product.productId] || 1,
-      unitType: product.saleUnit,
-      category: product.productType,
-      batchIds: product.batchIds,
-    })
+  const handleAddToReservation = (productBatch: ProductBatch) => {
+    createReservation(productBatch.productId, quantities[productBatch.productId] || 1)
   }
 
   const handleProductClick = (product: ProductBatch) => {
@@ -391,10 +382,10 @@ const HomePage = () => {
                   startIcon={<AddShoppingCartIcon />}
                   onClick={(e) => {
                     e.stopPropagation()
-                    handleAddToCart(topProducts[currentProductIndex])
+                    handleAddToReservation(topProducts[currentProductIndex])
                   }}
                 >
-                  Ajouter au panier
+                  Ajouter à la réservation
                 </Button>
               </Box>
               {/* Image du produit */}
@@ -542,7 +533,7 @@ const HomePage = () => {
                       color="success"
                       onClick={(e) => {
                         e.stopPropagation()
-                        handleAddToCart(product)
+                        handleAddToReservation(product)
                       }}
                       sx={{ minWidth: 'unset', px: 1 }}
                     >
