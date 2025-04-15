@@ -98,7 +98,6 @@ const AddBatchPage = () => {
       try {
         if (productContext) {
           await productContext.fetchAllProducts()
-          // Remove the variable declaration since we don't use it
         } else {
           console.error("ProductContext n'est pas disponible")
           setSnackbarMessage(
@@ -142,18 +141,13 @@ const AddBatchPage = () => {
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0]
-
-      // Get the file extension
       const fileExtension = selectedFile.name.split('.').pop() || ''
-
-      // Create a new File with the name "image" + original extension
       const renamedFile = new File([selectedFile], `image.${fileExtension}`, {
         type: selectedFile.type,
       })
 
       setProductImage(renamedFile)
 
-      // Preview remains the same
       const reader = new FileReader()
       reader.onload = () => {
         setImagePreview(reader.result as string)
@@ -185,25 +179,17 @@ const AddBatchPage = () => {
       } else if (product.image) {
         setImagePreview(product.image)
       }
-
-      // Lock the fields when a product is selected
       setFieldsLocked(true)
     } else {
-      // If no product is selected, unlock the fields
       setFieldsLocked(false)
     }
   }
 
   const handleProductNameChange = (value: string) => {
-    setProductName(value)
-
-    // If fields are locked and the name doesn't match any product in the list, unlock them
-    if (
-      fieldsLocked &&
-      productContext &&
-      !productContext.allProducts.some((p) => p.name === value)
-    ) {
-      setFieldsLocked(false)
+    setProductName(value);
+    if (fieldsLocked && productContext && 
+        !productContext.allProducts.some(p => p.name === value)) {
+      setFieldsLocked(false);
     }
   }
 
@@ -266,8 +252,11 @@ const AddBatchPage = () => {
         if (productImage) {
           await batchContext.createBatch(batchData, productImage)
         } else if (imagePreview) {
-          await batchContext.createBatch(batchData, new File([], 'placeholder'))
-          throw new Error('Using existing product images is not yet supported')
+          await batchContext.createBatch(
+            batchData,
+            new File([], 'placeholder')
+          )
+          throw new Error("Using existing product images is not yet supported")
         } else {
           throw new Error("L'image du produit est requise")
         }
@@ -295,9 +284,9 @@ const AddBatchPage = () => {
         navigate('/producer-dashboard')
       }, 2000)
     } catch (error) {
-      console.error("Erreur lors de l'ajout du lot:", error)
+      console.error('Erreur lors de l\'ajout du lot:', error)
       setSnackbarMessage(
-        error instanceof Error ? error.message : "Erreur lors de l'ajout du lot"
+        error instanceof Error ? error.message : 'Erreur lors de l\'ajout du lot'
       )
       setSnackbarSeverity('error')
       setOpenSnackbar(true)
@@ -329,9 +318,7 @@ const AddBatchPage = () => {
               <Autocomplete
                 id="product-name-autocomplete"
                 options={productContext ? productContext.allProducts : []}
-                loading={
-                  productContext ? productContext.loadingAllProducts : false
-                }
+                loading={productContext ? productContext.loadingAllProducts : false}
                 getOptionLabel={(option: Product | string) => {
                   return typeof option === 'string' ? option : option.name
                 }}
@@ -357,9 +344,8 @@ const AddBatchPage = () => {
                 freeSolo
                 onInputChange={(_, value) => handleProductNameChange(value)}
                 value={
-                  productContext?.allProducts.find(
-                    (p) => p.name === productName
-                  ) || null
+                  productContext?.allProducts.find((p) => p.name === productName) ||
+                  null
                 }
               />
             </Grid>

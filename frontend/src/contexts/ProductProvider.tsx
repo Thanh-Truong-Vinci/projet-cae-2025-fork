@@ -13,7 +13,6 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     const fetchProducts = async () => {
       try {
         setIsLoading(true)
-        // Use the updated endpoint path that matches your backend
         const response = await fetch('/api/batches/received/available-view')
 
         if (!response.ok) {
@@ -46,12 +45,12 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
       }
       const data = await response.json()
 
-      // Map the API response to match our Product interface
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mappedProducts = data.map((item: any) => ({
         id: item.id,
         name: item.name,
         description: item.description,
-        productType: item.type, // Keep the whole type object
+        productType: item.type,
         image: item.photo?.imageLocation || '',
         type: item.type,
         photo: item.photo,
