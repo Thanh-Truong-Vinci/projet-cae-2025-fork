@@ -5,7 +5,6 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import ReceiptIcon from '@mui/icons-material/Receipt'
 import AddBoxIcon from '@mui/icons-material/AddBox'
 import PersonIcon from '@mui/icons-material/Person'
-import InventoryIcon from '@mui/icons-material/Inventory' // Add this import
 import { UserContext } from '../../contexts/UserContext'
 import { UserContextType } from '../../types'
 import { CartContext } from '../../contexts/CartContext'
