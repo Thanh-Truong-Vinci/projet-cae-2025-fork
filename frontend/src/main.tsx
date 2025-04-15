@@ -31,6 +31,7 @@ import { PhotoProvider } from './contexts/PhotoProvider.tsx'
 import ManageProductTypesPage from './components/pages/ManageProductTypesPage.tsx'
 import { ProductTypeProvider } from './contexts/ProductTypeProvider.tsx'
 import { ReservationProvider } from './contexts/ReservationProvider'
+import HandlePendingBatchesPage from './components/pages/HandlePendingBatchesPage'
 
 const router = createBrowserRouter([
   {
@@ -138,6 +139,14 @@ const router = createBrowserRouter([
         element: (
           <SimpleProtectedRoute requiredRole="Manager">
             <ManageProductTypesPage />
+          </SimpleProtectedRoute>
+        ),
+      },
+      {
+        path: 'pending-batches',
+        element: (
+          <SimpleProtectedRoute requiredRole="Manager">
+            <HandlePendingBatchesPage />
           </SimpleProtectedRoute>
         ),
       },

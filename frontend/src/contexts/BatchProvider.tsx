@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext, ReactNode, useCallback } from 'react'
 import axios from 'axios'
 import { BatchContext } from './BatchContext'
-import { Batch, NewBatch } from '../types'
+import { Batch, ManagerBatch, NewBatch } from '../types'
 import { UserContext } from './UserContext'
 
 interface BatchProviderProps {
@@ -10,6 +10,7 @@ interface BatchProviderProps {
 
 export const BatchProvider = ({ children }: BatchProviderProps) => {
   const [myBatches, setMyBatches] = useState<Batch[]>([])
+  const [managerBatches, setManagerBatches] = useState<ManagerBatch[]>([])
   const [approvedBatches, setApprovedBatches] = useState<Batch[]>([])
   const [receivedBatches, setReceivedBatches] = useState<Batch[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -78,6 +79,45 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
         : []
 
       setMyBatches(formattedBatches)
+    } catch (err) {
+      console.error('Erreur lors de la récupération des lots:', err)
+      if (err instanceof Error) {
+        setError(`Impossible de charger vos lots: ${err.message}`)
+      } else {
+        setError('Impossible de charger vos lots')
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  }, [authenticatedUser])
+
+  const fetchManagerBatches = useCallback(async () => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      if (!authenticatedUser) {
+        throw new Error('Vous devez être authentifié pour accéder à vos lots')
+      }
+
+      // Utilisation de fetch avec méthode GET
+      const response = await fetch('/api/batches/pending', {
+        method: 'GET',
+        headers: {
+          Authorization: authenticatedUser.token,
+          'Content-Type': 'application/json',
+        },
+      })
+
+      // Vérification de la réponse
+      if (!response.ok) {
+        throw new Error(`Erreur: ${response.status} ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      console.log('Réponse API batches:', data)
+
+      setManagerBatches(data)
     } catch (err) {
       console.error('Erreur lors de la récupération des lots:', err)
       if (err instanceof Error) {
@@ -362,6 +402,74 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
     }
   }
 
+  const acceptBatch = useCallback(async (batchId: number): Promise<void> => {
+    setIsLoading(true)
+    setError(null)
+    
+    try {
+      if (!authenticatedUser) {
+        throw new Error('Vous devez être authentifié pour accepter un lot')
+      }
+  
+      const response = await fetch(`/api/batches/${batchId}/accept`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': authenticatedUser.token,
+          'Content-Type': 'application/json'
+        }
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Erreur: ${response.status}`)
+      }
+      
+      // Recharger les lots pour mettre à jour l'interface
+      await fetchManagerBatches()
+    } catch (err) {
+      console.error('Erreur lors de l\'acceptation du lot:', err)
+      setError(err instanceof Error ? err.message : 'Erreur inconnue')
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }, [authenticatedUser, fetchManagerBatches])
+  
+  const rejectBatch = useCallback(async (batchId: number, rejectionReason: string): Promise<void> => {
+    setIsLoading(true)
+    setError(null)
+    
+    try {
+      if (!authenticatedUser) {
+        throw new Error('Vous devez être authentifié pour rejeter un lot')
+      }
+  
+      if (!rejectionReason.trim()) {
+        throw new Error('Une raison de rejet est requise')
+      }
+      
+      const response = await fetch(`/api/batches/${batchId}/reject?message=${encodeURIComponent(rejectionReason)}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': authenticatedUser.token,
+          'Content-Type': 'application/json'
+        }
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Erreur: ${response.status}`)
+      }
+      
+      // Recharger les lots pour mettre à jour l'interface
+      await fetchManagerBatches()
+    } catch (err) {
+      console.error('Erreur lors du rejet du lot:', err)
+      setError(err instanceof Error ? err.message : 'Erreur inconnue')
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }, [authenticatedUser, fetchManagerBatches])
+
   useEffect(() => {
     if (authenticatedUser?.role === 'Volunteer') {
       fetchApprovedBatches()
@@ -372,10 +480,12 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
     <BatchContext.Provider
       value={{
         myBatches,
+        managerBatches,
         approvedBatches,
         receivedBatches,
         isLoading,
         error,
+        fetchManagerBatches,
         fetchApprovedBatches,
         fetchMyBatches,
         fetchReceivedBatches,
@@ -383,6 +493,8 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
         createBatch,
         updateBatchImage,
         updateBatchImageById,
+        acceptBatch,
+        rejectBatch,
       }}
     >
       {children}
