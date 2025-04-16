@@ -88,7 +88,7 @@ const HandlePendingBatchesPage = () => {
         setLoading(false)
       }
     },
-    [acceptBatch, fetchPendingBatches]
+    [acceptBatch]
   )
 
   const handleRejectClick = (batch: PendingBatch) => {
