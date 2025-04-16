@@ -68,12 +68,18 @@ interface LoginUser {
 export interface Product {
   id: number
   name: string
-  price: string
   image: string
-  category: string
   description: string
-  unitType: string
   productType?: ProductType
+  type?: {
+    id: number
+    title: string
+  }
+  photo?: {
+    id: number
+    productName: string
+    imageLocation: string
+  }
 }
 
 export interface ProductType {
@@ -104,9 +110,12 @@ export interface CartItem {
 
 export interface ProductContextType {
   products: ProductBatch[]
+  allProducts: Product[]
+  loadingAllProducts: boolean
   getProductById: (id: number) => ProductBatch | undefined
   getProductsByCategory: (category: string) => ProductBatch[]
   getCategoryLabel: (category: string) => string
+  fetchAllProducts: () => Promise<void>
   isLoading: boolean
   error: string | null
 }

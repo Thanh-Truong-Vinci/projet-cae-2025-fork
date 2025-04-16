@@ -1,17 +1,18 @@
 import { useState, useEffect, ReactNode, useCallback } from 'react'
 import { ProductContext } from './ProductContext'
-import { ProductBatch } from '../types'
+import { ProductBatch, Product } from '../types'
 
 export const ProductProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<ProductBatch[]>([])
+  const [allProducts, setAllProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [loadingAllProducts, setLoadingAllProducts] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setIsLoading(true)
-        // Use the updated endpoint path that matches your backend
         const response = await fetch('/api/batches/received/available-view')
 
         if (!response.ok) {
@@ -35,6 +36,37 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     fetchProducts()
   }, [])
 
+  const fetchAllProducts = useCallback(async () => {
+    try {
+      setLoadingAllProducts(true)
+      const response = await fetch('/api/products')
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`)
+      }
+      const data = await response.json()
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const mappedProducts = data.map((item: any) => ({
+        id: item.id,
+        name: item.name,
+        description: item.description,
+        productType: item.type,
+        image: item.photo?.imageLocation || '',
+        type: item.type,
+        photo: item.photo,
+      }))
+
+      setAllProducts(mappedProducts)
+      return mappedProducts
+    } catch (error) {
+      console.error('Error fetching all products:', error)
+      setError('Failed to load all products')
+      return []
+    } finally {
+      setLoadingAllProducts(false)
+    }
+  }, [])
+
   const getProductById = useCallback(
     (id: number) => products.find((product) => product.productId === id),
     [products]
@@ -46,7 +78,6 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     [products]
   )
 
-  // Version simplifiée sans dépendance à categoryLabels
   const getCategoryLabel = useCallback(
     (category: string) => {
       // Vérifier si un produit avec cette catégorie existe et a un type
@@ -79,11 +110,14 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     <ProductContext.Provider
       value={{
         products,
+        allProducts,
+        loadingAllProducts,
         isLoading,
         error,
         getProductById,
         getProductsByCategory,
         getCategoryLabel,
+        fetchAllProducts,
       }}
     >
       {children}

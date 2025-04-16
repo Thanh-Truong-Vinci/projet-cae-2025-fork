@@ -52,7 +52,7 @@ public class ReservationService {
     Reservation reservation = new Reservation();
     reservation.setClient(client);
     reservation.setPrice(0.0);
-    reservation.setStatus(ReservationStatus.PENDING);
+    reservation.setStatus(ReservationStatus.BUILDING);
     reservation.setReservationDate(LocalDate.now());
     reservationLineService.addProduct(reservation, product, quantity);
     return reservationRepository.save(reservation);
@@ -74,7 +74,7 @@ public class ReservationService {
 
     Reservation reservation =
         reservationRepository
-            .findByClientAndStatus(client, ReservationStatus.PENDING)
+            .findByClientAndStatus(client, ReservationStatus.BUILDING)
             .orElseGet(() -> createReservation(client, product, quantity));
 
     reservationLineService.addProduct(reservation, product, quantity);
