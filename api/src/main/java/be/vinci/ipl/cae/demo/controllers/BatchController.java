@@ -182,32 +182,20 @@ public class BatchController {
   @PatchMapping("/{id}/accept")
   @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
   public Batch acceptBatch(@PathVariable long id) {
-    // TODO verify token if is a manager
-    Batch batch = batchService.acceptBatch(id);
-    // TODO remove verification
-    if (batch == null) {
-      throw new ResourceNotFoundException("Lot non trouvé");
-    }
-    return batch;
+    return batchService.acceptBatch(id);
   }
 
   /**
    * Rejette un lot avec un message de notification.
    *
    * @param id l'identifiant du lot à rejeter
-   * @param message le message expliquant le rejet
+   * @param message le message expliquant le rejet (optionnel)
    * @return le lot rejeté
    */
   @PatchMapping("/{id}/reject")
   @PreAuthorize("hasRole('ROLE_MANAGER')")
-  public Batch rejectBatch(@PathVariable long id, @RequestParam String message) {
-    // TODO verify token if is a manager
-    Batch batch = batchService.rejectBatch(id, message);
-    // TODO remove verification
-    if (batch == null) {
-      throw new ResourceNotFoundException("Lot non trouvé");
-    }
-    return batch;
+  public Batch rejectBatch(@PathVariable long id, @RequestParam(required = false) String message) {
+    return batchService.rejectBatch(id, message);
   }
 
   /**
@@ -372,7 +360,7 @@ public class BatchController {
    */
   @GetMapping("/pending")
   @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
-  public List<ManagerBatchView> getManagerBatches() {
-    return batchService.getManagerBatches();
+  public List<ManagerBatchView> getPendingBatches() {
+    return batchService.getPendingBatches();
   }
 }
