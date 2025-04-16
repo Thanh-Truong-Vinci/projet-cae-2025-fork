@@ -14,8 +14,8 @@ public class ManagerBatchView {
   private Long id;
   private String productName;
   private String productType;
-  private String imageUrl;
-  private String description; // Description du produit
+  private String imageLocation;
+  private String description;
   private LocalDate availabilityDate;
   private Integer availableQuantity;
   private Double unitPrice;
@@ -23,6 +23,4 @@ public class ManagerBatchView {
   private Long producerId;
   private String producerName;
   private LocalDate createdAt;
-  private String rejectionReason;
-  private String status;
 }

@@ -159,10 +159,10 @@ export interface ProductBatch {
   companyName: string
   earliestProductionDate: string
   batchIds: number[]
-  batchQuantities: number[]   
+  batchQuantities: number[]
 }
 
-export interface ManagerBatch {
+export interface PendingBatch {
   id: number
   productName: string
   productType: string
@@ -174,25 +174,27 @@ export interface ManagerBatch {
   unitType: string
   producerId: number
   producerName: string
-  createdAt:  string
-  status: string
-  }
+  createdAt: string
+}
 
 export interface BatchContextType {
   myBatches: Batch[]
-  managerBatches: ManagerBatch[]
+  pendingBatches: PendingBatch[] // Remplacé managerBatches par pendingBatches
   approvedBatches: Batch[]
   receivedBatches: Batch[]
   isLoading: boolean
   error: string | null
   fetchMyBatches: () => Promise<void>
-  fetchManagerBatches: () => Promise<void>
+  fetchPendingBatches: () => Promise<void>
   fetchApprovedBatches: () => Promise<void>
   fetchReceivedBatches: () => Promise<Batch[]>
   receiveBatch: (batchId: number) => Promise<Batch | null>
   createBatch: (newBatch: NewBatch, image: File) => Promise<void>
   updateBatchImage: (batchId: number, image: File) => Promise<Batch | null>
-  updateBatchImageById: (batchId: number, imageId: number) => Promise<Batch | null>
+  updateBatchImageById: (
+    batchId: number,
+    imageId: number
+  ) => Promise<Batch | null>
   acceptBatch: (batchId: number) => Promise<void>
   rejectBatch: (batchId: number, rejectionReason: string) => Promise<void>
 }

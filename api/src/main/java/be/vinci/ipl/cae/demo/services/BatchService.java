@@ -22,7 +22,6 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 /** Service class for managing batches. */
-@SuppressWarnings("PMD")
 @Service
 public class BatchService {
 
@@ -99,10 +98,10 @@ public class BatchService {
   }
 
   /**
-   * Rejette un lot avec un message.
+   * Rejette un lot avec un message de notification optionnel.
    *
-   * @param id l'ID du lot à rejeter
-   * @param message le message de rejet
+   * @param id l'identifiant du lot à rejeter
+   * @param message le message expliquant le rejet (peut être null ou vide)
    * @return le lot rejeté ou null si non trouvé
    */
   public Batch rejectBatch(long id, String message) {
@@ -113,20 +112,22 @@ public class BatchService {
 
     batch.setStatus(BatchStatus.REJECTED);
 
-    // Création de la notification
-    Notification notification = new Notification();
-    notification.setIsRead(false);
-    notification.setMessage(message);
+    // Création de la notification seulement si un message est fourni
+    if (message != null && !message.trim().isEmpty()) {
+      Notification notification = new Notification();
+      notification.setIsRead(false);
+      notification.setMessage(message);
 
-    Producer producer = producerRepository.findById(batch.getProducer().getId()).orElse(null);
-    if (producer == null) {
-      return null;
+      Producer producer = producerRepository.findById(batch.getProducer().getId()).orElse(null);
+      if (producer == null) {
+        return null;
+      }
+
+      notification.setProducer(producer);
+      notification = notificationRepository.save(notification);
+      batch.setNotificationId(notification.getId());
     }
 
-    notification.setProducer(producer);
-    notification = notificationRepository.save(notification);
-
-    batch.setNotificationId(notification.getId());
     return batchRepository.save(batch);
   }
 
@@ -270,139 +271,59 @@ public class BatchService {
     List<BatchView> batchViews = new ArrayList<>();
 
     for (Batch batch : batches) {
-      BatchView view = new BatchView();
-      fillBasicBatchInfo(batch, view);
-      fillProductInfo(batch, view);
-      fillImageInfo(batch, view);
-      fillProducerInfo(batch, view);
-      fillNotificationInfo(batch, view);
-
-      batchViews.add(view);
+      BatchView batchView = new BatchView();
+      batchView.setId(batch.getId());
+      batchView.setStatus(batch.getStatus().toString());
+      batchView.setCreatedAt(batch.getProductionDate());
+      batchView.setProductName(batch.getProduct().getName());
+      batchView.setProductType(batch.getProduct().getType().getTitle());
+      batchView.setUnitPrice(batch.getUnitPrice());
+      batchView.setUnitType(batch.getSaleUnit());
+      batchView.setImageUrl(batch.getPhoto() != null ? batch.getPhoto().getImageLocation() : null);
+      batchView.setAvailabilityDate(batch.getAvailabilityDate());
+      batchView.setAvailableQuantity(batch.getAvailableQuantity());
+      batchView.setProducerId(batch.getProducer().getId());
+      batchView.setProducerName(batch.getProducer().getCompany());
+      batchViews.add(batchView);
     }
 
     return batchViews;
   }
 
   /**
-   * Récupère tous les lots ayant le statut PENDING, APPROVED ou REJECTED et les convertit en DTO
-   * PendingBatchView.
+   * Récupère tous les lots ayant le statut PENDING et les convertit en DTO ManagerBatchView, triés
+   * par date de création.
    *
-   * @return la liste des lots pour le gestionnaire (en attente, acceptés, rejetés) au format
-   *     PendingBatchView
+   * @return la liste des lots en attente au format ManagerBatchView, triés par date de création
    */
-  public List<ManagerBatchView> getManagerBatches() {
-    // Récupérer tous les lots avec les statuts pertinents pour le gestionnaire
-    List<Batch> pendingBatches = batchRepository.findByStatus(BatchStatus.PENDING);
-    List<Batch> approvedBatches = batchRepository.findByStatus(BatchStatus.APPROVED);
-    List<Batch> rejectedBatches = batchRepository.findByStatus(BatchStatus.REJECTED);
+  public List<ManagerBatchView> getPendingBatches() {
+    // Récupérer les lots avec statut PENDING
+    List<Batch> batches = batchRepository.findByStatus(BatchStatus.PENDING);
+    List<ManagerBatchView> managerBatchViews = new ArrayList<>();
 
-    // Combiner les listes
-    List<Batch> allBatches = new ArrayList<>();
-    allBatches.addAll(pendingBatches);
-    allBatches.addAll(approvedBatches);
-    allBatches.addAll(rejectedBatches);
-
-    List<ManagerBatchView> pendingBatchViews = new ArrayList<>();
-
-    for (Batch batch : allBatches) {
+    // Convertir chaque lot en ManagerBatchView
+    for (Batch batch : batches) {
       ManagerBatchView view = new ManagerBatchView();
-      fillBasicBatchInfo(batch, view);
-      fillProductInfo(batch, view);
-      fillImageInfo(batch, view);
-      fillProducerInfo(batch, view);
-      fillNotificationInfo(batch, view);
+      view.setId(batch.getId());
+      view.setCreatedAt(batch.getProductionDate());
+      view.setProductName(batch.getProduct().getName());
+      view.setProductType(batch.getProduct().getType().getTitle());
+      view.setUnitPrice(batch.getUnitPrice());
+      view.setUnitType(batch.getSaleUnit());
+      view.setImageLocation(batch.getPhoto() != null ? batch.getPhoto().getImageLocation() : null);
+      view.setAvailabilityDate(batch.getAvailabilityDate());
+      view.setAvailableQuantity(batch.getAvailableQuantity());
+      view.setProducerId(batch.getProducer().getId());
+      view.setProducerName(batch.getProducer().getCompany());
 
-      pendingBatchViews.add(view);
+      // Champ spécifique à ManagerBatchView
+      view.setDescription(batch.getProduct().getDescription());
+      managerBatchViews.add(view);
     }
 
-    // Tri par date de création (du plus récent au plus ancien)
-    pendingBatchViews.sort(Comparator.comparing(ManagerBatchView::getCreatedAt).reversed());
+    // Trier la liste par date de création (productionDate)
+    managerBatchViews.sort(Comparator.comparing(ManagerBatchView::getCreatedAt));
 
-    return pendingBatchViews;
-  }
-
-  /** Remplit les informations de base communes à partir d'un batch. */
-  private void fillBasicBatchInfo(Batch batch, Object view) {
-    if (view instanceof BatchView batchView) {
-      batchView.setId(batch.getId());
-      batchView.setAvailabilityDate(batch.getAvailabilityDate());
-      batchView.setAvailableQuantity(batch.getAvailableQuantity());
-      batchView.setUnitPrice(batch.getUnitPrice());
-      batchView.setUnitType(batch.getSaleUnit());
-      batchView.setStatus(batch.getStatus().toString());
-      batchView.setCreatedAt(batch.getProductionDate());
-    } else if (view instanceof ManagerBatchView managerView) {
-      managerView.setId(batch.getId());
-      managerView.setAvailabilityDate(batch.getAvailabilityDate());
-      managerView.setAvailableQuantity(batch.getAvailableQuantity());
-      managerView.setUnitPrice(batch.getUnitPrice());
-      managerView.setUnitType(batch.getSaleUnit());
-      managerView.setStatus(batch.getStatus().toString());
-      managerView.setCreatedAt(batch.getProductionDate());
-    }
-  }
-
-  /** Remplit les informations du produit. */
-  private void fillProductInfo(Batch batch, Object view) {
-    if (batch.getProduct() == null) {
-      return;
-    }
-
-    if (view instanceof BatchView batchView) {
-      batchView.setProductName(batch.getProduct().getName());
-      if (batch.getProduct().getType() != null) {
-        batchView.setProductType(batch.getProduct().getType().getTitle());
-      }
-    } else if (view instanceof ManagerBatchView managerView) {
-      managerView.setProductName(batch.getProduct().getName());
-      managerView.setDescription(batch.getProduct().getDescription());
-      if (batch.getProduct().getType() != null) {
-        managerView.setProductType(batch.getProduct().getType().getTitle());
-      }
-    }
-  }
-
-  /**
-   * Gère les informations d'image pour les vues de lots.
-   */
-  private void fillImageInfo(Batch batch, Object view) {
-    if (batch.getPhoto() == null) return;
-    
-    if (view instanceof BatchView batchView) {
-      batchView.setImageUrl(batch.getPhoto().getImageLocation());
-    } else if (view instanceof ManagerBatchView managerView) {
-      managerView.setImageUrl(batch.getPhoto().getImageLocation());
-    }
-  }
-
-  /**
-   * Gère les informations de producteur pour les vues de lots.
-   */
-  private void fillProducerInfo(Batch batch, Object view) {
-    if (batch.getProducer() == null) return;
-    
-    if (view instanceof BatchView batchView) {
-      batchView.setProducerId(batch.getProducer().getId());
-      batchView.setProducerName(batch.getProducer().getCompany());
-    } else if (view instanceof ManagerBatchView managerView) {
-      managerView.setProducerId(batch.getProducer().getId());
-      managerView.setProducerName(batch.getProducer().getCompany());
-    }
-  }
-
-  /**
-   * Gère les informations de notification/rejet pour les vues de lots.
-   */
-  private void fillNotificationInfo(Batch batch, Object view) {
-    if (batch.getNotificationId() == null) return;
-    
-    Notification notification = notificationRepository.findById(batch.getNotificationId()).orElse(null);
-    if (notification == null) return;
-    
-    if (view instanceof BatchView batchView) {
-      batchView.setRejectionReason(notification.getMessage());
-    } else if (view instanceof ManagerBatchView managerView) {
-      managerView.setRejectionReason(notification.getMessage());
-    }
+    return managerBatchViews;
   }
 }
