@@ -259,6 +259,7 @@ export interface ReservationContextType {
   isLoading: boolean
   error: string | null
   fetchReservations: () => Promise<Reservation[]>
+  fetchAllReservations: () => Promise<Reservation[]>
   createReservation: (productId: number, quantity: number) => Promise<void>
   toPendingReservation: (reservationId: number) => Promise<void>
   toConfirmReservation: (reservationId: number) => Promise<void>

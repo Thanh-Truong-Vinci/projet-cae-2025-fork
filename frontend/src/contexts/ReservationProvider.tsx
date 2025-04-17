@@ -64,6 +64,48 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
     }
   }, [authenticatedUser])
 
+  // Fetch all reservations regardless of the client
+  const fetchAllReservations = useCallback(async (): Promise<Reservation[]> => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const response = await axios.get('/api/reservation/all', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      const data = response.data
+      console.log('Toutes les réservations récupérées:', data)
+
+      const formattedReservations = Array.isArray(data)
+        ? data.map((reservation: Reservation) => ({
+            ...reservation,
+            reservationDate:
+              reservation.reservationDate || new Date().toISOString(),
+            saleDate: reservation.saleDate || undefined,
+            reservationLines: Array.isArray(reservation.reservationLines)
+              ? reservation.reservationLines
+              : [],
+          }))
+        : []
+
+      setReservations(formattedReservations)
+      return formattedReservations
+    } catch (err) {
+      console.error('Erreur lors de la récupération de toutes les réservations:', err)
+      if (err instanceof Error) {
+        setError(`Impossible de charger les réservations: ${err.message}`)
+      } else {
+        setError('Impossible de charger les réservations')
+      }
+      return []
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
   // Create a new reservation
   const createReservation = async (
     productId: number,
@@ -281,6 +323,7 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
         isLoading,
         error,
         fetchReservations,
+        fetchAllReservations, // Added fetchAllReservations to the context
         createReservation,
         toPendingReservation,
         toConfirmReservation,
