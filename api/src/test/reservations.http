@@ -1,0 +1,52 @@
+@baseUrl = http://localhost:3000
+@clientToken = {{login_client.response.body.token}}
+
+### Login come cliente
+# @name login_client
+POST {{baseUrl}}/auths/login
+Content-Type: application/json
+
+{
+  "email": "mario.rossi@example.com",
+  "password": "Azqwazqw1@"
+}
+
+### Effettuare una prenotazione
+POST {{baseUrl}}/reservation/reserve
+Content-Type: application/json
+Authorization: Bearer {{clientToken}}
+
+{
+  "productId": 1,
+  "quantity": 2
+}
+
+### Ottenere la lista delle prenotazioni
+GET {{baseUrl}}/reservation/list
+Authorization: Bearer {{clientToken}}
+
+### Cambiare lo stato di una prenotazione a PENDING
+POST {{baseUrl}}/reservation/toPending
+Content-Type: application/json
+Authorization: Bearer {{clientToken}}
+
+{
+  "reservationId": 1
+}
+
+### Cambiare lo stato di una prenotazione a CONFIRMED
+POST {{baseUrl}}/reservation/toConfirm
+Content-Type: application/json
+
+{
+  "reservationId": 1
+}
+
+### Cambiare lo stato di una prenotazione a CANCELLED
+POST {{baseUrl}}/reservation/toCancel
+Content-Type: application/json
+Authorization: Bearer {{clientToken}}
+
+{
+  "reservationId": 1
+}

@@ -678,3 +678,28 @@ INSERT INTO client (id_user)
 SELECT id_user
 FROM users
 WHERE email = 'client@example.com';
+
+-- Creare un utente cliente di base
+INSERT INTO users (name, firstname, email, password, date_inscription)
+VALUES ('Rossi', 'Mario', 'mario.rossi@example.com',
+        '$2a$10$8Cv0QyLMQ.dDlswhLhd8peiW6.KWnQLl0VmL5lw41/trJgprkg2vm',
+        CURRENT_DATE);
+
+-- Aggiungere l'indirizzo per l'utente
+INSERT INTO user_with_address (id_user, street, number, box, postal_code, city, country, phone_number)
+SELECT id_user,
+       'Via Roma',
+       '10',
+       '',
+       '00100',
+       'Roma',
+       'Italia',
+       '+390612345678'
+FROM users
+WHERE email = 'mario.rossi@example.com';
+
+-- Creare l'entrata cliente
+INSERT INTO client (id_user)
+SELECT id_user
+FROM users
+WHERE email = 'mario.rossi@example.com';
