@@ -251,8 +251,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-20',
        '2025-03-10' -- Date de production (antérieure à la date de dépôt)
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Tomates Bio';
 
 -- Pour le lot des Pommes Royal Gala
@@ -270,8 +270,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-15',
        '2025-03-05' -- 10 jours avant le dépôt
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pommes Royal Gala';
 
 -- Pour le lot de Pain au levain
@@ -289,8 +289,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-25',
        '2025-03-24' -- 1 jour avant (pain frais)
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pain au levain';
 
 -- Pour le lot de Fromage fermier
@@ -308,8 +308,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-18',
        '2025-01-18' -- 2 mois avant (fromage affiné)
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Fromage fermier';
 
 -- Pour le lot de Carottes Bio
@@ -327,8 +327,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-22',
        '2025-03-15' -- 7 jours avant la récolte
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Carottes Bio';
 
 -- Pour le lot de Bière artisanale
@@ -346,8 +346,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-21',
        '2025-02-21' -- 1 mois avant (temps de fermentation)
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Bière artisanale';
 
 -- Pour le lot de Poulet fermier
@@ -365,8 +365,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-19',
        '2025-03-18' -- 1 jour avant (fraîcheur)
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Poulet fermier';
 
 -- Pour le lot de Yaourt nature
@@ -384,8 +384,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-16',
        '2025-03-14' -- 2 jours avant
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Yaourt nature';
 
 -- Créer un lot pour ce nouveau producteur
@@ -405,8 +405,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-25',
        '2025-02-15' -- Production antérieure (vin qui a besoin d'être vieilli)
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Bière artisanale';
 
 -- Créer un lot pour ce nouveau producteur
@@ -426,8 +426,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-28',
        '2025-03-20' -- Production récente pour fruits frais
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pommes Royal Gala';
 
 -- Fix all approved batches inserts
@@ -446,8 +446,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-10',
        '2025-03-01' -- 9 jours avant
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pomme Jonagold';
 
 -- Pour le lot de Chou-fleur cheddar (APPROVED)
@@ -465,8 +465,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-12',
        '2025-03-05' -- 7 jours avant
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Chou-fleur cheddar';
 
 -- Pour le lot de Fromage fermier (APPROVED)
@@ -484,8 +484,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-18',
        '2025-01-18' -- 2 mois avant (fromage affiné)
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Fromage fermier';
 
 -- Création de lots à l'état RECEIVED
@@ -504,8 +504,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-10',
        '2025-03-05' -- 5 jours avant le dépôt
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Tomates Bio';
 
 -- Pour le lot de Carottes Bio (RECEIVED)
@@ -523,8 +523,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-15',
        '2025-03-08' -- 7 jours avant le dépôt
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Carottes Bio';
 
 -- Pour un deuxième lot de Carottes Bio (RECEIVED) - fusionnable avec le lot existant
@@ -534,16 +534,16 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
        p.id_product,
        ph.id_photo,
-       '2025-04-20',  -- Date différente, mais même produit/prix/unité/photo
-       2.50,          -- MÊME unitPrice que le lot existant (2.50)
-       'kg',          -- MÊME saleUnit que le lot existant ('kg')
-       25,            -- Quantité différente qui s'additionnera (35 + 25 = 60 total)
-       'RECEIVED',    -- MÊME statut que le lot existant (RECEIVED)
-       '2025-03-25',  -- Date de dépôt différente, pas importante pour la fusion
-       '2025-03-20'   -- Date de production différente
+       '2025-04-20', -- Date différente, mais même produit/prix/unité/photo
+       2.50,         -- MÊME unitPrice que le lot existant (2.50)
+       'kg',         -- MÊME saleUnit que le lot existant ('kg')
+       25,           -- Quantité différente qui s'additionnera (35 + 25 = 60 total)
+       'RECEIVED',   -- MÊME statut que le lot existant (RECEIVED)
+       '2025-03-25', -- Date de dépôt différente, pas importante pour la fusion
+       '2025-03-20'  -- Date de production différente
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Carottes Bio';
 
 -- Pour un lot de Carottes Bio (RECEIVED) - presque fusionnable mais avec prix différent
@@ -553,16 +553,16 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
        p.id_product,
        ph.id_photo,
-       '2025-04-25',  -- Date différente (pas importante pour la fusion)
-       2.49,          -- Prix LÉGÈREMENT DIFFÉRENT (2.49 vs 2.50) - empêche la fusion
-       'kg',          -- MÊME unité de vente que les autres lots
-       20,            -- Quantité disponible
-       'RECEIVED',    -- MÊME statut (nécessaire pour apparaître dans la vue)
-       '2025-03-28',  -- Date de dépôt
-       '2025-03-22'   -- Date de production
+       '2025-04-25', -- Date différente (pas importante pour la fusion)
+       2.49,         -- Prix LÉGÈREMENT DIFFÉRENT (2.49 vs 2.50) - empêche la fusion
+       'kg',         -- MÊME unité de vente que les autres lots
+       20,           -- Quantité disponible
+       'RECEIVED',   -- MÊME statut (nécessaire pour apparaître dans la vue)
+       '2025-03-28', -- Date de dépôt
+       '2025-03-22'  -- Date de production
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Carottes Bio';
 
 -- Pour le lot de Yaourt nature (RECEIVED)
@@ -580,8 +580,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-20',
        '2025-03-18' -- 2 jours avant le dépôt
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Yaourt nature';
 
 -- 1. Lot avec une unité de vente différente (tout le reste identique)
@@ -591,16 +591,16 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
        p.id_product,
        ph.id_photo,
-       '2025-04-30',  
-       2.50,          -- MÊME prix que les lots de carottes existants
-       'piece',       -- UNITÉ DIFFÉRENTE (piece vs kg) - empêche la fusion
-       15,            
-       'RECEIVED',    
-       '2025-04-01',  
+       '2025-04-30',
+       2.50,    -- MÊME prix que les lots de carottes existants
+       'piece', -- UNITÉ DIFFÉRENTE (piece vs kg) - empêche la fusion
+       15,
+       'RECEIVED',
+       '2025-04-01',
        '2025-03-25'
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Carottes Bio';
 
 -- 2. Lot avec une photo différente (tout le reste identique)
@@ -609,13 +609,13 @@ INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
        p.id_product,
-       (SELECT id_photo FROM photos WHERE product_name = 'tomate_bio'),  -- PHOTO DIFFÉRENTE - empêche la fusion
-       '2025-05-01',  
-       2.50,          -- MÊME prix
-       'kg',          -- MÊME unité
-       18,            
-       'RECEIVED',    
-       '2025-04-02',  
+       (SELECT id_photo FROM photos WHERE product_name = 'tomate_bio'), -- PHOTO DIFFÉRENTE - empêche la fusion
+       '2025-05-01',
+       2.50,                                                            -- MÊME prix
+       'kg',                                                            -- MÊME unité
+       18,
+       'RECEIVED',
+       '2025-04-02',
        '2025-03-28'
 FROM products p
 WHERE p.name = 'Carottes Bio';
@@ -627,16 +627,16 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer WHERE company = 'Les Vergers de Marie'), -- PRODUCTEUR DIFFÉRENT - SERA FUSIONNÉ quand même
        p.id_product,
        ph.id_photo,
-       '2025-05-05',  
-       2.50,          -- MÊME prix
-       'kg',          -- MÊME unité
-       22,            
-       'RECEIVED',    
-       '2025-04-03',  
+       '2025-05-05',
+       2.50,                                                                  -- MÊME prix
+       'kg',                                                                  -- MÊME unité
+       22,
+       'RECEIVED',
+       '2025-04-03',
        '2025-03-30'
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'Carottes Bio';
 
 SELECT id_user, NULL

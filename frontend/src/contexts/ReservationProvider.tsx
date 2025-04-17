@@ -94,7 +94,10 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
       setReservations(formattedReservations)
       return formattedReservations
     } catch (err) {
-      console.error('Erreur lors de la récupération de toutes les réservations:', err)
+      console.error(
+        'Erreur lors de la récupération de toutes les réservations:',
+        err
+      )
       if (err instanceof Error) {
         setError(`Impossible de charger les réservations: ${err.message}`)
       } else {

@@ -25,10 +25,9 @@ public class ReservationController {
   private final ReservationService reservationService;
 
   /**
-   * Constructs a ReservationController with the specified AuthsService and
-   * ReservationService.
+   * Constructs a ReservationController with the specified AuthsService and ReservationService.
    *
-   * @param authsService       the authentication service.
+   * @param authsService the authentication service.
    * @param reservationService the reservation service.
    */
   public ReservationController(AuthsService authsService, ReservationService reservationService) {
@@ -39,9 +38,8 @@ public class ReservationController {
   /**
    * Reserves a product for a client.
    *
-   * @param reservationRequest the reservation request containing product ID and
-   *                           quantity.
-   * @param token              the authorization token from the request header.
+   * @param reservationRequest the reservation request containing product ID and quantity.
+   * @param token the authorization token from the request header.
    * @throws ResourceNotFoundException if the token is invalid or expired.
    */
   @PostMapping("/reserve")
@@ -76,9 +74,9 @@ public class ReservationController {
    * Changes the status of a reservation to PENDING.
    *
    * @param reservationId the ID of the reservation to update.
-   * @param token         the authorization token from the request header.
+   * @param token the authorization token from the request header.
    * @throws ResourceNotFoundException if the token is invalid or expired.
-   * @throws ConflictException         if the reservation ID is missing.
+   * @throws ConflictException if the reservation ID is missing.
    */
   @PostMapping("/toPending")
   public void toPending(
@@ -91,11 +89,10 @@ public class ReservationController {
    *
    * @param reservationId the ID of the reservation to update.
    * @throws ResourceNotFoundException if the token is invalid or expired.
-   * @throws ConflictException         if the reservation ID is missing.
+   * @throws ConflictException if the reservation ID is missing.
    */
   @PostMapping("/toConfirm")
-  public void toConfirm(
-      @RequestBody Long reservationId) {
+  public void toConfirm(@RequestBody Long reservationId) {
     if (reservationId == null) {
       throw new ConflictException("Reservation ID is required");
     }
@@ -106,9 +103,9 @@ public class ReservationController {
    * Changes the status of a reservation to CANCELLED.
    *
    * @param reservationId the ID of the reservation to update.
-   * @param token         the authorization token from the request header.
+   * @param token the authorization token from the request header.
    * @throws ResourceNotFoundException if the token is invalid or expired.
-   * @throws ConflictException         if the reservation ID is missing.
+   * @throws ConflictException if the reservation ID is missing.
    */
   @PostMapping("/toCancel")
   public void toCancel(
@@ -130,10 +127,10 @@ public class ReservationController {
    * Validates client token and reservation ID, then changes reservation status.
    *
    * @param reservationId the ID of the reservation to update.
-   * @param token         the authorization token from the request header.
-   * @param status        the new status to set.
+   * @param token the authorization token from the request header.
+   * @param status the new status to set.
    * @throws ResourceNotFoundException if the token is invalid or expired.
-   * @throws ConflictException         if the reservation ID is missing.
+   * @throws ConflictException if the reservation ID is missing.
    */
   private void validateAndChangeStatus(Long reservationId, String token, ReservationStatus status) {
     Client client = authsService.isValidClientToken(token);
