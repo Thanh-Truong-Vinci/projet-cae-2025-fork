@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import {
   Box,
   Typography,
@@ -28,6 +28,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { useNavigate } from 'react-router-dom'
 import { UserContext } from '../../contexts/UserContext'
 import { ReservationContext } from '../../contexts/ReservationContext'
+import { Reservation } from '../../types'
 
 const CartPage = () => {
   const { authenticatedUser } = useContext(UserContext)
@@ -38,18 +39,26 @@ const CartPage = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false)
   const [message, setMessage] = useState('')
   const reservationContext = useContext(ReservationContext)
+  const [reservations, setReservations] = useState<Reservation[]>([])
+  const [reservation, setReservation] = useState<Reservation | null>(null)
+
+  useEffect(() => {
+    if (reservationContext && reservationContext.fetchReservations) {
+      reservationContext.fetchReservations().then((r) => {
+        setReservations(r)
+        const buildingReservation = r.find(
+          (res) => res.status === 'BUILDING'
+        )
+        setReservation(buildingReservation ?? null)
+      })
+    }
+  }, [])
 
   if (!reservationContext) {
     throw new Error(
       'ReservationContext must be used within a ReservationProvider'
     )
   }
-
-  const { reservations, toPendingReservation } = reservationContext
-
-  const reservation = reservations.find(
-    (reservation) => reservation.status === 'BUILDING'
-  )
 
   // Calcul de la date minimale (demain)
   const getTomorrowFormatted = () => {
@@ -79,9 +88,9 @@ const CartPage = () => {
   }
 
   const calculateTotal = () => {
-    return reservation?.reservationLines.reduce(
-      (total, item) =>
-        total + item.quantity * item.batch.unitPrice,
+    if (!reservation || !reservation.reservationLines) return 0
+    return reservation.reservationLines.reduce(
+      (total, line) => total + line.quantity * line.batch.unitPrice,
       0
     )
   }
@@ -148,7 +157,11 @@ const CartPage = () => {
   }
 
   const handleConfirmReservation = async () => {
-    if (selectedDate && (reservation?.reservationLines?.length ?? 0) > 0 && isDateValid) {
+    if (
+      selectedDate &&
+      (reservation?.reservationLines?.length ?? 0) > 0 &&
+      isDateValid
+    ) {
       if (!authenticatedUser) {
         setMessage('Vous devez vous connecter pour faire une réservation')
         setOpenSnackbar(true)
@@ -160,7 +173,7 @@ const CartPage = () => {
 
       try {
         if (reservation) {
-          await toPendingReservation(reservation.id)
+          await reservationContext.toPendingReservation(reservation.id)
         }
 
         const formattedDate = new Intl.DateTimeFormat('fr-FR', {
@@ -179,7 +192,10 @@ const CartPage = () => {
           },
         })
       } catch (error) {
-        console.error("Erreur lors de l'enregistrement de la réservation:", error)
+        console.error(
+          "Erreur lors de l'enregistrement de la réservation:",
+          error
+        )
         setMessage(
           "Une erreur est survenue lors de l'enregistrement de votre réservation. Veuillez réessayer."
         )
@@ -194,11 +210,23 @@ const CartPage = () => {
 
   return (
     <Box sx={{ width: '100%', p: 3 }}>
+      {/* TODO remove Debug information */}
+      <Box sx={{ mt: 3 }}>
+        <Typography variant="body2" color="textSecondary">
+          <strong>Debug - Reservation:</strong>{' '}
+          {JSON.stringify(reservation, null, 2)}
+        </Typography>
+        <Typography variant="body2" color="textSecondary">
+          <strong>Debug - Reservations:</strong>{' '}
+          {JSON.stringify(reservations, null, 2)}
+        </Typography>
+      </Box>
+
       <Typography variant="h4" sx={{ mb: 3 }}>
         Mon Panier
       </Typography>
 
-      {reservation?.reservationLines.length === 0 ? (
+      {!reservation || reservation.reservationLines.length === 0 ? (
         <Box sx={{ textAlign: 'center', py: 5 }}>
           <Typography variant="h6" sx={{ mb: 2 }}>
             Votre panier est vide
@@ -226,7 +254,7 @@ const CartPage = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {reservation?.reservationLines.map((item) => (
+                {reservation.reservationLines.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell>
                       <img
