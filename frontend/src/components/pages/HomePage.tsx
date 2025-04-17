@@ -139,9 +139,18 @@ const HomePage = () => {
   // Mettre à jour filteredProducts
   useEffect(() => {
     if (products) {
-      setFilteredProducts(products)
+      const seen = new Set()
+      const uniqueProducts = products.filter((p) => {
+        const key = `${p.productId}-${p.unitPrice}`
+        if (seen.has(key)) return false
+        seen.add(key)
+        return true
+      })
+  
+      setFilteredProducts(uniqueProducts)
     }
   }, [products])
+  
 
   // ça va nous permettre de ne pas avoir soucis de différence de casse, d'espaces ou d'accents
   const normalizeString = (str: string | undefined): string => {
@@ -153,28 +162,33 @@ const HomePage = () => {
   }
 
   const handleFilter = () => {
-    let results = [...products]
-
+    const seen = new Set()
+    let results = products.filter((p) => {
+      const key = `${p.productId}-${p.unitPrice}`
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+  
     if (type) {
       const normalizedType = normalizeString(type)
-
-      results = products.filter((product) => {
+      results = results.filter((product) => {
         const normalizedCategory = normalizeString(product.productType)
-
         return normalizedCategory === normalizedType
       })
     }
-
+  
     if (productName.trim()) {
       const searchTerm = productName.toLowerCase().trim()
       results = results.filter((product) =>
         product.productName.toLowerCase().includes(searchTerm)
       )
     }
-
+  
     setFilteredProducts(results)
     setVisibleProducts(productsPerLoad)
   }
+  
 
   const handleQuantityChange = (productId: number, value: number) => {
     setQuantities((prev) => ({
