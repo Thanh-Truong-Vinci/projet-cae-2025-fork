@@ -25,13 +25,11 @@ import {
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { CartContext } from '../../contexts/CartContext'
 import { useNavigate } from 'react-router-dom'
 import { UserContext } from '../../contexts/UserContext'
+import { ReservationContext } from '../../contexts/ReservationContext'
 
 const CartPage = () => {
-  const { cartItems, removeFromCart, updateQuantity, clearCart } =
-    useContext(CartContext)
   const { authenticatedUser } = useContext(UserContext)
   const navigate = useNavigate()
   const [openCalendar, setOpenCalendar] = useState(false)
@@ -39,6 +37,19 @@ const CartPage = () => {
   const [isDateValid, setIsDateValid] = useState(false)
   const [openSnackbar, setOpenSnackbar] = useState(false)
   const [message, setMessage] = useState('')
+  const reservationContext = useContext(ReservationContext)
+
+  if (!reservationContext) {
+    throw new Error(
+      'ReservationContext must be used within a ReservationProvider'
+    )
+  }
+
+  const { reservations, toPendingReservation } = reservationContext
+
+  const reservation = reservations.find(
+    (reservation) => reservation.status === 'BUILDING'
+  )
 
   // Calcul de la date minimale (demain)
   const getTomorrowFormatted = () => {
@@ -68,26 +79,31 @@ const CartPage = () => {
   }
 
   const calculateTotal = () => {
-    return cartItems.reduce(
+    return reservation?.reservationLines.reduce(
       (total, item) =>
-        total + Number(item.price.replace('€', '')) * item.quantity,
+        total + item.quantity * item.batch.unitPrice,
       0
     )
   }
 
   const handleQuantityChange = (id: number, change: number) => {
-    const item = cartItems.find((item) => item.id === id)
-    if (item) {
-      const newQuantity = Math.max(1, item.quantity + change)
-      updateQuantity(id, newQuantity)
-    }
+    console.log('handleQuantityChange', id, change)
+    // Not implemented yet
   }
 
   const handleDirectQuantityChange = (id: number, value: string) => {
-    const quantity = parseInt(value)
-    if (quantity > 0) {
-      updateQuantity(id, quantity)
-    }
+    console.log('handleQuantityChange', id, value)
+    // Not implemented yet
+  }
+
+  const clearCart = () => {
+    console.log('removeFromCart')
+    // Not implemented yet
+  }
+
+  const removeFromCart = (id: number) => {
+    console.log('removeFromCart', id)
+    // Not implemented yet
   }
 
   const handleOpenCalendar = () => {
@@ -131,8 +147,8 @@ const CartPage = () => {
     }
   }
 
-  const handleConfirmReservation = () => {
-    if (selectedDate && cartItems.length > 0 && isDateValid) {
+  const handleConfirmReservation = async () => {
+    if (selectedDate && (reservation?.reservationLines?.length ?? 0) > 0 && isDateValid) {
       if (!authenticatedUser) {
         setMessage('Vous devez vous connecter pour faire une réservation')
         setOpenSnackbar(true)
@@ -142,145 +158,28 @@ const CartPage = () => {
         return
       }
 
-      // Journalisation détaillée de l'utilisateur et de son ID
-      console.log('Utilisateur authentifié:', JSON.stringify(authenticatedUser))
-
-      // Extraire l'ID utilisateur en mode débogage
-      let userId
-      if ('id' in authenticatedUser) {
-        userId = authenticatedUser.id
-        console.log(
-          'ID trouvé depuis la propriété "id":',
-          userId,
-          'type:',
-          typeof userId
-        )
-      } else if ('userId' in authenticatedUser) {
-        // Remplacer (authenticatedUser as any).userId par une méthode plus typée
-        userId = (authenticatedUser as Record<string, unknown>).userId as
-          | number
-          | string
-        console.log(
-          'ID trouvé depuis la propriété "userId":',
-          userId,
-          'type:',
-          typeof userId
-        )
-      } else {
-        // Parcourir toutes les propriétés pour trouver un ID potentiel
-        const keys = Object.keys(authenticatedUser)
-        console.log("Propriétés disponibles dans l'utilisateur:", keys)
-
-        // Chercher une propriété qui ressemble à un ID
-        for (const key of keys) {
-          if (key.toLowerCase().includes('id')) {
-            // Remplacer (authenticatedUser as any)[key] par une méthode plus typée
-            userId = (authenticatedUser as unknown as Record<string, unknown>)[
-              key
-            ] as number | string
-            console.log(
-              `ID potentiel trouvé dans la propriété "${key}":`,
-              userId
-            )
-            break
-          }
-        }
-
-        if (!userId) {
-          userId = Date.now() // Fallback si aucun ID n'est trouvé
-          console.log(
-            "Aucun ID trouvé, utilisation d'un ID temporaire:",
-            userId
-          )
-        }
-      }
-
-      // Convertir explicitement en nombre pour s'assurer de la cohérence
-      userId = Number(userId)
-      console.log('ID utilisateur final utilisé pour la réservation:', userId)
-
-      // Création d'une nouvelle réservation avec l'ID utilisateur
-      const selectedDateObj = new Date(selectedDate)
-      const reservation = {
-        id: Date.now(),
-        userId: userId,
-        date: selectedDateObj,
-        items: [...cartItems],
-        total: calculateTotal(),
-        status: 'En attente',
-      }
-
-      console.log('Nouvelle réservation créée:', JSON.stringify(reservation))
-
       try {
-        // Récupération des réservations existantes
-        const existingReservations = JSON.parse(
-          localStorage.getItem('userReservations') || '[]'
-        )
+        if (reservation) {
+          await toPendingReservation(reservation.id)
+        }
 
-        console.log('Réservations existantes:', existingReservations.length)
-
-        // Ajout de la nouvelle réservation
-        const updatedReservations = [...existingReservations, reservation]
-        console.log('Réservations mises à jour:', updatedReservations.length)
-
-        // Sauvegarde dans le localStorage
-        localStorage.setItem(
-          'userReservations',
-          JSON.stringify(updatedReservations)
-        )
-
-        // Vérifiez immédiatement après
-        const test = localStorage.getItem('userReservations')
-        console.log(
-          'Vérification après sauvegarde:',
-          test ? JSON.parse(test).length : 'aucun'
-        )
-
-        console.log(
-          'Réservation enregistrée avec succès. Vérifiez le localStorage'
-        )
-
-        // Vérifier immédiatement que la réservation a bien été enregistrée
-        const verifyReservations = JSON.parse(
-          localStorage.getItem('userReservations') || '[]'
-        )
-        console.log(
-          'Vérification - nombre de réservations dans localStorage:',
-          verifyReservations.length
-        )
-        console.log(
-          'Dernière réservation dans localStorage:',
-          verifyReservations.length > 0
-            ? JSON.stringify(verifyReservations[verifyReservations.length - 1])
-            : 'aucune'
-        )
-
-        // Format de date pour l'affichage
         const formattedDate = new Intl.DateTimeFormat('fr-FR', {
           day: 'numeric',
           month: 'long',
           year: 'numeric',
-        }).format(selectedDateObj)
+        }).format(new Date(selectedDate))
 
-        // Message de confirmation amélioré
-        const confirmationMessage = `Votre réservation pour le ${formattedDate} a été enregistrée avec succès! Vous pouvez la consulter dans "Mes réservations".`
+        const confirmationMessage = `Votre réservation pour le ${formattedDate} a été enregistrée avec succès! Vous pouvez la consulter dans \"Mes réservations\".`
 
-        // Fermeture du calendrier et vidage du panier
         setOpenCalendar(false)
-        clearCart()
 
-        // Redirection vers la page d'accueil avec le message de confirmation
         navigate('/', {
           state: {
             message: confirmationMessage,
           },
         })
       } catch (error) {
-        console.error(
-          "Erreur lors de l'enregistrement de la réservation:",
-          error
-        )
+        console.error("Erreur lors de l'enregistrement de la réservation:", error)
         setMessage(
           "Une erreur est survenue lors de l'enregistrement de votre réservation. Veuillez réessayer."
         )
@@ -299,7 +198,7 @@ const CartPage = () => {
         Mon Panier
       </Typography>
 
-      {cartItems.length === 0 ? (
+      {reservation?.reservationLines.length === 0 ? (
         <Box sx={{ textAlign: 'center', py: 5 }}>
           <Typography variant="h6" sx={{ mb: 2 }}>
             Votre panier est vide
@@ -327,17 +226,17 @@ const CartPage = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {cartItems.map((item) => (
+                {reservation?.reservationLines.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell>
                       <img
-                        src={item.image}
-                        alt={item.name}
+                        src={item.batch.imageUrl}
+                        alt={item.batch.productName}
                         style={{ width: 60, height: 60, objectFit: 'cover' }}
                       />
                     </TableCell>
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell align="right">{item.price}</TableCell>
+                    <TableCell>{item.batch.productName}</TableCell>
+                    <TableCell align="right">{item.batch.unitPrice}</TableCell>
                     <TableCell align="center">
                       <Box
                         sx={{
@@ -374,7 +273,7 @@ const CartPage = () => {
                       </Box>
                     </TableCell>
                     <TableCell align="right">
-                      {`${(Number(item.price.replace('€', '')) * item.quantity).toFixed(2)}€`}
+                      {`${(item.batch.unitPrice * item.quantity).toFixed(2)}€`}
                     </TableCell>
                     <TableCell align="center">
                       <IconButton
@@ -417,7 +316,7 @@ const CartPage = () => {
             </Box>
             <Box sx={{ textAlign: 'right' }}>
               <Typography variant="h6">
-                Total: {calculateTotal().toFixed(2)}€
+                Total: {calculateTotal()?.toFixed(2)}€
               </Typography>
               <Button
                 variant="contained"
