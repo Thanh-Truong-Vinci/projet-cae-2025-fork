@@ -50,7 +50,7 @@ const CartPage = () => {
         setReservation(buildingReservation ?? null)
       })
     }
-  }, [])
+  }, [reservationContext, reservationContext?.fetchReservations])
 
   if (!reservationContext) {
     throw new Error(
@@ -180,7 +180,7 @@ const CartPage = () => {
           year: 'numeric',
         }).format(new Date(selectedDate))
 
-        const confirmationMessage = `Votre réservation pour le ${formattedDate} a été enregistrée avec succès! Vous pouvez la consulter dans \"Mes réservations\".`
+        const confirmationMessage = `Votre réservation pour le ${formattedDate} a été enregistrée avec succès! Vous pouvez la consulter dans "Mes réservations".`
 
         setOpenCalendar(false)
 
