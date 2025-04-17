@@ -26,8 +26,7 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
         )
       }
 
-      const response = await axios.get('/reservation/list', {
-        // TODO why doesn't it work with /api/reservation/list
+      const response = await axios.get('/api/reservation/list', {
         headers: {
           Authorization: authenticatedUser.token,
           'Content-Type': 'application/json',
