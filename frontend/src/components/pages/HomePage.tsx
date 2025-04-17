@@ -196,7 +196,10 @@ const HomePage = () => {
   }
 
   const handleAddToReservation = (productBatch: ProductBatch) => {
-    createReservation(productBatch.productId, quantities[productBatch.productId] || 1)
+    createReservation(
+      productBatch.productId,
+      quantities[productBatch.productId] || 1
+    )
   }
 
   const handleProductClick = (product: ProductBatch) => {
