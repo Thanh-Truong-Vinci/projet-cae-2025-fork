@@ -44,7 +44,11 @@ const VolunteerHomePage = () => {
     )
   }
 
-  const { reservations, toConfirmReservation } = reservationContext
+  const { reservations, fetchAllReservations, toConfirmReservation } = reservationContext;
+
+  useEffect(() => {
+    fetchAllReservations();
+  }, [fetchAllReservations]);
 
   if (!batchContext) {
     throw new Error(

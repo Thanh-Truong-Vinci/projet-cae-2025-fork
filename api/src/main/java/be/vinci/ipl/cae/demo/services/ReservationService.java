@@ -105,6 +105,15 @@ public class ReservationService {
   }
 
   /**
+   * Retrieves all reservations regardless of the client.
+   *
+   * @return a list of all reservations.
+   */
+  public List<Reservation> getAllReservations() {
+    return (List<Reservation>) reservationRepository.findAll();
+  }
+
+  /**
    * Changes the status of a reservation.
    *
    * @param reservationId the ID of the reservation to update

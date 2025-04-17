@@ -28,4 +28,11 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
    * @return a list of reservations for the specified client
    */
   List<Reservation> findByClient(Client client);
+
+  /**
+   * Finds all reservations regardless of the client.
+   *
+   * @return a list of all reservations
+   */
+  List<Reservation> findAll();
 }
