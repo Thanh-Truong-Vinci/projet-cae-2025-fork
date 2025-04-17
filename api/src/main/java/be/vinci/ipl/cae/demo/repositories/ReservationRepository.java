@@ -34,5 +34,6 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
    *
    * @return a list of all reservations
    */
+  @Override
   List<Reservation> findAll();
 }
