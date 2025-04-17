@@ -274,6 +274,52 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
     }
   }
 
+  const createBatchWithExistingProduct = async (
+    newBatch: NewBatch,
+    productId: number
+  ): Promise<void> => {
+    try {
+      if (!authenticatedUser) {
+        throw new Error('Vous devez être authentifié pour ajouter un lot')
+      }
+
+      console.log(
+        'Création de lot avec produit existant:',
+        newBatch.productName,
+        'productId:',
+        productId
+      )
+
+      const response = await fetch(
+        `/api/batches/createbatch/existing?productId=${productId}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: authenticatedUser.token,
+          },
+          body: JSON.stringify(newBatch),
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error(
+          `fetch error : ${response.status} : ${response.statusText}`
+        )
+      }
+
+      const createdBatch = await response.json()
+      console.log('Lot créé avec succès (produit existant):', createdBatch)
+
+      return createdBatch
+    } catch (err) {
+      console.error('createBatchWithExistingProduct::error: ', err)
+      throw err instanceof Error
+        ? new Error(err.message || 'Erreur lors de la création du lot')
+        : new Error('Erreur inconnue lors de la création du lot')
+    }
+  }
+
   const updateBatchImage = async (
     batchId: number,
     image: File
@@ -496,6 +542,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
         fetchReceivedBatches,
         receiveBatch,
         createBatch,
+        createBatchWithExistingProduct,
         updateBatchImage,
         updateBatchImageById,
         acceptBatch,

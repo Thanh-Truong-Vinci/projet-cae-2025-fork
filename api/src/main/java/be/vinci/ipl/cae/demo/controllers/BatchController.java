@@ -134,6 +134,31 @@ public class BatchController {
   }
 
   /**
+   * Creates a new batch with an existing product.
+   *
+   * @param newBatch the batch data
+   * @param productId the ID of the existing product
+   * @return the created batch
+   */
+  @PostMapping("/createbatch/existing")
+  @PreAuthorize(SecurityConstants.HAS_ROLE_PRODUCER)
+  public Batch createBatchWithExistingProduct(
+      @RequestBody NewBatch newBatch,
+      @RequestParam Long productId) {
+
+    if (newBatch == null || productId == null) {
+      throw new ConflictException("Données invalides");
+    }
+
+    Batch batch = batchService.createBatchWithExistingProduct(newBatch, productId);
+    if (batch == null) {
+      throw new ConflictException("Échec de la création du lot");
+    }
+
+    return batch;
+  }
+
+  /**
    * Affiche les lots d'un producteur dont la quantité est supérieur à 0.
    *
    * @param token le toke du producteur

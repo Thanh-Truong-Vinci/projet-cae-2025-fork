@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, ChangeEvent, FormEvent } from 'react'
+import { useState, useEffect, useContext, ChangeEvent, FormEvent, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Typography,
@@ -50,8 +50,8 @@ const AddBatchPage = () => {
   const batchContext = useContext(BatchContext)
   const productContext = useReactContext(ProductContext)
   const { productTypes, loading: loadingTypes } = useProductType()
+  const hasLoadedProducts = useRef(false);
 
-  // États du formulaire
   const [productName, setProductName] = useState('')
   const [productType, setProductType] = useState<ProductType | ''>('')
   const [productDescription, setProductDescription] = useState('')
@@ -69,6 +69,7 @@ const AddBatchPage = () => {
     'success'
   )
   const [fieldsLocked, setFieldsLocked] = useState(false)
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(null)
 
   useEffect(() => {
     if (!batchContext) {
@@ -86,7 +87,6 @@ const AddBatchPage = () => {
       setSnackbarSeverity('error')
       setOpenSnackbar(true)
 
-      // Rediriger après un court délai
       setTimeout(() => {
         navigate('/')
       }, 3000)
@@ -96,26 +96,20 @@ const AddBatchPage = () => {
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        if (productContext) {
-          await productContext.fetchAllProducts()
-        } else {
-          console.error("ProductContext n'est pas disponible")
-          setSnackbarMessage(
-            'Erreur de contexte lors du chargement des produits'
-          )
-          setSnackbarSeverity('error')
-          setOpenSnackbar(true)
+        if (productContext && !hasLoadedProducts.current) {
+          hasLoadedProducts.current = true;
+          await productContext.fetchAllProducts();
         }
       } catch (error) {
-        console.error('Error loading products:', error)
-        setSnackbarMessage('Erreur lors du chargement des produits')
-        setSnackbarSeverity('error')
-        setOpenSnackbar(true)
+        console.error('Error loading products:', error);
+        setSnackbarMessage('Erreur lors du chargement des produits');
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
       }
-    }
+    };
 
-    loadProducts()
-  }, [productContext])
+    loadProducts();
+  }, [productContext]);
 
   if (!authenticatedUser || authenticatedUser.role !== 'Producer') {
     return (
@@ -139,20 +133,27 @@ const AddBatchPage = () => {
   }
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (fieldsLocked) {
+      setSnackbarMessage('Changez le nom du produit pour modifier l\'image');
+      setSnackbarSeverity('error');
+      setOpenSnackbar(true);
+      return;
+    }
+    
     if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0]
-      const fileExtension = selectedFile.name.split('.').pop() || ''
+      const selectedFile = e.target.files[0];
+      const fileExtension = selectedFile.name.split('.').pop() || '';
       const renamedFile = new File([selectedFile], `image.${fileExtension}`, {
         type: selectedFile.type,
-      })
-
-      setProductImage(renamedFile)
-
-      const reader = new FileReader()
+      });
+      
+      setProductImage(renamedFile);
+      
+      const reader = new FileReader();
       reader.onload = () => {
-        setImagePreview(reader.result as string)
-      }
-      reader.readAsDataURL(selectedFile)
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(selectedFile);
     }
   }
 
@@ -166,6 +167,8 @@ const AddBatchPage = () => {
     if (product) {
       setProductName(product.name)
       setProductDescription(product.description)
+      setSelectedProductId(product.id)
+      
       if (product.type && product.type.title) {
         setProductType(product.type.title)
         console.log('Product type set to:', product.type.title)
@@ -181,6 +184,7 @@ const AddBatchPage = () => {
       }
       setFieldsLocked(true)
     } else {
+      setSelectedProductId(null)
       setFieldsLocked(false)
     }
   }
@@ -197,49 +201,40 @@ const AddBatchPage = () => {
   }
 
   const validateForm = (): boolean => {
-    const newErrors: FormErrors = {}
-
+    const newErrors: FormErrors = {};
+    
     if (!productName.trim())
-      newErrors.productName = 'Le nom du produit est requis'
-    if (!productType) newErrors.productType = 'Le type de produit est requis'
+      newErrors.productName = 'Le nom du produit est requis';
+      
+    if (!productType) 
+      newErrors.productType = 'Le type de produit est requis';
+      
     if (productDescription && productDescription.length > 500) {
-      newErrors.productDescription =
-        'La description ne doit pas dépasser 500 caractères'
+      newErrors.productDescription = 'La description ne doit pas dépasser 500 caractères';
     }
-    if (!productImage && !imagePreview)
-      newErrors.productImage = 'Une image est requise'
+    
+    if (!fieldsLocked && !productImage && !imagePreview)
+      newErrors.productImage = 'Une image est requise';
+      
     if (!availabilityDate)
-      newErrors.availabilityDate = 'La date de disponibilité est requise'
-    if (!availableQuantity.trim())
-      newErrors.availableQuantity = 'La quantité disponible est requise'
-    else if (
-      isNaN(Number(availableQuantity)) ||
-      Number(availableQuantity) <= 0
-    ) {
-      newErrors.availableQuantity = 'La quantité doit être un nombre positif'
-    }
-    if (!unitPrice.trim()) newErrors.unitPrice = 'Le prix unitaire est requis'
-    else if (isNaN(Number(unitPrice)) || Number(unitPrice) <= 0) {
-      newErrors.unitPrice = 'Le prix doit être un nombre positif'
-    }
-    if (!unitType.trim()) newErrors.unitType = "L'unité de vente est requise"
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+      newErrors.availabilityDate = 'La date de disponibilité est requise';
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-
+    
     if (!validateForm()) return
-
+    
     setIsSubmitting(true)
-
+    
     try {
-      if (!productImage && !imagePreview) {
+      if (!selectedProductId && !productImage && !imagePreview) {
         throw new Error("L'image du produit est requise")
       }
-
+      
       const batchData: NewBatch = {
         email: authenticatedUser.email,
         productName: productName,
@@ -250,39 +245,39 @@ const AddBatchPage = () => {
         saleUnit: unitType,
         availableQuantity: parseInt(availableQuantity),
       }
-
+      
       if (batchContext) {
-        if (productImage) {
+        if (selectedProductId) {
+          await batchContext.createBatchWithExistingProduct(batchData, selectedProductId)
+        } 
+        else if (productImage) {
           await batchContext.createBatch(batchData, productImage)
-        } else if (imagePreview) {
-          await batchContext.createBatch(batchData, new File([], 'placeholder'))
-          throw new Error('Using existing product images is not yet supported')
-        } else {
-          throw new Error("L'image du produit est requise")
+        } 
+        else {
+          throw new Error("Une erreur s'est produite lors de la création du lot")
         }
-      } else {
-        throw new Error("Le contexte BatchContext n'est pas disponible")
+        
+        setProductName('')
+        setProductType('')
+        setProductDescription('')
+        setProductImage(null)
+        setImagePreview(null)
+        setAvailabilityDate(null)
+        setAvailableQuantity('')
+        setUnitPrice('')
+        setUnitType('')
+        setSelectedProductId(null)
+
+        setSnackbarMessage(
+          'Lot ajouté avec succès! Il sera examiné par un gestionnaire.'
+        )
+        setSnackbarSeverity('success')
+        setOpenSnackbar(true)
+
+        setTimeout(() => {
+          navigate('/producer-dashboard')
+        }, 2000)
       }
-
-      setProductName('')
-      setProductType('')
-      setProductDescription('')
-      setProductImage(null)
-      setImagePreview(null)
-      setAvailabilityDate(null)
-      setAvailableQuantity('')
-      setUnitPrice('')
-      setUnitType('')
-
-      setSnackbarMessage(
-        'Lot ajouté avec succès! Il sera examiné par un gestionnaire.'
-      )
-      setSnackbarSeverity('success')
-      setOpenSnackbar(true)
-
-      setTimeout(() => {
-        navigate('/producer-dashboard')
-      }, 2000)
     } catch (error) {
       console.error("Erreur lors de l'ajout du lot:", error)
       setSnackbarMessage(

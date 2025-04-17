@@ -179,22 +179,20 @@ export interface PendingBatch {
 
 export interface BatchContextType {
   myBatches: Batch[]
-  pendingBatches: PendingBatch[] // Remplacé managerBatches par pendingBatches
+  pendingBatches: PendingBatch[]
   approvedBatches: Batch[]
   receivedBatches: Batch[]
   isLoading: boolean
   error: string | null
-  fetchMyBatches: () => Promise<void>
   fetchPendingBatches: () => Promise<void>
   fetchApprovedBatches: () => Promise<void>
+  fetchMyBatches: () => Promise<void>
   fetchReceivedBatches: () => Promise<Batch[]>
   receiveBatch: (batchId: number) => Promise<Batch | null>
   createBatch: (newBatch: NewBatch, image: File) => Promise<void>
+  createBatchWithExistingProduct: (newBatch: NewBatch, productId: number) => Promise<void>
   updateBatchImage: (batchId: number, image: File) => Promise<Batch | null>
-  updateBatchImageById: (
-    batchId: number,
-    imageId: number
-  ) => Promise<Batch | null>
+  updateBatchImageById: (batchId: number, imageId: number) => Promise<Batch | null>
   acceptBatch: (batchId: number) => Promise<void>
   rejectBatch: (batchId: number, rejectionReason: string) => Promise<void>
 }

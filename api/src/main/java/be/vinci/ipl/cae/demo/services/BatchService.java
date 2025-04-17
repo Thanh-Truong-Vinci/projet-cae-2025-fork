@@ -13,6 +13,7 @@ import be.vinci.ipl.cae.demo.models.entities.Product;
 import be.vinci.ipl.cae.demo.repositories.BatchRepository;
 import be.vinci.ipl.cae.demo.repositories.NotificationRepository;
 import be.vinci.ipl.cae.demo.repositories.ProducerRepository;
+import be.vinci.ipl.cae.demo.repositories.ProductRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -28,15 +29,18 @@ public class BatchService {
   private final BatchRepository batchRepository;
   private final ProducerRepository producerRepository;
   private final NotificationRepository notificationRepository;
+  private final ProductRepository productRepository;
 
   /** Constructeur du service. */
   public BatchService(
       BatchRepository batchRepository,
       ProducerRepository producerRepository,
-      NotificationRepository notificationRepository) {
+      NotificationRepository notificationRepository,
+      ProductRepository productRepository) {
     this.batchRepository = batchRepository;
     this.producerRepository = producerRepository;
     this.notificationRepository = notificationRepository;
+    this.productRepository = productRepository;
   }
 
   /**
@@ -47,7 +51,44 @@ public class BatchService {
    */
   public Batch createBatch(NewBatch newBatch, Product product, Photo photo) {
     Producer producer = producerRepository.findByEmail(newBatch.getEmail());
+    return createBatchInternal(producer, product, photo, newBatch);
+  }
 
+  /**
+   * Creates a new batch using an existing product.
+   *
+   * @param newBatch the batch data
+   * @param productId the ID of the existing product
+   * @return the created batch
+   */
+  public Batch createBatchWithExistingProduct(NewBatch newBatch, Long productId) {
+    Producer producer = producerRepository.findByEmail(newBatch.getEmail());
+    
+    // Find the existing product
+    Product product = productRepository.findById(productId)
+        .orElse(null);
+    
+    if (product == null) {
+      return null;
+    }
+    
+    // Use the product's existing photo
+    Photo photo = product.getPhoto();
+    
+    return createBatchInternal(producer, product, photo, newBatch);
+  }
+  
+  /**
+   * Internal helper method to create a batch with given producer, product, photo and batch data.
+   * This eliminates code duplication between the public batch creation methods.
+   *
+   * @param producer the producer creating the batch
+   * @param product the product being used
+   * @param photo the photo associated with the product
+   * @param newBatch the batch data
+   * @return the created batch
+   */
+  private Batch createBatchInternal(Producer producer, Product product, Photo photo, NewBatch newBatch) {
     Batch batch = new Batch();
     batch.setProducer(producer);
     batch.setProduct(product);
