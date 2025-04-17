@@ -54,7 +54,7 @@ public class ReservationService {
     Reservation reservation = new Reservation();
     reservation.setClient(client);
     reservation.setPrice(0.0);
-    reservation.setStatus(ReservationStatus.PENDING);
+    reservation.setStatus(ReservationStatus.BUILDING);
     reservation.setReservationDate(LocalDate.now());
 
     // Save the reservation first to avoid transient property issues
@@ -79,13 +79,13 @@ public class ReservationService {
     }
 
     Reservation reservation = reservationRepository
-        .findByClientAndStatus(client, ReservationStatus.PENDING)
+        .findByClientAndStatus(client, ReservationStatus.BUILDING)
         .orElseGet(() -> {
           // Create and save the reservation first
           Reservation newReservation = new Reservation();
           newReservation.setClient(client);
           newReservation.setPrice(0.0);
-          newReservation.setStatus(ReservationStatus.PENDING);
+          newReservation.setStatus(ReservationStatus.BUILDING);
           newReservation.setReservationDate(LocalDate.now());
           return reservationRepository.save(newReservation);
         });
