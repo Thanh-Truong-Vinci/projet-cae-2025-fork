@@ -146,11 +146,10 @@ const HomePage = () => {
         seen.add(key)
         return true
       })
-  
+
       setFilteredProducts(uniqueProducts)
     }
   }, [products])
-  
 
   // ça va nous permettre de ne pas avoir soucis de différence de casse, d'espaces ou d'accents
   const normalizeString = (str: string | undefined): string => {
@@ -169,7 +168,7 @@ const HomePage = () => {
       seen.add(key)
       return true
     })
-  
+
     if (type) {
       const normalizedType = normalizeString(type)
       results = results.filter((product) => {
@@ -177,18 +176,17 @@ const HomePage = () => {
         return normalizedCategory === normalizedType
       })
     }
-  
+
     if (productName.trim()) {
       const searchTerm = productName.toLowerCase().trim()
       results = results.filter((product) =>
         product.productName.toLowerCase().includes(searchTerm)
       )
     }
-  
+
     setFilteredProducts(results)
     setVisibleProducts(productsPerLoad)
   }
-  
 
   const handleQuantityChange = (productId: number, value: number) => {
     setQuantities((prev) => ({
