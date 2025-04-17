@@ -1,4 +1,11 @@
-import { useState, useEffect, useContext, ChangeEvent, FormEvent, useRef } from 'react'
+import {
+  useState,
+  useEffect,
+  useContext,
+  ChangeEvent,
+  FormEvent,
+  useRef,
+} from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Typography,
@@ -50,7 +57,7 @@ const AddBatchPage = () => {
   const batchContext = useContext(BatchContext)
   const productContext = useReactContext(ProductContext)
   const { productTypes, loading: loadingTypes } = useProductType()
-  const hasLoadedProducts = useRef(false);
+  const hasLoadedProducts = useRef(false)
 
   const [productName, setProductName] = useState('')
   const [productType, setProductType] = useState<ProductType | ''>('')
@@ -69,7 +76,9 @@ const AddBatchPage = () => {
     'success'
   )
   const [fieldsLocked, setFieldsLocked] = useState(false)
-  const [selectedProductId, setSelectedProductId] = useState<number | null>(null)
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(
+    null
+  )
 
   useEffect(() => {
     if (!batchContext) {
@@ -97,19 +106,19 @@ const AddBatchPage = () => {
     const loadProducts = async () => {
       try {
         if (productContext && !hasLoadedProducts.current) {
-          hasLoadedProducts.current = true;
-          await productContext.fetchAllProducts();
+          hasLoadedProducts.current = true
+          await productContext.fetchAllProducts()
         }
       } catch (error) {
-        console.error('Error loading products:', error);
-        setSnackbarMessage('Erreur lors du chargement des produits');
-        setSnackbarSeverity('error');
-        setOpenSnackbar(true);
+        console.error('Error loading products:', error)
+        setSnackbarMessage('Erreur lors du chargement des produits')
+        setSnackbarSeverity('error')
+        setOpenSnackbar(true)
       }
-    };
+    }
 
-    loadProducts();
-  }, [productContext]);
+    loadProducts()
+  }, [productContext])
 
   if (!authenticatedUser || authenticatedUser.role !== 'Producer') {
     return (
@@ -134,26 +143,26 @@ const AddBatchPage = () => {
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (fieldsLocked) {
-      setSnackbarMessage('Changez le nom du produit pour modifier l\'image');
-      setSnackbarSeverity('error');
-      setOpenSnackbar(true);
-      return;
+      setSnackbarMessage("Changez le nom du produit pour modifier l'image")
+      setSnackbarSeverity('error')
+      setOpenSnackbar(true)
+      return
     }
-    
+
     if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0];
-      const fileExtension = selectedFile.name.split('.').pop() || '';
+      const selectedFile = e.target.files[0]
+      const fileExtension = selectedFile.name.split('.').pop() || ''
       const renamedFile = new File([selectedFile], `image.${fileExtension}`, {
         type: selectedFile.type,
-      });
-      
-      setProductImage(renamedFile);
-      
-      const reader = new FileReader();
+      })
+
+      setProductImage(renamedFile)
+
+      const reader = new FileReader()
       reader.onload = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(selectedFile);
+        setImagePreview(reader.result as string)
+      }
+      reader.readAsDataURL(selectedFile)
     }
   }
 
@@ -168,7 +177,7 @@ const AddBatchPage = () => {
       setProductName(product.name)
       setProductDescription(product.description)
       setSelectedProductId(product.id)
-      
+
       if (product.type && product.type.title) {
         setProductType(product.type.title)
         console.log('Product type set to:', product.type.title)
@@ -201,40 +210,40 @@ const AddBatchPage = () => {
   }
 
   const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
-    
+    const newErrors: FormErrors = {}
+
     if (!productName.trim())
-      newErrors.productName = 'Le nom du produit est requis';
-      
-    if (!productType) 
-      newErrors.productType = 'Le type de produit est requis';
-      
+      newErrors.productName = 'Le nom du produit est requis'
+
+    if (!productType) newErrors.productType = 'Le type de produit est requis'
+
     if (productDescription && productDescription.length > 500) {
-      newErrors.productDescription = 'La description ne doit pas dépasser 500 caractères';
+      newErrors.productDescription =
+        'La description ne doit pas dépasser 500 caractères'
     }
-    
+
     if (!fieldsLocked && !productImage && !imagePreview)
-      newErrors.productImage = 'Une image est requise';
-      
+      newErrors.productImage = 'Une image est requise'
+
     if (!availabilityDate)
-      newErrors.availabilityDate = 'La date de disponibilité est requise';
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+      newErrors.availabilityDate = 'La date de disponibilité est requise'
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateForm()) return
-    
+
     setIsSubmitting(true)
-    
+
     try {
       if (!selectedProductId && !productImage && !imagePreview) {
         throw new Error("L'image du produit est requise")
       }
-      
+
       const batchData: NewBatch = {
         email: authenticatedUser.email,
         productName: productName,
@@ -245,18 +254,21 @@ const AddBatchPage = () => {
         saleUnit: unitType,
         availableQuantity: parseInt(availableQuantity),
       }
-      
+
       if (batchContext) {
         if (selectedProductId) {
-          await batchContext.createBatchWithExistingProduct(batchData, selectedProductId)
-        } 
-        else if (productImage) {
+          await batchContext.createBatchWithExistingProduct(
+            batchData,
+            selectedProductId
+          )
+        } else if (productImage) {
           await batchContext.createBatch(batchData, productImage)
-        } 
-        else {
-          throw new Error("Une erreur s'est produite lors de la création du lot")
+        } else {
+          throw new Error(
+            "Une erreur s'est produite lors de la création du lot"
+          )
         }
-        
+
         setProductName('')
         setProductType('')
         setProductDescription('')

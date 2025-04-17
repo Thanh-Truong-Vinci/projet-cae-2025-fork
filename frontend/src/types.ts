@@ -190,9 +190,15 @@ export interface BatchContextType {
   fetchReceivedBatches: () => Promise<Batch[]>
   receiveBatch: (batchId: number) => Promise<Batch | null>
   createBatch: (newBatch: NewBatch, image: File) => Promise<void>
-  createBatchWithExistingProduct: (newBatch: NewBatch, productId: number) => Promise<void>
+  createBatchWithExistingProduct: (
+    newBatch: NewBatch,
+    productId: number
+  ) => Promise<void>
   updateBatchImage: (batchId: number, image: File) => Promise<Batch | null>
-  updateBatchImageById: (batchId: number, imageId: number) => Promise<Batch | null>
+  updateBatchImageById: (
+    batchId: number,
+    imageId: number
+  ) => Promise<Batch | null>
   acceptBatch: (batchId: number) => Promise<void>
   rejectBatch: (batchId: number, rejectionReason: string) => Promise<void>
 }
