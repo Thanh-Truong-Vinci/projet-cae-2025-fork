@@ -14,7 +14,7 @@ Content-Type: application/json
 ### Effettuare una prenotazione
 POST {{baseUrl}}/reservation/reserve
 Content-Type: application/json
-Authorization: Bearer {{clientToken}}
+Authorization: {{clientToken}}
 
 {
   "productId": 1,
@@ -23,12 +23,12 @@ Authorization: Bearer {{clientToken}}
 
 ### Ottenere la lista delle prenotazioni
 GET {{baseUrl}}/reservation/list
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhdXRoMCIsImVtYWlsIjoibWFyaW8ucm9zc2lAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDQ4OTI0NzAsImV4cCI6MTc0NDk3ODg3MH0.zW7ikDGh2oWc4BcIlYWTVedDTGStx8BuXF6iSbS0-ZU
+Authorization: {{clientToken}}
 
 ### Cambiare lo stato di una prenotazione a PENDING
 POST {{baseUrl}}/reservation/toPending
 Content-Type: application/json
-Authorization: Bearer {{clientToken}}
+Authorization: {{clientToken}}
 
 {
   "reservationId": 1
@@ -45,7 +45,7 @@ Content-Type: application/json
 ### Cambiare lo stato di una prenotazione a CANCELLED
 POST {{baseUrl}}/reservation/toCancel
 Content-Type: application/json
-Authorization: Bearer {{clientToken}}
+Authorization: {{clientToken}}
 
 {
   "reservationId": 1
