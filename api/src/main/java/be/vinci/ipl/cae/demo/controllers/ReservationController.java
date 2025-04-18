@@ -3,12 +3,14 @@ package be.vinci.ipl.cae.demo.controllers;
 import be.vinci.ipl.cae.demo.exceptions.ConflictException;
 import be.vinci.ipl.cae.demo.exceptions.ResourceNotFoundException;
 import be.vinci.ipl.cae.demo.models.dtos.ReservationRequest;
+import be.vinci.ipl.cae.demo.models.dtos.views.ReservationView;
 import be.vinci.ipl.cae.demo.models.entities.Client;
 import be.vinci.ipl.cae.demo.models.entities.Reservation;
 import be.vinci.ipl.cae.demo.models.entities.ReservationStatus;
 import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.ReservationService;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -62,12 +64,14 @@ public class ReservationController {
    * @throws ResourceNotFoundException if the token is invalid or expired.
    */
   @GetMapping("/list")
-  public List<Reservation> getReservations(@RequestHeader("Authorization") String token) {
+  public List<ReservationView> getReservations(@RequestHeader("Authorization") String token) {
     Client client = authsService.isValidClientToken(token);
     if (client == null) {
       throw new ResourceNotFoundException("Token not valid, expired or user is not client");
     }
-    return reservationService.getReservations(client);
+    return reservationService.getReservations(client).stream()
+        .map(ReservationView::new)
+        .collect(Collectors.toList());
   }
 
   /**

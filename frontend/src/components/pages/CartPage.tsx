@@ -46,11 +46,11 @@ const CartPage = () => {
     if (reservationContext && reservationContext.fetchReservations) {
       reservationContext.fetchReservations().then((r) => {
         setReservations(r)
-        const buildingReservation = r.find((res) => res.status === 'BUILDING')
+        const buildingReservation = r.find((res) => res.status !== 'CANCELED')
         setReservation(buildingReservation ?? null)
       })
     }
-  }, [reservationContext, reservationContext?.fetchReservations])
+  }, [])
 
   if (!reservationContext) {
     throw new Error(
