@@ -74,7 +74,7 @@ public class ReservationService {
 
     Reservation reservation =
         reservationRepository
-            .findByClientAndStatus(client, ReservationStatus.BUILDING)
+            .findByClientAndStatus(client, ReservationStatus.BUILDING.name())
             .orElseGet(() -> createReservation(client, product, quantity));
 
     reservationLineService.addProduct(reservation, product, quantity);

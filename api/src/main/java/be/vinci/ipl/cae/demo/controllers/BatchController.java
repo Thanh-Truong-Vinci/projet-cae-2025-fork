@@ -143,8 +143,7 @@ public class BatchController {
   @PostMapping("/createbatch/existing")
   @PreAuthorize(SecurityConstants.HAS_ROLE_PRODUCER)
   public Batch createBatchWithExistingProduct(
-      @RequestBody NewBatch newBatch,
-      @RequestParam Long productId) {
+      @RequestBody NewBatch newBatch, @RequestParam Long productId) {
 
     if (newBatch == null || productId == null) {
       throw new ConflictException("Données invalides");

@@ -654,27 +654,156 @@ SELECT id_user, NULL
 FROM users
 WHERE email = 'volunteer@example.com';
 
--- 1. Créer un utilisateur de base
+-- Création d'un client pour les réservations
 INSERT INTO users (name, firstname, email, password, date_inscription)
-VALUES ('Dupont', 'Michel', 'client@example.com',
+VALUES ('Martin', 'Pierre', 'pierre.martin@example.com',
         '$2a$10$8Cv0QyLMQ.dDlswhLhd8peiW6.KWnQLl0VmL5lw41/trJgprkg2vm',
         CURRENT_DATE);
 
--- 2. Ajouter l'adresse (obligatoire pour un UserWithAddress)
 INSERT INTO user_with_address (id_user, street, number, box, postal_code, city, country, phone_number)
-SELECT id_user,
-       'Avenue des Clients',
-       '25',
-       'A',
-       '1050',
-       'Bruxelles',
-       'Belgique',
-       '+32412345678'
-FROM users
-WHERE email = 'client@example.com';
+SELECT id_user, 'Avenue des Clients', '25', 'A', '1050', 'Bruxelles', 'Belgique', '+32476543210'
+FROM users WHERE email = 'pierre.martin@example.com';
 
--- 3. Créer l'entrée client 
 INSERT INTO client (id_user)
-SELECT id_user
-FROM users
-WHERE email = 'client@example.com';
+SELECT id_user FROM users WHERE email = 'pierre.martin@example.com';
+
+-- PREMIÈRE RÉSERVATION
+-- Créer une réservation confirmée pour le client
+INSERT INTO reservation (client, status, reservation_date, sale_date, price)
+SELECT id_user, 'CONFIRMED', CURRENT_DATE - 5, CURRENT_DATE, 0
+FROM users WHERE email = 'pierre.martin@example.com';
+
+-- Récupérer l'ID de la réservation
+WITH reservation_id AS (
+  SELECT id_reservation 
+  FROM reservation 
+  WHERE client = (SELECT id_user FROM users WHERE email = 'pierre.martin@example.com')
+  ORDER BY id_reservation DESC
+  LIMIT 1
+)
+-- Ajouter une ligne de réservation pour les Carottes Bio
+INSERT INTO reservation_lines (reservation_id, batch_id, quantity)
+SELECT r.id_reservation, b.id, 3
+FROM reservation_id r, batches b
+JOIN products p ON b.product_id = p.id_product
+WHERE p.name = 'Carottes Bio' 
+  AND b.status = 'RECEIVED'
+  AND b.available_quantity >= 3  -- Vérifier que la quantité disponible est suffisante
+LIMIT 1;
+
+-- Ajouter une ligne de réservation pour le Yaourt nature
+WITH reservation_id AS (
+  SELECT id_reservation 
+  FROM reservation 
+  WHERE client = (SELECT id_user FROM users WHERE email = 'pierre.martin@example.com')
+  ORDER BY id_reservation DESC
+  LIMIT 1
+)
+INSERT INTO reservation_lines (reservation_id, batch_id, quantity)
+SELECT r.id_reservation, b.id, 2
+FROM reservation_id r, batches b
+JOIN products p ON b.product_id = p.id_product
+WHERE p.name = 'Yaourt nature' 
+  AND b.status = 'RECEIVED'
+  AND b.available_quantity >= 2  -- Vérifier que la quantité disponible est suffisante
+LIMIT 1;
+
+-- Mettre à jour le prix total de la première réservation
+UPDATE reservation r
+SET price = (
+  SELECT SUM(b.unit_price * rl.quantity) 
+  FROM reservation_lines rl
+  JOIN batches b ON rl.batch_id = b.id
+  WHERE rl.reservation_id = r.id_reservation
+)
+WHERE client = (
+  SELECT id_user FROM users WHERE email = 'pierre.martin@example.com'
+)
+AND id_reservation = (
+  SELECT id_reservation 
+  FROM reservation 
+  WHERE client = (SELECT id_user FROM users WHERE email = 'pierre.martin@example.com')
+  ORDER BY id_reservation DESC
+  LIMIT 1
+);
+
+-- DEUXIÈME RÉSERVATION (pour le même client)
+-- Créer une deuxième réservation pour le client
+INSERT INTO reservation (client, status, reservation_date, sale_date, price)
+SELECT id_user, 'CONFIRMED', CURRENT_DATE - 2, CURRENT_DATE, 0
+FROM users WHERE email = 'pierre.martin@example.com';
+
+-- Récupérer l'ID de la deuxième réservation
+WITH reservation_id AS (
+  SELECT id_reservation 
+  FROM reservation 
+  WHERE client = (SELECT id_user FROM users WHERE email = 'pierre.martin@example.com')
+  ORDER BY id_reservation DESC
+  LIMIT 1
+)
+-- Ajouter une ligne de réservation pour les Tomates Bio
+INSERT INTO reservation_lines (reservation_id, batch_id, quantity)
+SELECT r.id_reservation, b.id, 2
+FROM reservation_id r, batches b
+JOIN products p ON b.product_id = p.id_product
+WHERE p.name = 'Tomates Bio' 
+  AND b.status = 'RECEIVED'
+  AND b.available_quantity >= 2  -- Vérifier que la quantité disponible est suffisante
+LIMIT 1;
+
+-- Mettre à jour le prix total de la deuxième réservation
+UPDATE reservation r
+SET price = (
+  SELECT SUM(b.unit_price * rl.quantity) 
+  FROM reservation_lines rl
+  JOIN batches b ON rl.batch_id = b.id
+  WHERE rl.reservation_id = r.id_reservation
+)
+WHERE client = (
+  SELECT id_user FROM users WHERE email = 'pierre.martin@example.com'
+)
+AND id_reservation = (
+  SELECT id_reservation 
+  FROM reservation 
+  WHERE client = (SELECT id_user FROM users WHERE email = 'pierre.martin@example.com')
+  ORDER BY id_reservation DESC
+  LIMIT 1
+);
+
+-- Mettre à jour les quantités disponibles dans les lots
+UPDATE batches b
+SET available_quantity = available_quantity - 3
+WHERE id = (
+  SELECT batch_id FROM reservation_lines rl
+  JOIN reservation r ON rl.reservation_id = r.id_reservation
+  JOIN batches b2 ON rl.batch_id = b2.id
+  JOIN products p ON b2.product_id = p.id_product
+  WHERE p.name = 'Carottes Bio' AND r.client = (SELECT id_user FROM users WHERE email = 'pierre.martin@example.com')
+  ORDER BY r.id_reservation
+  LIMIT 1
+);
+
+UPDATE batches b
+SET available_quantity = available_quantity - 2
+WHERE id = (
+  SELECT batch_id FROM reservation_lines rl
+  JOIN reservation r ON rl.reservation_id = r.id_reservation
+  JOIN batches b2 ON rl.batch_id = b2.id
+  JOIN products p ON b2.product_id = p.id_product
+  WHERE p.name = 'Yaourt nature' AND r.client = (SELECT id_user FROM users WHERE email = 'pierre.martin@example.com')
+  ORDER BY r.id_reservation
+  LIMIT 1
+);
+
+UPDATE batches b
+SET available_quantity = available_quantity - 2
+WHERE id = (
+  SELECT batch_id FROM reservation_lines rl
+  JOIN reservation r ON rl.reservation_id = r.id_reservation
+  JOIN batches b2 ON rl.batch_id = b2.id
+  JOIN products p ON b2.product_id = p.id_product
+  WHERE p.name = 'Tomates Bio' AND r.client = (SELECT id_user FROM users WHERE email = 'pierre.martin@example.com')
+  ORDER BY r.id_reservation DESC
+  LIMIT 1
+);
+

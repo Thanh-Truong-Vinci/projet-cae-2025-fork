@@ -63,21 +63,20 @@ public class BatchService {
    */
   public Batch createBatchWithExistingProduct(NewBatch newBatch, Long productId) {
     Producer producer = producerRepository.findByEmail(newBatch.getEmail());
-    
+
     // Find the existing product
-    Product product = productRepository.findById(productId)
-        .orElse(null);
-    
+    Product product = productRepository.findById(productId).orElse(null);
+
     if (product == null) {
       return null;
     }
-    
+
     // Use the product's existing photo
     Photo photo = product.getPhoto();
-    
+
     return createBatchInternal(producer, product, photo, newBatch);
   }
-  
+
   /**
    * Internal helper method to create a batch with given producer, product, photo and batch data.
    * This eliminates code duplication between the public batch creation methods.
@@ -88,7 +87,8 @@ public class BatchService {
    * @param newBatch the batch data
    * @return the created batch
    */
-  private Batch createBatchInternal(Producer producer, Product product, Photo photo, NewBatch newBatch) {
+  private Batch createBatchInternal(
+      Producer producer, Product product, Photo photo, NewBatch newBatch) {
     Batch batch = new Batch();
     batch.setProducer(producer);
     batch.setProduct(product);

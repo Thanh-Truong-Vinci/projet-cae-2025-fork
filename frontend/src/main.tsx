@@ -32,6 +32,7 @@ import ManageProductTypesPage from './components/pages/ManageProductTypesPage.ts
 import { ProductTypeProvider } from './contexts/ProductTypeProvider.tsx'
 import { ReservationProvider } from './contexts/ReservationProvider'
 import HandlePendingBatchesPage from './components/pages/HandlePendingBatchesPage'
+import { StatisticsProvider } from './contexts/StatisticsProvider'
 
 const router = createBrowserRouter([
   {
@@ -114,7 +115,9 @@ const router = createBrowserRouter([
         path: 'manager-dashboard',
         element: (
           <SimpleProtectedRoute requiredRole="Manager">
-            <ManagerDashboardPage />
+            <StatisticsProvider>
+              <ManagerDashboardPage />
+            </StatisticsProvider>
           </SimpleProtectedRoute>
         ),
       },
