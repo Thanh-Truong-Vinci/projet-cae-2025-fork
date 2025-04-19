@@ -84,7 +84,7 @@ describe('NavBar', () => {
     )
 
     // Check that the logout button is in the document
-    const logoutButton = screen.getByText(/Se déconnecter/i)
+    const logoutButton = screen.getByLabelText(/se-déconnecter/i)
     expect(logoutButton).toBeDefined()
 
     // Check that the login and register buttons are not in the document
@@ -94,6 +94,7 @@ describe('NavBar', () => {
     expect(registerButton).toBeNull()
     expect(loginButton).toBeNull()
   })
+
   test('navigates to /register when register button is clicked', () => {
     const mockContextValue = {
       authenticatedUser: undefined,
@@ -179,7 +180,7 @@ describe('NavBar', () => {
       </MemoryRouter>
     )
 
-    const logoutButton = screen.getByText(/Se déconnecter/i)
+    const logoutButton = screen.getByLabelText(/se-déconnecter/i)
     fireEvent.click(logoutButton)
 
     // Check that document.cookie was set to expire the token
