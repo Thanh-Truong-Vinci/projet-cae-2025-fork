@@ -319,7 +319,7 @@ const AddBatchPage = () => {
     setIsSubmitting(true)
 
     try {
-      if (!selectedProductId && !productImage && !imagePreview) {
+      if (!selectedProductId && !productImage && !selectedImage) {
         throw new Error("L'image du produit est requise")
       }
 
@@ -336,25 +336,20 @@ const AddBatchPage = () => {
 
       if (batchContext) {
         if (selectedProductId) {
+          // Use existing product
           await batchContext.createBatchWithExistingProduct(
             batchData,
             selectedProductId
           )
-        } else if (productImage) {
-          await batchContext.createBatch(batchData, productImage)
         } else if (selectedImage) {
-          const imageData = new FormData()
-          imageData.append(
-            'batch',
-            new Blob([JSON.stringify(batchData)], { type: 'application/json' })
+          // Use existing image
+          await batchContext.createBatchWithExistingImage(
+            batchData,
+            selectedImage.id
           )
-          imageData.append('imageId', selectedImage.id.toString())
-          const response = await fetch(selectedImage.imageLocation)
-          const blob = await response.blob()
-          const file = new File([blob], 'selected_image.jpg', {
-            type: blob.type,
-          })
-          await batchContext.createBatch(batchData, file)
+        } else if (productImage) {
+          // Upload new image
+          await batchContext.createBatch(batchData, productImage)
         } else {
           throw new Error(
             "Une erreur s'est produite lors de la création du lot"
@@ -403,7 +398,7 @@ const AddBatchPage = () => {
   const ImageSelectionModal = () => {
     const [modalSearchQuery, setModalSearchQuery] = useState(searchQuery)
     const modalFilteredPhotos = photos.filter((photo) =>
-      photo.productName.toLowerCase().includes(modalSearchQuery.toLowerCase())
+      photo.productName?.toLowerCase().includes(modalSearchQuery.toLowerCase())
     )
 
     return (
@@ -486,11 +481,18 @@ const AddBatchPage = () => {
                         component="img"
                         height="100"
                         image={photo.imageLocation}
-                        alt={photo.productName}
+                        alt={photo.productName || `Photo #${photo.id}`}
                       />
                       <CardContent sx={{ p: 1 }}>
                         <Typography variant="caption" noWrap>
-                          {photo.productName}
+                          {photo.productName || `Photo #${photo.id}`}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          display="block"
+                          color="text.secondary"
+                        >
+                          ID: {photo.id}
                         </Typography>
                       </CardContent>
                     </Card>

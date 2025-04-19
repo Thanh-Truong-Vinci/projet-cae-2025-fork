@@ -158,6 +158,36 @@ public class BatchController {
   }
 
   /**
+   * Creates a new batch with a new product but using an existing image.
+   *
+   * @param newBatch the batch data
+   * @param photoId the ID of the existing photo
+   * @return the created batch
+   */
+  @PostMapping("/createbatch/existingimage")
+  @PreAuthorize(SecurityConstants.HAS_ROLE_PRODUCER)
+  public Batch createBatchWithExistingImage(
+      @RequestBody NewBatch newBatch, @RequestParam Long photoId) {
+
+    if (newBatch == null || photoId == null) {
+      throw new ConflictException("Données invalides");
+    }
+
+    // Check if the photo exists
+    Photo photo = photoService.getPhotoById(photoId);
+    if (photo == null) {
+      throw new ResourceNotFoundException("Image non trouvée avec l'ID: " + photoId);
+    }
+
+    Batch batch = batchService.createBatchWithExistingImage(newBatch, photoId);
+    if (batch == null) {
+      throw new ConflictException("Échec de la création du lot");
+    }
+
+    return batch;
+  }
+
+  /**
    * Affiche les lots d'un producteur dont la quantité est supérieur à 0.
    *
    * @param token le toke du producteur

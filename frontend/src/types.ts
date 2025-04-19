@@ -194,6 +194,10 @@ export interface BatchContextType {
     newBatch: NewBatch,
     productId: number
   ) => Promise<void>
+  createBatchWithExistingImage: (
+    newBatch: NewBatch,
+    photoId: number
+  ) => Promise<void>
   updateBatchImage: (batchId: number, image: File) => Promise<Batch | null>
   updateBatchImageById: (
     batchId: number,

@@ -320,6 +320,52 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
     }
   }
 
+  const createBatchWithExistingImage = async (
+    newBatch: NewBatch,
+    photoId: number
+  ): Promise<void> => {
+    try {
+      if (!authenticatedUser) {
+        throw new Error('Vous devez être authentifié pour ajouter un lot')
+      }
+
+      console.log(
+        'Création de lot avec image existante:',
+        newBatch.productName,
+        'photoId:',
+        photoId
+      )
+
+      const response = await fetch(
+        `/api/batches/createbatch/existingimage?photoId=${photoId}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: authenticatedUser.token,
+          },
+          body: JSON.stringify(newBatch),
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error(
+          `fetch error : ${response.status} : ${response.statusText}`
+        )
+      }
+
+      const createdBatch = await response.json()
+      console.log('Lot créé avec succès (image existante):', createdBatch)
+
+      return createdBatch
+    } catch (err) {
+      console.error('createBatchWithExistingImage::error: ', err)
+      throw err instanceof Error
+        ? new Error(err.message || 'Erreur lors de la création du lot')
+        : new Error('Erreur inconnue lors de la création du lot')
+    }
+  }
+
   const updateBatchImage = async (
     batchId: number,
     image: File
@@ -543,6 +589,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
         receiveBatch,
         createBatch,
         createBatchWithExistingProduct,
+        createBatchWithExistingImage,
         updateBatchImage,
         updateBatchImageById,
         acceptBatch,

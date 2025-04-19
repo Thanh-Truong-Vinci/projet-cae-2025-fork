@@ -10,10 +10,12 @@ import be.vinci.ipl.cae.demo.models.entities.Notification;
 import be.vinci.ipl.cae.demo.models.entities.Photo;
 import be.vinci.ipl.cae.demo.models.entities.Producer;
 import be.vinci.ipl.cae.demo.models.entities.Product;
+import be.vinci.ipl.cae.demo.models.entities.ProductType;
 import be.vinci.ipl.cae.demo.repositories.BatchRepository;
 import be.vinci.ipl.cae.demo.repositories.NotificationRepository;
 import be.vinci.ipl.cae.demo.repositories.ProducerRepository;
 import be.vinci.ipl.cae.demo.repositories.ProductRepository;
+import be.vinci.ipl.cae.demo.repositories.ProductTypeRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -30,17 +32,26 @@ public class BatchService {
   private final ProducerRepository producerRepository;
   private final NotificationRepository notificationRepository;
   private final ProductRepository productRepository;
+  private final ProductTypeRepository productTypeRepository;
+  private final PhotoService photoService;
+  private final ProductService productService;
 
   /** Constructeur du service. */
   public BatchService(
       BatchRepository batchRepository,
       ProducerRepository producerRepository,
       NotificationRepository notificationRepository,
-      ProductRepository productRepository) {
+      ProductRepository productRepository,
+      ProductTypeRepository productTypeRepository,
+      PhotoService photoService,
+      ProductService productService) {
     this.batchRepository = batchRepository;
     this.producerRepository = producerRepository;
     this.notificationRepository = notificationRepository;
     this.productRepository = productRepository;
+    this.productTypeRepository = productTypeRepository;
+    this.photoService = photoService;
+    this.productService = productService;
   }
 
   /**
@@ -74,6 +85,42 @@ public class BatchService {
     // Use the product's existing photo
     Photo photo = product.getPhoto();
 
+    return createBatchInternal(producer, product, photo, newBatch);
+  }
+
+  /**
+   * Creates a new batch using an existing image from the database.
+   *
+   * @param newBatch the batch data
+   * @param photoId the ID of the existing photo to use
+   * @return the created batch
+   */
+  public Batch createBatchWithExistingImage(NewBatch newBatch, Long photoId) {
+    Producer producer = producerRepository.findByEmail(newBatch.getEmail());
+    
+    // Find the existing photo
+    Photo photo = photoService.getPhotoById(photoId);
+    if (photo == null) {
+      return null;
+    }
+    
+    // Get the product type
+    ProductType productType = productTypeRepository.findByTitle(newBatch.getProductType());
+    if (productType == null) {
+      return null;
+    }
+    
+    // Create a new product with the existing photo
+    Product product = productService.createProduct(
+        newBatch.getProductName(), 
+        productType, 
+        newBatch.getProductDescription(), 
+        photo);
+    
+    if (product == null) {
+      return null;
+    }
+    
     return createBatchInternal(producer, product, photo, newBatch);
   }
 
