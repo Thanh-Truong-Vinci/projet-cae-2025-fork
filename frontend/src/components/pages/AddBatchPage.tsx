@@ -67,7 +67,11 @@ const AddBatchPage = () => {
   const batchContext = useContext(BatchContext)
   const productContext = useReactContext(ProductContext)
   const { productTypes, loading: loadingTypes } = useProductType()
-  const { photos, isLoading: isLoadingPhotos, fetchAllPhotos } = useContext(PhotoContext)!
+  const {
+    photos,
+    isLoading: isLoadingPhotos,
+    fetchAllPhotos,
+  } = useContext(PhotoContext)!
   const hasLoadedProducts = useRef(false)
   const [photosLoaded, setPhotosLoaded] = useState(false)
 
@@ -91,7 +95,7 @@ const AddBatchPage = () => {
   const [selectedProductId, setSelectedProductId] = useState<number | null>(
     null
   )
-  
+
   // Image selection modal states
   const [isImageModalOpen, setIsImageModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -136,7 +140,7 @@ const AddBatchPage = () => {
 
     loadProducts()
   }, [productContext])
-  
+
   useEffect(() => {
     if (!photosLoaded) {
       fetchAllPhotos()
@@ -239,7 +243,7 @@ const AddBatchPage = () => {
       setFieldsLocked(false)
     }
   }
-  
+
   const handleOpenImageModal = () => {
     if (fieldsLocked) {
       setSnackbarMessage("Changez le nom du produit pour modifier l'image")
@@ -247,10 +251,10 @@ const AddBatchPage = () => {
       setOpenSnackbar(true)
       return
     }
-    
+
     setIsImageModalOpen(true)
     setSearchQuery('')
-    
+
     if (!photosLoaded) {
       fetchAllPhotos()
         .then(() => setPhotosLoaded(true))
@@ -259,14 +263,14 @@ const AddBatchPage = () => {
         })
     }
   }
-  
+
   // Handle selecting an image from the gallery
   const handleImageSelect = (photo: Photo) => {
     setSelectedImage(photo)
     setProductImage(null)
     setImagePreview(photo.imageLocation)
   }
-  
+
   // Confirm image selection and close modal
   const handleConfirmImageSelection = () => {
     setIsImageModalOpen(false)
@@ -291,14 +295,17 @@ const AddBatchPage = () => {
     if (!availabilityDate)
       newErrors.availabilityDate = 'La date de disponibilité est requise'
 
-    if (!availableQuantity || isNaN(Number(availableQuantity)) || Number(availableQuantity) <= 0)
+    if (
+      !availableQuantity ||
+      isNaN(Number(availableQuantity)) ||
+      Number(availableQuantity) <= 0
+    )
       newErrors.availableQuantity = 'La quantité doit être un nombre positif'
 
     if (!unitPrice || isNaN(Number(unitPrice)) || Number(unitPrice) <= 0)
       newErrors.unitPrice = 'Le prix doit être un nombre positif'
 
-    if (!unitType.trim())
-      newErrors.unitType = "L'unité de vente est requise"
+    if (!unitType.trim()) newErrors.unitType = "L'unité de vente est requise"
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -337,11 +344,16 @@ const AddBatchPage = () => {
           await batchContext.createBatch(batchData, productImage)
         } else if (selectedImage) {
           const imageData = new FormData()
-          imageData.append('batch', new Blob([JSON.stringify(batchData)], { type: 'application/json' }))
+          imageData.append(
+            'batch',
+            new Blob([JSON.stringify(batchData)], { type: 'application/json' })
+          )
           imageData.append('imageId', selectedImage.id.toString())
           const response = await fetch(selectedImage.imageLocation)
           const blob = await response.blob()
-          const file = new File([blob], "selected_image.jpg", { type: blob.type })
+          const file = new File([blob], 'selected_image.jpg', {
+            type: blob.type,
+          })
           await batchContext.createBatch(batchData, file)
         } else {
           throw new Error(
@@ -386,14 +398,14 @@ const AddBatchPage = () => {
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false)
   }
-  
+
   // Image selection modal component
   const ImageSelectionModal = () => {
-    const [modalSearchQuery, setModalSearchQuery] = useState(searchQuery);
+    const [modalSearchQuery, setModalSearchQuery] = useState(searchQuery)
     const modalFilteredPhotos = photos.filter((photo) =>
       photo.productName.toLowerCase().includes(modalSearchQuery.toLowerCase())
-    );
-    
+    )
+
     return (
       <Modal
         open={isImageModalOpen}
@@ -498,7 +510,10 @@ const AddBatchPage = () => {
           <Box
             sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}
           >
-            <Button onClick={() => setIsImageModalOpen(false)} variant="outlined">
+            <Button
+              onClick={() => setIsImageModalOpen(false)}
+              variant="outlined"
+            >
               Annuler
             </Button>
             <Button
@@ -511,8 +526,8 @@ const AddBatchPage = () => {
           </Box>
         </Paper>
       </Modal>
-    );
-  };
+    )
+  }
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
@@ -615,7 +630,14 @@ const AddBatchPage = () => {
               <Box
                 sx={{ border: '1px dashed grey', p: 2, textAlign: 'center' }}
               >
-                <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center', gap: 2 }}>
+                <Box
+                  sx={{
+                    mb: 2,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: 2,
+                  }}
+                >
                   <input
                     accept="image/*"
                     style={{ display: 'none' }}
@@ -633,7 +655,7 @@ const AddBatchPage = () => {
                       Télécharger une image
                     </Button>
                   </label>
-                  
+
                   <Button
                     variant="outlined"
                     startIcon={<PhotoLibraryIcon />}
@@ -764,7 +786,7 @@ const AddBatchPage = () => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-      
+
       {/* Image selection modal */}
       <ImageSelectionModal />
     </Container>

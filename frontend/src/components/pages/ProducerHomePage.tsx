@@ -242,7 +242,7 @@ const ProducerHomePage = () => {
     const modalFilteredPhotos = photos.filter((photo) =>
       photo.productName.toLowerCase().includes(modalSearchQuery.toLowerCase())
     )
-  
+
     return (
       <Modal
         open={isImageModalOpen}
@@ -278,7 +278,7 @@ const ProducerHomePage = () => {
               <CloseIcon />
             </IconButton>
           </Box>
-  
+
           <Box sx={{ mb: 3 }}>
             <Typography variant="subtitle1">Image actuelle:</Typography>
             <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
@@ -289,7 +289,7 @@ const ProducerHomePage = () => {
               />
             </Box>
           </Box>
-  
+
           <Box sx={{ mb: 3 }}>
             <TextField
               label="Rechercher une image"
@@ -301,11 +301,11 @@ const ProducerHomePage = () => {
               }}
               sx={{ mb: 2 }}
             />
-  
+
             <Typography variant="subtitle1" sx={{ mb: 1 }}>
               Images disponibles:
             </Typography>
-  
+
             {isLoadingPhotos ? (
               <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
                 <CircularProgress />
@@ -354,9 +354,9 @@ const ProducerHomePage = () => {
               </Grid>
             )}
           </Box>
-  
+
           <Divider sx={{ my: 2 }} />
-  
+
           <Box sx={{ mt: 2 }}>
             <Button
               variant="outlined"
@@ -382,11 +382,14 @@ const ProducerHomePage = () => {
               </Typography>
             )}
           </Box>
-  
+
           <Box
             sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}
           >
-            <Button onClick={() => setIsImageModalOpen(false)} variant="outlined">
+            <Button
+              onClick={() => setIsImageModalOpen(false)}
+              variant="outlined"
+            >
               Annuler
             </Button>
             <Button
@@ -525,7 +528,11 @@ const ProducerHomePage = () => {
                                   alignItems: 'flex-start',
                                 }}
                               >
-                                <Typography variant="h6" component="h3" gutterBottom>
+                                <Typography
+                                  variant="h6"
+                                  component="h3"
+                                  gutterBottom
+                                >
                                   {batch.productName}
                                 </Typography>
                                 <Chip
@@ -543,7 +550,10 @@ const ProducerHomePage = () => {
                                   variant="outlined"
                                   sx={{ mb: 1 }}
                                 />
-                                <Typography variant="body2" color="text.secondary">
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                >
                                   <strong>Disponible:</strong>{' '}
                                   {format(
                                     new Date(batch.availabilityDate),
@@ -551,45 +561,65 @@ const ProducerHomePage = () => {
                                     { locale: fr }
                                   )}
                                 </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                  <strong>Quantité:</strong> {batch.availableQuantity}{' '}
-                                  {batch.unitType}
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                >
+                                  <strong>Quantité:</strong>{' '}
+                                  {batch.availableQuantity} {batch.unitType}
                                 </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                  <strong>Prix:</strong> {batch.unitPrice.toFixed(2)}€/
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                >
+                                  <strong>Prix:</strong>{' '}
+                                  {batch.unitPrice.toFixed(2)}€/
                                   {batch.unitType}
                                 </Typography>
                               </Box>
 
-                              {batch.status === 'REJECTED' && batch.rejectionReason && (
-                                <Box
-                                  sx={{
-                                    mt: 2,
-                                    p: 1,
-                                    bgcolor: 'error.light',
-                                    borderRadius: 1,
-                                  }}
-                                >
-                                  <Typography variant="caption" color="error.dark">
-                                    <strong>Motif du refus:</strong>{' '}
-                                    {batch.rejectionReason}
-                                  </Typography>
-                                </Box>
-                              )}
+                              {batch.status === 'REJECTED' &&
+                                batch.rejectionReason && (
+                                  <Box
+                                    sx={{
+                                      mt: 2,
+                                      p: 1,
+                                      bgcolor: 'error.light',
+                                      borderRadius: 1,
+                                    }}
+                                  >
+                                    <Typography
+                                      variant="caption"
+                                      color="error.dark"
+                                    >
+                                      <strong>Motif du refus:</strong>{' '}
+                                      {batch.rejectionReason}
+                                    </Typography>
+                                  </Box>
+                                )}
 
                               <Box sx={{ mt: 2 }}>
-                                <Typography variant="caption" color="text.secondary">
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                >
                                   Ajouté le{' '}
-                                  {format(new Date(batch.createdAt), 'dd/MM/yyyy', {
-                                    locale: fr,
-                                  })}
+                                  {format(
+                                    new Date(batch.createdAt),
+                                    'dd/MM/yyyy',
+                                    {
+                                      locale: fr,
+                                    }
+                                  )}
                                 </Typography>
                               </Box>
                             </CardContent>
 
                             <Divider />
 
-                            <CardActions sx={{ justifyContent: 'center', p: 1 }}>
+                            <CardActions
+                              sx={{ justifyContent: 'center', p: 1 }}
+                            >
                               {/* Ne montrer le bouton de modification que si le lot n'est pas refusé */}
                               {batch.status !== 'REJECTED' && (
                                 <Button
