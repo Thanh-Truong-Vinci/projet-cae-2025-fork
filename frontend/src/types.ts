@@ -228,25 +228,33 @@ export interface PhotoContextType {
   fetchAllPhotos: () => Promise<void>
 }
 
-// Reservation interfaces
-export interface Reservation {
+/* eslint-disable no-unused-vars */
+export enum ReservationStatus {
+  BUILDING = 'BUILDING',
+  PENDING = 'PENDING',
+  CONFIRMED = 'CONFIRMED',
+  CANCELLED = 'CANCELLED',
+}
+/* eslint-enable no-unused-vars */
+
+export interface ReservationView {
   id: number
-  client?: {
-    id: number
-    name: string
-    firstname: string
-  }
-  status: string
+  clientId: number | null
+  status: ReservationStatus
   reservationDate: string
   saleDate?: string
   price: number
-  reservationLines: ReservationLine[]
+  reservationLines: ReservationLineView[]
 }
 
-export interface ReservationLine {
+export interface ReservationLineView {
   id: number
   quantity: number
-  batch: Batch
+  batchId: number
+  productId: number
+  productName: string
+  unitPrice: number
+  imageLocation: string
 }
 
 export interface ReservationRequest {
@@ -255,11 +263,11 @@ export interface ReservationRequest {
 }
 
 export interface ReservationContextType {
-  reservations: Reservation[]
+  reservations: ReservationView[]
   isLoading: boolean
   error: string | null
-  fetchReservations: () => Promise<Reservation[]>
-  fetchAllReservations: () => Promise<Reservation[]>
+  fetchReservations: () => Promise<ReservationView[]>
+  fetchAllReservations: () => Promise<ReservationView[]>
   createReservation: (productId: number, quantity: number) => Promise<void>
   toPendingReservation: (reservationId: number) => Promise<void>
   toConfirmReservation: (reservationId: number) => Promise<void>

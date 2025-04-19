@@ -4,9 +4,8 @@ import be.vinci.ipl.cae.demo.models.entities.ReservationLine;
 import lombok.Data;
 
 /**
- * Data Transfer Object (DTO) representing a reservation line view.
- * This class simplifies the ReservationLine entity for display purposes,
- * avoiding circular references in JSON serialization.
+ * Data Transfer Object (DTO) representing a reservation line view. This class simplifies the
+ * ReservationLine entity for display purposes, avoiding circular references in JSON serialization.
  */
 @Data
 public class ReservationLineView {
@@ -15,10 +14,12 @@ public class ReservationLineView {
   private Long batchId;
   private Long productId;
   private String productName;
+  private double unitPrice;
+  private String imageLocation;
 
   /**
-   * Constructor for ReservationLineView.
-   * Creates a reservation line view from a ReservationLine entity.
+   * Constructor for ReservationLineView. Creates a reservation line view from a ReservationLine
+   * entity.
    *
    * @param reservationLine the ReservationLine entity to convert
    */
@@ -28,5 +29,7 @@ public class ReservationLineView {
     this.batchId = reservationLine.getBatch().getId();
     this.productId = reservationLine.getBatch().getProduct().getId();
     this.productName = reservationLine.getBatch().getProduct().getName();
+    this.unitPrice = reservationLine.getBatch().getUnitPrice();
+    this.imageLocation = reservationLine.getBatch().getPhoto().getImageLocation();
   }
 }

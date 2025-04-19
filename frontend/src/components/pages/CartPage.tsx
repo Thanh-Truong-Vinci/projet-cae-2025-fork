@@ -28,7 +28,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { useNavigate } from 'react-router-dom'
 import { UserContext } from '../../contexts/UserContext'
 import { ReservationContext } from '../../contexts/ReservationContext'
-import { Reservation } from '../../types'
+import { ReservationStatus, ReservationView } from '../../types'
 
 const CartPage = () => {
   const { authenticatedUser } = useContext(UserContext)
@@ -39,18 +39,18 @@ const CartPage = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false)
   const [message, setMessage] = useState('')
   const reservationContext = useContext(ReservationContext)
-  const [reservations, setReservations] = useState<Reservation[]>([])
-  const [reservation, setReservation] = useState<Reservation | null>(null)
+  const [reservation, setReservation] = useState<ReservationView | null>(null)
 
   useEffect(() => {
     if (reservationContext && reservationContext.fetchReservations) {
       reservationContext.fetchReservations().then((r) => {
-        setReservations(r)
-        const buildingReservation = r.find((res) => res.status !== 'CANCELED')
+        const buildingReservation = r.find(
+          (res) => res.status === ReservationStatus.BUILDING
+        )
         setReservation(buildingReservation ?? null)
       })
     }
-  }, [])
+  }, [reservationContext])
 
   if (!reservationContext) {
     throw new Error(
@@ -88,7 +88,7 @@ const CartPage = () => {
   const calculateTotal = () => {
     if (!reservation || !reservation.reservationLines) return 0
     return reservation.reservationLines.reduce(
-      (total, line) => total + line.quantity * line.batch.unitPrice,
+      (total, line) => total + line.quantity * line.unitPrice,
       0
     )
   }
@@ -208,18 +208,6 @@ const CartPage = () => {
 
   return (
     <Box sx={{ width: '100%', p: 3 }}>
-      {/* TODO remove Debug information */}
-      <Box sx={{ mt: 3 }}>
-        <Typography variant="body2" color="textSecondary">
-          <strong>Debug - Reservation:</strong>{' '}
-          {JSON.stringify(reservation, null, 2)}
-        </Typography>
-        <Typography variant="body2" color="textSecondary">
-          <strong>Debug - Reservations:</strong>{' '}
-          {JSON.stringify(reservations, null, 2)}
-        </Typography>
-      </Box>
-
       <Typography variant="h4" sx={{ mb: 3 }}>
         Mon Panier
       </Typography>
@@ -256,13 +244,13 @@ const CartPage = () => {
                   <TableRow key={item.id}>
                     <TableCell>
                       <img
-                        src={item.batch.imageUrl}
-                        alt={item.batch.productName}
+                        src={item.imageLocation || '/placeholder.jpg'}
+                        alt={item.productName}
                         style={{ width: 60, height: 60, objectFit: 'cover' }}
                       />
                     </TableCell>
-                    <TableCell>{item.batch.productName}</TableCell>
-                    <TableCell align="right">{item.batch.unitPrice}</TableCell>
+                    <TableCell>{item.productName}</TableCell>
+                    <TableCell align="right">{item.unitPrice}</TableCell>
                     <TableCell align="center">
                       <Box
                         sx={{
@@ -299,7 +287,7 @@ const CartPage = () => {
                       </Box>
                     </TableCell>
                     <TableCell align="right">
-                      {`${(item.batch.unitPrice * item.quantity).toFixed(2)}€`}
+                      {`${(item.unitPrice * item.quantity).toFixed(2)}€`}
                     </TableCell>
                     <TableCell align="center">
                       <IconButton

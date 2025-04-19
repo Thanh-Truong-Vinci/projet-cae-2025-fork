@@ -8,10 +8,9 @@ import java.util.stream.Collectors;
 import lombok.Data;
 
 /**
- * Data Transfer Object (DTO) representing a reservation view.
- * This class is used to present reservation data to clients
- * in a structured format, containing only the necessary information
- * for display purposes.
+ * Data Transfer Object (DTO) representing a reservation view. This class is used to present
+ * reservation data to clients in a structured format, containing only the necessary information for
+ * display purposes.
  */
 @Data
 public class ReservationView {
@@ -24,8 +23,7 @@ public class ReservationView {
   private List<ReservationLineView> reservationLines;
 
   /**
-   * Constructor for ReservationView.
-   * Creates a reservation view from a Reservation entity.
+   * Constructor for ReservationView. Creates a reservation view from a Reservation entity.
    *
    * @param reservation the Reservation entity to convert
    */
@@ -36,8 +34,9 @@ public class ReservationView {
     this.reservationDate = reservation.getReservationDate();
     this.saleDate = reservation.getSaleDate();
     this.price = reservation.getPrice();
-    this.reservationLines = reservation.getReservationLines().stream()
-        .map(ReservationLineView::new)
-        .collect(Collectors.toList());
+    this.reservationLines =
+        reservation.getReservationLines().stream()
+            .map(ReservationLineView::new)
+            .collect(Collectors.toList());
   }
 }
