@@ -31,6 +31,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import { BatchContext } from '../../contexts/BatchContext'
 import { UserContext } from '../../contexts/UserContext'
 import { ReservationContext } from '../../contexts/ReservationContext'
+import { ReservationStatus } from '../../types'
 
 const VolunteerHomePage = () => {
   const navigate = useNavigate()
@@ -72,7 +73,7 @@ const VolunteerHomePage = () => {
 
   // Filter reservations to only include those in 'Pending' state
   let pendingReservations = reservations.filter(
-    (reservation) => reservation.status === 'Pending'
+    (reservation) => reservation.status === ReservationStatus.PENDING
   )
 
   if (pendingReservations.length == 0) {
@@ -80,27 +81,19 @@ const VolunteerHomePage = () => {
     pendingReservations = [
       {
         id: 0,
-        client: { id: 0, firstname: '', name: '' },
+        clientId: 0,
         reservationDate: new Date().toISOString(),
         price: 10,
-        status: 'Pending',
+        status: ReservationStatus.PENDING,
         reservationLines: [
           {
             id: 0,
-            batch: {
-              id: 0,
-              productName: 'Produit de test',
-              productType: 'Type de test',
-              unitPrice: 10,
-              unitType: 'kg',
-              availableQuantity: 100,
-              availabilityDate: new Date().toISOString(),
-              imageUrl: 'https://via.placeholder.com/150',
-              producerId: 1,
-              createdAt: new Date().toISOString(),
-              status: 'APPROVED',
-            },
             quantity: 1,
+            batchId: 0,
+            productId: 0,
+            productName: 'Produit de test',
+            unitPrice: 10,
+            imageLocation: 'https://via.placeholder.com/150',
           },
         ],
       },
@@ -327,10 +320,7 @@ const VolunteerHomePage = () => {
                 {pendingReservations.map((reservation) => (
                   <React.Fragment key={reservation.id}>
                     <TableRow>
-                      <TableCell>
-                        {reservation.client?.firstname}{' '}
-                        {reservation.client?.name}
-                      </TableCell>
+                      <TableCell>{reservation.clientId}</TableCell>
                       <TableCell>
                         {format(
                           new Date(reservation.reservationDate),
@@ -401,10 +391,10 @@ const VolunteerHomePage = () => {
                                         <CardMedia
                                           component="img"
                                           image={
-                                            line.batch.imageUrl ||
+                                            line.imageLocation ||
                                             'https://via.placeholder.com/150'
                                           }
-                                          alt={line.batch.productName}
+                                          alt={line.productName}
                                           sx={{
                                             width: 60,
                                             height: 60,
@@ -413,13 +403,11 @@ const VolunteerHomePage = () => {
                                           }}
                                         />
                                       </TableCell>
-                                      <TableCell>
-                                        {line.batch.productName}
-                                      </TableCell>
+                                      <TableCell>{line.productName}</TableCell>
                                       <TableCell>{line.quantity}</TableCell>
                                       <TableCell>
                                         {(
-                                          line.quantity * line.batch.unitPrice
+                                          line.quantity * line.unitPrice
                                         ).toFixed(2)}
                                         €
                                       </TableCell>

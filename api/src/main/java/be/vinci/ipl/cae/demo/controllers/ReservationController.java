@@ -5,7 +5,6 @@ import be.vinci.ipl.cae.demo.exceptions.ResourceNotFoundException;
 import be.vinci.ipl.cae.demo.models.dtos.ReservationRequest;
 import be.vinci.ipl.cae.demo.models.dtos.views.ReservationView;
 import be.vinci.ipl.cae.demo.models.entities.Client;
-import be.vinci.ipl.cae.demo.models.entities.Reservation;
 import be.vinci.ipl.cae.demo.models.entities.ReservationStatus;
 import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.ReservationService;
@@ -120,11 +119,13 @@ public class ReservationController {
   /**
    * Retrieves all reservations regardless of the client.
    *
-   * @return a list of all reservations.
+   * @return a list of all reservations as ReservationView.
    */
   @GetMapping("/all")
-  public List<Reservation> getAllReservations() {
-    return reservationService.getAllReservations();
+  public List<ReservationView> getAllReservations() {
+    return reservationService.getAllReservations().stream()
+        .map(ReservationView::new)
+        .collect(Collectors.toList());
   }
 
   /**

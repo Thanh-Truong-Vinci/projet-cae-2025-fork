@@ -2,20 +2,22 @@ import { useState, useEffect, useContext, ReactNode, useCallback } from 'react'
 import axios from 'axios'
 import { ReservationContext } from './ReservationContext'
 import { UserContext } from './UserContext'
-import { Reservation, ReservationRequest } from '../types'
+import { ReservationRequest, ReservationView } from '../types'
 
 interface ReservationProviderProps {
   children: ReactNode
 }
 
 export const ReservationProvider = ({ children }: ReservationProviderProps) => {
-  const [reservations, setReservations] = useState<Reservation[]>([])
+  const [reservations, setReservations] = useState<ReservationView[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const { authenticatedUser } = useContext(UserContext)
 
   // Fetch all reservations for the current user
-  const fetchReservations = useCallback(async (): Promise<Reservation[]> => {
+  const fetchReservations = useCallback(async (): Promise<
+    ReservationView[]
+  > => {
     setIsLoading(true)
     setError(null)
 
@@ -38,7 +40,7 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
 
       // Format dates and ensure consistency
       const formattedReservations = Array.isArray(data)
-        ? data.map((reservation: Reservation) => ({
+        ? data.map((reservation: ReservationView) => ({
             ...reservation,
             reservationDate:
               reservation.reservationDate || new Date().toISOString(),
@@ -65,7 +67,9 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
   }, [authenticatedUser])
 
   // Fetch all reservations regardless of the client
-  const fetchAllReservations = useCallback(async (): Promise<Reservation[]> => {
+  const fetchAllReservations = useCallback(async (): Promise<
+    ReservationView[]
+  > => {
     setIsLoading(true)
     setError(null)
 
@@ -80,7 +84,7 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
       console.log('Toutes les réservations récupérées:', data)
 
       const formattedReservations = Array.isArray(data)
-        ? data.map((reservation: Reservation) => ({
+        ? data.map((reservation: ReservationView) => ({
             ...reservation,
             reservationDate:
               reservation.reservationDate || new Date().toISOString(),
