@@ -266,22 +266,22 @@ export interface ReservationContextType {
 }
 
 export interface SalesStatistics {
-  productId: number;
-  productName: string;
-  productType: string;
-  year: number;
-  month: number;
-  receivedQuantity: number;
-  soldQuantity: number;
-  unitType: string;
-  totalRevenue: number;
+  productId: number
+  productName: string
+  productType: string
+  year: number
+  month: number
+  receivedQuantity: number
+  soldQuantity: number
+  unitType: string
+  totalRevenue: number
 }
 
 export interface StatisticsContextType {
-  salesStatistics: SalesStatistics[];
-  isLoading: boolean;
-  error: string | null;
-  fetchSalesStatistics: (year?: number, month?: number) => Promise<void>;
+  salesStatistics: SalesStatistics[]
+  isLoading: boolean
+  error: string | null
+  fetchSalesStatistics: (year?: number, month?: number) => Promise<void>
 }
 
 type MaybeAuthenticatedUser = AuthenticatedUser | undefined

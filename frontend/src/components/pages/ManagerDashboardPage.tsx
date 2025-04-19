@@ -40,13 +40,13 @@ interface ProductWithBatches extends ProductBatch {
 }
 
 interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
+  children?: React.ReactNode
+  index: number
+  value: number
 }
 
 function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
+  const { children, value, index, ...other } = props
 
   return (
     <div
@@ -56,20 +56,16 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
-  );
+  )
 }
 
 function a11yProps(index: number) {
   return {
     id: `simple-tab-${index}`,
     'aria-controls': `simple-tabpanel-${index}`,
-  };
+  }
 }
 
 const months = [
@@ -85,11 +81,11 @@ const months = [
   { value: 10, label: 'Octobre' },
   { value: 11, label: 'Novembre' },
   { value: 12, label: 'Décembre' },
-];
+]
 
 const ManagerDashboardPage = () => {
   const navigate = useNavigate()
-  const [tabValue, setTabValue] = useState(0);
+  const [tabValue, setTabValue] = useState(0)
 
   // Produits et lots
   const {
@@ -110,10 +106,19 @@ const ManagerDashboardPage = () => {
   >([])
 
   // Statistiques
-  const { salesStatistics, isLoading: statsLoading, error: statsError, fetchSalesStatistics } = useContext(StatisticsContext)!
-  const [selectedYear, setSelectedYear] = useState<number | undefined>(new Date().getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState<number | undefined>(undefined);
-  
+  const {
+    salesStatistics,
+    isLoading: statsLoading,
+    error: statsError,
+    fetchSalesStatistics,
+  } = useContext(StatisticsContext)!
+  const [selectedYear, setSelectedYear] = useState<number | undefined>(
+    new Date().getFullYear()
+  )
+  const [selectedMonth, setSelectedMonth] = useState<number | undefined>(
+    undefined
+  )
+
   // États généraux
   const { authenticatedUser } = useContext(UserContext)
   const [isLoading, setIsLoading] = useState(true)
@@ -121,12 +126,12 @@ const ManagerDashboardPage = () => {
 
   // Gestion des onglets
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
-  };
+    setTabValue(newValue)
+  }
 
   // Générateur d'années pour le filtre (5 dernières années)
-  const currentYear = new Date().getFullYear();
-  const availableYears = Array.from({ length: 5 }, (_, i) => currentYear - i);
+  const currentYear = new Date().getFullYear()
+  const availableYears = Array.from({ length: 5 }, (_, i) => currentYear - i)
 
   // Rediriger si non authentifié ou non gestionnaire
   useEffect(() => {
@@ -185,42 +190,62 @@ const ManagerDashboardPage = () => {
   // Chargement des statistiques
   useEffect(() => {
     if (tabValue === 1) {
-      fetchSalesStatistics(selectedYear, selectedMonth);
+      fetchSalesStatistics(selectedYear, selectedMonth)
     }
-  }, [fetchSalesStatistics, selectedYear, selectedMonth, tabValue]);
+  }, [fetchSalesStatistics, selectedYear, selectedMonth, tabValue])
 
   // Calculer les totaux pour les métriques
-  const totalReceived = salesStatistics.reduce((sum, stat) => sum + (stat.receivedQuantity || 0), 0);
-  const totalSold = salesStatistics.reduce((sum, stat) => sum + (stat.soldQuantity || 0), 0);
-  const totalRevenue = salesStatistics.reduce((sum, stat) => sum + (stat.totalRevenue || 0), 0);
+  const totalReceived = salesStatistics.reduce(
+    (sum, stat) => sum + (stat.receivedQuantity || 0),
+    0
+  )
+  const totalSold = salesStatistics.reduce(
+    (sum, stat) => sum + (stat.soldQuantity || 0),
+    0
+  )
+  const totalRevenue = salesStatistics.reduce(
+    (sum, stat) => sum + (stat.totalRevenue || 0),
+    0
+  )
 
   // Gestionnaires d'événements pour les filtres
   const handleYearChange = (event: SelectChangeEvent<number | ''>) => {
-    const value = event.target.value;
-    setSelectedYear(value === '' ? undefined : Number(value));
-  };
+    const value = event.target.value
+    setSelectedYear(value === '' ? undefined : Number(value))
+  }
 
   const handleMonthChange = (event: SelectChangeEvent<number | ''>) => {
-    const value = event.target.value;
-    setSelectedMonth(value === '' ? undefined : Number(value));
-  };
+    const value = event.target.value
+    setSelectedMonth(value === '' ? undefined : Number(value))
+  }
 
   // Grouper les statistiques par type de produit
-  const statsByProductType = salesStatistics.reduce((acc, stat) => {
-    const key = stat.productType;
-    if (!acc[key]) {
-      acc[key] = {
-        productType: key,
-        receivedQuantity: 0,
-        soldQuantity: 0,
-        totalRevenue: 0
-      };
-    }
-    acc[key].receivedQuantity += stat.receivedQuantity || 0;
-    acc[key].soldQuantity += stat.soldQuantity || 0;
-    acc[key].totalRevenue += stat.totalRevenue || 0;
-    return acc;
-  }, {} as Record<string, { productType: string; receivedQuantity: number; soldQuantity: number; totalRevenue: number }>);
+  const statsByProductType = salesStatistics.reduce(
+    (acc, stat) => {
+      const key = stat.productType
+      if (!acc[key]) {
+        acc[key] = {
+          productType: key,
+          receivedQuantity: 0,
+          soldQuantity: 0,
+          totalRevenue: 0,
+        }
+      }
+      acc[key].receivedQuantity += stat.receivedQuantity || 0
+      acc[key].soldQuantity += stat.soldQuantity || 0
+      acc[key].totalRevenue += stat.totalRevenue || 0
+      return acc
+    },
+    {} as Record<
+      string,
+      {
+        productType: string
+        receivedQuantity: number
+        soldQuantity: number
+        totalRevenue: number
+      }
+    >
+  )
 
   if (productsLoading || batchesLoading || statsLoading || isLoading) {
     return (
@@ -251,7 +276,11 @@ const ManagerDashboardPage = () => {
       </Typography>
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-        <Tabs value={tabValue} onChange={handleTabChange} aria-label="manager dashboard tabs">
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          aria-label="manager dashboard tabs"
+        >
           <Tab label="Produits en Stock" {...a11yProps(0)} />
           <Tab label="Statistiques des Ventes" {...a11yProps(1)} />
         </Tabs>
@@ -335,7 +364,8 @@ const ManagerDashboardPage = () => {
                         paragraph
                         sx={{ mb: 3 }}
                       >
-                        {product.description || 'Aucune description disponible.'}
+                        {product.description ||
+                          'Aucune description disponible.'}
                       </Typography>
 
                       <Divider sx={{ mb: 2 }} />
@@ -466,7 +496,9 @@ const ManagerDashboardPage = () => {
                 <Typography variant="h6" color="textSecondary" gutterBottom>
                   Revenu Total
                 </Typography>
-                <Typography variant="h3">{totalRevenue.toFixed(2)} €</Typography>
+                <Typography variant="h3">
+                  {totalRevenue.toFixed(2)} €
+                </Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -499,7 +531,9 @@ const ManagerDashboardPage = () => {
                         ? `${((stat.soldQuantity / stat.receivedQuantity) * 100).toFixed(1)}%`
                         : 'N/A'}
                     </TableCell>
-                    <TableCell align="right">{stat.totalRevenue.toFixed(2)} €</TableCell>
+                    <TableCell align="right">
+                      {stat.totalRevenue.toFixed(2)} €
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -536,12 +570,19 @@ const ManagerDashboardPage = () => {
                       <TableCell>{stat.productName}</TableCell>
                       <TableCell>{stat.productType}</TableCell>
                       <TableCell>
-                        {months.find(m => m.value === stat.month)?.label} {stat.year}
+                        {months.find((m) => m.value === stat.month)?.label}{' '}
+                        {stat.year}
                       </TableCell>
-                      <TableCell align="right">{stat.receivedQuantity || 0}</TableCell>
-                      <TableCell align="right">{stat.soldQuantity || 0}</TableCell>
+                      <TableCell align="right">
+                        {stat.receivedQuantity || 0}
+                      </TableCell>
+                      <TableCell align="right">
+                        {stat.soldQuantity || 0}
+                      </TableCell>
                       <TableCell>{stat.unitType}</TableCell>
-                      <TableCell align="right">{(stat.totalRevenue || 0).toFixed(2)} €</TableCell>
+                      <TableCell align="right">
+                        {(stat.totalRevenue || 0).toFixed(2)} €
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

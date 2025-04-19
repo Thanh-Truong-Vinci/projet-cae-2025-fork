@@ -1,4 +1,6 @@
-import { createContext } from 'react';
-import { StatisticsContextType } from '../types';
+import { createContext } from 'react'
+import { StatisticsContextType } from '../types'
 
-export const StatisticsContext = createContext<StatisticsContextType | undefined>(undefined);
+export const StatisticsContext = createContext<
+  StatisticsContextType | undefined
+>(undefined)
