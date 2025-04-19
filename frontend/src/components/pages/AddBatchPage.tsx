@@ -137,7 +137,6 @@ const AddBatchPage = () => {
     loadProducts()
   }, [productContext])
   
-  // Load photos once
   useEffect(() => {
     if (!photosLoaded) {
       fetchAllPhotos()
@@ -241,7 +240,6 @@ const AddBatchPage = () => {
     }
   }
   
-  // Open the image selection modal
   const handleOpenImageModal = () => {
     if (fieldsLocked) {
       setSnackbarMessage("Changez le nom du produit pour modifier l'image")
@@ -253,7 +251,6 @@ const AddBatchPage = () => {
     setIsImageModalOpen(true)
     setSearchQuery('')
     
-    // Make sure photos are loaded
     if (!photosLoaded) {
       fetchAllPhotos()
         .then(() => setPhotosLoaded(true))
@@ -262,11 +259,6 @@ const AddBatchPage = () => {
         })
     }
   }
-  
-  // Filter photos based on search query
-  const filteredPhotos = photos.filter((photo) =>
-    photo.productName.toLowerCase().includes(searchQuery.toLowerCase())
-  )
   
   // Handle selecting an image from the gallery
   const handleImageSelect = (photo: Photo) => {
@@ -344,17 +336,9 @@ const AddBatchPage = () => {
         } else if (productImage) {
           await batchContext.createBatch(batchData, productImage)
         } else if (selectedImage) {
-          // Create with existing image ID
           const imageData = new FormData()
           imageData.append('batch', new Blob([JSON.stringify(batchData)], { type: 'application/json' }))
           imageData.append('imageId', selectedImage.id.toString())
-          // Here we'd need a special endpoint that can handle creating a batch with an existing image ID
-          // For now, we'll just use the createBatch method since we have the preview URL
-          
-          // This is a simplified approach - in a real implementation, you might need to:
-          // 1. Fetch the actual image file from the URL
-          // 2. Convert it to a File object
-          // 3. Send it via createBatch
           const response = await fetch(selectedImage.imageLocation)
           const blob = await response.blob()
           const file = new File([blob], "selected_image.jpg", { type: blob.type })
@@ -404,124 +388,131 @@ const AddBatchPage = () => {
   }
   
   // Image selection modal component
-  const ImageSelectionModal = () => (
-    <Modal
-      open={isImageModalOpen}
-      onClose={() => setIsImageModalOpen(false)}
-      aria-labelledby="image-selection-modal"
-    >
-      <Paper
-        sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '90%',
-          maxWidth: 800,
-          maxHeight: '90vh',
-          overflow: 'auto',
-          p: 4,
-          outline: 'none',
-        }}
+  const ImageSelectionModal = () => {
+    const [modalSearchQuery, setModalSearchQuery] = useState(searchQuery);
+    const modalFilteredPhotos = photos.filter((photo) =>
+      photo.productName.toLowerCase().includes(modalSearchQuery.toLowerCase())
+    );
+    
+    return (
+      <Modal
+        open={isImageModalOpen}
+        onClose={() => setIsImageModalOpen(false)}
+        aria-labelledby="image-selection-modal"
       >
-        <Box
+        <Paper
           sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            mb: 2,
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '90%',
+            maxWidth: 800,
+            maxHeight: '90vh',
+            overflow: 'auto',
+            p: 4,
+            outline: 'none',
           }}
         >
-          <Typography variant="h6" id="image-selection-modal">
-            Choisir une image
-          </Typography>
-          <IconButton onClick={() => setIsImageModalOpen(false)}>
-            <CloseIcon />
-          </IconButton>
-        </Box>
-
-        <Box sx={{ mb: 3 }}>
-          <TextField
-            label="Rechercher une image"
-            fullWidth
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            InputProps={{
-              endAdornment: <SearchIcon />,
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 2,
             }}
-            sx={{ mb: 2 }}
-          />
-
-          <Typography variant="subtitle1" sx={{ mb: 1 }}>
-            Images disponibles:
-          </Typography>
-
-          {isLoadingPhotos ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-              <CircularProgress />
-            </Box>
-          ) : (
-            <Grid
-              container
-              spacing={2}
-              sx={{ maxHeight: '300px', overflow: 'auto' }}
-            >
-              {filteredPhotos.map((photo) => (
-                <Grid item xs={6} sm={4} md={3} key={photo.id}>
-                  <Card
-                    onClick={() => handleImageSelect(photo)}
-                    sx={{
-                      cursor: 'pointer',
-                      border:
-                        selectedImage?.id === photo.id
-                          ? '2px solid #1976d2'
-                          : 'none',
-                      transition: '0.3s',
-                      '&:hover': { transform: 'scale(1.03)' },
-                    }}
-                  >
-                    <CardMedia
-                      component="img"
-                      height="100"
-                      image={photo.imageLocation}
-                      alt={photo.productName}
-                    />
-                    <CardContent sx={{ p: 1 }}>
-                      <Typography variant="caption" noWrap>
-                        {photo.productName}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-              {filteredPhotos.length === 0 && (
-                <Box sx={{ p: 2, width: '100%', textAlign: 'center' }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Aucune image ne correspond à votre recherche
-                  </Typography>
-                </Box>
-              )}
-            </Grid>
-          )}
-        </Box>
-
-        <Box
-          sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}
-        >
-          <Button onClick={() => setIsImageModalOpen(false)} variant="outlined">
-            Annuler
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleConfirmImageSelection}
-            disabled={!selectedImage}
           >
-            Confirmer
-          </Button>
-        </Box>
-      </Paper>
-    </Modal>
-  )
+            <Typography variant="h6" id="image-selection-modal">
+              Choisir une image
+            </Typography>
+            <IconButton onClick={() => setIsImageModalOpen(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+
+          <Box sx={{ mb: 3 }}>
+            <TextField
+              label="Rechercher une image"
+              fullWidth
+              value={modalSearchQuery}
+              onChange={(e) => setModalSearchQuery(e.target.value)}
+              InputProps={{
+                endAdornment: <SearchIcon />,
+              }}
+              sx={{ mb: 2 }}
+            />
+
+            <Typography variant="subtitle1" sx={{ mb: 1 }}>
+              Images disponibles:
+            </Typography>
+
+            {isLoadingPhotos ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+                <CircularProgress />
+              </Box>
+            ) : (
+              <Grid
+                container
+                spacing={2}
+                sx={{ maxHeight: '300px', overflow: 'auto' }}
+              >
+                {modalFilteredPhotos.map((photo) => (
+                  <Grid item xs={6} sm={4} md={3} key={photo.id}>
+                    <Card
+                      onClick={() => handleImageSelect(photo)}
+                      sx={{
+                        cursor: 'pointer',
+                        border:
+                          selectedImage?.id === photo.id
+                            ? '2px solid #1976d2'
+                            : 'none',
+                        transition: '0.3s',
+                        '&:hover': { transform: 'scale(1.03)' },
+                      }}
+                    >
+                      <CardMedia
+                        component="img"
+                        height="100"
+                        image={photo.imageLocation}
+                        alt={photo.productName}
+                      />
+                      <CardContent sx={{ p: 1 }}>
+                        <Typography variant="caption" noWrap>
+                          {photo.productName}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+                {modalFilteredPhotos.length === 0 && (
+                  <Box sx={{ p: 2, width: '100%', textAlign: 'center' }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Aucune image ne correspond à votre recherche
+                    </Typography>
+                  </Box>
+                )}
+              </Grid>
+            )}
+          </Box>
+
+          <Box
+            sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}
+          >
+            <Button onClick={() => setIsImageModalOpen(false)} variant="outlined">
+              Annuler
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleConfirmImageSelection}
+              disabled={!selectedImage}
+            >
+              Confirmer
+            </Button>
+          </Box>
+        </Paper>
+      </Modal>
+    );
+  };
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>

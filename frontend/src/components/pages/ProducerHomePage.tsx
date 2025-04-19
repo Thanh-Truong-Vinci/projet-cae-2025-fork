@@ -33,7 +33,6 @@ import { BatchContext } from '../../contexts/BatchContext'
 import { PhotoContext } from '../../contexts/PhotoContext'
 import { Batch, Photo } from '../../types'
 
-// Tab interface for the status tabs
 interface TabPanelProps {
   children?: React.ReactNode
   index: number
@@ -82,10 +81,8 @@ const ProducerHomePage = () => {
   } = useContext(PhotoContext)!
   const [error, setError] = useState<string | null>(null)
 
-  // Tab state
   const [tabValue, setTabValue] = useState(0)
 
-  // Image editing states
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null)
   const [isImageModalOpen, setIsImageModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -140,7 +137,6 @@ const ProducerHomePage = () => {
     setSearchQuery('')
     setIsImageModalOpen(true)
 
-    // No need to fetch photos again, we already have them
     if (!photosLoaded) {
       fetchAllPhotos()
         .then(() => setPhotosLoaded(true))
@@ -149,11 +145,6 @@ const ProducerHomePage = () => {
         })
     }
   }
-
-  // Filter photos based on search query
-  const filteredPhotos = photos.filter((photo) =>
-    photo.productName.toLowerCase().includes(searchQuery.toLowerCase())
-  )
 
   // Filter batches based on selected tab
   const filteredBatches = myBatches.filter((batch) => {
@@ -196,7 +187,7 @@ const ProducerHomePage = () => {
   const handleUpdateImage = async () => {
     if (!selectedBatch) return
 
-    setError(null) // Clear any previous errors
+    setError(null)
 
     try {
       if (uploadedImage) {
@@ -246,163 +237,170 @@ const ProducerHomePage = () => {
   }
 
   // Image Edit Modal Component
-  const ImageEditModal = () => (
-    <Modal
-      open={isImageModalOpen}
-      onClose={() => setIsImageModalOpen(false)}
-      aria-labelledby="image-edit-modal"
-    >
-      <Paper
-        sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '90%',
-          maxWidth: 800,
-          maxHeight: '90vh',
-          overflow: 'auto',
-          p: 4,
-          outline: 'none',
-        }}
+  const ImageEditModal = () => {
+    const [modalSearchQuery, setModalSearchQuery] = useState(searchQuery)
+    const modalFilteredPhotos = photos.filter((photo) =>
+      photo.productName.toLowerCase().includes(modalSearchQuery.toLowerCase())
+    )
+  
+    return (
+      <Modal
+        open={isImageModalOpen}
+        onClose={() => setIsImageModalOpen(false)}
+        aria-labelledby="image-edit-modal"
       >
-        <Box
+        <Paper
           sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            mb: 2,
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '90%',
+            maxWidth: 800,
+            maxHeight: '90vh',
+            overflow: 'auto',
+            p: 4,
+            outline: 'none',
           }}
         >
-          <Typography variant="h6" id="image-edit-modal">
-            Changer l'image du lot: {selectedBatch?.productName}
-          </Typography>
-          <IconButton onClick={() => setIsImageModalOpen(false)}>
-            <CloseIcon />
-          </IconButton>
-        </Box>
-
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="subtitle1">Image actuelle:</Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
-            <img
-              src={selectedBatch?.imageUrl}
-              alt={selectedBatch?.productName}
-              style={{ maxHeight: '200px', objectFit: 'contain' }}
-            />
-          </Box>
-        </Box>
-
-        <Box sx={{ mb: 3 }}>
-          <TextField
-            label="Rechercher une image"
-            fullWidth
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            InputProps={{
-              endAdornment: <SearchIcon />,
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 2,
             }}
-            sx={{ mb: 2 }}
-          />
-
-          <Typography variant="subtitle1" sx={{ mb: 1 }}>
-            Images disponibles:
-          </Typography>
-
-          {isLoadingPhotos ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-              <CircularProgress />
-            </Box>
-          ) : (
-            <Grid
-              container
-              spacing={2}
-              sx={{ maxHeight: '300px', overflow: 'auto' }}
-            >
-              {filteredPhotos.map((photo) => (
-                <Grid item xs={6} sm={4} md={3} key={photo.id}>
-                  <Card
-                    onClick={() => handleImageSelect(photo)}
-                    sx={{
-                      cursor: 'pointer',
-                      border:
-                        selectedImage?.id === photo.id
-                          ? '2px solid #1976d2'
-                          : 'none',
-                      transition: '0.3s',
-                      '&:hover': { transform: 'scale(1.03)' },
-                    }}
-                  >
-                    <CardMedia
-                      component="img"
-                      height="100"
-                      image={photo.imageLocation}
-                      alt={photo.productName}
-                    />
-                    <CardContent sx={{ p: 1 }}>
-                      <Typography variant="caption" noWrap>
-                        {photo.productName}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-              {filteredPhotos.length === 0 && (
-                <Box sx={{ p: 2, width: '100%', textAlign: 'center' }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Aucune image ne correspond à votre recherche
-                  </Typography>
-                </Box>
-              )}
-            </Grid>
-          )}
-        </Box>
-
-        <Divider sx={{ my: 2 }} />
-
-        <Box sx={{ mt: 2 }}>
-          <Button
-            variant="outlined"
-            component="label"
-            startIcon={<CloudUploadIcon />}
-            fullWidth
-            sx={{ mb: 1 }}
           >
-            Télécharger une image personnalisée
-            <input
-              type="file"
-              hidden
-              accept="image/*"
-              onChange={handleImageUpload}
-            />
-          </Button>
-          {uploadedImage && (
-            <Typography
-              variant="caption"
-              sx={{ display: 'block', textAlign: 'center' }}
-            >
-              Fichier sélectionné: {uploadedImage.name}
+            <Typography variant="h6" id="image-edit-modal">
+              Changer l'image du lot: {selectedBatch?.productName}
             </Typography>
-          )}
-        </Box>
-
-        <Box
-          sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}
-        >
-          <Button onClick={() => setIsImageModalOpen(false)} variant="outlined">
-            Annuler
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleUpdateImage}
-            disabled={!selectedImage && !uploadedImage}
+            <IconButton onClick={() => setIsImageModalOpen(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+  
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="subtitle1">Image actuelle:</Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
+              <img
+                src={selectedBatch?.imageUrl}
+                alt={selectedBatch?.productName}
+                style={{ maxHeight: '200px', objectFit: 'contain' }}
+              />
+            </Box>
+          </Box>
+  
+          <Box sx={{ mb: 3 }}>
+            <TextField
+              label="Rechercher une image"
+              fullWidth
+              value={modalSearchQuery}
+              onChange={(e) => setModalSearchQuery(e.target.value)}
+              InputProps={{
+                endAdornment: <SearchIcon />,
+              }}
+              sx={{ mb: 2 }}
+            />
+  
+            <Typography variant="subtitle1" sx={{ mb: 1 }}>
+              Images disponibles:
+            </Typography>
+  
+            {isLoadingPhotos ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+                <CircularProgress />
+              </Box>
+            ) : (
+              <Grid
+                container
+                spacing={2}
+                sx={{ maxHeight: '300px', overflow: 'auto' }}
+              >
+                {modalFilteredPhotos.map((photo) => (
+                  <Grid item xs={6} sm={4} md={3} key={photo.id}>
+                    <Card
+                      onClick={() => handleImageSelect(photo)}
+                      sx={{
+                        cursor: 'pointer',
+                        border:
+                          selectedImage?.id === photo.id
+                            ? '2px solid #1976d2'
+                            : 'none',
+                        transition: '0.3s',
+                        '&:hover': { transform: 'scale(1.03)' },
+                      }}
+                    >
+                      <CardMedia
+                        component="img"
+                        height="100"
+                        image={photo.imageLocation}
+                        alt={photo.productName}
+                      />
+                      <CardContent sx={{ p: 1 }}>
+                        <Typography variant="caption" noWrap>
+                          {photo.productName}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+                {modalFilteredPhotos.length === 0 && (
+                  <Box sx={{ p: 2, width: '100%', textAlign: 'center' }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Aucune image ne correspond à votre recherche
+                    </Typography>
+                  </Box>
+                )}
+              </Grid>
+            )}
+          </Box>
+  
+          <Divider sx={{ my: 2 }} />
+  
+          <Box sx={{ mt: 2 }}>
+            <Button
+              variant="outlined"
+              component="label"
+              startIcon={<CloudUploadIcon />}
+              fullWidth
+              sx={{ mb: 1 }}
+            >
+              Télécharger une image personnalisée
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={handleImageUpload}
+              />
+            </Button>
+            {uploadedImage && (
+              <Typography
+                variant="caption"
+                sx={{ display: 'block', textAlign: 'center' }}
+              >
+                Fichier sélectionné: {uploadedImage.name}
+              </Typography>
+            )}
+          </Box>
+  
+          <Box
+            sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}
           >
-            Confirmer
-          </Button>
-        </Box>
-      </Paper>
-    </Modal>
-  )
+            <Button onClick={() => setIsImageModalOpen(false)} variant="outlined">
+              Annuler
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleUpdateImage}
+              disabled={!selectedImage && !uploadedImage}
+            >
+              Confirmer
+            </Button>
+          </Box>
+        </Paper>
+      </Modal>
+    )
+  }
 
   // Si l'utilisateur n'est pas connecté ou n'est pas un producteur, ne pas rendre la page
   if (!authenticatedUser || authenticatedUser.role !== 'Producer') {
