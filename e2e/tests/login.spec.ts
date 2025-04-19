@@ -52,7 +52,7 @@ test.describe("Login", () => {
 
     await expect(page).toHaveURL("/")
 
-    await expect(page.getByText("Se déconnecter")).toBeVisible();
+    await expect(page.getByLabel("se-déconnecter")).toBeVisible();
 
     await expect(page.getByText("Terroir & Cie")).toBeVisible();
   });
@@ -68,8 +68,8 @@ test.describe("Login", () => {
 
       await expect(page).toHaveURL("/");
 
-      await expect(page.getByText("Se déconnecter")).toBeVisible();
-      await page.getByText("Se déconnecter").click();
+      await expect(page.getByLabel("se-déconnecter")).toBeVisible();
+      await page.getByLabel("se-déconnecter").click();
 
       await expect(page).toHaveURL("/")
       await expect(page.getByText("Inscription")).toBeVisible();
