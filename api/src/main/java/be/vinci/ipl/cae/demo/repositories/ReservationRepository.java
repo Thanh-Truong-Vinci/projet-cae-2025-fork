@@ -29,12 +29,12 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
    */
   List<Reservation> findByClient(Client client);
 
-    /**
-     * Finds reservations by status.
-     *
-     * @param status the status of the reservations
-     * @return a list of reservations with the specified status
-     */
+  /**
+   * Finds reservations by status.
+   *
+   * @param status the status of the reservations
+   * @return a list of reservations with the specified status
+   */
   List<Reservation> findByStatus(ReservationStatus status);
 
   /**

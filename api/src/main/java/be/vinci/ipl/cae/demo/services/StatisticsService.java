@@ -69,8 +69,9 @@ public class StatisticsService {
         String key = generateKey(batch.getProduct().getId(), depositDate);
 
         // Utiliser la méthode réutilisable pour configurer l'objet statistiques
-        SalesStatisticsView stats = getOrCreateStatistics(
-            statisticsMap, key, batch, depositDate.getYear(), depositDate.getMonthValue());
+        SalesStatisticsView stats =
+            getOrCreateStatistics(
+                statisticsMap, key, batch, depositDate.getYear(), depositDate.getMonthValue());
 
         // Incrémenter la quantité reçue
         int currentReceived = stats.getReceivedQuantity() != null ? stats.getReceivedQuantity() : 0;
@@ -100,8 +101,9 @@ public class StatisticsService {
           String key = generateKey(batch.getProduct().getId(), saleDate);
 
           // Utiliser la méthode réutilisable pour configurer l'objet statistiques
-          SalesStatisticsView stats = getOrCreateStatistics(
-              statisticsMap, key, batch, saleDate.getYear(), saleDate.getMonthValue());
+          SalesStatisticsView stats =
+              getOrCreateStatistics(
+                  statisticsMap, key, batch, saleDate.getYear(), saleDate.getMonthValue());
 
           // Incrémenter la quantité vendue
           int currentSold = stats.getSoldQuantity() != null ? stats.getSoldQuantity() : 0;
@@ -165,7 +167,7 @@ public class StatisticsService {
       Batch batch,
       int year,
       int month) {
-    
+
     SalesStatisticsView stats = statisticsMap.getOrDefault(key, new SalesStatisticsView());
     stats.setProductId(batch.getProduct().getId());
     stats.setProductName(batch.getProduct().getName());
@@ -173,7 +175,7 @@ public class StatisticsService {
     stats.setYear(year);
     stats.setMonth(month);
     stats.setUnitType(batch.getSaleUnit());
-    
+
     return stats;
   }
 }
