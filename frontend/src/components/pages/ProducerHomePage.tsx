@@ -17,6 +17,8 @@ import {
   Modal,
   TextField,
   IconButton,
+  Tabs,
+  Tab,
 } from '@mui/material'
 import { UserContext } from '../../contexts/UserContext'
 import { useNavigate } from 'react-router-dom'
@@ -30,6 +32,36 @@ import { fr } from 'date-fns/locale'
 import { BatchContext } from '../../contexts/BatchContext'
 import { PhotoContext } from '../../contexts/PhotoContext'
 import { Batch, Photo } from '../../types'
+
+// Tab interface for the status tabs
+interface TabPanelProps {
+  children?: React.ReactNode
+  index: number
+  value: number
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`batch-tabpanel-${index}`}
+      aria-labelledby={`batch-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
+    </div>
+  )
+}
+
+function a11yProps(index: number) {
+  return {
+    id: `batch-tab-${index}`,
+    'aria-controls': `batch-tabpanel-${index}`,
+  }
+}
 
 const ProducerHomePage = () => {
   const navigate = useNavigate()
@@ -46,8 +78,12 @@ const ProducerHomePage = () => {
     photos,
     isLoading: isLoadingPhotos,
     fetchAllPhotos,
+    error: photoError,
   } = useContext(PhotoContext)!
   const [error, setError] = useState<string | null>(null)
+
+  // Tab state
+  const [tabValue, setTabValue] = useState(0)
 
   // Image editing states
   const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null)
@@ -55,6 +91,7 @@ const ProducerHomePage = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedImage, setSelectedImage] = useState<Photo | null>(null)
   const [uploadedImage, setUploadedImage] = useState<File | null>(null)
+  const [photosLoaded, setPhotosLoaded] = useState(false)
 
   // Rediriger si l'utilisateur n'est pas connecté ou n'est pas un producteur
   useEffect(() => {
@@ -77,6 +114,21 @@ const ProducerHomePage = () => {
     }
   }, [authenticatedUser, fetchMyBatches])
 
+  // Load photos only once when the component mounts
+  useEffect(() => {
+    if (!photosLoaded) {
+      fetchAllPhotos()
+        .then(() => setPhotosLoaded(true))
+        .catch((err) => {
+          console.error('Erreur lors de la récupération des photos:', err)
+        })
+    }
+  }, [fetchAllPhotos, photosLoaded])
+
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue)
+  }
+
   const handleAddBatch = () => {
     navigate('/add-batch')
   }
@@ -87,15 +139,44 @@ const ProducerHomePage = () => {
     setUploadedImage(null)
     setSearchQuery('')
     setIsImageModalOpen(true)
-    fetchAllPhotos().catch((err) => {
-      console.error('Erreur lors de la récupération des photos:', err)
-    })
+
+    // No need to fetch photos again, we already have them
+    if (!photosLoaded) {
+      fetchAllPhotos()
+        .then(() => setPhotosLoaded(true))
+        .catch((err) => {
+          console.error('Erreur lors de la récupération des photos:', err)
+        })
+    }
   }
 
   // Filter photos based on search query
   const filteredPhotos = photos.filter((photo) =>
     photo.productName.toLowerCase().includes(searchQuery.toLowerCase())
   )
+
+  // Filter batches based on selected tab
+  const filteredBatches = myBatches.filter((batch) => {
+    const status = batch.status?.toUpperCase()
+    const isOutOfStock = batch.availableQuantity === 0
+
+    switch (tabValue) {
+      case 0: // All
+        return true
+      case 1: // En vente (APPROVED)
+        return status === 'APPROVED' && !isOutOfStock
+      case 2: // En attente (PENDING)
+        return status === 'PENDING'
+      case 3: // Refusé (REJECTED)
+        return status === 'REJECTED'
+      case 4: // Reçu (RECEIVED)
+        return status === 'RECEIVED'
+      case 5: // Épuisé (out of stock)
+        return isOutOfStock
+      default:
+        return true
+    }
+  })
 
   // Handle selecting an image from the gallery
   const handleImageSelect = (photo: Photo) => {
@@ -351,9 +432,9 @@ const ProducerHomePage = () => {
         </Button>
       </Box>
 
-      {(error || batchError) && (
+      {(error || batchError || photoError) && (
         <Alert severity="error" sx={{ mb: 3 }}>
-          {error || batchError}
+          {error || batchError || photoError}
         </Alert>
       )}
 
@@ -361,6 +442,23 @@ const ProducerHomePage = () => {
         <Typography variant="h5" component="h2" gutterBottom>
           Vos lots de produits
         </Typography>
+
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
+            aria-label="batch status tabs"
+            variant="scrollable"
+            scrollButtons="auto"
+          >
+            <Tab label="Tous" {...a11yProps(0)} />
+            <Tab label="En vente" {...a11yProps(1)} />
+            <Tab label="En attente" {...a11yProps(2)} />
+            <Tab label="Refusé" {...a11yProps(3)} />
+            <Tab label="Reçu" {...a11yProps(4)} />
+            <Tab label="Épuisé" {...a11yProps(5)} />
+          </Tabs>
+        </Box>
 
         {isLoading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
@@ -382,125 +480,139 @@ const ProducerHomePage = () => {
             </Button>
           </Box>
         ) : (
-          <Grid container spacing={3}>
-            {myBatches.map((batch) => {
-              const statusInfo = getStatusLabel(
-                batch.status,
-                batch.availableQuantity
-              )
+          <>
+            {[0, 1, 2, 3, 4, 5].map((tabIndex) => (
+              <TabPanel key={tabIndex} value={tabValue} index={tabIndex}>
+                {filteredBatches.length === 0 ? (
+                  <Box sx={{ p: 3, textAlign: 'center' }}>
+                    <Typography variant="body1" color="textSecondary">
+                      Aucun lot dans cette catégorie.
+                    </Typography>
+                  </Box>
+                ) : (
+                  <Grid container spacing={3}>
+                    {filteredBatches.map((batch) => {
+                      const statusInfo = getStatusLabel(
+                        batch.status,
+                        batch.availableQuantity
+                      )
 
-              return (
-                <Grid item xs={12} sm={6} md={4} key={batch.id}>
-                  <Card
-                    elevation={3}
-                    sx={{
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      opacity:
-                        batch.status === 'REJECTED' ||
-                        batch.availableQuantity === 0
-                          ? 0.7
-                          : 1,
-                    }}
-                  >
-                    <CardMedia
-                      component="img"
-                      height="160"
-                      image={batch.imageUrl}
-                      alt={batch.productName}
-                    />
-                    <CardContent sx={{ flexGrow: 1 }}>
-                      <Box
-                        sx={{
-                          mb: 2,
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'flex-start',
-                        }}
-                      >
-                        <Typography variant="h6" component="h3" gutterBottom>
-                          {batch.productName}
-                        </Typography>
-                        <Chip
-                          label={statusInfo.label}
-                          size="small"
-                          color={statusInfo.color}
-                        />
-                      </Box>
+                      return (
+                        <Grid item xs={12} sm={6} md={4} key={batch.id}>
+                          <Card
+                            elevation={3}
+                            sx={{
+                              height: '100%',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              opacity:
+                                batch.status === 'REJECTED' ||
+                                batch.availableQuantity === 0
+                                  ? 0.7
+                                  : 1,
+                            }}
+                          >
+                            <CardMedia
+                              component="img"
+                              height="160"
+                              image={batch.imageUrl}
+                              alt={batch.productName}
+                            />
+                            <CardContent sx={{ flexGrow: 1 }}>
+                              <Box
+                                sx={{
+                                  mb: 2,
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'flex-start',
+                                }}
+                              >
+                                <Typography variant="h6" component="h3" gutterBottom>
+                                  {batch.productName}
+                                </Typography>
+                                <Chip
+                                  label={statusInfo.label}
+                                  size="small"
+                                  color={statusInfo.color}
+                                />
+                              </Box>
 
-                      <Box sx={{ mb: 1 }}>
-                        <Chip
-                          label={batch.productType}
-                          size="small"
-                          color="primary"
-                          variant="outlined"
-                          sx={{ mb: 1 }}
-                        />
-                        <Typography variant="body2" color="text.secondary">
-                          <strong>Disponible:</strong>{' '}
-                          {format(
-                            new Date(batch.availabilityDate),
-                            'dd MMMM yyyy',
-                            { locale: fr }
-                          )}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          <strong>Quantité:</strong> {batch.availableQuantity}{' '}
-                          {batch.unitType}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          <strong>Prix:</strong> {batch.unitPrice.toFixed(2)}€/
-                          {batch.unitType}
-                        </Typography>
-                      </Box>
+                              <Box sx={{ mb: 1 }}>
+                                <Chip
+                                  label={batch.productType}
+                                  size="small"
+                                  color="primary"
+                                  variant="outlined"
+                                  sx={{ mb: 1 }}
+                                />
+                                <Typography variant="body2" color="text.secondary">
+                                  <strong>Disponible:</strong>{' '}
+                                  {format(
+                                    new Date(batch.availabilityDate),
+                                    'dd MMMM yyyy',
+                                    { locale: fr }
+                                  )}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                  <strong>Quantité:</strong> {batch.availableQuantity}{' '}
+                                  {batch.unitType}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                  <strong>Prix:</strong> {batch.unitPrice.toFixed(2)}€/
+                                  {batch.unitType}
+                                </Typography>
+                              </Box>
 
-                      {batch.status === 'REJECTED' && batch.rejectionReason && (
-                        <Box
-                          sx={{
-                            mt: 2,
-                            p: 1,
-                            bgcolor: 'error.light',
-                            borderRadius: 1,
-                          }}
-                        >
-                          <Typography variant="caption" color="error.dark">
-                            <strong>Motif du refus:</strong>{' '}
-                            {batch.rejectionReason}
-                          </Typography>
-                        </Box>
-                      )}
+                              {batch.status === 'REJECTED' && batch.rejectionReason && (
+                                <Box
+                                  sx={{
+                                    mt: 2,
+                                    p: 1,
+                                    bgcolor: 'error.light',
+                                    borderRadius: 1,
+                                  }}
+                                >
+                                  <Typography variant="caption" color="error.dark">
+                                    <strong>Motif du refus:</strong>{' '}
+                                    {batch.rejectionReason}
+                                  </Typography>
+                                </Box>
+                              )}
 
-                      <Box sx={{ mt: 2 }}>
-                        <Typography variant="caption" color="text.secondary">
-                          Ajouté le{' '}
-                          {format(new Date(batch.createdAt), 'dd/MM/yyyy', {
-                            locale: fr,
-                          })}
-                        </Typography>
-                      </Box>
-                    </CardContent>
+                              <Box sx={{ mt: 2 }}>
+                                <Typography variant="caption" color="text.secondary">
+                                  Ajouté le{' '}
+                                  {format(new Date(batch.createdAt), 'dd/MM/yyyy', {
+                                    locale: fr,
+                                  })}
+                                </Typography>
+                              </Box>
+                            </CardContent>
 
-                    <Divider />
+                            <Divider />
 
-                    <CardActions sx={{ justifyContent: 'center', p: 1 }}>
-                      {/* Ne montrer le bouton de modification que si le lot n'est pas refusé */}
-                      {batch.status !== 'REJECTED' && (
-                        <Button
-                          size="small"
-                          startIcon={<EditIcon />}
-                          onClick={() => handleEditBatch(batch)}
-                          disabled={batch.availableQuantity === 0}
-                        >
-                          Modifier
-                        </Button>
-                      )}
-                    </CardActions>
-                  </Card>
-                </Grid>
-              )
-            })}
-          </Grid>
+                            <CardActions sx={{ justifyContent: 'center', p: 1 }}>
+                              {/* Ne montrer le bouton de modification que si le lot n'est pas refusé */}
+                              {batch.status !== 'REJECTED' && (
+                                <Button
+                                  size="small"
+                                  startIcon={<EditIcon />}
+                                  onClick={() => handleEditBatch(batch)}
+                                  disabled={batch.availableQuantity === 0}
+                                >
+                                  Modifier
+                                </Button>
+                              )}
+                            </CardActions>
+                          </Card>
+                        </Grid>
+                      )
+                    })}
+                  </Grid>
+                )}
+              </TabPanel>
+            ))}
+          </>
         )}
       </Paper>
 
