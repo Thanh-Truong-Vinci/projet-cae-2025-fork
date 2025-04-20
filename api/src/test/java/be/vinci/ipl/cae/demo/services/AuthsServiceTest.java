@@ -446,7 +446,6 @@ public class AuthsServiceTest {
         assertEquals("ROLE_MANAGER", AuthsService.Role.MANAGER.getAuthority());
         assertEquals("ROLE_ADMIN", AuthsService.Role.ADMIN.getAuthority());
         assertEquals("ROLE_VOLUNTEER", AuthsService.Role.VOLUNTEER.getAuthority());
-        // Ajoutez d'autres valeurs d'enum si nécessaire
     }
 
     @Test
@@ -457,7 +456,6 @@ public class AuthsServiceTest {
         assertEquals("Manager", AuthsService.Role.MANAGER.getDisplayName());
         assertEquals("Admin", AuthsService.Role.ADMIN.getDisplayName());
         assertEquals("Volunteer", AuthsService.Role.VOLUNTEER.getDisplayName());
-        // Ajoutez d'autres valeurs d'enum si nécessaire
     }
 }
 
