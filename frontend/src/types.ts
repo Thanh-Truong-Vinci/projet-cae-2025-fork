@@ -276,12 +276,8 @@ export interface ReservationContextType {
   toPendingReservation: (reservationId: number) => Promise<void>
   toConfirmReservation: (reservationId: number) => Promise<void>
   cancelReservation: (reservationId: number) => Promise<void>
-  updateReservationLineQuantity: (
-    lineId: number,
-    quantity: number
-  ) => Promise<void>
   clearReservation: (reservationId: number) => Promise<void>
-  removeReservationLine: (lineId: number) => Promise<void>
+  changeReservationLineQuantity: (lineId: number, quantity: number) => Promise<void>
 }
 
 export interface SalesStatistics {

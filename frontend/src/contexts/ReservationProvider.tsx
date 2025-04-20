@@ -316,7 +316,51 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
     }
   }
 
-  const updateReservationLineQuantity = async (
+  const clearReservation = async (reservationId: number): Promise<void> => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      if (!authenticatedUser) {
+        throw new Error('Vous devez être authentifié pour vider une réservation')
+      }
+
+      const response = await axios.post(
+        `/api/reservation/clear`,
+        reservationId,
+        {
+          headers: {
+            Authorization: authenticatedUser.token,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (response.status >= 200 && response.status < 300) {
+        console.log('Réservation vidée avec succès')
+        // Refresh reservations
+        await fetchReservations()
+      } else {
+        throw new Error(`Erreur lors du vidage de la réservation: ${response.status}`)
+      }
+    } catch (err) {
+      console.error('Erreur lors du vidage de la réservation:', err)
+      if (axios.isAxiosError(err)) {
+        setError(
+          err.response?.data?.message || 'Erreur lors du vidage de la réservation'
+        )
+      } else if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError('Erreur inconnue lors du vidage de la réservation')
+      }
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const changeReservationLineQuantity = async (
     lineId: number,
     quantity: number
   ): Promise<void> => {
@@ -326,13 +370,13 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
     try {
       if (!authenticatedUser) {
         throw new Error(
-          'Vous devez être authentifié pour modifier une réservation'
+          'Vous devez être authentifié pour modifier la quantité d\'une ligne de réservation'
         )
       }
 
-      const response = await axios.put(
-        `/api/reservation/line/${lineId}/quantity`,
-        { quantity },
+      const response = await axios.post(
+        `/api/reservation/changeQuantity`,
+        { reservationLineId: lineId, quantity },
         {
           headers: {
             Authorization: authenticatedUser.token,
@@ -342,120 +386,25 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
       )
 
       if (response.status >= 200 && response.status < 300) {
-        console.log('Quantité mise à jour avec succès')
+        console.log('Quantité de la ligne mise à jour avec succès')
         // Refresh reservations
         await fetchReservations()
       } else {
         throw new Error(
-          `Erreur lors de la mise à jour de la quantité: ${response.status}`
+          `Erreur lors de la mise à jour de la quantité de la ligne: ${response.status}`
         )
       }
     } catch (err) {
-      console.error('Erreur lors de la mise à jour de la quantité:', err)
+      console.error('Erreur lors de la mise à jour de la quantité de la ligne:', err)
       if (axios.isAxiosError(err)) {
         setError(
           err.response?.data?.message ||
-            'Erreur lors de la mise à jour de la quantité'
+            'Erreur lors de la mise à jour de la quantité de la ligne'
         )
       } else if (err instanceof Error) {
         setError(err.message)
       } else {
-        setError('Erreur inconnue lors de la mise à jour de la quantité')
-      }
-      throw err
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const clearReservation = async (reservationId: number): Promise<void> => {
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      if (!authenticatedUser) {
-        throw new Error('Vous devez être authentifié pour vider votre panier')
-      }
-
-      const response = await axios.delete(
-        `/api/reservation/${reservationId}/clear`,
-        {
-          headers: {
-            Authorization: authenticatedUser.token,
-            'Content-Type': 'application/json',
-          },
-        }
-      )
-
-      if (response.status >= 200 && response.status < 300) {
-        console.log('Panier vidé avec succès')
-        // Refresh reservations
-        await fetchReservations()
-      } else {
-        throw new Error(`Erreur lors du vidage du panier: ${response.status}`)
-      }
-    } catch (err) {
-      console.error('Erreur lors du vidage du panier:', err)
-      if (axios.isAxiosError(err)) {
-        setError(
-          err.response?.data?.message || 'Erreur lors du vidage du panier'
-        )
-      } else if (err instanceof Error) {
-        setError(err.message)
-      } else {
-        setError('Erreur inconnue lors du vidage du panier')
-      }
-      throw err
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const removeReservationLine = async (lineId: number): Promise<void> => {
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      if (!authenticatedUser) {
-        throw new Error(
-          'Vous devez être authentifié pour supprimer un produit du panier'
-        )
-      }
-
-      const id = parseInt(String(lineId), 10)
-
-      // Utiliser l'endpoint de quantité existant avec une quantité de 0
-      const response = await axios.put(
-        `/api/reservation/line/${id}/quantity`,
-        { quantity: 0 },
-        {
-          headers: {
-            Authorization: authenticatedUser.token,
-            'Content-Type': 'application/json',
-          },
-        }
-      )
-
-      if (response.status >= 200 && response.status < 300) {
-        console.log('Produit supprimé du panier avec succès')
-        // Refresh reservations
-        await fetchReservations()
-      } else {
-        throw new Error(
-          `Erreur lors de la suppression du produit: ${response.status}`
-        )
-      }
-    } catch (err) {
-      console.error('Erreur lors de la suppression du produit:', err)
-      if (axios.isAxiosError(err)) {
-        setError(
-          err.response?.data?.message ||
-            'Erreur lors de la suppression du produit'
-        )
-      } else if (err instanceof Error) {
-        setError(err.message)
-      } else {
-        setError('Erreur inconnue lors de la suppression du produit')
+        setError('Erreur inconnue lors de la mise à jour de la quantité de la ligne')
       }
       throw err
     } finally {
@@ -482,9 +431,8 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
         toPendingReservation,
         toConfirmReservation,
         cancelReservation,
-        updateReservationLineQuantity,
         clearReservation,
-        removeReservationLine,
+     changeReservationLineQuantity,
       }}
     >
       {children}
