@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/** ProductController to handle Product requests. */
+/**
+ * ProductController to handle Product requests.
+ */
 @RestController
 @RequestMapping("/products")
 public class ProductController {
@@ -99,7 +101,7 @@ public class ProductController {
   /**
    * Update a Product.
    *
-   * @param id the Product id.
+   * @param id         the Product id.
    * @param newProduct the new Product data.
    * @return the updated Product.
    */

@@ -32,7 +32,7 @@ public class StatisticsController {
   /**
    * Récupère les statistiques de ventes, optionnellement filtrées par année et/ou mois.
    *
-   * @param year l'année pour laquelle récupérer les statistiques (optionnel)
+   * @param year  l'année pour laquelle récupérer les statistiques (optionnel)
    * @param month le mois pour lequel récupérer les statistiques (optionnel)
    * @return la liste des statistiques de ventes
    */

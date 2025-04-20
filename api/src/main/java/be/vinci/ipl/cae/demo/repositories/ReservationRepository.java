@@ -8,7 +8,9 @@ import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-/** Repository interface for Reservation entities. */
+/**
+ * Repository interface for Reservation entities.
+ */
 @Repository
 public interface ReservationRepository extends CrudRepository<Reservation, Long> {
 

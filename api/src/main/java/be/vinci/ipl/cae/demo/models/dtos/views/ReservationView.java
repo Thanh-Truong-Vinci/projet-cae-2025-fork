@@ -14,6 +14,7 @@ import lombok.Data;
  */
 @Data
 public class ReservationView {
+
   private Long id;
   private Long clientId;
   private ReservationStatus status;

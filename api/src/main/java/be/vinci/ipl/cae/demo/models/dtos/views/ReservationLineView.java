@@ -9,6 +9,7 @@ import lombok.Data;
  */
 @Data
 public class ReservationLineView {
+
   private Long id;
   private Integer quantity;
   private Long batchId;

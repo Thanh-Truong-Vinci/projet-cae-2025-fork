@@ -12,7 +12,9 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
-/** Service class for managing reservations. */
+/**
+ * Service class for managing reservations.
+ */
 @Service
 public class ReservationService {
 
@@ -24,10 +26,10 @@ public class ReservationService {
   /**
    * Constructs a new ReservationService with the specified repositories and services.
    *
-   * @param reservationRepository the repository for reservations
-   * @param batchRepository the repository for batches
+   * @param reservationRepository  the repository for reservations
+   * @param batchRepository        the repository for batches
    * @param reservationLineService the service for reservation lines
-   * @param productService the service for products
+   * @param productService         the service for products
    */
   public ReservationService(
       ReservationRepository reservationRepository,
@@ -43,8 +45,8 @@ public class ReservationService {
   /**
    * Creates a new reservation for a client with the specified product and quantity.
    *
-   * @param client the client making the reservation
-   * @param product the product to reserve
+   * @param client   the client making the reservation
+   * @param product  the product to reserve
    * @param quantity the quantity of the product to reserve
    * @return the created reservation
    */
@@ -65,9 +67,9 @@ public class ReservationService {
   /**
    * Reserves a product for a client with the specified quantity.
    *
-   * @param client the client making the reservation
+   * @param client    the client making the reservation
    * @param productId the ID of the product to reserve
-   * @param quantity the quantity of the product to reserve
+   * @param quantity  the quantity of the product to reserve
    * @return the updated reservation or null if product not found
    */
   public Reservation reserveProduct(Client client, Long productId, int quantity) {
@@ -117,7 +119,7 @@ public class ReservationService {
    * Changes the status of a reservation.
    *
    * @param reservationId the ID of the reservation to update
-   * @param newStatus the new status for the reservation
+   * @param newStatus     the new status for the reservation
    * @return the updated reservation, or null if the reservation was not found
    */
   public Reservation changeStatus(Long reservationId, ReservationStatus newStatus) {

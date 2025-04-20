@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.server.ResponseStatusException;
 
-/** GlobalExceptionHandler to handle exceptions globally. */
+/**
+ * GlobalExceptionHandler to handle exceptions globally.
+ */
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -36,7 +38,7 @@ public class GlobalExceptionHandler {
   /**
    * Handle ResourceNotFoundException.
    *
-   * @param ex the exception.
+   * @param ex      the exception.
    * @param request the request.
    * @return the response entity.
    */
@@ -60,7 +62,7 @@ public class GlobalExceptionHandler {
   /**
    * Handle ResponseStatusException.
    *
-   * @param ex the exception.
+   * @param ex      the exception.
    * @param request the request.
    * @return the response entity.
    */
@@ -86,7 +88,7 @@ public class GlobalExceptionHandler {
   /**
    * Handle AccessDeniedException.
    *
-   * @param ex the exception.
+   * @param ex      the exception.
    * @param request the request.
    * @return the response entity.
    */
@@ -112,7 +114,7 @@ public class GlobalExceptionHandler {
   /**
    * Handle all other exceptions.
    *
-   * @param ex the exception.
+   * @param ex      the exception.
    * @param request the request.
    * @return the response entity.
    */

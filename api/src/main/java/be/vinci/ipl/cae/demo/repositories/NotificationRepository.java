@@ -6,7 +6,9 @@ import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-/** Repository interface for managing notifications. */
+/**
+ * Repository interface for managing notifications.
+ */
 @Repository
 public interface NotificationRepository extends CrudRepository<Notification, Long> {
 

@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class ManagerBatchView {
+
   private Long id;
   private String productName;
   private String productType;

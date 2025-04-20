@@ -16,7 +16,9 @@ import java.util.Date;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-/** Service for handling authentication-related operations. */
+/**
+ * Service for handling authentication-related operations.
+ */
 @Service
 public class AuthsService {
 
@@ -29,7 +31,9 @@ public class AuthsService {
   private final ProducerRepository producerRepository;
   private final BCryptPasswordEncoder passwordEncoder;
 
-  /** Service for handling authentication-related operations. */
+  /**
+   * Service for handling authentication-related operations.
+   */
   public AuthsService(
       UserRepository userRepository,
       ClientRepository clientRepository,
@@ -50,10 +54,10 @@ public class AuthsService {
    * @return the generated JWT token
    */
   @SuppressWarnings({
-    "checkstyle:FileTabCharacter",
-    "checkstyle:Indentation",
-    "checkstyle:LineLength",
-    "checkstyle:MissingJavadocMethod"
+      "checkstyle:FileTabCharacter",
+      "checkstyle:Indentation",
+      "checkstyle:LineLength",
+      "checkstyle:MissingJavadocMethod"
   })
   public String createJwtToken(String email) {
     if (email == null || email.isBlank()) {
@@ -75,10 +79,10 @@ public class AuthsService {
    * @return the email if the token is valid, null otherwise
    */
   @SuppressWarnings({
-    "checkstyle:FileTabCharacter",
-    "checkstyle:Indentation",
-    "checkstyle:LineLength",
-    "checkstyle:MissingJavadocMethod"
+      "checkstyle:FileTabCharacter",
+      "checkstyle:Indentation",
+      "checkstyle:LineLength",
+      "checkstyle:MissingJavadocMethod"
   })
   public String verifyJwtToken(String token) {
     if (token == null || token.isBlank()) {
@@ -165,7 +169,7 @@ public class AuthsService {
   /**
    * Login a client.
    *
-   * @param email the email
+   * @param email    the email
    * @param password the password
    * @return the authenticated user if the login is successful, null otherwise
    */
@@ -189,7 +193,9 @@ public class AuthsService {
     return authenticatedUser;
   }
 
-  /** Enum representing user roles in the system. */
+  /**
+   * Enum representing user roles in the system.
+   */
   public enum Role {
     CLIENT("Client"),
     MANAGER("Manager"),
@@ -213,7 +219,9 @@ public class AuthsService {
     }
   }
 
-  /** Security constants for PreAuthorize expressions. */
+  /**
+   * Security constants for PreAuthorize expressions.
+   */
   public static final class SecurityConstants {
 
     public static final String HAS_ROLE_CLIENT = "hasRole('ROLE_CLIENT')";
@@ -222,6 +230,7 @@ public class AuthsService {
     public static final String HAS_ROLE_VOLUNTEER = "hasRole('ROLE_VOLUNTEER')";
     public static final String HAS_ROLE_ADMIN = "hasRole('ROLE_ADMIN')";
 
-    private SecurityConstants() {}
+    private SecurityConstants() {
+    }
   }
 }

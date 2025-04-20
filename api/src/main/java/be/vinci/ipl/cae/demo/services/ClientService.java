@@ -7,7 +7,9 @@ import java.time.LocalDate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-/** Client service. */
+/**
+ * Client service.
+ */
 @Service
 public class ClientService {
 
@@ -19,8 +21,8 @@ public class ClientService {
    * Constructor.
    *
    * @param clientRepository the client repository
-   * @param userRepository the user repository
-   * @param passwordEncoder the password encoder
+   * @param userRepository   the user repository
+   * @param passwordEncoder  the password encoder
    */
   public ClientService(
       ClientRepository clientRepository,
@@ -34,16 +36,16 @@ public class ClientService {
   /**
    * Create a new client.
    *
-   * @param name the last name
-   * @param firstname the first name
-   * @param email the email
-   * @param password the password
-   * @param civility the civility
-   * @param street the street
-   * @param number the street number
-   * @param postalCode the postal code
-   * @param city the city
-   * @param country the country
+   * @param name        the last name
+   * @param firstname   the first name
+   * @param email       the email
+   * @param password    the password
+   * @param civility    the civility
+   * @param street      the street
+   * @param number      the street number
+   * @param postalCode  the postal code
+   * @param city        the city
+   * @param country     the country
    * @param phoneNumber the phone number (optional)
    * @return the created client
    */
@@ -80,16 +82,16 @@ public class ClientService {
   /**
    * Register a new client.
    *
-   * @param name the last name
-   * @param firstname the first name
-   * @param email the email
-   * @param password the password
-   * @param civility the civility
-   * @param street the street
-   * @param number the street number
-   * @param postalCode the postal code
-   * @param city the city
-   * @param country the country
+   * @param name        the last name
+   * @param firstname   the first name
+   * @param email       the email
+   * @param password    the password
+   * @param civility    the civility
+   * @param street      the street
+   * @param number      the street number
+   * @param postalCode  the postal code
+   * @param city        the city
+   * @param country     the country
    * @param phoneNumber the phone number (optional)
    * @return true if the registration is successful, false otherwise
    */

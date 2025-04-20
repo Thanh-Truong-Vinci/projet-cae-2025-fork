@@ -4,7 +4,9 @@ import be.vinci.ipl.cae.demo.models.entities.Product;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-/** Interface de repository pour les entités `Product`. */
+/**
+ * Interface de repository pour les entités `Product`.
+ */
 @Repository
 public interface ProductRepository extends CrudRepository<Product, Long> {
 

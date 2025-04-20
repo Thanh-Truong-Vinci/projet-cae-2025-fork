@@ -18,7 +18,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-/** JwtAuthenticationFilter to handle user authentication. */
+/**
+ * JwtAuthenticationFilter to handle user authentication.
+ */
 @Configuration
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -38,11 +40,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   /**
    * Filter to handle user authentication.
    *
-   * @param request the request.
-   * @param response the response.
+   * @param request     the request.
+   * @param response    the response.
    * @param filterChain the filter chain.
    * @throws ServletException the servlet exception.
-   * @throws IOException the IO exception.
+   * @throws IOException      the IO exception.
    */
   @Override
   protected void doFilterInternal(

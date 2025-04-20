@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Controller for managing manager and producer registrations. */
+/**
+ * Controller for managing manager and producer registrations.
+ */
 @RestController
 @RequestMapping("/manager")
 public class ManagerController {
@@ -26,9 +28,9 @@ public class ManagerController {
   /**
    * Constructs a ManagerController with the specified services.
    *
-   * @param managerService the service for managing managers.
+   * @param managerService  the service for managing managers.
    * @param producerService the service for managing producers.
-   * @param authsService the service for authentication.
+   * @param authsService    the service for authentication.
    */
   public ManagerController(
       ManagerService managerService, ProducerService producerService, AuthsService authsService) {
@@ -41,7 +43,7 @@ public class ManagerController {
    * Register a new manager.
    *
    * @param credentials the manager credentials from the request body.
-   * @param token the authorization token from the request header.
+   * @param token       the authorization token from the request header.
    * @throws ConflictException if the email is already in use.
    */
   @PostMapping("/registermanager")
@@ -65,7 +67,7 @@ public class ManagerController {
    * Register a new producer.
    *
    * @param credentials the producer credentials from the request body.
-   * @param token the authorization token from the request header.
+   * @param token       the authorization token from the request header.
    * @throws ConflictException if email already exists.
    */
   @PostMapping("/registerproducer")

@@ -6,7 +6,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-/** Client entity. */
+/**
+ * Client entity.
+ */
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Data

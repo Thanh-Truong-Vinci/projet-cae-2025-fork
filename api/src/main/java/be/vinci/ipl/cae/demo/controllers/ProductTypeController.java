@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Controller pour gérer les opérations sur les types de produits. */
+/**
+ * Controller pour gérer les opérations sur les types de produits.
+ */
 @RestController
 @RequestMapping("/product-types")
 public class ProductTypeController {

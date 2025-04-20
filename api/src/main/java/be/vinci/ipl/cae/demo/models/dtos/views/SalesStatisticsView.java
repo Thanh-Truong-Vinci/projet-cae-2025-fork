@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class SalesStatisticsView {
+
   private Long productId;
   private String productName;
   private String productType;

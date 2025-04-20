@@ -3,7 +3,9 @@ package be.vinci.ipl.cae.demo.models.dtos;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** DTO pour la création et modification des produits. */
+/**
+ * DTO pour la création et modification des produits.
+ */
 @Data
 @NoArgsConstructor
 public class NewProduct {

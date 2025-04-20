@@ -55,11 +55,13 @@ WHERE email = 'producer@example.com';
 
 -- Créer un second producteur de test
 INSERT INTO users (name, firstname, email, password, date_inscription)
-VALUES ('Martin', 'Sophie', 'sophie.martin@example.com', '$2a$10$8Cv0QyLMQ.dDlswhLhd8peiW6.KWnQLl0VmL5lw41/trJgprkg2vm',
+VALUES ('Martin', 'Sophie', 'sophie.martin@example.com',
+        '$2a$10$8Cv0QyLMQ.dDlswhLhd8peiW6.KWnQLl0VmL5lw41/trJgprkg2vm',
         '2024-02-10');
 
 -- Récupérer l'ID et créer l'adresse du second producteur
-INSERT INTO user_with_address (id_user, street, number, box, postal_code, city, country, phone_number)
+INSERT INTO user_with_address (id_user, street, number, box, postal_code, city, country,
+                               phone_number)
 SELECT id_user,
        'Chemin des Vignes',
        '15',
@@ -79,11 +81,13 @@ WHERE email = 'sophie.martin@example.com';
 
 -- Créer un second producteur de test
 INSERT INTO users (name, firstname, email, password, date_inscription)
-VALUES ('Dubois', 'Marie', 'marie.dubois@example.com', '$2a$10$8Cv0QyLMQ.dDlswhLhd8peiW6.KWnQLl0VmL5lw41/trJgprkg2vm',
+VALUES ('Dubois', 'Marie', 'marie.dubois@example.com',
+        '$2a$10$8Cv0QyLMQ.dDlswhLhd8peiW6.KWnQLl0VmL5lw41/trJgprkg2vm',
         '2024-02-20');
 
 -- Récupérer l'ID et créer l'adresse du second producteur
-INSERT INTO user_with_address (id_user, street, number, box, postal_code, city, country, phone_number)
+INSERT INTO user_with_address (id_user, street, number, box, postal_code, city, country,
+                               phone_number)
 SELECT id_user,
        'Route du Verger',
        '23',
@@ -237,7 +241,8 @@ WHERE pt.title = 'Légumes'
 
 -- Créer des lots pour chaque produit
 -- Fix all pending batches inserts
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -251,12 +256,13 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-20',
        '2025-03-10' -- Date de production (antérieure à la date de dépôt)
 FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Tomates Bio';
 
 -- Pour le lot des Pommes Royal Gala
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -270,12 +276,13 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-15',
        '2025-03-05' -- 10 jours avant le dépôt
 FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pommes Royal Gala';
 
 -- Pour le lot de Pain au levain
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -289,12 +296,13 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-25',
        '2025-03-24' -- 1 jour avant (pain frais)
 FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pain au levain';
 
 -- Pour le lot de Fromage fermier
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -308,12 +316,13 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-18',
        '2025-01-18' -- 2 mois avant (fromage affiné)
 FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Fromage fermier';
 
 -- Pour le lot de Carottes Bio
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -327,12 +336,13 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-22',
        '2025-03-15' -- 7 jours avant la récolte
 FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Carottes Bio';
 
 -- Pour le lot de Bière artisanale
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -346,12 +356,13 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-21',
        '2025-02-21' -- 1 mois avant (temps de fermentation)
 FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Bière artisanale';
 
 -- Pour le lot de Poulet fermier
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -365,12 +376,13 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-19',
        '2025-03-18' -- 1 jour avant (fraîcheur)
 FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Poulet fermier';
 
 -- Pour le lot de Yaourt nature
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -384,12 +396,13 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-16',
        '2025-03-14' -- 2 jours avant
 FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Yaourt nature';
 
 -- Créer un lot pour ce nouveau producteur
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user
@@ -405,12 +418,13 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-25',
        '2025-02-15' -- Production antérieure (vin qui a besoin d'être vieilli)
 FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Bière artisanale';
 
 -- Créer un lot pour ce nouveau producteur
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user
@@ -426,13 +440,14 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-28',
        '2025-03-20' -- Production récente pour fruits frais
 FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pommes Royal Gala';
 
 -- Fix all approved batches inserts
 -- Pour le lot de Pomme Jonagold (APPROVED)
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -446,12 +461,13 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-10',
        '2025-03-01' -- 9 jours avant
 FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Pomme Jonagold';
 
 -- Pour le lot de Chou-fleur cheddar (APPROVED)
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -465,12 +481,13 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-12',
        '2025-03-05' -- 7 jours avant
 FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Chou-fleur cheddar';
 
 -- Pour le lot de Fromage fermier (APPROVED)
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -484,13 +501,14 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-18',
        '2025-01-18' -- 2 mois avant (fromage affiné)
 FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Fromage fermier';
 
 -- Création de lots à l'état RECEIVED
 -- Pour le lot de Tomates Bio (RECEIVED)
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -504,12 +522,13 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-10',
        '2025-03-05' -- 5 jours avant le dépôt
 FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Tomates Bio';
 
 -- Pour le lot de Carottes Bio (RECEIVED)
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -523,12 +542,13 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-15',
        '2025-03-08' -- 7 jours avant le dépôt
 FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Carottes Bio';
 
 -- Pour un deuxième lot de Carottes Bio (RECEIVED) - fusionnable avec le lot existant
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -542,12 +562,13 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-25', -- Date de dépôt différente, pas importante pour la fusion
        '2025-03-20'  -- Date de production différente
 FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Carottes Bio';
 
 -- Pour un lot de Carottes Bio (RECEIVED) - presque fusionnable mais avec prix différent
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -561,12 +582,13 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-28', -- Date de dépôt
        '2025-03-22'  -- Date de production
 FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Carottes Bio';
 
 -- Pour le lot de Yaourt nature (RECEIVED)
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -580,12 +602,13 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-20',
        '2025-03-18' -- 2 jours avant le dépôt
 FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Yaourt nature';
 
 -- 1. Lot avec une unité de vente différente (tout le reste identique)
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -599,12 +622,13 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-04-01',
        '2025-03-25'
 FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Carottes Bio';
 
 -- 2. Lot avec une photo différente (tout le reste identique)
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer LIMIT 1),
@@ -621,7 +645,8 @@ FROM products p
 WHERE p.name = 'Carottes Bio';
 
 -- 3. Lot avec un producteur différent (paramètre hors clé de fusion - sera fusionné quand même)
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price, sale_unit,
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit,
                      available_quantity, status, deposit_date, production_date)
 SELECT (SELECT id_user FROM manager LIMIT 1),
        (SELECT id_user FROM producer WHERE company = 'Les Vergers de Marie'), -- PRODUCTEUR DIFFÉRENT - SERA FUSIONNÉ quand même
@@ -635,8 +660,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-04-03',
        '2025-03-30'
 FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
+    JOIN photos ph
+ON p.photo_id = ph.id_photo
 WHERE p.name = 'Carottes Bio';
 
 SELECT id_user, NULL
@@ -661,7 +686,8 @@ VALUES ('Dupont', 'Michel', 'client@example.com',
         CURRENT_DATE);
 
 -- 2. Ajouter l'adresse (obligatoire pour un UserWithAddress)
-INSERT INTO user_with_address (id_user, street, number, box, postal_code, city, country, phone_number)
+INSERT INTO user_with_address (id_user, street, number, box, postal_code, city, country,
+                               phone_number)
 SELECT id_user,
        'Avenue des Clients',
        '25',
@@ -686,7 +712,8 @@ VALUES ('Rossi', 'Mario', 'mario.rossi@example.com',
         CURRENT_DATE);
 
 -- Aggiungere l'indirizzo per l'utente
-INSERT INTO user_with_address (id_user, street, number, box, postal_code, city, country, phone_number)
+INSERT INTO user_with_address (id_user, street, number, box, postal_code, city, country,
+                               phone_number)
 SELECT id_user,
        'Via Roma',
        '10',

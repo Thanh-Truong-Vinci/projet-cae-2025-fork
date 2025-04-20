@@ -9,7 +9,9 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** ProductType entity. */
+/**
+ * ProductType entity.
+ */
 @Entity
 @Table(name = "product_types")
 @Data
