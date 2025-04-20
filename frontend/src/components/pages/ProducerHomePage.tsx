@@ -224,7 +224,7 @@ const ProducerHomePage = () => {
     // Adaptation aux valeurs de status en majuscules venant de l'API
     switch (status?.toUpperCase()) {
       case 'APPROVED':
-        return { label: 'En vente', color: 'success' as const }
+        return { label: 'Accepté', color: 'success' as const }
       case 'PENDING':
         return { label: 'En attente', color: 'warning' as const }
       case 'REJECTED':
@@ -453,7 +453,7 @@ const ProducerHomePage = () => {
             scrollButtons="auto"
           >
             <Tab label="Tous" {...a11yProps(0)} />
-            <Tab label="En vente" {...a11yProps(1)} />
+            <Tab label="Accepté" {...a11yProps(1)} />
             <Tab label="En attente" {...a11yProps(2)} />
             <Tab label="Refusé" {...a11yProps(3)} />
             <Tab label="Reçu" {...a11yProps(4)} />
@@ -683,7 +683,7 @@ const ProducerHomePage = () => {
                   ).length
                 }
               </Typography>
-              <Typography variant="body1">Lots en vente</Typography>
+              <Typography variant="body1">Lots acceptés</Typography>
             </Box>
           </Grid>
           <Grid item xs={12} sm={4} md={3}>
