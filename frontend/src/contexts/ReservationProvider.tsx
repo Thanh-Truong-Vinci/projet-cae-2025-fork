@@ -316,6 +316,146 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
     }
   }
 
+  const updateReservationLineQuantity = async (
+    lineId: number,
+    quantity: number
+  ): Promise<void> => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      if (!authenticatedUser) {
+        throw new Error(
+          'Vous devez être authentifié pour modifier une réservation'
+        )
+      }
+
+      const response = await axios.put(
+        `/api/reservation/line/${lineId}/quantity`,
+        { quantity },
+        {
+          headers: {
+            Authorization: authenticatedUser.token,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (response.status >= 200 && response.status < 300) {
+        console.log('Quantité mise à jour avec succès')
+        // Refresh reservations
+        await fetchReservations()
+      } else {
+        throw new Error(
+          `Erreur lors de la mise à jour de la quantité: ${response.status}`
+        )
+      }
+    } catch (err) {
+      console.error('Erreur lors de la mise à jour de la quantité:', err)
+      if (axios.isAxiosError(err)) {
+        setError(
+          err.response?.data?.message ||
+            'Erreur lors de la mise à jour de la quantité'
+        )
+      } else if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError('Erreur inconnue lors de la mise à jour de la quantité')
+      }
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const clearReservation = async (reservationId: number): Promise<void> => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      if (!authenticatedUser) {
+        throw new Error('Vous devez être authentifié pour vider votre panier')
+      }
+
+      const response = await axios.delete(
+        `/api/reservation/${reservationId}/clear`,
+        {
+          headers: {
+            Authorization: authenticatedUser.token,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (response.status >= 200 && response.status < 300) {
+        console.log('Panier vidé avec succès')
+        // Refresh reservations
+        await fetchReservations()
+      } else {
+        throw new Error(`Erreur lors du vidage du panier: ${response.status}`)
+      }
+    } catch (err) {
+      console.error('Erreur lors du vidage du panier:', err)
+      if (axios.isAxiosError(err)) {
+        setError(
+          err.response?.data?.message || 'Erreur lors du vidage du panier'
+        )
+      } else if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError('Erreur inconnue lors du vidage du panier')
+      }
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const removeReservationLine = async (lineId: number): Promise<void> => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      if (!authenticatedUser) {
+        throw new Error(
+          'Vous devez être authentifié pour supprimer un produit du panier'
+        )
+      }
+
+      const response = await axios.delete(`/api/reservation/line/${lineId}`, {
+        headers: {
+          Authorization: authenticatedUser.token,
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.status >= 200 && response.status < 300) {
+        console.log('Produit supprimé du panier avec succès')
+        // Refresh reservations
+        await fetchReservations()
+      } else {
+        throw new Error(
+          `Erreur lors de la suppression du produit: ${response.status}`
+        )
+      }
+    } catch (err) {
+      console.error('Erreur lors de la suppression du produit:', err)
+      if (axios.isAxiosError(err)) {
+        setError(
+          err.response?.data?.message ||
+            'Erreur lors de la suppression du produit'
+        )
+      } else if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError('Erreur inconnue lors de la suppression du produit')
+      }
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   // Load the user's reservations when the component mounts and the user is authenticated
   useEffect(() => {
     if (authenticatedUser && authenticatedUser.role === 'Client') {
@@ -330,11 +470,14 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
         isLoading,
         error,
         fetchReservations,
-        fetchAllReservations, // Added fetchAllReservations to the context
+        fetchAllReservations,
         createReservation,
         toPendingReservation,
         toConfirmReservation,
         cancelReservation,
+        updateReservationLineQuantity,
+        clearReservation,
+        removeReservationLine,
       }}
     >
       {children}

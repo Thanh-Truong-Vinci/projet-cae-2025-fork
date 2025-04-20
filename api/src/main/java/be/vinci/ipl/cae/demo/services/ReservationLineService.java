@@ -6,6 +6,7 @@ import be.vinci.ipl.cae.demo.models.entities.Reservation;
 import be.vinci.ipl.cae.demo.models.entities.ReservationLine;
 import be.vinci.ipl.cae.demo.repositories.BatchRepository;
 import be.vinci.ipl.cae.demo.repositories.ReservationLineRepository;
+import be.vinci.ipl.cae.demo.exceptions.ConflictException;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -46,26 +47,52 @@ public class ReservationLineService {
    * @param quantity the quantity of the product to add
    */
   public void addProduct(Reservation reservation, Product product, int quantity) {
-    List<Batch> batches =
-        batchRepository.findByProductIdAndAvailableQuantityGreaterThan(product.getId(), 0);
-    int totalAvailableQuantity = batches.stream().mapToInt(Batch::getAvailableQuantity).sum();
 
-    if (totalAvailableQuantity < quantity) {
-      throw new IllegalArgumentException(
-          "Not enough stock available for product: " + product.getName());
+    List<ReservationLine> existingLines = reservationLineRepository
+        .findByReservationAndProductOrderByBatchProductionDateAsc(reservation, product);
+    
+    int remainingQuantity = quantity;
+    
+    // augmenter la quantité si le produit existe déjà
+    for (ReservationLine line : existingLines) {
+        Batch batch = line.getBatch();
+        if (batch.getAvailableQuantity() > 0) {
+            int additionalQuantity = Math.min(batch.getAvailableQuantity(), remainingQuantity);
+            if (additionalQuantity > 0) {
+                line.setQuantity(line.getQuantity() + additionalQuantity);
+                reservationLineRepository.save(line);
+                
+                batch.setAvailableQuantity(batch.getAvailableQuantity() - additionalQuantity);
+                batchRepository.save(batch);
+                
+                remainingQuantity -= additionalQuantity;
+                if (remainingQuantity <= 0) return;
+            }
+        }
     }
 
-    int remainingQuantity = quantity;
-    for (Batch batch : batches) {
-      if (remainingQuantity <= 0) {
-        break;
-      }
-
-      int batchQuantity = Math.min(batch.getAvailableQuantity(), remainingQuantity);
-      createReservationLine(reservation, batch, batchQuantity);
-      remainingQuantity -= batchQuantity;
-      batch.setAvailableQuantity(batch.getAvailableQuantity() - batchQuantity);
-      batchRepository.save(batch);
+    if (remainingQuantity > 0) {
+        List<Batch> batches = batchRepository
+            .findByProductIdAndAvailableQuantityGreaterThanOrderByProductionDateAsc(
+                product.getId(), 0);
+                
+        for (Batch batch : batches) {
+            // Vérifier que ce lot n'est pas déjà utilisé dans des lignes existantes
+            if (existingLines.stream().noneMatch(line -> line.getBatch().getId() == batch.getId())) {
+                int batchQuantity = Math.min(batch.getAvailableQuantity(), remainingQuantity);
+                createReservationLine(reservation, batch, batchQuantity);
+                remainingQuantity -= batchQuantity;
+                batch.setAvailableQuantity(batch.getAvailableQuantity() - batchQuantity);
+                batchRepository.save(batch);
+                
+                if (remainingQuantity <= 0) break;
+            }
+        }
+    }
+    
+    if (remainingQuantity > 0) {
+        throw new ConflictException(
+            "Not enough stock available for product: " + product.getName());
     }
   }
 }

@@ -93,24 +93,82 @@ const CartPage = () => {
     )
   }
 
-  const handleQuantityChange = (id: number, change: number) => {
-    console.log('handleQuantityChange', id, change)
-    // Not implemented yet
+  const handleQuantityChange = async (id: number, change: number) => {
+    if (!reservation) return
+
+    const line = reservation.reservationLines.find((l) => l.id === id)
+    if (!line) return
+
+    const newQuantity = Math.max(1, line.quantity + change)
+    await handleDirectQuantityChange(id, newQuantity.toString())
   }
 
-  const handleDirectQuantityChange = (id: number, value: string) => {
-    console.log('handleQuantityChange', id, value)
-    // Not implemented yet
+  const handleDirectQuantityChange = async (id: number, valueStr: string) => {
+    try {
+      const value = parseInt(valueStr, 10)
+      if (isNaN(value) || value < 1) return
+
+      if (reservation && reservationContext.updateReservationLineQuantity) {
+        await reservationContext.updateReservationLineQuantity(id, value)
+
+        // Rafraîchir les données
+        const updatedReservations = await reservationContext.fetchReservations()
+        const buildingReservation = updatedReservations.find(
+          (res) => res.status === ReservationStatus.BUILDING
+        )
+        setReservation(buildingReservation ?? null)
+      }
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de la quantité:', error)
+      setMessage('Impossible de mettre à jour la quantité')
+      setOpenSnackbar(true)
+    }
   }
 
-  const clearCart = () => {
-    console.log('removeFromCart')
-    // Not implemented yet
+  const clearCart = async () => {
+    try {
+      if (reservation && reservationContext.clearReservation) {
+        await reservationContext.clearReservation(reservation.id)
+
+        // Rafraîchir les données
+        const updatedReservations = await reservationContext.fetchReservations()
+        const buildingReservation = updatedReservations.find(
+          (res) => res.status === ReservationStatus.BUILDING
+        )
+        setReservation(buildingReservation ?? null)
+
+        // Montrer confirmation
+        setMessage('Votre panier a été vidé')
+        setOpenSnackbar(true)
+      }
+    } catch (error) {
+      console.error('Erreur lors du vidage du panier:', error)
+      setMessage('Impossible de vider le panier')
+      setOpenSnackbar(true)
+    }
   }
 
-  const removeFromCart = (id: number) => {
-    console.log('removeFromCart', id)
-    // Not implemented yet
+  const removeFromCart = async (id: number) => {
+    try {
+      if (reservation && reservationContext.removeReservationLine) {
+        await reservationContext.removeReservationLine(id)
+
+        // Rafraîchir les données de réservation pour mettre à jour l'affichage
+        const updatedReservations = await reservationContext.fetchReservations()
+        const buildingReservation = updatedReservations.find(
+          (res) => res.status === ReservationStatus.BUILDING
+        )
+        setReservation(buildingReservation ?? null)
+
+        // Montrer confirmation
+        setMessage('Produit retiré du panier avec succès')
+        setOpenSnackbar(true)
+      }
+    } catch (error) {
+      console.error('Erreur lors de la suppression du produit:', error)
+      setMessage('Impossible de supprimer ce produit du panier')
+      setOpenSnackbar(true)
+    }
   }
 
   const handleOpenCalendar = () => {
