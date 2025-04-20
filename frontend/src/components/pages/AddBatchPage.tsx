@@ -117,9 +117,10 @@ const AddBatchPage = () => {
       setSnackbarSeverity('error')
       setOpenSnackbar(true)
 
+      // Ajouter cette redirection après un délai
       setTimeout(() => {
         navigate('/')
-      }, 3000)
+      }, 3000) // 3 secondes pour laisser le temps de voir le message
     }
   }, [authenticatedUser, navigate])
 
