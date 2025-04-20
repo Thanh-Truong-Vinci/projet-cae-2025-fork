@@ -102,10 +102,12 @@ public class ReservationLineService {
   }
 
   /**
-   * Retrieves all reservation lines for a given reservation.
+   * Changes the quantity of a reservation line.
+   *
+   * @param reservationLine the reservation line to change
+   * @param newQuantity the new quantity for the reservation line
    */
-  public void changeQuantity(
-      ReservationLine reservationLine, int newQuantity) {
+  public void changeQuantity(ReservationLine reservationLine, int newQuantity) {
     // update batch available quantity
     int quantityDifference = reservationLine.getQuantity() - newQuantity;
     Batch batch = reservationLine.getBatch();
@@ -123,6 +125,11 @@ public class ReservationLineService {
     reservationLineRepository.save(reservationLine);
   }
 
+  /**
+   * Deletes a reservation line and updates the available quantity of the associated batch.
+   *
+   * @param reservationLine the reservation line to delete
+   */
   public void deleteReservationLine(ReservationLine reservationLine) {
     // update batch available quantity
     Batch batch = reservationLine.getBatch();

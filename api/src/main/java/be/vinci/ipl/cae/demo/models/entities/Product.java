@@ -11,9 +11,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Product entity.
- */
+/** Product entity. */
 @Entity
 @Table(name = "products")
 @Data

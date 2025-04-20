@@ -6,9 +6,7 @@ import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * BatchView DTO pour l'affichage fusionné des lots avec même produit et prix.
- */
+/** BatchView DTO pour l'affichage fusionné des lots avec même produit et prix. */
 @Data
 @NoArgsConstructor
 public class ProductBatchView {

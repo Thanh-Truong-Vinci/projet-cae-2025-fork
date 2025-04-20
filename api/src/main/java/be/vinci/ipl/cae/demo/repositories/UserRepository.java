@@ -8,9 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-/**
- * User repository.
- */
+/** User repository. */
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
@@ -26,7 +24,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
    * Find a user by its email.
    *
    * @param password the new password
-   * @param email    the email
+   * @param email the email
    * @return the user
    */
   @Modifying

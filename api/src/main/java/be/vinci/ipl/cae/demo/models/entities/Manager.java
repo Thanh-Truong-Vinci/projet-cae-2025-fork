@@ -7,9 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-/**
- * Manager entity.
- */
+/** Manager entity. */
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Data

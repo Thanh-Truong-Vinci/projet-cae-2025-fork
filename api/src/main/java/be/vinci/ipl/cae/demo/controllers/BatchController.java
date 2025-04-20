@@ -32,9 +32,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- * Controller pour gérer les opérations sur les lots.
- */
+/** Controller pour gérer les opérations sur les lots. */
 @RestController
 @RequestMapping("/batches")
 public class BatchController {
@@ -48,9 +46,9 @@ public class BatchController {
   /**
    * Constructeur du controller.
    *
-   * @param batchService          le service de gestion des lots injecté
-   * @param productService        le service de gestion des photos injecté
-   * @param photoService          le service de gestion des photos injecté
+   * @param batchService le service de gestion des lots injecté
+   * @param productService le service de gestion des photos injecté
+   * @param photoService le service de gestion des photos injecté
    * @param productTypeRepository le repository de gestion des types de produits injecté
    */
   public BatchController(
@@ -70,7 +68,7 @@ public class BatchController {
    * Crée un nouveau lot avec un produit et une photo associée.
    *
    * @param newBatch les informations du lot à créer (au format JSON)
-   * @param image    le fichier image du produit
+   * @param image le fichier image du produit
    * @return le lot créé
    */
   @PostMapping("/createbatch")
@@ -138,7 +136,7 @@ public class BatchController {
   /**
    * Creates a new batch with an existing product.
    *
-   * @param newBatch  the batch data
+   * @param newBatch the batch data
    * @param productId the ID of the existing product
    * @return the created batch
    */
@@ -163,7 +161,7 @@ public class BatchController {
    * Creates a new batch with a new product but using an existing image.
    *
    * @param newBatch the batch data
-   * @param photoId  the ID of the existing photo
+   * @param photoId the ID of the existing photo
    * @return the created batch
    */
   @PostMapping("/createbatch/existingimage")
@@ -244,7 +242,7 @@ public class BatchController {
   /**
    * Rejette un lot avec un message de notification.
    *
-   * @param id      l'identifiant du lot à rejeter
+   * @param id l'identifiant du lot à rejeter
    * @param message le message expliquant le rejet (optionnel)
    * @return le lot rejeté
    */
@@ -281,7 +279,7 @@ public class BatchController {
   /**
    * Met à jour l'image d'un lot avec une nouvelle image téléchargée.
    *
-   * @param id    l'identifiant du lot à mettre à jour
+   * @param id l'identifiant du lot à mettre à jour
    * @param image le fichier image à utiliser
    * @return le lot mis à jour
    */
@@ -307,7 +305,7 @@ public class BatchController {
   /**
    * Met à jour l'image d'un lot avec une image existante par ID.
    *
-   * @param id          l'identifiant du lot à mettre à jour
+   * @param id l'identifiant du lot à mettre à jour
    * @param requestBody contient l'identifiant de l'image à utiliser
    * @return le lot mis à jour
    */
@@ -340,10 +338,10 @@ public class BatchController {
    * Vérifie que le producteur est propriétaire du lot.
    *
    * @param batchId l'identifiant du lot
-   * @param token   le token d'authentification
+   * @param token le token d'authentification
    * @return le lot si l'utilisateur est autorisé
    * @throws ResourceNotFoundException si le lot n'existe pas
-   * @throws ConflictException         si l'utilisateur n'est pas autorisé
+   * @throws ConflictException si l'utilisateur n'est pas autorisé
    */
   private Batch verifyBatchOwnership(long batchId, String token) {
     // Vérifier que l'utilisateur est le producteur du lot
@@ -365,7 +363,7 @@ public class BatchController {
    * Met à jour un lot avec une nouvelle photo.
    *
    * @param batchId l'identifiant du lot
-   * @param photo   la photo à associer
+   * @param photo la photo à associer
    * @return le lot mis à jour
    * @throws ConflictException si la mise à jour échoue
    */

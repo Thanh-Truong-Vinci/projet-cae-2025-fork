@@ -24,9 +24,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;
 
-/**
- * Service class for managing batches.
- */
+/** Service class for managing batches. */
 @Service
 public class BatchService {
 
@@ -38,9 +36,7 @@ public class BatchService {
   private final PhotoService photoService;
   private final ProductService productService;
 
-  /**
-   * Constructeur du service.
-   */
+  /** Constructeur du service. */
   public BatchService(
       BatchRepository batchRepository,
       ProducerRepository producerRepository,
@@ -72,7 +68,7 @@ public class BatchService {
   /**
    * Creates a new batch using an existing product.
    *
-   * @param newBatch  the batch data
+   * @param newBatch the batch data
    * @param productId the ID of the existing product
    * @return the created batch
    */
@@ -96,7 +92,7 @@ public class BatchService {
    * Creates a new batch using an existing image from the database.
    *
    * @param newBatch the batch data
-   * @param photoId  the ID of the existing photo to use
+   * @param photoId the ID of the existing photo to use
    * @return the created batch
    */
   public Batch createBatchWithExistingImage(NewBatch newBatch, Long photoId) {
@@ -113,11 +109,9 @@ public class BatchService {
     }
 
     // Create a new product with the existing photo
-    Product product = productService.createProduct(
-        newBatch.getProductName(),
-        productType,
-        newBatch.getProductDescription(),
-        photo);
+    Product product =
+        productService.createProduct(
+            newBatch.getProductName(), productType, newBatch.getProductDescription(), photo);
 
     if (product == null) {
       return null;
@@ -134,8 +128,8 @@ public class BatchService {
    * This eliminates code duplication between the public batch creation methods.
    *
    * @param producer the producer creating the batch
-   * @param product  the product being used
-   * @param photo    the photo associated with the product
+   * @param product the product being used
+   * @param photo the photo associated with the product
    * @param newBatch the batch data
    * @return the created batch
    */
@@ -193,7 +187,7 @@ public class BatchService {
   /**
    * Rejette un lot avec un message de notification optionnel.
    *
-   * @param id      l'identifiant du lot à rejeter
+   * @param id l'identifiant du lot à rejeter
    * @param message le message expliquant le rejet (peut être null ou vide)
    * @return le lot rejeté ou null si non trouvé
    */
@@ -269,7 +263,7 @@ public class BatchService {
    * Updates the photo of a batch with a new uploaded image.
    *
    * @param batchId the ID of the batch to update
-   * @param photo   the new photo entity
+   * @param photo the new photo entity
    * @return the updated batch or null if the batch was not found
    */
   public Batch updateBatchPhoto(long batchId, Photo photo) {

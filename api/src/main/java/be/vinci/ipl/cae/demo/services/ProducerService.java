@@ -7,9 +7,7 @@ import java.time.LocalDate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-/**
- * Producer Service.
- */
+/** Producer Service. */
 @Service
 public class ProducerService {
 
@@ -34,17 +32,17 @@ public class ProducerService {
   /**
    * Create a new Producer.
    *
-   * @param name        the last name
-   * @param firstname   the first name
-   * @param company     the company
-   * @param email       the email
-   * @param password    the password
-   * @param street      the street
-   * @param number      the number
-   * @param box         the box
-   * @param postalCode  the postalCode
-   * @param city        the city
-   * @param country     the country
+   * @param name the last name
+   * @param firstname the first name
+   * @param company the company
+   * @param email the email
+   * @param password the password
+   * @param street the street
+   * @param number the number
+   * @param box the box
+   * @param postalCode the postalCode
+   * @param city the city
+   * @param country the country
    * @param phoneNumber the phoneNumber
    */
   public void createProducer(
@@ -82,17 +80,17 @@ public class ProducerService {
   /**
    * Register a new producer.
    *
-   * @param name        the last name
-   * @param firstname   the first name
-   * @param company     the company
-   * @param email       the email
-   * @param password    the password
-   * @param street      the street
-   * @param number      the number
-   * @param box         the box
-   * @param postalCode  the postalCode
-   * @param city        the city
-   * @param country     the country
+   * @param name the last name
+   * @param firstname the first name
+   * @param company the company
+   * @param email the email
+   * @param password the password
+   * @param street the street
+   * @param number the number
+   * @param box the box
+   * @param postalCode the postalCode
+   * @param city the city
+   * @param country the country
    * @param phoneNumber the phoneNumber
    * @return true if the registration is successful, false otherwise
    */

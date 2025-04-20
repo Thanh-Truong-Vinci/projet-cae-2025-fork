@@ -3,9 +3,7 @@ package be.vinci.ipl.cae.demo.models.dtos;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * CredentialsRegister DTO.
- */
+/** CredentialsRegister DTO. */
 @Data
 @NoArgsConstructor
 public class CredentialsProfile {
