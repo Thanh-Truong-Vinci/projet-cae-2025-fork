@@ -422,12 +422,19 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
         )
       }
 
-      const response = await axios.delete(`/api/reservation/line/${lineId}`, {
-        headers: {
-          Authorization: authenticatedUser.token,
-          'Content-Type': 'application/json',
-        },
-      })
+      const id = parseInt(String(lineId), 10)
+
+      // Utiliser l'endpoint de quantité existant avec une quantité de 0
+      const response = await axios.put(
+        `/api/reservation/line/${id}/quantity`,
+        { quantity: 0 },
+        {
+          headers: {
+            Authorization: authenticatedUser.token,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
 
       if (response.status >= 200 && response.status < 300) {
         console.log('Produit supprimé du panier avec succès')

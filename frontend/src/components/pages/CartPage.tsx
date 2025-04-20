@@ -1,5 +1,4 @@
 import { useContext, useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
 import {
   Box,
   Typography,
@@ -34,7 +33,6 @@ import { ReservationStatus, ReservationView } from '../../types'
 const CartPage = () => {
   const { authenticatedUser } = useContext(UserContext)
   const navigate = useNavigate()
-  const location = useLocation()
   const [openCalendar, setOpenCalendar] = useState(false)
   const [selectedDate, setSelectedDate] = useState<string>('')
   const [isDateValid, setIsDateValid] = useState(false)
@@ -42,17 +40,29 @@ const CartPage = () => {
   const [message, setMessage] = useState('')
   const reservationContext = useContext(ReservationContext)
   const [reservation, setReservation] = useState<ReservationView | null>(null)
+  const [fetchTimestamp, setFetchTimestamp] = useState(0)
+  const CACHE_DURATION = 5000 // 5 secondes
 
   useEffect(() => {
+    const now = Date.now()
+    if (now - fetchTimestamp < CACHE_DURATION && reservation !== null) {
+      return
+    }
+
     if (reservationContext && reservationContext.fetchReservations) {
       reservationContext.fetchReservations().then((r) => {
         const buildingReservation = r.find(
           (res) => res.status === ReservationStatus.BUILDING
         )
         setReservation(buildingReservation ?? null)
+        setFetchTimestamp(now)
       })
     }
-  }, [reservationContext, location.key])
+  }, [reservationContext, fetchTimestamp, reservation])
+
+  const forceRefresh = () => {
+    setFetchTimestamp(Date.now())
+  }
 
   if (!reservationContext) {
     throw new Error(
@@ -112,13 +122,7 @@ const CartPage = () => {
 
       if (reservation && reservationContext.updateReservationLineQuantity) {
         await reservationContext.updateReservationLineQuantity(id, value)
-
-        // Rafraîchir les données
-        const updatedReservations = await reservationContext.fetchReservations()
-        const buildingReservation = updatedReservations.find(
-          (res) => res.status === ReservationStatus.BUILDING
-        )
-        setReservation(buildingReservation ?? null)
+        forceRefresh() // Utiliser forceRefresh au lieu de fetchReservations
       }
     } catch (error) {
       console.error('Erreur lors de la mise à jour de la quantité:', error)
@@ -131,15 +135,7 @@ const CartPage = () => {
     try {
       if (reservation && reservationContext.clearReservation) {
         await reservationContext.clearReservation(reservation.id)
-
-        // Rafraîchir les données
-        const updatedReservations = await reservationContext.fetchReservations()
-        const buildingReservation = updatedReservations.find(
-          (res) => res.status === ReservationStatus.BUILDING
-        )
-        setReservation(buildingReservation ?? null)
-
-        // Montrer confirmation
+        forceRefresh()
         setMessage('Votre panier a été vidé')
         setOpenSnackbar(true)
       }
@@ -154,15 +150,7 @@ const CartPage = () => {
     try {
       if (reservation && reservationContext.removeReservationLine) {
         await reservationContext.removeReservationLine(id)
-
-        // Rafraîchir les données de réservation pour mettre à jour l'affichage
-        const updatedReservations = await reservationContext.fetchReservations()
-        const buildingReservation = updatedReservations.find(
-          (res) => res.status === ReservationStatus.BUILDING
-        )
-        setReservation(buildingReservation ?? null)
-
-        // Montrer confirmation
+        forceRefresh()
         setMessage('Produit retiré du panier avec succès')
         setOpenSnackbar(true)
       }
