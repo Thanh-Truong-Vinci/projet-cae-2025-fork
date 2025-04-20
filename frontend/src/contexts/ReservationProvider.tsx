@@ -322,7 +322,9 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
 
     try {
       if (!authenticatedUser) {
-        throw new Error('Vous devez être authentifié pour vider une réservation')
+        throw new Error(
+          'Vous devez être authentifié pour vider une réservation'
+        )
       }
 
       const response = await axios.post(
@@ -341,13 +343,16 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
         // Refresh reservations
         await fetchReservations()
       } else {
-        throw new Error(`Erreur lors du vidage de la réservation: ${response.status}`)
+        throw new Error(
+          `Erreur lors du vidage de la réservation: ${response.status}`
+        )
       }
     } catch (err) {
       console.error('Erreur lors du vidage de la réservation:', err)
       if (axios.isAxiosError(err)) {
         setError(
-          err.response?.data?.message || 'Erreur lors du vidage de la réservation'
+          err.response?.data?.message ||
+            'Erreur lors du vidage de la réservation'
         )
       } else if (err instanceof Error) {
         setError(err.message)
@@ -370,7 +375,7 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
     try {
       if (!authenticatedUser) {
         throw new Error(
-          'Vous devez être authentifié pour modifier la quantité d\'une ligne de réservation'
+          "Vous devez être authentifié pour modifier la quantité d'une ligne de réservation"
         )
       }
 
@@ -395,7 +400,10 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
         )
       }
     } catch (err) {
-      console.error('Erreur lors de la mise à jour de la quantité de la ligne:', err)
+      console.error(
+        'Erreur lors de la mise à jour de la quantité de la ligne:',
+        err
+      )
       if (axios.isAxiosError(err)) {
         setError(
           err.response?.data?.message ||
@@ -404,7 +412,9 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
       } else if (err instanceof Error) {
         setError(err.message)
       } else {
-        setError('Erreur inconnue lors de la mise à jour de la quantité de la ligne')
+        setError(
+          'Erreur inconnue lors de la mise à jour de la quantité de la ligne'
+        )
       }
       throw err
     } finally {
@@ -432,7 +442,7 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
         toConfirmReservation,
         cancelReservation,
         clearReservation,
-     changeReservationLineQuantity,
+        changeReservationLineQuantity,
       }}
     >
       {children}
