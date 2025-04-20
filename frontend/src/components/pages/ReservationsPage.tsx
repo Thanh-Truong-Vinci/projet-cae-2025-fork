@@ -18,47 +18,82 @@ import {
   Divider,
   Snackbar,
   Alert,
+  CircularProgress,
+  Tabs,
+  Tab,
 } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { UserContext } from '../../contexts/UserContext'
+import { ReservationContext } from '../../contexts/ReservationContext'
+import {
+  ReservationStatus,
+  ReservationView,
+  ReservationLineView,
+} from '../../types'
+import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
 
-// Types pour les réservations
-interface ReservationItem {
-  id: number
-  name: string
-  price: string
-  image: string
-  quantity: number
-  unitType?: string
+interface TabPanelProps {
+  children?: React.ReactNode
+  index: number
+  value: number
 }
 
-interface Reservation {
-  id: number
-  userId: number
-  date: string | Date
-  items: ReservationItem[]
-  total: number
-  status: string
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`reservation-tabpanel-${index}`}
+      aria-labelledby={`reservation-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
+    </div>
+  )
+}
+
+function a11yProps(index: number) {
+  return {
+    id: `reservation-tab-${index}`,
+    'aria-controls': `reservation-tabpanel-${index}`,
+  }
 }
 
 const ReservationsPage = () => {
   const { authenticatedUser } = useContext(UserContext)
   const navigate = useNavigate()
-  const [reservations, setReservations] = useState<Reservation[]>([])
   const [openSnackbar, setOpenSnackbar] = useState(false)
-  const [message, setMessage] = useState('')
+  const [snackbarMessage, setSnackbarMessage] = useState('')
+  const [snackbarSeverity, setSnackbarSeverity] = useState<
+    'success' | 'error' | 'info' | 'warning'
+  >('info')
+  const [tabValue, setTabValue] = useState(0)
 
-  // Fonction pour déterminer si une date est passée ou future
-  const isDatePast = (dateStr: string | Date) => {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    return new Date(dateStr) < today
+  // Get reservation context
+  const reservationContext = useContext(ReservationContext)
+
+  if (!reservationContext) {
+    throw new Error(
+      'ReservationContext must be used within a ReservationProvider'
+    )
   }
 
-  // Simplifier la logique de chargement des réservations
+  const { reservations, fetchReservations, isLoading, error } =
+    reservationContext
+
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue)
+  }
+
   useEffect(() => {
     if (!authenticatedUser) {
-      setMessage('Vous devez vous connecter pour accéder à vos réservations')
+      setSnackbarMessage(
+        'Vous devez vous connecter pour accéder à vos réservations'
+      )
+      setSnackbarSeverity('info')
       setOpenSnackbar(true)
       setTimeout(() => {
         navigate('/login', { state: { returnTo: '/reservations' } })
@@ -66,89 +101,190 @@ const ReservationsPage = () => {
       return
     }
 
-    console.log(
-      "Chargement des réservations pour l'utilisateur:",
-      authenticatedUser
-    )
+    fetchReservations()
+  }, [authenticatedUser, fetchReservations, navigate])
 
-    try {
-      // 1. Solution temporaire : montrer TOUTES les réservations
-      // Cela nous permettra de voir si les réservations existent bien
-      const storedReservations = localStorage.getItem('userReservations')
-      if (!storedReservations) {
-        console.log('Aucune réservation dans le localStorage')
-        setReservations([])
-        return
-      }
+  // Function to format dates uniformly
+  const formatDate = (dateStr: string): string => {
+    return format(new Date(dateStr), 'dd MMMM yyyy', { locale: fr })
+  }
 
-      const allReservations = JSON.parse(storedReservations)
-
-      // Pour déboguer, affichez toutes les réservations dans la console
-      console.log('Toutes les réservations chargées:', allReservations)
-
-      // Trier les réservations: d'abord les dates futures (ordre croissant), puis les dates passées (ordre décroissant)
-      const today = new Date()
-      today.setHours(0, 0, 0, 0) // Normaliser la date d'aujourd'hui
-
-      const sortedReservations = [...allReservations].sort((a, b) => {
-        const dateA = new Date(a.date)
-        const dateB = new Date(b.date)
-
-        const aIsFuture = dateA >= today
-        const bIsFuture = dateB >= today
-
-        // Si les deux dates sont dans le futur, trier par ordre croissant (plus proche d'abord)
-        if (aIsFuture && bIsFuture) {
-          return dateA.getTime() - dateB.getTime()
-        }
-
-        // Si les deux dates sont dans le passé, trier par ordre décroissant (plus récent d'abord)
-        if (!aIsFuture && !bIsFuture) {
-          return dateB.getTime() - dateA.getTime()
-        }
-
-        // Les réservations futures viennent avant les réservations passées
-        return aIsFuture ? -1 : 1
-      })
-
-      setReservations(sortedReservations)
-
-      // Notez que nous affichons toutes les réservations sans filtre pour déboguer
-      console.log(
-        'Réservations triées et affichées:',
-        sortedReservations.length
-      )
-    } catch (error) {
-      console.error('Erreur lors du chargement des réservations:', error)
-    }
-  }, [authenticatedUser, navigate])
-
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'en attente':
+  // Function to get appropriate chip color for status
+  const getStatusColor = (
+    status: ReservationStatus
+  ): 'warning' | 'info' | 'success' | 'error' | 'default' => {
+    switch (status) {
+      case ReservationStatus.PENDING:
         return 'warning'
-      case 'confirmé':
-        return 'info'
-      case 'prêt':
+      case ReservationStatus.CONFIRMED:
         return 'success'
-      case 'annulé':
+      case ReservationStatus.CANCELLED:
         return 'error'
       default:
         return 'default'
     }
   }
 
-  const formatDate = (dateStr: string | Date) => {
-    return new Intl.DateTimeFormat('fr-FR', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    }).format(new Date(dateStr))
+  // Function to get status display text
+  const getStatusDisplay = (status: ReservationStatus): string => {
+    switch (status) {
+      case ReservationStatus.BUILDING:
+        return 'En construction'
+      case ReservationStatus.PENDING:
+        return 'En attente'
+      case ReservationStatus.CONFIRMED:
+        return 'Confirmé'
+      case ReservationStatus.CANCELLED:
+        return 'Annulé'
+      default:
+        return 'Inconnu'
+    }
   }
 
+  // Handle snackbar close
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false)
+  }
+
+  // Calculate total price of a reservation line
+  const calculateLineTotal = (unitPrice: number, quantity: number): string => {
+    return (unitPrice * quantity).toFixed(2) + '€'
+  }
+
+  // Calculate total price for a reservation
+  const calculateReservationTotal = (reservation: ReservationView): string => {
+    if (typeof reservation.price === 'number') {
+      return reservation.price.toFixed(2) + '€'
+    }
+    // Calculate from reservation lines if price isn't available
+    const total = reservation.reservationLines.reduce(
+      (sum: number, line: ReservationLineView) =>
+        sum + line.unitPrice * line.quantity,
+      0
+    )
+    return total.toFixed(2) + '€'
+  }
+
+  // Filter reservations by status
+  const pendingReservations = reservations.filter(
+    (res) => res.status === ReservationStatus.PENDING
+  )
+
+  const confirmedReservations = reservations.filter(
+    (res) => res.status === ReservationStatus.CONFIRMED
+  )
+
+  const cancelledReservations = reservations.filter(
+    (res) => res.status === ReservationStatus.CANCELLED
+  )
+
+  // Create reservation list component to avoid code duplication
+  const renderReservationList = (reservationList: ReservationView[]) => (
+    <>
+      {reservationList.length === 0 ? (
+        <Box sx={{ textAlign: 'center', py: 3 }}>
+          <Typography variant="body1" color="text.secondary">
+            Aucune réservation dans cette catégorie
+          </Typography>
+        </Box>
+      ) : (
+        reservationList.map((reservation) => (
+          <Accordion
+            key={reservation.id}
+            sx={{
+              mb: 2,
+              opacity:
+                reservation.status === ReservationStatus.CANCELLED ? 0.8 : 1,
+            }}
+          >
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls={`reservation-${reservation.id}-content`}
+              id={`reservation-${reservation.id}-header`}
+            >
+              <Box
+                sx={{
+                  width: '100%',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                }}
+              >
+                <Typography sx={{ fontWeight: 'bold' }}>
+                  Réservation #{reservation.id} -
+                  {reservation.saleDate
+                    ? `Retiré le ${formatDate(reservation.saleDate)}`
+                    : `Prévu le ${formatDate(reservation.reservationDate)}`}
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Typography>
+                    {calculateReservationTotal(reservation)}
+                  </Typography>
+                  <Chip
+                    label={getStatusDisplay(reservation.status)}
+                    color={getStatusColor(reservation.status)}
+                    size="small"
+                  />
+                </Box>
+              </Box>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Divider sx={{ mb: 2 }} />
+              <TableContainer component={Paper} variant="outlined">
+                <Table size="small">
+                  <TableHead>
+                    <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                      <TableCell>Produit</TableCell>
+                      <TableCell>Nom</TableCell>
+                      <TableCell align="right">Prix unitaire</TableCell>
+                      <TableCell align="center">Quantité</TableCell>
+                      <TableCell align="right">Total</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {reservation.reservationLines.map((line) => (
+                      <TableRow key={line.id}>
+                        <TableCell>
+                          <img
+                            src={line.imageLocation || '/placeholder.jpg'}
+                            alt={line.productName}
+                            style={{
+                              width: 40,
+                              height: 40,
+                              objectFit: 'cover',
+                              borderRadius: '4px',
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell>{line.productName}</TableCell>
+                        <TableCell align="right">
+                          {line.unitPrice.toFixed(2)}€
+                        </TableCell>
+                        <TableCell align="center">{line.quantity}</TableCell>
+                        <TableCell align="right">
+                          {calculateLineTotal(line.unitPrice, line.quantity)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </AccordionDetails>
+          </Accordion>
+        ))
+      )}
+    </>
+  )
+
+  if (isLoading) {
+    return (
+      <Box
+        sx={{ width: '100%', p: 3, display: 'flex', justifyContent: 'center' }}
+      >
+        <CircularProgress />
+      </Box>
+    )
   }
 
   return (
@@ -157,7 +293,13 @@ const ReservationsPage = () => {
         Mes Réservations
       </Typography>
 
-      {reservations.length === 0 ? (
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {error}
+        </Alert>
+      )}
+
+      {!error && reservations.length === 0 ? (
         <Box sx={{ textAlign: 'center', py: 5 }}>
           <Typography variant="h6" sx={{ mb: 2 }}>
             Vous n'avez aucune réservation
@@ -172,205 +314,50 @@ const ReservationsPage = () => {
         </Box>
       ) : (
         <Box>
-          {/* Section pour les réservations à venir */}
-          {reservations.some((r) => !isDatePast(r.date)) && (
-            <>
-              <Typography
-                variant="h6"
-                sx={{ mt: 2, mb: 2, color: 'primary.main' }}
-              >
-                Réservations à venir
-              </Typography>
-              {reservations
-                .filter((r) => !isDatePast(r.date))
-                .map((reservation) => (
-                  <Accordion key={reservation.id} sx={{ mb: 2 }}>
-                    <AccordionSummary
-                      expandIcon={<ExpandMoreIcon />}
-                      aria-controls={`reservation-${reservation.id}-content`}
-                      id={`reservation-${reservation.id}-header`}
-                    >
-                      <Box
-                        sx={{
-                          width: '100%',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          flexWrap: 'wrap',
-                        }}
-                      >
-                        <Typography sx={{ fontWeight: 'bold' }}>
-                          Retrait prévu le {formatDate(reservation.date)}
-                        </Typography>
-                        <Box
-                          sx={{ display: 'flex', alignItems: 'center', gap: 2 }}
-                        >
-                          <Typography>
-                            {`${reservation.total.toFixed(2)}€`}
-                          </Typography>
-                          <Chip
-                            label={reservation.status}
-                            color={getStatusColor(reservation.status)}
-                            size="small"
-                          />
-                        </Box>
-                      </Box>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Divider sx={{ mb: 2 }} />
-                      <TableContainer component={Paper} variant="outlined">
-                        <Table size="small">
-                          <TableHead>
-                            <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                              <TableCell>Produit</TableCell>
-                              <TableCell>Nom</TableCell>
-                              <TableCell align="right">Prix unitaire</TableCell>
-                              <TableCell align="center">Quantité</TableCell>
-                              <TableCell align="right">Total</TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {reservation.items.map((item) => (
-                              <TableRow key={item.id}>
-                                <TableCell>
-                                  <img
-                                    src={item.image}
-                                    alt={item.name}
-                                    style={{
-                                      width: 40,
-                                      height: 40,
-                                      objectFit: 'cover',
-                                    }}
-                                  />
-                                </TableCell>
-                                <TableCell>{item.name}</TableCell>
-                                <TableCell align="right">
-                                  {item.price}
-                                </TableCell>
-                                <TableCell align="center">
-                                  {item.quantity} {item.unitType || ''}
-                                </TableCell>
-                                <TableCell align="right">
-                                  {`${(Number(item.price.replace('€', '')) * item.quantity).toFixed(2)}€`}
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                      <Box sx={{ mt: 2, textAlign: 'right' }}>
-                        <Typography variant="body2" color="text.secondary">
-                          Numéro de réservation: #{reservation.id}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          User ID: {reservation.userId}
-                        </Typography>
-                      </Box>
-                    </AccordionDetails>
-                  </Accordion>
-                ))}
-            </>
-          )}
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs
+              value={tabValue}
+              onChange={handleTabChange}
+              aria-label="reservation tabs"
+              variant="scrollable"
+              scrollButtons="auto"
+            >
+              <Tab label="En attente" {...a11yProps(0)} />
+              <Tab
+                label="Récupérées"
+                {...a11yProps(1)}
+                sx={{
+                  color: confirmedReservations.length
+                    ? 'success.main'
+                    : 'inherit',
+                }}
+              />
+              <Tab
+                label="Abandonnées"
+                {...a11yProps(2)}
+                sx={{
+                  color: cancelledReservations.length
+                    ? 'error.main'
+                    : 'inherit',
+                }}
+              />
+            </Tabs>
+          </Box>
 
-          {/* Section pour les réservations passées */}
-          {reservations.some((r) => isDatePast(r.date)) && (
-            <>
-              <Typography
-                variant="h6"
-                sx={{ mt: 4, mb: 2, color: 'text.secondary' }}
-              >
-                Historique des réservations
-              </Typography>
-              {reservations
-                .filter((r) => isDatePast(r.date))
-                .map((reservation) => (
-                  <Accordion key={reservation.id} sx={{ mb: 2, opacity: 0.8 }}>
-                    <AccordionSummary
-                      expandIcon={<ExpandMoreIcon />}
-                      aria-controls={`reservation-${reservation.id}-content`}
-                      id={`reservation-${reservation.id}-header`}
-                    >
-                      <Box
-                        sx={{
-                          width: '100%',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          flexWrap: 'wrap',
-                        }}
-                      >
-                        <Typography sx={{ fontWeight: 'bold' }}>
-                          Retiré le {formatDate(reservation.date)}
-                        </Typography>
-                        <Box
-                          sx={{ display: 'flex', alignItems: 'center', gap: 2 }}
-                        >
-                          <Typography>
-                            {`${reservation.total.toFixed(2)}€`}
-                          </Typography>
-                          <Chip
-                            label={reservation.status}
-                            color={getStatusColor(reservation.status)}
-                            size="small"
-                          />
-                        </Box>
-                      </Box>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Divider sx={{ mb: 2 }} />
-                      <TableContainer component={Paper} variant="outlined">
-                        <Table size="small">
-                          <TableHead>
-                            <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                              <TableCell>Produit</TableCell>
-                              <TableCell>Nom</TableCell>
-                              <TableCell align="right">Prix unitaire</TableCell>
-                              <TableCell align="center">Quantité</TableCell>
-                              <TableCell align="right">Total</TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {reservation.items.map((item) => (
-                              <TableRow key={item.id}>
-                                <TableCell>
-                                  <img
-                                    src={item.image}
-                                    alt={item.name}
-                                    style={{
-                                      width: 40,
-                                      height: 40,
-                                      objectFit: 'cover',
-                                    }}
-                                  />
-                                </TableCell>
-                                <TableCell>{item.name}</TableCell>
-                                <TableCell align="right">
-                                  {item.price}
-                                </TableCell>
-                                <TableCell align="center">
-                                  {item.quantity} {item.unitType || ''}
-                                </TableCell>
-                                <TableCell align="right">
-                                  {`${(Number(item.price.replace('€', '')) * item.quantity).toFixed(2)}€`}
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                      <Box sx={{ mt: 2, textAlign: 'right' }}>
-                        <Typography variant="body2" color="text.secondary">
-                          Numéro de réservation: #{reservation.id}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          User ID: {reservation.userId}
-                        </Typography>
-                      </Box>
-                    </AccordionDetails>
-                  </Accordion>
-                ))}
-            </>
-          )}
+          {/* Pending Reservations Tab */}
+          <TabPanel value={tabValue} index={0}>
+            {renderReservationList(pendingReservations)}
+          </TabPanel>
+
+          {/* Confirmed Reservations Tab */}
+          <TabPanel value={tabValue} index={1}>
+            {renderReservationList(confirmedReservations)}
+          </TabPanel>
+
+          {/* Cancelled Reservations Tab */}
+          <TabPanel value={tabValue} index={2}>
+            {renderReservationList(cancelledReservations)}
+          </TabPanel>
         </Box>
       )}
       <Snackbar
@@ -381,10 +368,10 @@ const ReservationsPage = () => {
       >
         <Alert
           onClose={handleCloseSnackbar}
-          severity="info"
+          severity={snackbarSeverity}
           sx={{ width: '100%' }}
         >
-          {message}
+          {snackbarMessage}
         </Alert>
       </Snackbar>
     </Box>
