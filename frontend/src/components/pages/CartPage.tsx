@@ -42,38 +42,15 @@ const CartPage = () => {
   const [message, setMessage] = useState('')
   const reservationContext = useContext(ReservationContext)
   const [reservation, setReservation] = useState<ReservationView | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [loadingAction, setLoadingAction] = useState('')
 
   useEffect(() => {
-    let isMounted = true
-
     if (reservationContext && reservationContext.fetchReservations) {
-      setIsLoading(true)
-      console.log('Chargement du panier en cours...')
-
-      reservationContext
-        .fetchReservations()
-        .then((r) => {
-          if (!isMounted) return
-          const buildingReservation = r.find(
-            (res) => res.status === ReservationStatus.BUILDING
-          )
-          setReservation(buildingReservation ?? null)
-          console.log('Panier chargé avec succès')
-        })
-        .catch((err) => {
-          console.error('Erreur de chargement du panier:', err)
-          setMessage('Erreur lors du chargement de votre panier')
-          setOpenSnackbar(true)
-        })
-        .finally(() => {
-          if (isMounted) setIsLoading(false)
-        })
-    }
-
-    return () => {
-      isMounted = false
+      reservationContext.fetchReservations().then((r) => {
+        const buildingReservation = r.find(
+          (res) => res.status === ReservationStatus.BUILDING
+        )
+        setReservation(buildingReservation ?? null)
+      })
     }
   }, [reservationContext, location.key])
 
@@ -133,32 +110,20 @@ const CartPage = () => {
       const value = parseInt(valueStr, 10)
       if (isNaN(value) || value < 1) return
 
-      if (isLoading) return
-
-      setIsLoading(true)
-      setLoadingAction(`update-${id}`)
-
       if (reservation && reservationContext.updateReservationLineQuantity) {
         await reservationContext.updateReservationLineQuantity(id, value)
 
-        // Mise à jour optimiste sans recharger toutes les données
-        setReservation((prev) => {
-          if (!prev) return null
-          return {
-            ...prev,
-            reservationLines: prev.reservationLines.map((line) =>
-              line.id === id ? { ...line, quantity: value } : line
-            ),
-          }
-        })
+        // Rafraîchir les données
+        const updatedReservations = await reservationContext.fetchReservations()
+        const buildingReservation = updatedReservations.find(
+          (res) => res.status === ReservationStatus.BUILDING
+        )
+        setReservation(buildingReservation ?? null)
       }
     } catch (error) {
       console.error('Erreur lors de la mise à jour de la quantité:', error)
       setMessage('Impossible de mettre à jour la quantité')
       setOpenSnackbar(true)
-    } finally {
-      setIsLoading(false)
-      setLoadingAction('')
     }
   }
 
@@ -304,7 +269,7 @@ const CartPage = () => {
   return (
     <Box sx={{ width: '100%', p: 3 }}>
       <Typography variant="h4" sx={{ mb: 3 }}>
-        Mon Panier {isLoading && loadingAction === '' && ' (Chargement...)'}
+        Mon Panier
       </Typography>
 
       {!reservation || reservation.reservationLines.length === 0 ? (
