@@ -10,18 +10,14 @@ import be.vinci.ipl.cae.demo.repositories.ReservationLineRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
-/**
- * Service class for managing reservation lines.
- */
+/** Service class for managing reservation lines. */
 @Service
 public class ReservationLineService {
 
   private final BatchRepository batchRepository;
   private final ReservationLineRepository reservationLineRepository;
 
-  /**
-   * Default constructor for ReservationLineService.
-   */
+  /** Default constructor for ReservationLineService. */
   public ReservationLineService(
       BatchRepository batchRepository, ReservationLineRepository reservationLineRepository) {
     this.batchRepository = batchRepository;
@@ -32,8 +28,8 @@ public class ReservationLineService {
    * Creates a new reservation line with the specified details.
    *
    * @param reservation the reservation to add the line to
-   * @param batch       the batch of the product
-   * @param quantity    the quantity of the product
+   * @param batch the batch of the product
+   * @param quantity the quantity of the product
    */
   public void createReservationLine(Reservation reservation, Batch batch, int quantity) {
     ReservationLine reservationLine = new ReservationLine();
@@ -47,13 +43,14 @@ public class ReservationLineService {
    * Adds a product to a reservation with the specified quantity.
    *
    * @param reservation the reservation to add the product to
-   * @param product     the product to add
-   * @param quantity    the quantity of the product to add
+   * @param product the product to add
+   * @param quantity the quantity of the product to add
    */
   public void addProduct(Reservation reservation, Product product, int quantity) {
 
-    List<ReservationLine> existingLines = reservationLineRepository
-        .findByReservationAndBatchProductOrderByBatchProductionDateAsc(reservation, product);
+    List<ReservationLine> existingLines =
+        reservationLineRepository.findByReservationAndBatchProductOrderByBatchProductionDateAsc(
+            reservation, product);
 
     int remainingQuantity = quantity;
 
@@ -78,13 +75,14 @@ public class ReservationLineService {
     }
 
     if (remainingQuantity > 0) {
-      List<Batch> batches = batchRepository
-          .findByProductIdAndAvailableQuantityGreaterThanOrderByProductionDateAsc(
+      List<Batch> batches =
+          batchRepository.findByProductIdAndAvailableQuantityGreaterThanOrderByProductionDateAsc(
               product.getId(), 0);
 
       for (Batch batch : batches) {
         // Vérifier que ce lot n'est pas déjà utilisé dans des lignes existantes
-        if (existingLines.stream().noneMatch(line -> line.getBatch().getId().equals(batch.getId()))) {
+        if (existingLines.stream()
+            .noneMatch(line -> line.getBatch().getId().equals(batch.getId()))) {
           int batchQuantity = Math.min(batch.getAvailableQuantity(), remainingQuantity);
           createReservationLine(reservation, batch, batchQuantity);
           remainingQuantity -= batchQuantity;
@@ -99,8 +97,39 @@ public class ReservationLineService {
     }
 
     if (remainingQuantity > 0) {
-      throw new ConflictException(
-          "Not enough stock available for product: " + product.getName());
+      throw new ConflictException("Not enough stock available for product: " + product.getName());
     }
+  }
+
+  /**
+   * Retrieves all reservation lines for a given reservation.
+   */
+  public void changeQuantity(
+      ReservationLine reservationLine, int newQuantity) {
+    // update batch available quantity
+    int quantityDifference = reservationLine.getQuantity() - newQuantity;
+    Batch batch = reservationLine.getBatch();
+    batch.setAvailableQuantity(batch.getAvailableQuantity() + quantityDifference);
+    batchRepository.save(batch);
+
+    // if quantity is 0, delete the line it self and delete from reservation and return
+    if (newQuantity == 0) {
+      reservationLineRepository.delete(reservationLine);
+      return;
+    }
+
+    // set the new quantity in the line
+    reservationLine.setQuantity(newQuantity);
+    reservationLineRepository.save(reservationLine);
+  }
+
+  public void deleteReservationLine(ReservationLine reservationLine) {
+    // update batch available quantity
+    Batch batch = reservationLine.getBatch();
+    batch.setAvailableQuantity(batch.getAvailableQuantity() + reservationLine.getQuantity());
+    batchRepository.save(batch);
+
+    // delete the line it self and delete from reservation and return
+    reservationLineRepository.delete(reservationLine);
   }
 }

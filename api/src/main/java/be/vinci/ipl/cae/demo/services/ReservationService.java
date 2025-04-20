@@ -43,39 +43,16 @@ public class ReservationService {
   }
 
   /**
-   * Creates a new reservation for a client with the specified product and quantity.
-   *
-   * @param client   the client making the reservation
-   * @param product  the product to reserve
-   * @param quantity the quantity of the product to reserve
-   * @return the created reservation
-   */
-  public Reservation createReservation(Client client, Product product, int quantity) {
-    Reservation reservation = new Reservation();
-    reservation.setClient(client);
-    reservation.setPrice(0.0);
-    reservation.setStatus(ReservationStatus.BUILDING);
-    reservation.setReservationDate(LocalDate.now());
-
-    // Save the reservation first to avoid transient property issues
-    reservation = reservationRepository.save(reservation);
-
-    reservationLineService.addProduct(reservation, product, quantity);
-    return reservation;
-  }
-
-  /**
    * Reserves a product for a client with the specified quantity.
    *
    * @param client    the client making the reservation
    * @param productId the ID of the product to reserve
    * @param quantity  the quantity of the product to reserve
-   * @return the updated reservation or null if product not found
    */
-  public Reservation reserveProduct(Client client, Long productId, int quantity) {
+  public void reserveProduct(Client client, Long productId, int quantity) {
     Product product = productService.getProductById(productId);
     if (product == null) {
-      return null;
+      return;
     }
 
     Reservation reservation =
@@ -83,7 +60,6 @@ public class ReservationService {
             .findByClientAndStatus(client, ReservationStatus.BUILDING)
             .orElseGet(
                 () -> {
-                  // Create and save the reservation first
                   Reservation newReservation = new Reservation();
                   newReservation.setClient(client);
                   newReservation.setPrice(0.0);
@@ -93,7 +69,7 @@ public class ReservationService {
                 });
 
     reservationLineService.addProduct(reservation, product, quantity);
-    return reservationRepository.save(reservation);
+    reservationRepository.save(reservation);
   }
 
   /**
@@ -120,12 +96,11 @@ public class ReservationService {
    *
    * @param reservationId the ID of the reservation to update
    * @param newStatus     the new status for the reservation
-   * @return the updated reservation, or null if the reservation was not found
    */
-  public Reservation changeStatus(Long reservationId, ReservationStatus newStatus) {
+  public void changeStatus(Long reservationId, ReservationStatus newStatus) {
     Reservation reservation = reservationRepository.findById(reservationId).orElse(null);
     if (reservation == null) {
-      return null;
+      return;
     }
 
     // If changing to CANCELLED status, return items to stock
@@ -144,7 +119,7 @@ public class ReservationService {
     }
 
     reservation.setStatus(newStatus);
-    return reservationRepository.save(reservation);
+    reservationRepository.save(reservation);
   }
 
   /**
@@ -155,5 +130,17 @@ public class ReservationService {
    */
   public Reservation getReservationById(Long reservationId) {
     return reservationRepository.findById(reservationId).orElse(null);
+  }
+
+    /**
+     * Deletes a reservation and its associated lines.
+     *
+     * @param reservation the reservation to delete
+     */
+  public void deleteReservation(Reservation reservation) {
+    for (ReservationLine line : reservation.getReservationLines()) {
+      reservationLineService.deleteReservationLine(line);
+    }
+    reservationRepository.delete(reservation);
   }
 }

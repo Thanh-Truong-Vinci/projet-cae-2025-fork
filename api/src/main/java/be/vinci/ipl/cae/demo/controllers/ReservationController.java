@@ -2,12 +2,16 @@ package be.vinci.ipl.cae.demo.controllers;
 
 import be.vinci.ipl.cae.demo.exceptions.ConflictException;
 import be.vinci.ipl.cae.demo.exceptions.ResourceNotFoundException;
+import be.vinci.ipl.cae.demo.models.dtos.ChangeQuantityRequest;
 import be.vinci.ipl.cae.demo.models.dtos.ReservationRequest;
 import be.vinci.ipl.cae.demo.models.dtos.views.ReservationView;
 import be.vinci.ipl.cae.demo.models.entities.Client;
+import be.vinci.ipl.cae.demo.models.entities.ReservationLine;
 import be.vinci.ipl.cae.demo.models.entities.ReservationStatus;
 import be.vinci.ipl.cae.demo.services.AuthsService;
+import be.vinci.ipl.cae.demo.services.ReservationLineService;
 import be.vinci.ipl.cae.demo.services.ReservationService;
+import be.vinci.ipl.cae.demo.repositories.ReservationLineRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,16 +30,23 @@ public class ReservationController {
 
   private final AuthsService authsService;
   private final ReservationService reservationService;
+  private final ReservationLineService reservationLineService;
+  private final ReservationLineRepository reservationLineRepository;
 
   /**
    * Constructs a ReservationController with the specified AuthsService and ReservationService.
    *
    * @param authsService       the authentication service.
    * @param reservationService the reservation service.
+   * @param reservationLineService the reservation line service.
+   * @param reservationLineRepository the reservation line repository.
    */
-  public ReservationController(AuthsService authsService, ReservationService reservationService) {
+  public ReservationController(AuthsService authsService, ReservationService reservationService,
+      ReservationLineService reservationLineService, ReservationLineRepository reservationLineRepository) {
     this.authsService = authsService;
     this.reservationService = reservationService;
+    this.reservationLineService = reservationLineService;
+    this.reservationLineRepository = reservationLineRepository;
   }
 
   /**
@@ -148,5 +159,72 @@ public class ReservationController {
       throw new ConflictException("Reservation ID is required");
     }
     reservationService.changeStatus(reservationId, status);
+  }
+
+  /**
+   * Clears/deletes a reservation by ID.
+   *
+   * @param reservationId the ID of the reservation to delete.
+   * @param token         the authorization token from the request header.
+   * @throws ResourceNotFoundException if the token is invalid or expired or reservation not found.
+   */
+  @PostMapping("/clear")
+  public void clearReservation(
+      @RequestBody Long reservationId, 
+      @RequestHeader("Authorization") String token) {
+    Client client = authsService.isValidClientToken(token);
+    if (client == null) {
+      throw new ResourceNotFoundException("Token not valid, expired or user is not client");
+    }
+    
+    var reservation = reservationService.getReservationById(reservationId);
+    if (reservation == null) {
+      throw new ResourceNotFoundException("Reservation not found");
+    }
+    
+    // Verify the reservation belongs to the client
+    if (!reservation.getClient().getId().equals(client.getId())) {
+      throw new ConflictException("This reservation doesn't belong to the authenticated client");
+    }
+    
+    reservationService.deleteReservation(reservation);
+  }
+
+  /**
+   * Changes the quantity of a product in a reservation.
+   *
+   * @param request a request containing reservation line ID and new quantity
+   * @param token   the authorization token from the request header
+   * @throws ResourceNotFoundException if the token is invalid or expired or reservation line not found
+   */
+  @PostMapping("/changeQuantity")
+  public void changeQuantity(
+      @RequestBody ChangeQuantityRequest request,
+      @RequestHeader("Authorization") String token) {
+    Client client = authsService.isValidClientToken(token);
+    if (client == null) {
+      throw new ResourceNotFoundException("Token not valid, expired or user is not client");
+    }
+    
+    if (request.getReservationLineId() == null || request.getQuantity() == null) {
+      throw new ConflictException("Reservation line ID and quantity are required");
+    }
+    
+    // Fetch the reservation line
+    ReservationLine line = reservationLineRepository.findById(request.getReservationLineId())
+        .orElseThrow(() -> new ResourceNotFoundException("Reservation line not found"));
+    
+    // Verify the reservation belongs to the client
+    if (!line.getReservation().getClient().getId().equals(client.getId())) {
+      throw new ConflictException("This reservation doesn't belong to the authenticated client");
+    }
+    
+    // If reservation is not in BUILDING status, don't allow changes
+    if (line.getReservation().getStatus() != ReservationStatus.BUILDING) {
+      throw new ConflictException("Cannot modify a reservation that is not in BUILDING status");
+    }
+    
+    // Change quantity
+    reservationLineService.changeQuantity(line, request.getQuantity());
   }
 }
