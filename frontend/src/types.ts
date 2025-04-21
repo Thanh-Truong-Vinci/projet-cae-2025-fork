@@ -97,17 +97,6 @@ export const categoryLabels: { [key: string]: string } = {
   autres: 'Autres',
 }
 
-export interface CartItem {
-  id: number
-  name: string
-  price: string
-  image: string
-  quantity: number
-  unitType: string
-  category: string
-  batchIds: number[]
-}
-
 export interface ProductContextType {
   products: ProductBatch[]
   allProducts: Product[]

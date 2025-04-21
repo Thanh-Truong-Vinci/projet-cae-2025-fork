@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useContext } from 'react'
-import { Button, Box, IconButton, Badge } from '@mui/material'
+import { Button, Box, IconButton } from '@mui/material'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import ReceiptIcon from '@mui/icons-material/Receipt'
 import AddBoxIcon from '@mui/icons-material/AddBox'
@@ -10,12 +10,10 @@ import LogoutIcon from '@mui/icons-material/Logout'
 import { Link } from 'react-router-dom'
 import { UserContext } from '../../contexts/UserContext'
 import { UserContextType } from '../../types'
-import { CartContext } from '../../contexts/CartContext'
 
 const NavBar = () => {
   const { authenticatedUser, clearUser } =
     useContext<UserContextType>(UserContext)
-  const { getCartCount } = useContext(CartContext)
   const navigate = useNavigate()
 
   const handleLogout = async () => {
@@ -77,9 +75,7 @@ const NavBar = () => {
             sx={{ mr: 1 }}
             aria-label="panier"
           >
-            <Badge badgeContent={getCartCount()} color="error">
-              <ShoppingCartIcon sx={{ color: 'green' }} />
-            </Badge>
+            <ShoppingCartIcon sx={{ color: 'green' }} />
           </IconButton>
           <IconButton
             onClick={() => navigate('/reservations')}
