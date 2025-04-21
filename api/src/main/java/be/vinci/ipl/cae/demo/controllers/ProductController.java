@@ -75,7 +75,6 @@ public class ProductController {
         || newProduct.getDescription().isBlank()) {
       throw new ConflictException("Invalid product data");
     }
-    // TODO call addProduct, not createProduct
     return productService.createProduct(newProduct);
   }
 
@@ -88,7 +87,6 @@ public class ProductController {
   @DeleteMapping("/{id}")
   @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
   public Product deleteProduct(@PathVariable long id) {
-    // TODO verify token if is a manager
     Product product = productService.deleteProduct(id);
     if (product == null) {
       throw new ResourceNotFoundException("Product not found");
@@ -106,7 +104,6 @@ public class ProductController {
   @PatchMapping("/{id}")
   @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
   public Product updateProduct(@PathVariable long id, @RequestBody NewProduct newProduct) {
-    // TODO verify token if is a manager
     if (newProduct == null
         || (newProduct.getName() != null && newProduct.getName().isBlank())
         || (newProduct.getDescription() != null && newProduct.getDescription().isBlank())) {

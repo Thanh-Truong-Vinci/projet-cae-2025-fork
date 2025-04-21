@@ -85,7 +85,7 @@ public class PhotoService {
    * @param image the image file to be uploaded
    * @return the blob URL of the uploaded image
    */
-  private String uploadImageToBlob(MultipartFile image) {
+  String uploadImageToBlob(MultipartFile image) {
     String imageUuid = UUID.randomUUID().toString();
     Map<String, String> metadata = new HashMap<>();
 
