@@ -195,9 +195,12 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
       )
 
       if (response.status >= 200 && response.status < 300) {
-        console.log('Réservation mise en attente avec succès')
-        // Update local state or refetch
-        await fetchReservations()
+        const updatedReservation = response.data
+        setReservations((prev) =>
+          prev.map((res) =>
+            res.id === updatedReservation.id ? updatedReservation : res
+          )
+        )
       } else {
         throw new Error(
           `Erreur lors du changement de statut de la réservation: ${response.status}`
@@ -289,10 +292,12 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
       )
 
       if (response.status >= 200 && response.status < 300) {
-        console.log('Réservation annulée avec succès')
-
-        // Update the local state by fetching the updated list
-        await fetchReservations()
+        const updatedReservation = response.data
+        setReservations((prev) =>
+          prev.map((res) =>
+            res.id === updatedReservation.id ? updatedReservation : res
+          )
+        )
       } else {
         throw new Error(
           `Erreur lors de l'annulation de la réservation: ${response.status}`
@@ -316,7 +321,7 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
     }
   }
 
-  const clearReservation = async (reservationId: number): Promise<void> => {
+  const clearReservation = async (reservationId: number): Promise<ReservationView> => {
     setIsLoading(true)
     setError(null)
 
@@ -339,9 +344,11 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
       )
 
       if (response.status >= 200 && response.status < 300) {
-        console.log('Réservation vidée avec succès')
-        // Refresh reservations
-        await fetchReservations()
+        const clearedReservation: ReservationView = response.data
+        setReservations((prev) =>
+          prev.filter((res) => res.id !== clearedReservation.id)
+        )
+        return clearedReservation
       } else {
         throw new Error(
           `Erreur lors du vidage de la réservation: ${response.status}`

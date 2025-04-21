@@ -111,18 +111,18 @@ const CartPage = () => {
     const line = reservation.reservationLines.find((l) => l.id === id)
     if (!line) return
 
-    const newQuantity = Math.max(1, line.quantity + change)
+    const newQuantity = line.quantity + change
     await handleDirectQuantityChange(id, newQuantity.toString())
   }
 
   const handleDirectQuantityChange = async (id: number, valueStr: string) => {
     try {
       const value = parseInt(valueStr, 10)
-      if (isNaN(value) || value < 1) return
+      if (isNaN(value) || value < 0 ) return
 
-      if (reservation && reservationContext.updateReservationLineQuantity) {
-        await reservationContext.updateReservationLineQuantity(id, value)
-        forceRefresh() // Utiliser forceRefresh au lieu de fetchReservations
+      if (reservation && reservationContext.changeReservationLineQuantity) {
+        await reservationContext.changeReservationLineQuantity(id, value)
+        forceRefresh()
       }
     } catch (error) {
       console.error('Erreur lors de la mise à jour de la quantité:', error)
@@ -134,29 +134,14 @@ const CartPage = () => {
   const clearCart = async () => {
     try {
       if (reservation && reservationContext.clearReservation) {
-        await reservationContext.clearReservation(reservation.id)
-        forceRefresh()
+        const clearedReservation = await reservationContext.clearReservation(reservation.id)
+        setReservation(clearedReservation)
         setMessage('Votre panier a été vidé')
         setOpenSnackbar(true)
       }
     } catch (error) {
       console.error('Erreur lors du vidage du panier:', error)
       setMessage('Impossible de vider le panier')
-      setOpenSnackbar(true)
-    }
-  }
-
-  const removeFromCart = async (id: number) => {
-    try {
-      if (reservation && reservationContext.removeReservationLine) {
-        await reservationContext.removeReservationLine(id)
-        forceRefresh()
-        setMessage('Produit retiré du panier avec succès')
-        setOpenSnackbar(true)
-      }
-    } catch (error) {
-      console.error('Erreur lors de la suppression du produit:', error)
-      setMessage('Impossible de supprimer ce produit du panier')
       setOpenSnackbar(true)
     }
   }
@@ -340,7 +325,7 @@ const CartPage = () => {
                     <TableCell align="center">
                       <IconButton
                         color="error"
-                        onClick={() => removeFromCart(item.id)}
+                        onClick={() => handleDirectQuantityChange(item.id, '0')}
                       >
                         <DeleteIcon />
                       </IconButton>

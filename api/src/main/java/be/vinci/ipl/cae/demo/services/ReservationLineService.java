@@ -8,6 +8,8 @@ import be.vinci.ipl.cae.demo.models.entities.ReservationLine;
 import be.vinci.ipl.cae.demo.repositories.BatchRepository;
 import be.vinci.ipl.cae.demo.repositories.ReservationLineRepository;
 import java.util.List;
+
+import be.vinci.ipl.cae.demo.repositories.ReservationRepository;
 import org.springframework.stereotype.Service;
 
 /** Service class for managing reservation lines. */
@@ -16,12 +18,14 @@ public class ReservationLineService {
 
   private final BatchRepository batchRepository;
   private final ReservationLineRepository reservationLineRepository;
+  private final ReservationRepository reservationRepository;
 
   /** Default constructor for ReservationLineService. */
   public ReservationLineService(
-      BatchRepository batchRepository, ReservationLineRepository reservationLineRepository) {
+      BatchRepository batchRepository, ReservationLineRepository reservationLineRepository, ReservationRepository reservationRepository) {
     this.batchRepository = batchRepository;
     this.reservationLineRepository = reservationLineRepository;
+    this.reservationRepository = reservationRepository;
   }
 
   /**
@@ -114,13 +118,13 @@ public class ReservationLineService {
     batch.setAvailableQuantity(batch.getAvailableQuantity() + quantityDifference);
     batchRepository.save(batch);
 
-    // if quantity is 0, delete the line it self and delete from reservation and return
+    // If quantity is 0, delete the line instead of updating it
     if (newQuantity == 0) {
-      reservationLineRepository.delete(reservationLine);
+      deleteReservationLine(reservationLine);
+      reservationRepository.save(reservationLine.getReservation());
       return;
     }
 
-    // set the new quantity in the line
     reservationLine.setQuantity(newQuantity);
     reservationLineRepository.save(reservationLine);
   }
@@ -140,3 +144,4 @@ public class ReservationLineService {
     reservationLineRepository.delete(reservationLine);
   }
 }
+

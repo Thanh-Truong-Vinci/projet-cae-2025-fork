@@ -92,13 +92,14 @@ public class ReservationController {
    *
    * @param reservationId the ID of the reservation to update.
    * @param token the authorization token from the request header.
+   * @return the updated reservation as ReservationView.
    * @throws ResourceNotFoundException if the token is invalid or expired.
    * @throws ConflictException if the reservation ID is missing.
    */
   @PostMapping("/toPending")
-  public void toPending(
+  public ReservationView toPending(
       @RequestBody Long reservationId, @RequestHeader("Authorization") String token) {
-    validateAndChangeStatus(reservationId, token, ReservationStatus.PENDING);
+    return changeReservationStatus(reservationId, token, ReservationStatus.PENDING, true);
   }
 
   /**
@@ -121,13 +122,37 @@ public class ReservationController {
    *
    * @param reservationId the ID of the reservation to update.
    * @param token the authorization token from the request header.
+   * @return the updated reservation as ReservationView.
    * @throws ResourceNotFoundException if the token is invalid or expired.
    * @throws ConflictException if the reservation ID is missing.
    */
   @PostMapping("/toCancel")
-  public void toCancel(
+  public ReservationView toCancel(
       @RequestBody Long reservationId, @RequestHeader("Authorization") String token) {
-    validateAndChangeStatus(reservationId, token, ReservationStatus.CANCELLED);
+    return changeReservationStatus(reservationId, token, ReservationStatus.CANCELLED, true);
+  }
+
+  /**
+   * Helper method to change a reservation's status and validate client token if needed.
+   *
+   * @param reservationId the ID of the reservation to update
+   * @param token the authorization token from the request header
+   * @param status the new status to set for the reservation
+   * @param validateToken whether to validate the client token
+   * @return the updated reservation as ReservationView
+   * @throws ResourceNotFoundException if the token is invalid or expired
+   * @throws ConflictException if the reservation ID is missing
+   */
+  private ReservationView changeReservationStatus(
+      Long reservationId, String token, ReservationStatus status, boolean validateToken) {
+    if (validateToken) {
+      validateClientToken(token);
+    }
+    if (reservationId == null) {
+      throw new ConflictException("Reservation ID is required");
+    }
+    var updatedReservation = reservationService.changeStatus(reservationId, status);
+    return new ReservationView(updatedReservation);
   }
 
   /**
@@ -143,39 +168,17 @@ public class ReservationController {
   }
 
   /**
-   * Validates client token and reservation ID, then changes reservation status.
-   *
-   * @param reservationId the ID of the reservation to update.
-   * @param token the authorization token from the request header.
-   * @param status the new status to set.
-   * @throws ResourceNotFoundException if the token is invalid or expired.
-   * @throws ConflictException if the reservation ID is missing.
-   */
-  private void validateAndChangeStatus(Long reservationId, String token, ReservationStatus status) {
-    Client client = authsService.isValidClientToken(token);
-    if (client == null) {
-      throw new ResourceNotFoundException("Token not valid, expired or user is not client");
-    }
-    if (reservationId == null) {
-      throw new ConflictException("Reservation ID is required");
-    }
-    reservationService.changeStatus(reservationId, status);
-  }
-
-  /**
    * Clears/deletes a reservation by ID.
    *
    * @param reservationId the ID of the reservation to delete.
    * @param token the authorization token from the request header.
+   * @return the cleared reservation as ReservationView.
    * @throws ResourceNotFoundException if the token is invalid or expired or reservation not found.
    */
   @PostMapping("/clear")
-  public void clearReservation(
+  public ReservationView clearReservation(
       @RequestBody Long reservationId, @RequestHeader("Authorization") String token) {
-    Client client = authsService.isValidClientToken(token);
-    if (client == null) {
-      throw new ResourceNotFoundException("Token not valid, expired or user is not client");
-    }
+    Client client = validateClientToken(token);
 
     var reservation = reservationService.getReservationById(reservationId);
     if (reservation == null) {
@@ -187,7 +190,8 @@ public class ReservationController {
       throw new ConflictException("This reservation doesn't belong to the authenticated client");
     }
 
-    reservationService.deleteReservation(reservation);
+    var clearedReservation = reservationService.deleteReservation(reservation);
+    return new ReservationView(clearedReservation);
   }
 
   /**
@@ -229,4 +233,20 @@ public class ReservationController {
     // Change quantity
     reservationLineService.changeQuantity(line, request.getQuantity());
   }
+
+  /**
+   * Validates the client token.
+   *
+   * @param token the authorization token from the request header.
+   * @return the validated client.
+   * @throws ResourceNotFoundException if the token is invalid or expired.
+   */
+  private Client validateClientToken(String token) {
+    Client client = authsService.isValidClientToken(token);
+    if (client == null) {
+      throw new ResourceNotFoundException("Token not valid, expired or user is not client");
+    }
+    return client;
+  }
 }
+

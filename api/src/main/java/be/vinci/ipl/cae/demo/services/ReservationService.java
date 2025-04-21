@@ -94,11 +94,12 @@ public class ReservationService {
    *
    * @param reservationId the ID of the reservation to update
    * @param newStatus the new status for the reservation
+   * @return the updated reservation
    */
-  public void changeStatus(Long reservationId, ReservationStatus newStatus) {
+  public Reservation changeStatus(Long reservationId, ReservationStatus newStatus) {
     Reservation reservation = reservationRepository.findById(reservationId).orElse(null);
     if (reservation == null) {
-      return;
+      return null;
     }
 
     // If changing to CANCELLED status, return items to stock
@@ -117,7 +118,7 @@ public class ReservationService {
     }
 
     reservation.setStatus(newStatus);
-    reservationRepository.save(reservation);
+    return reservationRepository.save(reservation);
   }
 
   /**
@@ -134,11 +135,14 @@ public class ReservationService {
    * Deletes a reservation and its associated lines.
    *
    * @param reservation the reservation to delete
+   * @return the deleted reservation
    */
-  public void deleteReservation(Reservation reservation) {
+  public Reservation deleteReservation(Reservation reservation) {
     for (ReservationLine line : reservation.getReservationLines()) {
       reservationLineService.deleteReservationLine(line);
     }
     reservationRepository.delete(reservation);
+    reservation.setReservationLines(List.of()); // Clear lines for the returned object
+    return reservation;
   }
 }
