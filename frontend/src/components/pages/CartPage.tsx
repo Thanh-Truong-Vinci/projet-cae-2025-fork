@@ -118,10 +118,13 @@ const CartPage = () => {
   const handleDirectQuantityChange = async (id: number, valueStr: string) => {
     try {
       const value = parseInt(valueStr, 10)
-      if (isNaN(value) || value < 0 ) return
+      if (isNaN(value) || value < 0) return
 
       if (reservation && reservationContext.changeReservationLineQuantity) {
-        setReservation(await reservationContext.changeReservationLineQuantity(id, value) ?? null)
+        setReservation(
+          (await reservationContext.changeReservationLineQuantity(id, value)) ??
+            null
+        )
         forceRefresh()
       }
     } catch (error) {
@@ -134,7 +137,9 @@ const CartPage = () => {
   const clearCart = async () => {
     try {
       if (reservation && reservationContext.clearReservation) {
-        const clearedReservation = await reservationContext.clearReservation(reservation.id)
+        const clearedReservation = await reservationContext.clearReservation(
+          reservation.id
+        )
         setReservation(clearedReservation)
         setMessage('Votre panier a été vidé')
         setOpenSnackbar(true)

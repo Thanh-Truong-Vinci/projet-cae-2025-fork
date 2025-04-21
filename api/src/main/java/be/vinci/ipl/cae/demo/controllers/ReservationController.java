@@ -232,7 +232,8 @@ public class ReservationController {
     }
 
     // Change quantity
-    Reservation updatedReservation = reservationLineService.changeQuantity(line, request.getQuantity());
+    Reservation updatedReservation =
+        reservationLineService.changeQuantity(line, request.getQuantity());
     return new ReservationView(updatedReservation);
   }
 
@@ -251,4 +252,3 @@ public class ReservationController {
     return client;
   }
 }
-

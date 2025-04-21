@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { ReservationRequest, ReservationView } from '../types'
+import { ReservationView } from '../types'
 
 export interface ReservationContextType {
   reservations: ReservationView[]

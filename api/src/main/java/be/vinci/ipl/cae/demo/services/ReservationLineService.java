@@ -7,9 +7,8 @@ import be.vinci.ipl.cae.demo.models.entities.Reservation;
 import be.vinci.ipl.cae.demo.models.entities.ReservationLine;
 import be.vinci.ipl.cae.demo.repositories.BatchRepository;
 import be.vinci.ipl.cae.demo.repositories.ReservationLineRepository;
-import java.util.List;
-
 import be.vinci.ipl.cae.demo.repositories.ReservationRepository;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 /** Service class for managing reservation lines. */
@@ -22,7 +21,9 @@ public class ReservationLineService {
 
   /** Default constructor for ReservationLineService. */
   public ReservationLineService(
-      BatchRepository batchRepository, ReservationLineRepository reservationLineRepository, ReservationRepository reservationRepository) {
+      BatchRepository batchRepository,
+      ReservationLineRepository reservationLineRepository,
+      ReservationRepository reservationRepository) {
     this.batchRepository = batchRepository;
     this.reservationLineRepository = reservationLineRepository;
     this.reservationRepository = reservationRepository;
@@ -144,4 +145,3 @@ public class ReservationLineService {
     reservationLineRepository.delete(reservationLine);
   }
 }
-

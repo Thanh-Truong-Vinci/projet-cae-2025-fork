@@ -321,7 +321,9 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
     }
   }
 
-  const clearReservation = async (reservationId: number): Promise<ReservationView> => {
+  const clearReservation = async (
+    reservationId: number
+  ): Promise<ReservationView> => {
     setIsLoading(true)
     setError(null)
 
