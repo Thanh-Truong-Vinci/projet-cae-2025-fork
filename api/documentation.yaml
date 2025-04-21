@@ -26,13 +26,13 @@ paths:
                 $ref: '#/components/schemas/AuthenticatedUser'
         '400':
           description: Requête mal formée
-        '401':
+        '404':
           description: Identifiants incorrects
 
   /auths/register:
     post:
       summary: Inscription
-      description: Inscription d'un utilisateur
+      description: Inscription d'un client
       requestBody:
         required: true
         description: Identifiants de l'utilisateur
@@ -42,11 +42,7 @@ paths:
               $ref: '#/components/schemas/CredentialsRegister'
       responses:
         '200':
-          description: Inscription réussie, renvoie un token JWT
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthenticatedUser'
+          description: Inscription réussie
         '400':
           description: Requête mal formée
         '409':
@@ -60,18 +56,923 @@ paths:
         required: true
         description: Token à vérifier
         content:
-          application/json:
+          text/plain:
             schema:
-              $ref: '#/components/schemas/TokenRequest'
+              type: string
       responses:
         '200':
           description: Token rafraîchi
           content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: Token invalide ou expiré
+
+  /auths/changepassword:
+    post:
+      summary: Changer le mot de passe
+      description: Modification du mot de passe d'un utilisateur
+      requestBody:
+        required: true
+        description: Identifiants avec l'ancien et le nouveau mot de passe
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CredentialsProfile'
+      responses:
+        '200':
+          description: Mot de passe modifié avec succès
+        '400':
+          description: Requête mal formée
+        '404':
+          description: Utilisateur non trouvé ou mot de passe incorrect
+
+  /batches/createbatch:
+    post:
+      summary: Créer un nouveau lot
+      description: Crée un nouveau lot avec un nouveau produit et une nouvelle photo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                batch:
+                  $ref: '#/components/schemas/NewBatch'
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Lot créé avec succès
+          content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthenticatedUser'
+                $ref: '#/components/schemas/Batch'
+        '400':
+          description: Requête mal formée
         '401':
-          description: Token invalide
+          description: Non autorisé
+        '409':
+          description: Conflit lors de la création
+
+  /batches/createbatch/existing:
+    post:
+      summary: Créer un lot avec un produit existant
+      description: Crée un nouveau lot en utilisant un produit existant
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewBatch'
+      parameters:
+        - name: productId
+          in: query
+          description: ID du produit existant
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Lot créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '400':
+          description: Requête mal formée
+        '401':
+          description: Non autorisé
+        '409':
+          description: Conflit lors de la création
+
+  /batches/createbatch/existingimage:
+    post:
+      summary: Créer un lot avec une image existante
+      description: Crée un nouveau lot avec un nouveau produit mais une image existante
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewBatch'
+      parameters:
+        - name: photoId
+          in: query
+          description: ID de la photo existante
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Lot créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '400':
+          description: Requête mal formée
+        '401':
+          description: Non autorisé
+        '404':
+          description: Image non trouvée
+        '409':
+          description: Conflit lors de la création
+
+  /batches/mybatches:
+    get:
+      summary: Récupérer les lots d'un producteur
+      description: Récupère tous les lots d'un producteur avec quantité > 0
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des lots du producteur
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Batch'
+        '401':
+          description: Non autorisé
+
+  /batches:
+    get:
+      summary: Récupérer tous les lots
+      description: Récupère la liste complète des lots
+      responses:
+        '200':
+          description: Liste de tous les lots
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Batch'
+
+  /batches/{id}:
+    get:
+      summary: Récupérer un lot par ID
+      description: Récupère les détails d'un lot spécifique
+      parameters:
+        - name: id
+          in: path
+          description: ID du lot
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Détails du lot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '404':
+          description: Lot non trouvé
+
+  /batches/{id}/accept:
+    patch:
+      summary: Accepter un lot
+      description: Accepte un lot en attente
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID du lot à accepter
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Lot accepté
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '401':
+          description: Non autorisé
+        '404':
+          description: Lot non trouvé
+
+  /batches/{id}/reject:
+    patch:
+      summary: Rejeter un lot
+      description: Rejette un lot en attente avec un message optionnel
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID du lot à rejeter
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: message
+          in: query
+          description: Message expliquant le rejet
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lot rejeté
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '401':
+          description: Non autorisé
+        '404':
+          description: Lot non trouvé
+
+  /batches/{id}/receive:
+    patch:
+      summary: Marquer un lot comme reçu
+      description: Marque un lot approuvé comme reçu
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID du lot à marquer comme reçu
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Lot marqué comme reçu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '401':
+          description: Non autorisé
+        '404':
+          description: Lot non trouvé
+        '409':
+          description: Impossible de marquer comme reçu
+
+  /batches/{id}/updateImage:
+    patch:
+      summary: Mettre à jour l'image d'un lot
+      description: Met à jour l'image d'un lot avec une nouvelle image
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID du lot à mettre à jour
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Image du lot mise à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '401':
+          description: Non autorisé
+        '404':
+          description: Lot non trouvé
+        '409':
+          description: Conflit lors de la mise à jour
+
+  /batches/{id}/updateImageById:
+    patch:
+      summary: Mettre à jour l'image d'un lot par ID
+      description: Met à jour l'image d'un lot avec une image existante
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID du lot à mettre à jour
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                imageId:
+                  type: integer
+                  format: int64
+      responses:
+        '200':
+          description: Image du lot mise à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '401':
+          description: Non autorisé
+        '404':
+          description: Lot ou image non trouvé
+        '409':
+          description: Conflit lors de la mise à jour
+
+  /batches/approved:
+    get:
+      summary: Récupérer les lots approuvés
+      description: Récupère tous les lots avec le statut APPROVED
+      responses:
+        '200':
+          description: Liste des lots approuvés
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Batch'
+
+  /batches/received:
+    get:
+      summary: Récupérer les lots reçus
+      description: Récupère tous les lots avec le statut RECEIVED
+      responses:
+        '200':
+          description: Liste des lots reçus
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BatchView'
+
+  /batches/received/available-view:
+    get:
+      summary: Récupérer les lots reçus avec quantité disponible
+      description: Récupère les lots reçus avec quantité disponible, fusionnés par produit/prix/unité
+      responses:
+        '200':
+          description: Liste des lots reçus fusionnés
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductBatchView'
+
+  /batches/pending:
+    get:
+      summary: Récupérer les lots en attente
+      description: Récupère tous les lots avec le statut PENDING
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des lots en attente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ManagerBatchView'
+        '401':
+          description: Non autorisé
+
+  /manager/registermanager:
+    post:
+      summary: Enregistrer un nouveau manager
+      description: Permet à un manager existant d'enregistrer un nouveau manager dans le système
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        description: Informations du nouveau manager
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CredentialsManager'
+      responses:
+        '200':
+          description: Enregistrement réussi du manager
+        '400':
+          description: Requête mal formée
+        '401':
+          description: Non autorisé (token invalide ou rôle insuffisant)
+        '409':
+          description: Email déjà utilisé
+
+  /manager/registerproducer:
+    post:
+      summary: Enregistrer un nouveau producteur
+      description: Permet à un manager d'enregistrer un nouveau producteur dans le système
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        description: Informations du nouveau producteur
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CredentialsProducer'
+      responses:
+        '200':
+          description: Enregistrement réussi du producteur
+        '400':
+          description: Requête mal formée
+        '401':
+          description: Non autorisé (token invalide ou rôle insuffisant)
+        '409':
+          description: Email déjà utilisé
+
+  /products:
+    get:
+      summary: Récupérer tous les produits
+      description: Récupère la liste complète des produits, avec tri optionnel
+      parameters:
+        - name: order
+          in: query
+          description: Ordre de tri des produits
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Liste des produits
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+
+    post:
+      summary: Ajouter un produit
+      description: Ajoute un nouveau produit dans la base de données
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewProduct'
+      responses:
+        '200':
+          description: Produit créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Requête mal formée
+        '401':
+          description: Non autorisé
+        '409':
+          description: Données invalides pour la création du produit
+
+  /products/{id}:
+    get:
+      summary: Récupérer un produit par son ID
+      description: Récupère les détails d'un produit spécifique par son identifiant
+      parameters:
+        - name: id
+          in: path
+          description: Identifiant du produit
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Détails du produit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Produit non trouvé
+
+    delete:
+      summary: Supprimer un produit
+      description: Supprime un produit de la base de données
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Identifiant du produit à supprimer
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Produit supprimé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '401':
+          description: Non autorisé
+        '404':
+          description: Produit non trouvé
+
+    patch:
+      summary: Mettre à jour un produit
+      description: Modifie les informations d'un produit existant
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Identifiant du produit à modifier
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewProduct'
+      responses:
+        '200':
+          description: Produit modifié avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Requête mal formée
+        '401':
+          description: Non autorisé
+        '404':
+          description: Produit non trouvé
+        '409':
+          description: Données invalides pour la modification du produit
+
+  /photo:
+    get:
+      summary: Récupérer toutes les photos
+      description: Récupère la liste de toutes les photos stockées dans le système
+      responses:
+        '200':
+          description: Liste des photos récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Photo'
+    post:
+      summary: Télécharger une nouvelle photo
+      description: Télécharge une nouvelle photo pour un produit
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                photo:
+                  $ref: '#/components/schemas/NewPhoto'
+                image:
+                  type: string
+                  format: binary
+                  description: Fichier image à télécharger
+      responses:
+        '200':
+          description: Photo téléchargée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Photo'
+        '400':
+          description: Requête mal formée
+        '409':
+          description: Informations de photo invalides
+
+  /product-types:
+    get:
+      summary: Récupérer tous les types de produits
+      description: Récupère la liste complète des types de produits
+      responses:
+        '200':
+          description: Liste des types de produits
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductType'
+
+    post:
+      summary: Créer un nouveau type de produit
+      description: Ajoute un nouveau type de produit dans le système
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewProductType'
+      responses:
+        '200':
+          description: Type de produit créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductType'
+        '400':
+          description: Requête mal formée
+        '401':
+          description: Non autorisé
+        '409':
+          description: Données invalides pour la création du type de produit
+
+  /product-types/{id}:
+    get:
+      summary: Récupérer un type de produit par ID
+      description: Récupère les détails d'un type de produit spécifique par son identifiant
+      parameters:
+        - name: id
+          in: path
+          description: Identifiant du type de produit
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Détails du type de produit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductType'
+        '404':
+          description: Type de produit non trouvé
+
+    delete:
+      summary: Supprimer un type de produit
+      description: Supprime un type de produit existant
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Identifiant du type de produit à supprimer
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Type de produit supprimé avec succès
+        '401':
+          description: Non autorisé
+        '404':
+          description: Type de produit non trouvé
+
+  /reservation/reserve:
+    post:
+      summary: Réserver un produit
+      description: Permet à un client de réserver un produit
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationRequest'
+      responses:
+        '200':
+          description: Produit réservé avec succès
+        '400':
+          description: Requête mal formée
+        '404':
+          description: Token invalide ou expiré
+        '409':
+          description: Conflit lors de la réservation
+
+  /reservation/list:
+    get:
+      summary: Liste des réservations d'un client
+      description: Récupère toutes les réservations d'un client authentifié
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des réservations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservationView'
+        '404':
+          description: Token invalide ou expiré
+
+  /reservation/toPending:
+    post:
+      summary: Passer une réservation à l'état PENDING
+      description: Change le statut d'une réservation à PENDING
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: integer
+              format: int64
+              description: ID de la réservation
+      responses:
+        '200':
+          description: Statut de la réservation mis à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationView'
+        '404':
+          description: Réservation non trouvée ou token invalide
+        '409':
+          description: ID de réservation manquant
+
+  /reservation/toConfirm:
+    post:
+      summary: Confirmer une réservation
+      description: Change le statut d'une réservation à CONFIRMED
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: integer
+              format: int64
+              description: ID de la réservation
+      responses:
+        '200':
+          description: Statut de la réservation mis à jour
+        '404':
+          description: Réservation non trouvée
+        '409':
+          description: ID de réservation manquant
+
+  /reservation/toCancel:
+    post:
+      summary: Annuler une réservation
+      description: Change le statut d'une réservation à CANCELLED
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: integer
+              format: int64
+              description: ID de la réservation
+      responses:
+        '200':
+          description: Statut de la réservation mis à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationView'
+        '404':
+          description: Réservation non trouvée ou token invalide
+        '409':
+          description: ID de réservation manquant
+
+  /reservation/all:
+    get:
+      summary: Toutes les réservations
+      description: Récupère toutes les réservations, indépendamment du client
+      responses:
+        '200':
+          description: Liste de toutes les réservations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservationView'
+
+  /reservation/clear:
+    post:
+      summary: Supprimer une réservation
+      description: Supprime une réservation par son ID
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: integer
+              format: int64
+              description: ID de la réservation
+      responses:
+        '200':
+          description: Réservation supprimée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationView'
+        '404':
+          description: Réservation non trouvée ou token invalide
+        '409':
+          description: La réservation n'appartient pas au client authentifié
+
+  /reservation/changeQuantity:
+    post:
+      summary: Modifier la quantité d'un produit
+      description: Modifie la quantité d'un produit dans une ligne de réservation
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeQuantityRequest'
+      responses:
+        '200':
+          description: Quantité modifiée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationView'
+        '404':
+          description: Ligne de réservation non trouvée ou token invalide
+        '409':
+          description: Conflit lors de la modification
+
+  /statistics/sales:
+    get:
+      summary: Récupérer les statistiques de ventes
+      description: Récupère les statistiques de ventes, optionnellement filtrées par année et/ou mois
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: year
+          in: query
+          description: Année pour filtrer les statistiques (optionnel)
+          required: false
+          schema:
+            type: integer
+        - name: month
+          in: query
+          description: Mois pour filtrer les statistiques (optionnel)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+      responses:
+        '200':
+          description: Statistiques de ventes récupérées avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SalesStatisticsView'
+        '401':
+          description: Non autorisé (token invalide ou rôle insuffisant)
+        '403':
+          description: Accès interdit (rôle insuffisant)
 
 components:
   securitySchemes:
@@ -105,6 +1006,10 @@ components:
         password:
           type: string
           example: password
+        civility:
+          type: string
+          enum: [Mr, Mrs, Ms]
+          example: Mr
         street:
           type: string
           example: User Street
@@ -126,6 +1031,18 @@ components:
         phoneNumber:
           type: string
           example: 123456789
+    CredentialsProfile:
+      type: object
+      properties:
+        email:
+          type: string
+          example: user@example.com
+        currentPassword:
+          type: string
+          example: current-password
+        newPassword:
+          type: string
+          example: new-password
     AuthenticatedUser:
       type: object
       properties:
@@ -135,8 +1052,383 @@ components:
         token:
           type: string
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJpYXQiOjE1MTYyMzkwMjJ9.4TJok9J
-    TokenRequest:
+    NewBatch:
       type: object
       properties:
-        token:
+        productName:
           type: string
+          example: "Tomates Bio"
+        productType:
+          type: string
+          example: "Légumes"
+        productDescription:
+          type: string
+          example: "Tomates cultivées sans pesticides"
+        availabilityDate:
+          type: string
+          format: date
+          example: "2025-04-15"
+        unitPrice:
+          type: number
+          format: double
+          example: 3.50
+        saleUnit:
+          type: string
+          example: "kg"
+        availableQuantity:
+          type: integer
+          example: 50
+    Batch:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        product:
+          $ref: '#/components/schemas/Product'
+        photo:
+          $ref: '#/components/schemas/Photo'
+        producer:
+          $ref: '#/components/schemas/Producer'
+        availabilityDate:
+          type: string
+          format: date
+        unitPrice:
+          type: number
+          format: double
+        saleUnit:
+          type: string
+        availableQuantity:
+          type: integer
+        status:
+          type: string
+          enum: [PENDING, APPROVED, REJECTED, RECEIVED]
+        depositDate:
+          type: string
+          format: date
+        productionDate:
+          type: string
+          format: date
+    BatchView:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        productName:
+          type: string
+        productType:
+          type: string
+        photoUrl:
+          type: string
+        producer:
+          type: string
+        unitPrice:
+          type: number
+          format: double
+        saleUnit:
+          type: string
+        availableQuantity:
+          type: integer
+    ProductBatchView:
+      type: object
+      properties:
+        productId:
+          type: integer
+          format: int64
+        productName:
+          type: string
+        productType:
+          type: string
+        photoUrl:
+          type: string
+        unitPrice:
+          type: number
+          format: double
+        saleUnit:
+          type: string
+        availableQuantity:
+          type: integer
+    ManagerBatchView:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        productName:
+          type: string
+        productType:
+          type: string
+        photoUrl:
+          type: string
+        producer:
+          type: string
+        company:
+          type: string
+        availabilityDate:
+          type: string
+          format: date
+        unitPrice:
+          type: number
+          format: double
+        saleUnit:
+          type: string
+        availableQuantity:
+          type: integer
+        depositDate:
+          type: string
+          format: date
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        productType:
+          type: object
+          properties:
+            id:
+              type: integer
+              format: int64
+            title:
+              type: string
+    Photo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        productName:
+          type: string
+        url:
+          type: string
+    Producer:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        firstname:
+          type: string
+        company:
+          type: string
+    CredentialsManager:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Dupont
+        firstname:
+          type: string
+          example: Jean
+        email:
+          type: string
+          example: jean.dupont@example.com
+        password:
+          type: string
+          example: password123
+      required:
+        - name
+        - firstname
+        - email
+        - password
+    CredentialsProducer:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Martin
+        firstname:
+          type: string
+          example: Sophie
+        company:
+          type: string
+          example: Ferme Bio du Bon Vivant
+        email:
+          type: string
+          example: sophie.martin@example.com
+        password:
+          type: string
+          example: password123
+        street:
+          type: string
+          example: Rue des Agriculteurs
+        number:
+          type: string
+          example: 42
+        box:
+          type: string
+          example: A
+        postalCode:
+          type: string
+          example: 1000
+        city:
+          type: string
+          example: Bruxelles
+        country:
+          type: string
+          example: Belgique
+        phoneNumber:
+          type: string
+          example: +32456789012
+      required:
+        - name
+        - firstname
+        - company
+        - email
+        - password
+        - street
+        - number
+        - postalCode
+        - city
+        - country
+        - phoneNumber
+    NewProduct:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Pommes Bio"
+        description:
+          type: string
+          example: "Pommes cultivées sans pesticides"
+        idProductType:
+          type: integer
+          format: int64
+          example: 2
+      required:
+        - name
+        - description
+        - idProductType
+    NewPhoto:
+      type: object
+      properties:
+        product:
+          type: string
+          description: Nom du produit associé à la photo
+          example: "Tomates Bio"
+      required:
+        - product
+    ProductType:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identifiant unique du type de produit
+        title:
+          type: string
+          description: Titre du type de produit
+          example: "Légumes"
+      required:
+        - id
+        - title
+
+    NewProductType:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Titre du nouveau type de produit
+          example: "Produits de la mer"
+      required:
+        - title
+
+    ReservationRequest:
+      type: object
+      properties:
+        productId:
+          type: integer
+          format: int64
+          description: ID du produit à réserver
+        quantity:
+          type: integer
+          description: Quantité à réserver
+      required:
+        - productId
+        - quantity
+
+    ChangeQuantityRequest:
+      type: object
+      properties:
+        reservationLineId:
+          type: integer
+          format: int64
+          description: ID de la ligne de réservation
+        quantity:
+          type: integer
+          description: Nouvelle quantité
+      required:
+        - reservationLineId
+        - quantity
+
+    ReservationView:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        clientEmail:
+          type: string
+        clientName:
+          type: string
+        status:
+          type: string
+          enum: [BUILDING, PENDING, CONFIRMED, CANCELLED]
+        creationDate:
+          type: string
+          format: date-time
+        completionDate:
+          type: string
+          format: date-time
+        lines:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+              productName:
+                type: string
+              productType:
+                type: string
+              unitPrice:
+                type: number
+                format: double
+              saleUnit:
+                type: string
+              quantity:
+                type: integer
+              photoUrl:
+                type: string
+    SalesStatisticsView:
+      type: object
+      properties:
+        year:
+          type: integer
+          description: Année des statistiques
+          example: 2025
+        month:
+          type: integer
+          description: Mois des statistiques (1-12)
+          example: 4
+        totalSales:
+          type: number
+          format: double
+          description: Montant total des ventes pour la période
+          example: 1250.50
+        productCount:
+          type: integer
+          description: Nombre de produits vendus pour la période
+          example: 75
+        reservationCount:
+          type: integer
+          description: Nombre de réservations pour la période
+          example: 23
