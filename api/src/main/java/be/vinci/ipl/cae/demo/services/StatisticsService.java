@@ -29,7 +29,7 @@ public class StatisticsService {
   /**
    * Constructeur du service de statistiques.
    *
-   * @param batchRepository       le repository pour les lots
+   * @param batchRepository le repository pour les lots
    * @param reservationRepository le repository pour les réservations
    */
   public StatisticsService(
@@ -41,7 +41,7 @@ public class StatisticsService {
   /**
    * Récupère les statistiques de ventes agrégées par produit, année et mois.
    *
-   * @param year  l'année pour filtrer les données (optionnel)
+   * @param year l'année pour filtrer les données (optionnel)
    * @param month le mois pour filtrer les données (optionnel)
    * @return la liste des statistiques de ventes
    */
@@ -120,9 +120,6 @@ public class StatisticsService {
 
     // Initialiser les valeurs manquantes à zéro
     for (SalesStatisticsView stats : statisticsMap.values()) {
-      if (stats.getReceivedQuantity() == null) {
-        stats.setReceivedQuantity(0);
-      }
       if (stats.getSoldQuantity() == null) {
         stats.setSoldQuantity(0);
       }
@@ -144,7 +141,7 @@ public class StatisticsService {
    * Génère une clé unique pour indexer les statistiques basée sur l'id du produit et la date.
    *
    * @param productId identifiant du produit
-   * @param date      date concernée (dépôt ou vente)
+   * @param date date concernée (dépôt ou vente)
    * @return la clé générée
    */
   private String generateKey(Long productId, LocalDate date) {
@@ -155,10 +152,10 @@ public class StatisticsService {
    * Récupère ou crée un objet de statistiques et initialise ses propriétés de base.
    *
    * @param statisticsMap la map contenant les statistiques
-   * @param key           la clé permettant d'indexer les statistiques
-   * @param batch         le lot contenant les informations du produit
-   * @param year          l'année concernée
-   * @param month         le mois concerné
+   * @param key la clé permettant d'indexer les statistiques
+   * @param batch le lot contenant les informations du produit
+   * @param year l'année concernée
+   * @param month le mois concerné
    * @return l'objet statistiques récupéré ou créé
    */
   private SalesStatisticsView getOrCreateStatistics(

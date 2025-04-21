@@ -5,7 +5,6 @@ import { ThemeProvider } from '@mui/material/styles'
 import theme from './themes'
 import { UserContextProvider } from './contexts/UserContext'
 import { ProductProvider } from './contexts/ProductProvider'
-import { CartProvider } from './contexts/CartContext'
 
 // Mock all page components
 vi.mock('./components/pages/HomePage', () => ({
@@ -175,9 +174,7 @@ describe('Main Application', () => {
       <ThemeProvider theme={theme}>
         <UserContextProvider>
           <ProductProvider>
-            <CartProvider>
-              <RouterProvider router={testRouter} />
-            </CartProvider>
+            <RouterProvider router={testRouter} />
           </ProductProvider>
         </UserContextProvider>
       </ThemeProvider>

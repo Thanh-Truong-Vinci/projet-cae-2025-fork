@@ -4,9 +4,7 @@ import be.vinci.ipl.cae.demo.repositories.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-/**
- * Profile Service.
- */
+/** Profile Service. */
 @Service
 public class ProfileService {
 
@@ -26,18 +24,16 @@ public class ProfileService {
   /**
    * Change the current password.
    *
-   * @param email           the email that wants to change his password
+   * @param email the email that wants to change his password
    * @param currentPassword the current password
-   * @param newPassword     the new password
+   * @param newPassword the new password
    * @return 1 if the password changes, 0 otherwise
    */
-  // TODO maybe is better to move this in AuthsService (nosense to have only 1 method in 1 Class)
-  // TODO remove the return
-  public int changePassword(String email, String currentPassword, String newPassword) {
+  public void changePassword(String email, String currentPassword, String newPassword) {
     if (!passwordEncoder.matches(
         currentPassword, userRepository.findByEmail(email).getPassword())) {
-      return 0;
+      return ;
     }
-    return userRepository.updatePassword(passwordEncoder.encode(newPassword), email);
+    userRepository.updatePassword(passwordEncoder.encode(newPassword), email);
   }
 }

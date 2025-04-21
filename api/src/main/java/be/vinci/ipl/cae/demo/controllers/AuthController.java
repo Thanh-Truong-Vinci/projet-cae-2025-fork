@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * AuthController to handle client authentication.
- */
+/** AuthController to handle client authentication. */
 @RestController
 @RequestMapping("/auths")
 public class AuthController {
@@ -31,7 +29,7 @@ public class AuthController {
    * Constructor for AuthController.
    *
    * @param clientService the injected ClientService.
-   * @param authsService  the injected AuthsService.
+   * @param authsService the injected AuthsService.
    */
   public AuthController(
       ProfileService profileService, ClientService clientService, AuthsService authsService) {

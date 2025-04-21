@@ -13,9 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- * Service class for managing photos.
- */
+/** Service class for managing photos. */
 @Service
 public class PhotoService {
 
@@ -27,10 +25,10 @@ public class PhotoService {
   /**
    * Constructor for PhotoService.
    *
-   * @param photoRepository     the repository for managing photo entities
+   * @param photoRepository the repository for managing photo entities
    * @param blobServiceEndpoint the endpoint for the Azure Blob service
-   * @param sasToken            the SAS token for accessing the Azure Blob service
-   * @param containerName       the name of the container in Azure Blob storage
+   * @param sasToken the SAS token for accessing the Azure Blob service
+   * @param containerName the name of the container in Azure Blob storage
    */
   public PhotoService(
       PhotoRepository photoRepository,
@@ -67,7 +65,7 @@ public class PhotoService {
    * Create a photo entry and upload the image to Azure Blob storage.
    *
    * @param product the product name associated with the photo
-   * @param image   the image file to be uploaded
+   * @param image the image file to be uploaded
    * @return the created Photo entity
    */
   public Photo createPhoto(String product, MultipartFile image) {
@@ -87,7 +85,7 @@ public class PhotoService {
    * @param image the image file to be uploaded
    * @return the blob URL of the uploaded image
    */
-  private String uploadImageToBlob(MultipartFile image) {
+  String uploadImageToBlob(MultipartFile image) {
     String imageUuid = UUID.randomUUID().toString();
     Map<String, String> metadata = new HashMap<>();
 

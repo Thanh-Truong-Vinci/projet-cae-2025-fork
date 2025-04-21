@@ -15,36 +15,32 @@ import {
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
-import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import { CartContext } from '../../contexts/CartContext'
 import { ProductBatch } from '../../types'
 import { ProductContext } from '../../contexts/ProductContext'
+import { ReservationContext } from '../../contexts/ReservationContext'
 
 const ProductDetailPage = () => {
   const { productId } = useParams<{ productId: string }>()
   const navigate = useNavigate()
   const location = useLocation()
-  const { addToCart } = useContext(CartContext)
   const { getProductById } = useContext(ProductContext)!
+  const { createReservation } = useContext(ReservationContext)!
   const [quantity, setQuantity] = useState(1)
   const [product, setProduct] = useState<ProductBatch | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Obtenir les données du produit
     const loadProduct = () => {
       try {
         setLoading(true)
 
-        // Vérifier si le produit est passé via l'état de navigation
         if (location.state?.product) {
           setProduct(location.state.product)
           return
         }
 
-        // Sinon, utiliser getProductById du contexte
         if (productId) {
           const foundProduct = getProductById(parseInt(productId))
           if (foundProduct) {
@@ -70,18 +66,9 @@ const ProductDetailPage = () => {
     setQuantity((prev) => Math.max(1, prev + change))
   }
 
-  const handleAddToCart = () => {
+  const handleAddToReservation = () => {
     if (product) {
-      addToCart({
-        id: product.productId,
-        name: product.productName,
-        price: `${product.unitPrice} € / ${product.saleUnit}`,
-        image: product.imageLocation || '/placeholder.jpg',
-        quantity: quantity,
-        unitType: product.saleUnit,
-        category: product.productType,
-        batchIds: product.batchIds,
-      })
+      createReservation(product.productId, quantity)
     }
   }
 
@@ -153,12 +140,12 @@ const ProductDetailPage = () => {
               alt={product.productName}
               sx={{
                 borderRadius: 1,
-                height: { xs: 250, sm: 300, md: 400 }, // Responsive height
+                height: { xs: 250, sm: 300, md: 400 },
                 width: '100%',
-                objectFit: 'contain', // Changed from 'cover' to maintain aspect ratio
-                backgroundColor: '#f5f5f5', // Light background for transparent images
+                objectFit: 'contain',
+                backgroundColor: '#f5f5f5',
                 display: 'block',
-                margin: '0 auto', // Center the image
+                margin: '0 auto',
               }}
             />
           </Grid>
@@ -236,17 +223,14 @@ const ProductDetailPage = () => {
               variant="contained"
               color="success"
               size="large"
-              startIcon={<AddShoppingCartIcon />}
               fullWidth
-              onClick={handleAddToCart}
+              onClick={handleAddToReservation}
             >
-              Ajouter au panier
+              Ajouter à la réservation
             </Button>
           </Grid>
         </Grid>
       </Paper>
-
-      {/* Suggestions ou informations supplémentaires pourraient être ajoutées ici */}
     </Box>
   )
 }

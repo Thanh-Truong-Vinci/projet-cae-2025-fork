@@ -12,9 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
-/**
- * Service class for managing reservations.
- */
+/** Service class for managing reservations. */
 @Service
 public class ReservationService {
 
@@ -26,10 +24,10 @@ public class ReservationService {
   /**
    * Constructs a new ReservationService with the specified repositories and services.
    *
-   * @param reservationRepository  the repository for reservations
-   * @param batchRepository        the repository for batches
+   * @param reservationRepository the repository for reservations
+   * @param batchRepository the repository for batches
    * @param reservationLineService the service for reservation lines
-   * @param productService         the service for products
+   * @param productService the service for products
    */
   public ReservationService(
       ReservationRepository reservationRepository,
@@ -43,39 +41,16 @@ public class ReservationService {
   }
 
   /**
-   * Creates a new reservation for a client with the specified product and quantity.
-   *
-   * @param client   the client making the reservation
-   * @param product  the product to reserve
-   * @param quantity the quantity of the product to reserve
-   * @return the created reservation
-   */
-  public Reservation createReservation(Client client, Product product, int quantity) {
-    Reservation reservation = new Reservation();
-    reservation.setClient(client);
-    reservation.setPrice(0.0);
-    reservation.setStatus(ReservationStatus.BUILDING);
-    reservation.setReservationDate(LocalDate.now());
-
-    // Save the reservation first to avoid transient property issues
-    reservation = reservationRepository.save(reservation);
-
-    reservationLineService.addProduct(reservation, product, quantity);
-    return reservation;
-  }
-
-  /**
    * Reserves a product for a client with the specified quantity.
    *
-   * @param client    the client making the reservation
+   * @param client the client making the reservation
    * @param productId the ID of the product to reserve
-   * @param quantity  the quantity of the product to reserve
-   * @return the updated reservation or null if product not found
+   * @param quantity the quantity of the product to reserve
    */
-  public Reservation reserveProduct(Client client, Long productId, int quantity) {
+  public void reserveProduct(Client client, Long productId, int quantity) {
     Product product = productService.getProductById(productId);
     if (product == null) {
-      return null;
+      return;
     }
 
     Reservation reservation =
@@ -83,7 +58,6 @@ public class ReservationService {
             .findByClientAndStatus(client, ReservationStatus.BUILDING)
             .orElseGet(
                 () -> {
-                  // Create and save the reservation first
                   Reservation newReservation = new Reservation();
                   newReservation.setClient(client);
                   newReservation.setPrice(0.0);
@@ -93,7 +67,7 @@ public class ReservationService {
                 });
 
     reservationLineService.addProduct(reservation, product, quantity);
-    return reservationRepository.save(reservation);
+    reservationRepository.save(reservation);
   }
 
   /**
@@ -119,8 +93,8 @@ public class ReservationService {
    * Changes the status of a reservation.
    *
    * @param reservationId the ID of the reservation to update
-   * @param newStatus     the new status for the reservation
-   * @return the updated reservation, or null if the reservation was not found
+   * @param newStatus the new status for the reservation
+   * @return the updated reservation
    */
   public Reservation changeStatus(Long reservationId, ReservationStatus newStatus) {
     Reservation reservation = reservationRepository.findById(reservationId).orElse(null);
@@ -140,6 +114,11 @@ public class ReservationService {
 
     // If confirming a reservation, set the sale date
     if (newStatus == ReservationStatus.CONFIRMED) {
+      double price = 0;
+      for (ReservationLine line : reservation.getReservationLines()) {
+        price += line.getQuantity() * line.getBatch().getUnitPrice();
+      }
+      reservation.setPrice(price);
       reservation.setSaleDate(LocalDate.now());
     }
 
@@ -155,5 +134,19 @@ public class ReservationService {
    */
   public Reservation getReservationById(Long reservationId) {
     return reservationRepository.findById(reservationId).orElse(null);
+  }
+
+  /**
+   * Deletes a reservation and its associated lines.
+   *
+   * @param reservation the reservation to delete
+   * @return the deleted reservation
+   */
+  public Reservation deleteReservation(Reservation reservation) {
+    for (ReservationLine line : reservation.getReservationLines()) {
+      reservationLineService.deleteReservationLine(line);
+    }
+    reservationRepository.delete(reservation);
+    return reservation;
   }
 }

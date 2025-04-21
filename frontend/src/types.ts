@@ -97,17 +97,6 @@ export const categoryLabels: { [key: string]: string } = {
   autres: 'Autres',
 }
 
-export interface CartItem {
-  id: number
-  name: string
-  price: string
-  image: string
-  quantity: number
-  unitType: string
-  category: string
-  batchIds: number[]
-}
-
 export interface ProductContextType {
   products: ProductBatch[]
   allProducts: Product[]
@@ -276,12 +265,11 @@ export interface ReservationContextType {
   toPendingReservation: (reservationId: number) => Promise<void>
   toConfirmReservation: (reservationId: number) => Promise<void>
   cancelReservation: (reservationId: number) => Promise<void>
-  updateReservationLineQuantity: (
+  clearReservation: (reservationId: number) => Promise<ReservationView>
+  changeReservationLineQuantity: (
     lineId: number,
     quantity: number
-  ) => Promise<void>
-  clearReservation: (reservationId: number) => Promise<void>
-  removeReservationLine: (lineId: number) => Promise<void>
+  ) => Promise<ReservationView>
 }
 
 export interface SalesStatistics {

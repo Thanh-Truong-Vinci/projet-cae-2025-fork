@@ -4,9 +4,7 @@ import java.time.LocalDate;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO représentant les informations d'un lot pour l'affichage.
- */
+/** DTO représentant les informations d'un lot pour l'affichage. */
 @Data
 @NoArgsConstructor
 public class BatchView {

@@ -6,9 +6,7 @@ import be.vinci.ipl.cae.demo.repositories.NotificationRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
-/**
- * Service class for managing notifications.
- */
+/** Service class for managing notifications. */
 @Service
 public class NotificationService {
 
@@ -22,10 +20,6 @@ public class NotificationService {
   public NotificationService(NotificationRepository notificationRepository) {
     this.notificationRepository = notificationRepository;
   }
-
-  // TODO CreateNotification
-
-  // TODO addNotification
 
   /**
    * Retrieves notifications for a given producer.

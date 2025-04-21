@@ -11,9 +11,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Notification entity representing user notifications.
- */
+/** Notification entity representing user notifications. */
 @Entity
 @Table(name = "notifications")
 @Data

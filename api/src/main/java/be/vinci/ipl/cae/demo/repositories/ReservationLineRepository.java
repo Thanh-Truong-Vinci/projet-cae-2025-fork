@@ -7,9 +7,7 @@ import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-/**
- * Repository interface for ReservationLine entities.
- */
+/** Repository interface for ReservationLine entities. */
 @Repository
 public interface ReservationLineRepository extends CrudRepository<ReservationLine, Long> {
 
@@ -18,7 +16,7 @@ public interface ReservationLineRepository extends CrudRepository<ReservationLin
    * du lot en ordre croissant.
    *
    * @param reservation La réservation à rechercher
-   * @param product     Le produit à rechercher
+   * @param product Le produit à rechercher
    * @return Une liste de lignes de réservation correspondant à la réservation et au produit
    *     spécifiés, triées par date de production du lot en ordre croissant
    */

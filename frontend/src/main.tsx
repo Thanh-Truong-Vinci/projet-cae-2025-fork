@@ -12,7 +12,6 @@ import ReservationsPage from './components/pages/ReservationsPage'
 import AddBatchPage from './components/pages/AddBatchPage.tsx'
 import ProducerHomePage from './components/pages/ProducerHomePage.tsx'
 import { UserContextProvider } from './contexts/UserContext.tsx'
-import { CartProvider } from './contexts/CartContext.tsx'
 import '@fontsource/roboto/700.css'
 import CssBaseline from '@mui/material/CssBaseline'
 import { ThemeProvider } from '@mui/material/styles'
@@ -171,11 +170,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <ProductProvider>
             <BatchProvider>
               <PhotoProvider>
-                <CartProvider>
-                  <ReservationProvider>
-                    <RouterProvider router={router} />
-                  </ReservationProvider>
-                </CartProvider>
+                <ReservationProvider>
+                  <RouterProvider router={router} />
+                </ReservationProvider>
               </PhotoProvider>
             </BatchProvider>
           </ProductProvider>

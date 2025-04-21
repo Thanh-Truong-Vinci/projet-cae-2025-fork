@@ -2,11 +2,16 @@ package be.vinci.ipl.cae.demo.controllers;
 
 import be.vinci.ipl.cae.demo.exceptions.ConflictException;
 import be.vinci.ipl.cae.demo.exceptions.ResourceNotFoundException;
+import be.vinci.ipl.cae.demo.models.dtos.ChangeQuantityRequest;
 import be.vinci.ipl.cae.demo.models.dtos.ReservationRequest;
 import be.vinci.ipl.cae.demo.models.dtos.views.ReservationView;
 import be.vinci.ipl.cae.demo.models.entities.Client;
+import be.vinci.ipl.cae.demo.models.entities.Reservation;
+import be.vinci.ipl.cae.demo.models.entities.ReservationLine;
 import be.vinci.ipl.cae.demo.models.entities.ReservationStatus;
+import be.vinci.ipl.cae.demo.repositories.ReservationLineRepository;
 import be.vinci.ipl.cae.demo.services.AuthsService;
+import be.vinci.ipl.cae.demo.services.ReservationLineService;
 import be.vinci.ipl.cae.demo.services.ReservationService;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,32 +22,40 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Controller for handling reservation-related operations.
- */
+/** Controller for handling reservation-related operations. */
 @RestController
 @RequestMapping("/reservation")
 public class ReservationController {
 
   private final AuthsService authsService;
   private final ReservationService reservationService;
+  private final ReservationLineService reservationLineService;
+  private final ReservationLineRepository reservationLineRepository;
 
   /**
    * Constructs a ReservationController with the specified AuthsService and ReservationService.
    *
-   * @param authsService       the authentication service.
+   * @param authsService the authentication service.
    * @param reservationService the reservation service.
+   * @param reservationLineService the reservation line service.
+   * @param reservationLineRepository the reservation line repository.
    */
-  public ReservationController(AuthsService authsService, ReservationService reservationService) {
+  public ReservationController(
+      AuthsService authsService,
+      ReservationService reservationService,
+      ReservationLineService reservationLineService,
+      ReservationLineRepository reservationLineRepository) {
     this.authsService = authsService;
     this.reservationService = reservationService;
+    this.reservationLineService = reservationLineService;
+    this.reservationLineRepository = reservationLineRepository;
   }
 
   /**
    * Reserves a product for a client.
    *
    * @param reservationRequest the reservation request containing product ID and quantity.
-   * @param token              the authorization token from the request header.
+   * @param token the authorization token from the request header.
    * @throws ResourceNotFoundException if the token is invalid or expired.
    */
   @PostMapping("/reserve")
@@ -79,14 +92,15 @@ public class ReservationController {
    * Changes the status of a reservation to PENDING.
    *
    * @param reservationId the ID of the reservation to update.
-   * @param token         the authorization token from the request header.
+   * @param token the authorization token from the request header.
+   * @return the updated reservation as ReservationView.
    * @throws ResourceNotFoundException if the token is invalid or expired.
-   * @throws ConflictException         if the reservation ID is missing.
+   * @throws ConflictException if the reservation ID is missing.
    */
   @PostMapping("/toPending")
-  public void toPending(
+  public ReservationView toPending(
       @RequestBody Long reservationId, @RequestHeader("Authorization") String token) {
-    validateAndChangeStatus(reservationId, token, ReservationStatus.PENDING);
+    return changeReservationStatus(reservationId, token, ReservationStatus.PENDING, true);
   }
 
   /**
@@ -94,7 +108,7 @@ public class ReservationController {
    *
    * @param reservationId the ID of the reservation to update.
    * @throws ResourceNotFoundException if the token is invalid or expired.
-   * @throws ConflictException         if the reservation ID is missing.
+   * @throws ConflictException if the reservation ID is missing.
    */
   @PostMapping("/toConfirm")
   public void toConfirm(@RequestBody Long reservationId) {
@@ -108,14 +122,38 @@ public class ReservationController {
    * Changes the status of a reservation to CANCELLED.
    *
    * @param reservationId the ID of the reservation to update.
-   * @param token         the authorization token from the request header.
+   * @param token the authorization token from the request header.
+   * @return the updated reservation as ReservationView.
    * @throws ResourceNotFoundException if the token is invalid or expired.
-   * @throws ConflictException         if the reservation ID is missing.
+   * @throws ConflictException if the reservation ID is missing.
    */
   @PostMapping("/toCancel")
-  public void toCancel(
+  public ReservationView toCancel(
       @RequestBody Long reservationId, @RequestHeader("Authorization") String token) {
-    validateAndChangeStatus(reservationId, token, ReservationStatus.CANCELLED);
+    return changeReservationStatus(reservationId, token, ReservationStatus.CANCELLED, true);
+  }
+
+  /**
+   * Helper method to change a reservation's status and validate client token if needed.
+   *
+   * @param reservationId the ID of the reservation to update
+   * @param token the authorization token from the request header
+   * @param status the new status to set for the reservation
+   * @param validateToken whether to validate the client token
+   * @return the updated reservation as ReservationView
+   * @throws ResourceNotFoundException if the token is invalid or expired
+   * @throws ConflictException if the reservation ID is missing
+   */
+  private ReservationView changeReservationStatus(
+      Long reservationId, String token, ReservationStatus status, boolean validateToken) {
+    if (validateToken) {
+      validateClientToken(token);
+    }
+    if (reservationId == null) {
+      throw new ConflictException("Reservation ID is required");
+    }
+    var updatedReservation = reservationService.changeStatus(reservationId, status);
+    return new ReservationView(updatedReservation);
   }
 
   /**
@@ -131,22 +169,86 @@ public class ReservationController {
   }
 
   /**
-   * Validates client token and reservation ID, then changes reservation status.
+   * Clears/deletes a reservation by ID.
    *
-   * @param reservationId the ID of the reservation to update.
-   * @param token         the authorization token from the request header.
-   * @param status        the new status to set.
-   * @throws ResourceNotFoundException if the token is invalid or expired.
-   * @throws ConflictException         if the reservation ID is missing.
+   * @param reservationId the ID of the reservation to delete.
+   * @param token the authorization token from the request header.
+   * @return the cleared reservation as ReservationView.
+   * @throws ResourceNotFoundException if the token is invalid or expired or reservation not found.
    */
-  private void validateAndChangeStatus(Long reservationId, String token, ReservationStatus status) {
+  @PostMapping("/clear")
+  public ReservationView clearReservation(
+      @RequestBody Long reservationId, @RequestHeader("Authorization") String token) {
+    Client client = validateClientToken(token);
+
+    var reservation = reservationService.getReservationById(reservationId);
+    if (reservation == null) {
+      throw new ResourceNotFoundException("Reservation not found");
+    }
+
+    // Verify the reservation belongs to the client
+    if (!reservation.getClient().getId().equals(client.getId())) {
+      throw new ConflictException("This reservation doesn't belong to the authenticated client");
+    }
+
+    var clearedReservation = reservationService.deleteReservation(reservation);
+    return new ReservationView(clearedReservation);
+  }
+
+  /**
+   * Changes the quantity of a product in a reservation.
+   *
+   * @param request a request containing reservation line ID and new quantity
+   * @param token the authorization token from the request header
+   * @throws ResourceNotFoundException if the token is invalid or expired or reservation line not
+   *     found
+   */
+  @PostMapping("/changeQuantity")
+  public ReservationView changeQuantity(
+      @RequestBody ChangeQuantityRequest request, @RequestHeader("Authorization") String token) {
     Client client = authsService.isValidClientToken(token);
     if (client == null) {
       throw new ResourceNotFoundException("Token not valid, expired or user is not client");
     }
-    if (reservationId == null) {
-      throw new ConflictException("Reservation ID is required");
+
+    if (request.getReservationLineId() == null || request.getQuantity() == null) {
+      throw new ConflictException("Reservation line ID and quantity are required");
     }
-    reservationService.changeStatus(reservationId, status);
+
+    // Fetch the reservation line
+    ReservationLine line =
+        reservationLineRepository
+            .findById(request.getReservationLineId())
+            .orElseThrow(() -> new ResourceNotFoundException("Reservation line not found"));
+
+    // Verify the reservation belongs to the client
+    if (!line.getReservation().getClient().getId().equals(client.getId())) {
+      throw new ConflictException("This reservation doesn't belong to the authenticated client");
+    }
+
+    // If reservation is not in BUILDING status, don't allow changes
+    if (line.getReservation().getStatus() != ReservationStatus.BUILDING) {
+      throw new ConflictException("Cannot modify a reservation that is not in BUILDING status");
+    }
+
+    // Change quantity
+    Reservation updatedReservation =
+        reservationLineService.changeQuantity(line, request.getQuantity());
+    return new ReservationView(updatedReservation);
+  }
+
+  /**
+   * Validates the client token.
+   *
+   * @param token the authorization token from the request header.
+   * @return the validated client.
+   * @throws ResourceNotFoundException if the token is invalid or expired.
+   */
+  private Client validateClientToken(String token) {
+    Client client = authsService.isValidClientToken(token);
+    if (client == null) {
+      throw new ResourceNotFoundException("Token not valid, expired or user is not client");
+    }
+    return client;
   }
 }
