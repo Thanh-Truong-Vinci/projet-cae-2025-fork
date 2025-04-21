@@ -120,9 +120,6 @@ public class StatisticsService {
 
     // Initialiser les valeurs manquantes à zéro
     for (SalesStatisticsView stats : statisticsMap.values()) {
-      if (stats.getReceivedQuantity() == null) {
-        stats.setReceivedQuantity(0);
-      }
       if (stats.getSoldQuantity() == null) {
         stats.setSoldQuantity(0);
       }
