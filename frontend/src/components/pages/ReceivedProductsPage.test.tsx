@@ -5,7 +5,13 @@ import ReceivedProductsPage from './ReceivedProductsPage'
 import { UserContext } from '../../contexts/UserContext'
 import { ProductContext } from '../../contexts/ProductContext'
 import { BatchContext } from '../../contexts/BatchContext'
-import { UserContextType, ProductContextType, BatchContextType, Batch, ProductBatch } from '../../types'
+import {
+  UserContextType,
+  ProductContextType,
+  BatchContextType,
+  Batch,
+  ProductBatch,
+} from '../../types'
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom')
@@ -25,7 +31,7 @@ vi.mock('date-fns', async () => {
 
 describe('ReceivedProductsPage', () => {
   const navigateMock = vi.fn()
-  
+
   const mockProducts: ProductBatch[] = [
     {
       productId: 1,
@@ -54,9 +60,9 @@ describe('ReceivedProductsPage', () => {
       earliestProductionDate: '2024-01-02',
       batchIds: [3],
       batchQuantities: [80],
-    }
+    },
   ]
-  
+
   const mockReceivedBatches: Batch[] = [
     {
       id: 1,
@@ -99,11 +105,11 @@ describe('ReceivedProductsPage', () => {
       imageUrl: 'http://example.com/carottes.jpg',
       createdAt: '2024-01-02',
       producerId: 2,
-    }
+    },
   ]
-  
+
   const fetchReceivedBatchesMock = vi.fn().mockResolvedValue(undefined)
-  
+
   const mockUserContextValue = {
     authenticatedUser: {
       id: 1,
@@ -119,25 +125,27 @@ describe('ReceivedProductsPage', () => {
     clearUser: vi.fn(),
     authsMe: vi.fn(),
   } as unknown as UserContextType
-  
+
   const mockProductContextValue = {
     products: mockProducts,
     isLoading: false,
     error: null,
     fetchProducts: vi.fn(),
-    getProductById: vi.fn((id: number) => mockProducts.find(p => p.productId === id)),
+    getProductById: vi.fn((id: number) =>
+      mockProducts.find((p) => p.productId === id)
+    ),
     fetchAllProducts: vi.fn(),
     allProducts: [],
     loadingAllProducts: false,
   } as unknown as ProductContextType
-  
+
   const mockBatchContextValue = {
     receivedBatches: mockReceivedBatches,
     isLoading: false,
     error: null,
     fetchReceivedBatches: fetchReceivedBatchesMock,
   } as unknown as BatchContextType
-  
+
   beforeEach(() => {
     vi.clearAllMocks()
     vi.mocked(useNavigate).mockReturnValue(navigateMock)
@@ -160,18 +168,18 @@ describe('ReceivedProductsPage', () => {
       </MemoryRouter>
     )
   }
-  
+
   test('redirects to home when user is not authenticated', () => {
     const unauthenticatedContext = {
       ...mockUserContextValue,
       authenticatedUser: null,
     } as unknown as UserContextType
-    
+
     renderWithContexts(unauthenticatedContext)
 
     expect(navigateMock).toHaveBeenCalledWith('/')
   })
-  
+
   test('redirects to home when user is not a manager', () => {
     const nonManagerContext = {
       ...mockUserContextValue,
@@ -180,68 +188,74 @@ describe('ReceivedProductsPage', () => {
         role: 'Client',
       },
     } as unknown as UserContextType
-    
+
     renderWithContexts(nonManagerContext)
-    
+
     expect(navigateMock).toHaveBeenCalledWith('/')
   })
-  
+
   test('displays loading state when fetching data', () => {
     const loadingProductContext = {
       ...mockProductContextValue,
       isLoading: true,
     } as unknown as ProductContextType
-    
+
     renderWithContexts(mockUserContextValue, loadingProductContext)
-    
+
     expect(screen.getByRole('progressbar')).toBeTruthy()
   })
-  
+
   test('displays error state when product fetch fails', async () => {
     const errorProductContext = {
       ...mockProductContextValue,
       error: 'Failed to load products',
-      isLoading: false
+      isLoading: false,
     } as unknown as ProductContextType
-    
+
     renderWithContexts(mockUserContextValue, errorProductContext)
-    
+
     await waitFor(() => {
       expect(screen.getByText(/Failed to load products/i)).toBeTruthy()
     })
   })
-  
+
   test('displays error state when batch fetch fails', async () => {
     const errorBatchContext = {
       ...mockBatchContextValue,
       error: 'Failed to load batches',
-      isLoading: false
+      isLoading: false,
     } as unknown as BatchContextType
-    
-    renderWithContexts(mockUserContextValue, mockProductContextValue, errorBatchContext)
-    
+
+    renderWithContexts(
+      mockUserContextValue,
+      mockProductContextValue,
+      errorBatchContext
+    )
+
     await waitFor(() => {
       expect(screen.getByText(/Failed to load batches/i)).toBeTruthy()
     })
   })
-  
+
   test('displays empty state when no products are available', async () => {
     const emptyProductContext = {
       ...mockProductContextValue,
       products: [],
-      isLoading: false
+      isLoading: false,
     } as unknown as ProductContextType
-    
+
     renderWithContexts(mockUserContextValue, emptyProductContext)
-    
+
     await waitFor(() => {
-      expect(screen.getByText(/Aucun produit reçu disponible actuellement/i)).toBeTruthy()
+      expect(
+        screen.getByText(/Aucun produit reçu disponible actuellement/i)
+      ).toBeTruthy()
     })
   })
-  
+
   test('displays product cards with correct information', async () => {
     renderWithContexts()
-    
+
     await waitFor(() => {
       expect(screen.getByText('Pommes')).toBeTruthy()
       expect(screen.getByText('Carottes')).toBeTruthy()
@@ -253,54 +267,54 @@ describe('ReceivedProductsPage', () => {
       expect(screen.getByText('Carottes fraîches')).toBeTruthy()
     })
   })
-  
+
   test('calculates total stock correctly', async () => {
     renderWithContexts()
-    
+
     await waitFor(() => {
       expect(screen.getByText('100 en stock')).toBeTruthy()
       expect(screen.getByText('80 en stock')).toBeTruthy()
     })
   })
-  
+
   test('displays batch details in table', async () => {
     renderWithContexts()
-    
+
     await waitFor(() => {
       const dateHeaders = screen.getAllByText('Date réception')
       expect(dateHeaders.length).toBeGreaterThan(0)
-      
+
       const producerHeaders = screen.getAllByText('Producteur')
       expect(producerHeaders.length).toBeGreaterThan(0)
-      
+
       const quantityHeaders = screen.getAllByText('Quantité')
       expect(quantityHeaders.length).toBeGreaterThan(0)
-      
+
       const priceHeaders = screen.getAllByText('Prix')
       expect(priceHeaders.length).toBeGreaterThan(0)
-      
+
       const unitHeaders = screen.getAllByText('Unité')
       expect(unitHeaders.length).toBeGreaterThan(0)
-      
+
       expect(screen.getAllByText('Ferme Bio').length).toBeGreaterThan(0)
       expect(screen.getByText('Ferme Verte')).toBeTruthy()
-    
+
       expect(screen.getAllByText('50').length).toBeGreaterThan(0)
       expect(screen.getByText('80')).toBeTruthy()
     })
   })
-  
+
   test('fetches received batches on component mount', async () => {
     renderWithContexts()
-    
+
     expect(fetchReceivedBatchesMock).toHaveBeenCalledTimes(1)
   })
-  
+
   test('throws error when ProductContext is null', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-    
+
     // Attempt to render with null ProductContext
-    expect(() => 
+    expect(() =>
       render(
         <MemoryRouter>
           <UserContext.Provider value={mockUserContextValue}>
@@ -313,15 +327,15 @@ describe('ReceivedProductsPage', () => {
         </MemoryRouter>
       )
     ).toThrow()
-    
+
     // Restore console.error
     errorSpy.mockRestore()
   })
-  
+
   test('throws error when BatchContext is null', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-    
-    expect(() => 
+
+    expect(() =>
       render(
         <MemoryRouter>
           <UserContext.Provider value={mockUserContextValue}>
@@ -334,26 +348,26 @@ describe('ReceivedProductsPage', () => {
         </MemoryRouter>
       )
     ).toThrow()
-    
+
     errorSpy.mockRestore()
   })
-  
+
   test('handles missing product description gracefully', async () => {
     const productsWithMissingDescription = [
       {
         ...mockProducts[0],
         description: undefined,
-      }
+      },
     ]
-    
+
     const customProductContext = {
       ...mockProductContextValue,
       products: productsWithMissingDescription,
-      isLoading: false
+      isLoading: false,
     } as unknown as ProductContextType
-    
+
     renderWithContexts(mockUserContextValue, customProductContext)
-    
+
     await waitFor(() => {
       expect(screen.getByText('Aucune description disponible.')).toBeTruthy()
     })
