@@ -43,7 +43,17 @@ vi.mock('@mui/material', async () => {
     DialogActions: ({ children }: { children: ReactNode }) => (
       <div data-testid="mock-dialog-actions">{children}</div>
     ),
-    TextField: ({ label, onChange, value, ...props }: { label?: string; onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; value?: string; [key: string]: unknown }) => (
+    TextField: ({
+      label,
+      onChange,
+      value,
+      ...props
+    }: {
+      label?: string
+      onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
+      value?: string
+      [key: string]: unknown
+    }) => (
       <input
         data-testid="mock-text-field"
         aria-label={label}

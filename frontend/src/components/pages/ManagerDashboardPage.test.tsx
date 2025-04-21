@@ -33,7 +33,9 @@ vi.mock('@mui/material', async () => {
     CircularProgress: () => (
       <div data-testid="mock-circular-progress">Loading...</div>
     ),
-    Tabs: ({ children }: { children: ReactNode }) => <div data-testid="mock-tabs">{children}</div>,
+    Tabs: ({ children }: { children: ReactNode }) => (
+      <div data-testid="mock-tabs">{children}</div>
+    ),
     Tab: ({ label }: { label?: string }) => (
       <div
         data-testid={`mock-tab-${label?.replace(/\s+/g, '-').toLowerCase()}`}
@@ -44,11 +46,16 @@ vi.mock('@mui/material', async () => {
     TableContainer: ({ children }: { children: ReactNode }) => (
       <div data-testid="mock-table-container">{children}</div>
     ),
-    Select: ({ children, onChange, value, disabled }: { 
-      children: ReactNode; 
-      onChange?: React.ChangeEventHandler<HTMLSelectElement>; 
-      value?: string | number;
-      disabled?: boolean;
+    Select: ({
+      children,
+      onChange,
+      value,
+      disabled,
+    }: {
+      children: ReactNode
+      onChange?: React.ChangeEventHandler<HTMLSelectElement>
+      value?: string | number
+      disabled?: boolean
     }) => (
       <select
         data-testid="mock-select"
@@ -59,9 +66,13 @@ vi.mock('@mui/material', async () => {
         {children}
       </select>
     ),
-    MenuItem: ({ children, value }: { children: ReactNode; value: string | number }) => (
-      <option value={value}>{children}</option>
-    ),
+    MenuItem: ({
+      children,
+      value,
+    }: {
+      children: ReactNode
+      value: string | number
+    }) => <option value={value}>{children}</option>,
     Alert: ({
       severity,
       children,
