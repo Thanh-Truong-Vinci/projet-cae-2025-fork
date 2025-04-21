@@ -15,17 +15,17 @@ declare module '../../types' {
 // Créer un type pour le contexte basé sur ce qui est utilisé dans l'application
 type BatchContextType = {
   pendingBatches: PendingBatch[]
-  myBatches: any[]
-  approvedBatches: any[]
-  receivedBatches: any[]
+  myBatches: Batch[]
+  approvedBatches: Batch[]
+  receivedBatches: Batch[]
   isLoading: boolean
   error: string | null
   fetchPendingBatches: () => Promise<void>
   fetchMyBatches: () => Promise<void>
   fetchApprovedBatches: () => Promise<void>
   fetchReceivedBatches: () => Promise<Batch[]>
-  createBatch: (newBatch: any, image: any) => Promise<void>
-  updateBatch: (id: number, batch: any) => Promise<void>
+  createBatch: (newBatch: Partial<Batch>, image: File) => Promise<void>
+  updateBatch: (id: number, batch: Partial<Batch>) => Promise<void>
   deleteBatch: (id: number) => Promise<void>
   acceptBatch: (id: number) => Promise<void>
   rejectBatch: (id: number, reason: string) => Promise<void>
@@ -33,14 +33,14 @@ type BatchContextType = {
   // Propriétés manquantes
   receiveBatch: (id: number) => Promise<Batch | null>
   createBatchWithExistingProduct: (
-    newBatch: any,
+    newBatch: Partial<Batch>,
     productId: number
   ) => Promise<void>
   createBatchWithExistingImage: (
-    newBatch: any,
+    newBatch: Partial<Batch>,
     photoId: number
   ) => Promise<void>
-  updateBatchImage: (id: number, image: any) => Promise<Batch | null>
+  updateBatchImage: (id: number, image: File) => Promise<Batch | null>
   updateBatchImageById: (id: number, imageId: number) => Promise<Batch | null>
 }
 
@@ -85,7 +85,7 @@ vi.mock('@mui/material', async () => {
     DialogActions: ({ children }: { children: ReactNode }) => (
       <div data-testid="mock-dialog-actions">{children}</div>
     ),
-    TextField: ({ label, onChange, value, ...props }: any) => (
+    TextField: ({ label, onChange, value, ...props }: { label?: string; onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; value?: string; [key: string]: unknown }) => (
       <input
         data-testid="mock-text-field"
         aria-label={label}

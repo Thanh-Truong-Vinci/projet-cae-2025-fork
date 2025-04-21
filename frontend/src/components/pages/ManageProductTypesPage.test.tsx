@@ -43,7 +43,7 @@ vi.mock('@mui/material', async () => {
     DialogActions: ({ children }: { children: ReactNode }) => (
       <div data-testid="mock-dialog-actions">{children}</div>
     ),
-    TextField: ({ label, onChange, value, ...props }: any) => (
+    TextField: ({ label, onChange, value, ...props }: { label?: string; onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; value?: string; [key: string]: unknown }) => (
       <input
         data-testid="mock-text-field"
         aria-label={label}
@@ -147,7 +147,7 @@ describe('ManageProductTypesPage', () => {
   })
 
   test("redirige vers la page d'accueil si l'utilisateur n'est pas authentifié", async () => {
-    renderWithContexts({} as any) // utilisateur vide → déclenche le if dans useEffect
+    renderWithContexts({} as MaybeAuthenticatedUser) // utilisateur vide → déclenche le if dans useEffect
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith('/')
     })
