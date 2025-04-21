@@ -12,7 +12,6 @@ import be.vinci.ipl.cae.demo.repositories.PhotoRepository;
 import be.vinci.ipl.cae.demo.repositories.ProductRepository;
 import be.vinci.ipl.cae.demo.repositories.ProductTypeRepository;
 
-import org.checkerframework.checker.units.qual.t;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
