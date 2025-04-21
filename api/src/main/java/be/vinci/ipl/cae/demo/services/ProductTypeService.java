@@ -69,7 +69,6 @@ public class ProductTypeService {
    * @param id the ID of the product type
    * @return the product type with the specified ID, or null if not found
    */
-  // TODO verify if is necessary (maybe we can get this by his title)
   public ProductType getProductTypeById(long id) {
     return productTypeRepository.findById(id).orElse(null);
   }

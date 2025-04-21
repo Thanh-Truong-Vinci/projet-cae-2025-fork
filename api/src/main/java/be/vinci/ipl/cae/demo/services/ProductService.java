@@ -61,7 +61,6 @@ public class ProductService {
    * @param newProduct les informations du nouveau produit
    * @return le produit créé et sauvegardé
    */
-  // TODO review this methode
   public Product createProduct(NewProduct newProduct) {
     Product product = new Product();
     product.setName(newProduct.getName());
@@ -84,8 +83,6 @@ public class ProductService {
 
     return productRepository.save(product);
   }
-
-  // TODO addProduct
 
   /**
    * Retrieves a list of products based on search criteria and type.

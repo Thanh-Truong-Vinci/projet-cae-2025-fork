@@ -47,7 +47,6 @@ public class ProductTypeController {
    * @param id l'identifiant du type de produit
    * @return le type de produit correspondant
    */
-  // TODO is realy necessary, we can do it by title
   @GetMapping("/{id}")
   public ProductType getProductTypeById(@PathVariable long id) {
     ProductType productType = productTypeService.getProductTypeById(id);
@@ -66,7 +65,6 @@ public class ProductTypeController {
   @PostMapping({"", "/"})
   @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
   public ProductType createProductType(@RequestBody NewProductType newProductType) {
-    // TODO verify token if is a manager
     if (newProductType == null
         || newProductType.getTitle() == null
         || newProductType.getTitle().isBlank()) {
@@ -85,7 +83,6 @@ public class ProductTypeController {
   @DeleteMapping("/{id}")
   @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
   public void deleteProductType(@PathVariable long id) {
-    // TODO verify token if is a manager
 
     // Check if product type exists before deletion
     ProductType productType = productTypeService.getProductTypeById(id);

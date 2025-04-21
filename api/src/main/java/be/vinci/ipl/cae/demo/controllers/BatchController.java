@@ -207,7 +207,6 @@ public class BatchController {
    */
   @GetMapping({"", "/"})
   public Iterable<Batch> getAllBatches() {
-    // TODO verify token if is a manager
     return batchService.getAllBatches();
   }
 
@@ -219,7 +218,6 @@ public class BatchController {
    */
   @GetMapping("/{id}")
   public Batch getBatchById(@PathVariable long id) {
-    // TODO verify token if is a manager or owner of the batch producer
     Batch batch = batchService.getBatchById(id);
     if (batch == null) {
       throw new ResourceNotFoundException("Lot non trouvé");
