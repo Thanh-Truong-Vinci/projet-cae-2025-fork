@@ -345,9 +345,6 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
 
       if (response.status >= 200 && response.status < 300) {
         const clearedReservation: ReservationView = response.data
-        setReservations((prev) =>
-          prev.filter((res) => res.id !== clearedReservation.id)
-        )
         return clearedReservation
       } else {
         throw new Error(
@@ -375,7 +372,7 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
   const changeReservationLineQuantity = async (
     lineId: number,
     quantity: number
-  ): Promise<void> => {
+  ): Promise<ReservationView> => {
     setIsLoading(true)
     setError(null)
 
@@ -398,9 +395,8 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
       )
 
       if (response.status >= 200 && response.status < 300) {
-        console.log('Quantité de la ligne mise à jour avec succès')
-        // Refresh reservations
-        await fetchReservations()
+        const updatedReservation: ReservationView = response.data
+        return updatedReservation
       } else {
         throw new Error(
           `Erreur lors de la mise à jour de la quantité de la ligne: ${response.status}`

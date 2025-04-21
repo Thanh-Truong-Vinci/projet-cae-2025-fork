@@ -6,6 +6,7 @@ import be.vinci.ipl.cae.demo.models.dtos.ChangeQuantityRequest;
 import be.vinci.ipl.cae.demo.models.dtos.ReservationRequest;
 import be.vinci.ipl.cae.demo.models.dtos.views.ReservationView;
 import be.vinci.ipl.cae.demo.models.entities.Client;
+import be.vinci.ipl.cae.demo.models.entities.Reservation;
 import be.vinci.ipl.cae.demo.models.entities.ReservationLine;
 import be.vinci.ipl.cae.demo.models.entities.ReservationStatus;
 import be.vinci.ipl.cae.demo.repositories.ReservationLineRepository;
@@ -203,7 +204,7 @@ public class ReservationController {
    *     found
    */
   @PostMapping("/changeQuantity")
-  public void changeQuantity(
+  public ReservationView changeQuantity(
       @RequestBody ChangeQuantityRequest request, @RequestHeader("Authorization") String token) {
     Client client = authsService.isValidClientToken(token);
     if (client == null) {
@@ -231,7 +232,8 @@ public class ReservationController {
     }
 
     // Change quantity
-    reservationLineService.changeQuantity(line, request.getQuantity());
+    Reservation updatedReservation = reservationLineService.changeQuantity(line, request.getQuantity());
+    return new ReservationView(updatedReservation);
   }
 
   /**

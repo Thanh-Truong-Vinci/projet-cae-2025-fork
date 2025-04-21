@@ -280,7 +280,7 @@ export interface ReservationContextType {
   changeReservationLineQuantity: (
     lineId: number,
     quantity: number
-  ) => Promise<void>
+  ) => Promise<ReservationView>
 }
 
 export interface SalesStatistics {

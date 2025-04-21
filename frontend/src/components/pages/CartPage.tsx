@@ -121,7 +121,7 @@ const CartPage = () => {
       if (isNaN(value) || value < 0 ) return
 
       if (reservation && reservationContext.changeReservationLineQuantity) {
-        await reservationContext.changeReservationLineQuantity(id, value)
+        setReservation(await reservationContext.changeReservationLineQuantity(id, value) ?? null)
         forceRefresh()
       }
     } catch (error) {

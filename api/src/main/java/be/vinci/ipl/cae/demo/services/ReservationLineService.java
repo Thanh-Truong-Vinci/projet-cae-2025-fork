@@ -111,22 +111,20 @@ public class ReservationLineService {
    * @param reservationLine the reservation line to change
    * @param newQuantity the new quantity for the reservation line
    */
-  public void changeQuantity(ReservationLine reservationLine, int newQuantity) {
+  public Reservation changeQuantity(ReservationLine reservationLine, int newQuantity) {
+    if (newQuantity == 0) {
+      deleteReservationLine(reservationLine);
+      return reservationLine.getReservation();
+    }
     // update batch available quantity
     int quantityDifference = reservationLine.getQuantity() - newQuantity;
     Batch batch = reservationLine.getBatch();
     batch.setAvailableQuantity(batch.getAvailableQuantity() + quantityDifference);
     batchRepository.save(batch);
 
-    // If quantity is 0, delete the line instead of updating it
-    if (newQuantity == 0) {
-      deleteReservationLine(reservationLine);
-      reservationRepository.save(reservationLine.getReservation());
-      return;
-    }
-
     reservationLine.setQuantity(newQuantity);
     reservationLineRepository.save(reservationLine);
+    return reservationLine.getReservation();
   }
 
   /**
@@ -141,6 +139,8 @@ public class ReservationLineService {
     batchRepository.save(batch);
 
     // delete the line it self and delete from reservation and return
+    reservationLine.getReservation().getReservationLines().remove(reservationLine);
+    reservationRepository.save(reservationLine.getReservation());
     reservationLineRepository.delete(reservationLine);
   }
 }

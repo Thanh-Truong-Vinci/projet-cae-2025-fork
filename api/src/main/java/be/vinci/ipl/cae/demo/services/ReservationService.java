@@ -142,7 +142,6 @@ public class ReservationService {
       reservationLineService.deleteReservationLine(line);
     }
     reservationRepository.delete(reservation);
-    reservation.setReservationLines(List.of()); // Clear lines for the returned object
     return reservation;
   }
 }
