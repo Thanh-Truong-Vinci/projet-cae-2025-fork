@@ -5,7 +5,12 @@ import VolunteerHomePage from './VolunteerHomePage'
 import { UserContext } from '../../contexts/UserContext'
 import { BatchContext } from '../../contexts/BatchContext'
 import { ReservationContext } from '../../contexts/ReservationContext'
-import { ReservationStatus, UserContextType, BatchContextType, ReservationContextType } from '../../types'
+import {
+  ReservationStatus,
+  UserContextType,
+  BatchContextType,
+  ReservationContextType,
+} from '../../types'
 import React from 'react'
 
 vi.mock('react-router-dom', async () => {
@@ -26,7 +31,7 @@ vi.mock('date-fns', async () => {
 
 describe('VolunteerHomePage', () => {
   const navigateMock = vi.fn()
-  
+
   const mockApprovedBatches = [
     {
       id: 1,
@@ -40,7 +45,7 @@ describe('VolunteerHomePage', () => {
       producerId: 1,
       createdAt: '2024-01-01',
       status: 'APPROVED',
-    }
+    },
   ]
 
   const mockReservations = [
@@ -59,11 +64,11 @@ describe('VolunteerHomePage', () => {
           productName: 'Test Product',
           unitPrice: 12.5,
           imageLocation: 'https://example.com/image.jpg',
-        }
-      ]
-    }
+        },
+      ],
+    },
   ]
-  
+
   const receiveBatchMock = vi.fn()
   const fetchAllReservationsMock = vi.fn()
   const toConfirmReservationMock = vi.fn()
@@ -85,7 +90,7 @@ describe('VolunteerHomePage', () => {
     registerProducer: vi.fn(),
     changePassword: vi.fn(),
   } as unknown as UserContextType
-  
+
   const mockBatchContextValue = {
     myBatches: [],
     pendingBatches: [],
@@ -107,7 +112,7 @@ describe('VolunteerHomePage', () => {
     receiveBatch: receiveBatchMock,
     setBatchError: vi.fn(),
   } as unknown as BatchContextType
-  
+
   const mockReservationContextValue = {
     reservations: mockReservations,
     isLoading: false,
@@ -122,7 +127,7 @@ describe('VolunteerHomePage', () => {
     toCompletedReservation: vi.fn(),
     toCancelledReservation: vi.fn(),
   } as unknown as ReservationContextType
-  
+
   beforeEach(() => {
     vi.clearAllMocks()
     vi.mocked(useNavigate).mockReturnValue(navigateMock)
@@ -145,18 +150,18 @@ describe('VolunteerHomePage', () => {
       </MemoryRouter>
     )
   }
-  
+
   test('redirects to home when not authenticated', () => {
     const unauthenticatedContext = {
       ...mockUserContextValue,
       authenticatedUser: null,
     } as unknown as UserContextType
-    
+
     renderWithContexts(unauthenticatedContext)
 
     expect(navigateMock).toHaveBeenCalledWith('/')
   })
-  
+
   test('redirects to home when authenticated but not as volunteer', () => {
     const nonVolunteerContext = {
       ...mockUserContextValue,
@@ -165,46 +170,48 @@ describe('VolunteerHomePage', () => {
         role: 'Client',
       },
     } as unknown as UserContextType
-    
+
     renderWithContexts(nonVolunteerContext)
 
     expect(navigateMock).toHaveBeenCalledWith('/')
   })
-  
+
   test('displays loading state when fetching data', () => {
     const loadingBatchContext = {
       ...mockBatchContextValue,
       isLoading: true,
     } as unknown as BatchContextType
-    
+
     renderWithContexts(mockUserContextValue, loadingBatchContext)
 
     const loadingIndicators = screen.getAllByRole('progressbar')
     expect(loadingIndicators.length).toBeGreaterThan(0)
   })
-  
+
   test('displays error state when fetch fails', () => {
     const errorBatchContext = {
       ...mockBatchContextValue,
       error: 'Failed to load data',
     } as unknown as BatchContextType
-    
+
     renderWithContexts(mockUserContextValue, errorBatchContext)
     const errorMessages = screen.getAllByText('Failed to load data')
     expect(errorMessages.length).toBeGreaterThan(0)
   })
-  
+
   test('displays empty state when no approved batches', () => {
     const emptyBatchContext = {
       ...mockBatchContextValue,
       approvedBatches: [],
     } as unknown as BatchContextType
-    
+
     renderWithContexts(mockUserContextValue, emptyBatchContext)
 
-    expect(screen.getByText('Aucun lot approuvé à recevoir pour le moment.')).toBeTruthy()
+    expect(
+      screen.getByText('Aucun lot approuvé à recevoir pour le moment.')
+    ).toBeTruthy()
   })
-  
+
   test('displays approved batches correctly', () => {
     renderWithContexts()
 
@@ -216,7 +223,7 @@ describe('VolunteerHomePage', () => {
     const receiveButton = screen.getByText('Recevoir')
     expect(receiveButton).toBeTruthy()
   })
-  
+
   test('opens confirmation dialog when receive button is clicked', () => {
     renderWithContexts()
 
@@ -224,16 +231,18 @@ describe('VolunteerHomePage', () => {
     fireEvent.click(receiveButton)
 
     expect(screen.getByText('Confirmer la réception')).toBeTruthy()
-    expect(screen.getByText(/Êtes-vous sûr de vouloir marquer ce lot comme reçu/)).toBeTruthy()
+    expect(
+      screen.getByText(/Êtes-vous sûr de vouloir marquer ce lot comme reçu/)
+    ).toBeTruthy()
 
     expect(screen.getByText('Annuler')).toBeTruthy()
     const confirmDialogButton = screen.getAllByText('Confirmer')[1]
     expect(confirmDialogButton).toBeTruthy()
   })
-  
+
   test('calls receiveBatch when confirm dialog button is clicked', async () => {
     receiveBatchMock.mockResolvedValue(undefined)
-    
+
     renderWithContexts()
 
     const receiveButton = screen.getByText('Recevoir')
@@ -248,10 +257,10 @@ describe('VolunteerHomePage', () => {
       expect(screen.getByText('Lot marqué comme reçu avec succès')).toBeTruthy()
     })
   })
-  
+
   test('shows error message when receiveBatch fails', async () => {
     receiveBatchMock.mockRejectedValue(new Error('Failed to receive batch'))
-    
+
     renderWithContexts()
 
     const receiveButton = screen.getByText('Recevoir')
@@ -264,10 +273,10 @@ describe('VolunteerHomePage', () => {
       expect(screen.getByText('Failed to receive batch')).toBeTruthy()
     })
   })
-  
+
   test('calls toConfirmReservation when reservation confirmation button is clicked', async () => {
     toConfirmReservationMock.mockResolvedValue(undefined)
-    
+
     renderWithContexts()
 
     const confirmReservationButton = screen.getAllByText('Confirmer')[0]
@@ -279,10 +288,12 @@ describe('VolunteerHomePage', () => {
       expect(screen.getByText('Réservation confirmée avec succès')).toBeTruthy()
     })
   })
-  
+
   test('shows error message when toConfirmReservation fails', async () => {
-    toConfirmReservationMock.mockRejectedValue(new Error('Failed to confirm reservation'))
-    
+    toConfirmReservationMock.mockRejectedValue(
+      new Error('Failed to confirm reservation')
+    )
+
     renderWithContexts()
 
     const confirmReservationButton = screen.getAllByText('Confirmer')[0]
@@ -292,7 +303,7 @@ describe('VolunteerHomePage', () => {
       expect(screen.getByText('Failed to confirm reservation')).toBeTruthy()
     })
   })
-  
+
   test('toggles reservation details when details button is clicked', () => {
     renderWithContexts()
 
@@ -317,8 +328,8 @@ describe('VolunteerHomePage', () => {
 
     expect(screen.queryByText('Lignes de réservation')).toBeNull()
   })
-  
-  test('closes dialog when cancel button is clicked', async () => { 
+
+  test('closes dialog when cancel button is clicked', async () => {
     renderWithContexts()
 
     const receiveButton = screen.getByText('Recevoir')
@@ -340,8 +351,12 @@ describe('VolunteerHomePage', () => {
       ...mockReservationContextValue,
       reservations: [],
     } as unknown as ReservationContextType
-    
-    renderWithContexts(mockUserContextValue, mockBatchContextValue, emptyReservationsContext)
+
+    renderWithContexts(
+      mockUserContextValue,
+      mockBatchContextValue,
+      emptyReservationsContext
+    )
     expect(screen.getByText('0')).toBeTruthy()
   })
 
@@ -349,25 +364,25 @@ describe('VolunteerHomePage', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     const mockReceiveBatchWithCheck = vi.fn().mockImplementation((batchId) => {
       if (batchId === null) {
-        return Promise.reject(new Error('Invalid batch ID'));
+        return Promise.reject(new Error('Invalid batch ID'))
       }
-      return Promise.resolve();
-    });
-    
+      return Promise.resolve()
+    })
+
     const customBatchContext = {
       ...mockBatchContextValue,
       receiveBatch: mockReceiveBatchWithCheck,
-    } as unknown as BatchContextType;
-    
+    } as unknown as BatchContextType
+
     renderWithContexts(mockUserContextValue, customBatchContext)
     try {
-      await mockReceiveBatchWithCheck(null);
-      expect('Promise should have been rejected').toBe(false);
+      await mockReceiveBatchWithCheck(null)
+      expect('Promise should have been rejected').toBe(false)
     } catch (error) {
       if (error instanceof Error) {
-        expect(error.message).toBe('Invalid batch ID');
+        expect(error.message).toBe('Invalid batch ID')
       } else {
-        fail('Expected error to be an instance of Error');
+        fail('Expected error to be an instance of Error')
       }
     }
     consoleSpy.mockRestore()
@@ -376,12 +391,14 @@ describe('VolunteerHomePage', () => {
   test('throws error when ReservationContext is null', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
-    expect(() => 
+    expect(() =>
       render(
         <MemoryRouter>
           <UserContext.Provider value={mockUserContextValue}>
             <BatchContext.Provider value={mockBatchContextValue}>
-              <ReservationContext.Provider value={null as any}>
+              <ReservationContext.Provider
+                value={null as unknown as ReservationContextType}
+              >
                 <VolunteerHomePage />
               </ReservationContext.Provider>
             </BatchContext.Provider>
@@ -389,7 +406,7 @@ describe('VolunteerHomePage', () => {
         </MemoryRouter>
       )
     ).toThrow('ReservationContext must be used within a ReservationProvider')
-    
+
     // Restore console.error
     errorSpy.mockRestore()
   })
@@ -397,11 +414,11 @@ describe('VolunteerHomePage', () => {
   test('throws error when BatchContext is null', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
-    expect(() => 
+    expect(() =>
       render(
         <MemoryRouter>
           <UserContext.Provider value={mockUserContextValue}>
-            <BatchContext.Provider value={null as any}>
+            <BatchContext.Provider value={null as unknown as BatchContextType}>
               <ReservationContext.Provider value={mockReservationContextValue}>
                 <VolunteerHomePage />
               </ReservationContext.Provider>
@@ -415,7 +432,7 @@ describe('VolunteerHomePage', () => {
   })
 
   test('renders correctly with both batch and reservation errors', () => {
-    const errorMessage = 'Batch error message';
+    const errorMessage = 'Batch error message'
     const errorContext = {
       ...mockBatchContextValue,
       error: errorMessage,
@@ -425,17 +442,23 @@ describe('VolunteerHomePage', () => {
       ...mockReservationContextValue,
       error: 'Reservation error message',
     } as unknown as ReservationContextType
-    
-    renderWithContexts(mockUserContextValue, errorContext, errorReservationContext)
 
-    const errorElements = screen.getAllByText(errorMessage);
-    expect(errorElements.length).toBeGreaterThan(1);
+    renderWithContexts(
+      mockUserContextValue,
+      errorContext,
+      errorReservationContext
+    )
 
-    const batchSection = screen.getByText('Lots à recevoir').closest('div');
-    const reservationSection = screen.getByText('Réservations en attente').closest('div');
-    
-    expect(batchSection?.textContent).toContain(errorMessage);
-    expect(reservationSection?.textContent).toContain(errorMessage);
+    const errorElements = screen.getAllByText(errorMessage)
+    expect(errorElements.length).toBeGreaterThan(1)
+
+    const batchSection = screen.getByText('Lots à recevoir').closest('div')
+    const reservationSection = screen
+      .getByText('Réservations en attente')
+      .closest('div')
+
+    expect(batchSection?.textContent).toContain(errorMessage)
+    expect(reservationSection?.textContent).toContain(errorMessage)
   })
 
   test('handles empty state for both batches and reservations', () => {
@@ -448,99 +471,109 @@ describe('VolunteerHomePage', () => {
       ...mockReservationContextValue,
       reservations: [],
     } as unknown as ReservationContextType
-    
-    renderWithContexts(mockUserContextValue, emptyContext, emptyReservationContext)
-    expect(screen.getByText('Aucun lot approuvé à recevoir pour le moment.')).toBeTruthy()
+
+    renderWithContexts(
+      mockUserContextValue,
+      emptyContext,
+      emptyReservationContext
+    )
+    expect(
+      screen.getByText('Aucun lot approuvé à recevoir pour le moment.')
+    ).toBeTruthy()
     expect(screen.getByText('0')).toBeTruthy()
   })
 
   test('directly tests the handleReceiveClick function', () => {
-    vi.spyOn(React, 'useState').mockImplementationOnce(() => [false, vi.fn()]);
-    vi.spyOn(React, 'useState').mockImplementationOnce(() => [null, vi.fn()]);
-    
-    renderWithContexts();
+    vi.spyOn(React, 'useState').mockImplementationOnce(() => [false, vi.fn()])
+    vi.spyOn(React, 'useState').mockImplementationOnce(() => [null, vi.fn()])
 
-    const receiveButton = screen.getByText('Recevoir');
-    fireEvent.click(receiveButton);
+    renderWithContexts()
 
-    expect(screen.getByText('Confirmer la réception')).toBeTruthy();
+    const receiveButton = screen.getByText('Recevoir')
+    fireEvent.click(receiveButton)
 
-  });
+    expect(screen.getByText('Confirmer la réception')).toBeTruthy()
+  })
 
   test('handles unexpected error format during batch reception', async () => {
-    receiveBatchMock.mockRejectedValue('Unexpected error format');
-    
-    renderWithContexts();
+    receiveBatchMock.mockRejectedValue('Unexpected error format')
 
-    const receiveButton = screen.getByText('Recevoir');
-    fireEvent.click(receiveButton);
+    renderWithContexts()
 
-    const confirmDialogButton = screen.getAllByText('Confirmer')[1];
-    fireEvent.click(confirmDialogButton);
+    const receiveButton = screen.getByText('Recevoir')
+    fireEvent.click(receiveButton)
+
+    const confirmDialogButton = screen.getAllByText('Confirmer')[1]
+    fireEvent.click(confirmDialogButton)
 
     await waitFor(() => {
-      expect(screen.getByText('Erreur lors de la réception du lot')).toBeTruthy();
-    });
-  });
+      expect(
+        screen.getByText('Erreur lors de la réception du lot')
+      ).toBeTruthy()
+    })
+  })
 
   test('handles unexpected error format during reservation confirmation', async () => {
-    toConfirmReservationMock.mockRejectedValue('Unexpected error format');
-    
-    renderWithContexts();
+    toConfirmReservationMock.mockRejectedValue('Unexpected error format')
 
-    const confirmReservationButton = screen.getAllByText('Confirmer')[0];
-    fireEvent.click(confirmReservationButton);
+    renderWithContexts()
+
+    const confirmReservationButton = screen.getAllByText('Confirmer')[0]
+    fireEvent.click(confirmReservationButton)
 
     await waitFor(() => {
-      expect(screen.getByText('Erreur lors de la confirmation de la réservation')).toBeTruthy();
-    });
-  });
+      expect(
+        screen.getByText('Erreur lors de la confirmation de la réservation')
+      ).toBeTruthy()
+    })
+  })
 
   test('verifies snackbar message appears after successful action', async () => {
-    receiveBatchMock.mockResolvedValue(undefined);
+    receiveBatchMock.mockResolvedValue(undefined)
 
-    const { getByText } = renderWithContexts();
+    const { getByText } = renderWithContexts()
 
-    const receiveButton = getByText('Recevoir');
-    fireEvent.click(receiveButton);
-    
-    const confirmButton = screen.getAllByText('Confirmer')[1];
-    fireEvent.click(confirmButton);
+    const receiveButton = getByText('Recevoir')
+    fireEvent.click(receiveButton)
+
+    const confirmButton = screen.getAllByText('Confirmer')[1]
+    fireEvent.click(confirmButton)
 
     await waitFor(() => {
-      expect(screen.getByText('Lot marqué comme reçu avec succès')).toBeTruthy();
-    });
-
-  });
+      expect(screen.getByText('Lot marqué comme reçu avec succès')).toBeTruthy()
+    })
+  })
 
   test('verifies snackbar message disappears after timeout', async () => {
-    receiveBatchMock.mockResolvedValue(undefined);
+    receiveBatchMock.mockResolvedValue(undefined)
 
-    renderWithContexts();
+    renderWithContexts()
 
-    const receiveButton = screen.getByText('Recevoir');
-    fireEvent.click(receiveButton);
-    
-    const confirmButton = screen.getAllByText('Confirmer')[1];
-    fireEvent.click(confirmButton);
+    const receiveButton = screen.getByText('Recevoir')
+    fireEvent.click(receiveButton)
+
+    const confirmButton = screen.getAllByText('Confirmer')[1]
+    fireEvent.click(confirmButton)
 
     await waitFor(() => {
-      expect(screen.getByText('Lot marqué comme reçu avec succès')).toBeTruthy();
-    });
+      expect(screen.getByText('Lot marqué comme reçu avec succès')).toBeTruthy()
+    })
 
     const closeSnackbar = () => {
-      const successMessage = screen.queryByText('Lot marqué comme reçu avec succès');
+      const successMessage = screen.queryByText(
+        'Lot marqué comme reçu avec succès'
+      )
       if (successMessage && successMessage.parentElement) {
-        successMessage.parentElement.remove();
+        successMessage.parentElement.remove()
       }
-    };
+    }
 
-    closeSnackbar();
+    closeSnackbar()
 
     await waitFor(() => {
-      expect(screen.queryByText('Lot marqué comme reçu avec succès')).toBeNull();
-    });
-  });
+      expect(screen.queryByText('Lot marqué comme reçu avec succès')).toBeNull()
+    })
+  })
 
   test('handles all edge cases of reservation display', () => {
     const specialReservationContext = {
@@ -549,15 +582,19 @@ describe('VolunteerHomePage', () => {
         {
           ...mockReservations[0],
           status: ReservationStatus.CONFIRMED,
-        }
+        },
       ],
-    } as unknown as ReservationContextType;
-    
-    renderWithContexts(mockUserContextValue, mockBatchContextValue, specialReservationContext);
+    } as unknown as ReservationContextType
 
-    expect(screen.getByText('Lots à recevoir')).toBeTruthy();
-    expect(screen.getByText('Réservations en attente')).toBeTruthy();
-  });
+    renderWithContexts(
+      mockUserContextValue,
+      mockBatchContextValue,
+      specialReservationContext
+    )
+
+    expect(screen.getByText('Lots à recevoir')).toBeTruthy()
+    expect(screen.getByText('Réservations en attente')).toBeTruthy()
+  })
 
   test('renders reservation with empty reservationLines', () => {
     const emptyLinesReservationContext = {
@@ -565,69 +602,74 @@ describe('VolunteerHomePage', () => {
       reservations: [
         {
           ...mockReservations[0],
-          reservationLines: []
-        }
+          reservationLines: [],
+        },
       ],
-    } as unknown as ReservationContextType;
-    
-    renderWithContexts(mockUserContextValue, mockBatchContextValue, emptyLinesReservationContext);
+    } as unknown as ReservationContextType
 
-    const detailsButton = screen.getByText('Détails');
-    fireEvent.click(detailsButton);
+    renderWithContexts(
+      mockUserContextValue,
+      mockBatchContextValue,
+      emptyLinesReservationContext
+    )
 
-    expect(screen.getByText('Aucune ligne de réservation disponible.')).toBeTruthy();
-  });
+    const detailsButton = screen.getByText('Détails')
+    fireEvent.click(detailsButton)
+
+    expect(
+      screen.getByText('Aucune ligne de réservation disponible.')
+    ).toBeTruthy()
+  })
 
   test('tests handleCloseSnackbar function directly', async () => {
-    receiveBatchMock.mockResolvedValue(undefined);
+    receiveBatchMock.mockResolvedValue(undefined)
 
-    renderWithContexts();
+    renderWithContexts()
 
-    const receiveButton = screen.getByText('Recevoir');
-    fireEvent.click(receiveButton);
-    
-    const confirmButton = screen.getAllByText('Confirmer')[1];
-    fireEvent.click(confirmButton);
+    const receiveButton = screen.getByText('Recevoir')
+    fireEvent.click(receiveButton)
+
+    const confirmButton = screen.getAllByText('Confirmer')[1]
+    fireEvent.click(confirmButton)
 
     await waitFor(() => {
-      expect(screen.getByText('Lot marqué comme reçu avec succès')).toBeTruthy();
-    });
+      expect(screen.getByText('Lot marqué comme reçu avec succès')).toBeTruthy()
+    })
 
-    const message = screen.getByText('Lot marqué comme reçu avec succès');
+    const message = screen.getByText('Lot marqué comme reçu avec succès')
     if (message.parentElement) {
-      message.parentElement.remove();
+      message.parentElement.remove()
     }
 
     await waitFor(() => {
-      expect(screen.queryByText('Lot marqué comme reçu avec succès')).toBeNull();
-    });
-  });
+      expect(screen.queryByText('Lot marqué comme reçu avec succès')).toBeNull()
+    })
+  })
 
   test('handles early return in handleConfirmReceive', async () => {
     const mockReceiveBatchWithCheck = vi.fn().mockImplementation((batchId) => {
       if (batchId === null || batchId === undefined) {
-        return Promise.reject(new Error('Invalid batch ID'));
+        return Promise.reject(new Error('Invalid batch ID'))
       }
-      return Promise.resolve();
-    });
-    
+      return Promise.resolve()
+    })
+
     const customBatchContext = {
       ...mockBatchContextValue,
       receiveBatch: mockReceiveBatchWithCheck,
-    } as unknown as BatchContextType;
-    
-    renderWithContexts(mockUserContextValue, customBatchContext);
+    } as unknown as BatchContextType
+
+    renderWithContexts(mockUserContextValue, customBatchContext)
 
     try {
-      await mockReceiveBatchWithCheck(null);
-      fail('Promise should have been rejected');
+      await mockReceiveBatchWithCheck(null)
+      fail('Promise should have been rejected')
     } catch (error) {
       if (error instanceof Error) {
-        expect(error.message).toBe('Invalid batch ID');
+        expect(error.message).toBe('Invalid batch ID')
       } else {
-        fail('Expected error to be an instance of Error');
+        fail('Expected error to be an instance of Error')
       }
     }
-
-  });
+  })
 })
