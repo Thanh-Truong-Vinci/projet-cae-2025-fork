@@ -29,13 +29,11 @@ public class ProfileService {
    * @param newPassword the new password
    * @return 1 if the password changes, 0 otherwise
    */
-  // TODO maybe is better to move this in AuthsService (nosense to have only 1 method in 1 Class)
-  // TODO remove the return
-  public int changePassword(String email, String currentPassword, String newPassword) {
+  public void changePassword(String email, String currentPassword, String newPassword) {
     if (!passwordEncoder.matches(
         currentPassword, userRepository.findByEmail(email).getPassword())) {
-      return 0;
+      return ;
     }
-    return userRepository.updatePassword(passwordEncoder.encode(newPassword), email);
+    userRepository.updatePassword(passwordEncoder.encode(newPassword), email);
   }
 }
