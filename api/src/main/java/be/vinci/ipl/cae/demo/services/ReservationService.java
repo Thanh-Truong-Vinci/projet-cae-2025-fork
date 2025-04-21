@@ -114,6 +114,11 @@ public class ReservationService {
 
     // If confirming a reservation, set the sale date
     if (newStatus == ReservationStatus.CONFIRMED) {
+      double price = 0;
+      for (ReservationLine line : reservation.getReservationLines()) {
+        price += line.getQuantity() * line.getBatch().getUnitPrice();
+      }
+      reservation.setPrice(price);
       reservation.setSaleDate(LocalDate.now());
     }
 
