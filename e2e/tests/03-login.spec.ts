@@ -40,7 +40,7 @@ test.describe("Login", () => {
     await goFromHomePageToLoginPage(page);
   });
 
-  test("TC2.1: should login a user when valid data is provided", async ({ page }) => {
+  test("TC3.1: should login a user when valid data is provided", async ({ page }) => {
 
     const formData = {
       email: testUser.email,
@@ -57,7 +57,7 @@ test.describe("Login", () => {
     await expect(page.getByText("Terroir & Cie")).toBeVisible();
   });
 
-  test("TC2.2: should successfully logout when user clicks on logout button", async ({ page }) => {
+  test("TC3.2: should successfully logout when user clicks on logout button", async ({ page }) => {
       const formData = {
         email: testUser.email,
         password: testUser.password,
@@ -75,7 +75,7 @@ test.describe("Login", () => {
       await expect(page.getByText("Inscription")).toBeVisible();
     });
 
-  test("TC2.3: should not login a user when the password is incorrect", async ({ page }) => {
+  test("TC3.3: should not login a user when the password is incorrect", async ({ page }) => {
     const formData = {
       email: testUser.email,
       password: "wrongpassword",
@@ -87,7 +87,7 @@ test.describe("Login", () => {
     await expect(page.getByText("Email ou mot de passe incorrect.")).toBeVisible();
   });
 
-  test("TC2.4: should not login a user when the email doesn't exist", async ({ page }) => {
+  test("TC3.4: should not login a user when the email doesn't exist", async ({ page }) => {
       const formData = {
         email: "notexist" + faker.internet.email(),
         password: "test123",

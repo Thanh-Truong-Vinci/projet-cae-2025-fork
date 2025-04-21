@@ -1,5 +1,10 @@
 import { Page, expect } from "@playwright/test";
 
+const goToHomePage = async (page: Page) => {
+  await page.goto("/");
+  await expect(page).toHaveURL("/");
+};
+
 const goFromHomePageToRegisterPage = async (page: Page) => {
   await page.goto("/");
   await page.getByText("Inscription").click();
@@ -58,4 +63,10 @@ const loginWith = async (page: Page, formData: {
   await page.getByRole("button", { name: "S'authentifier" }).click();
 };
 
-export { registerWith, goFromHomePageToRegisterPage, loginWith, goFromHomePageToLoginPage };
+export { 
+  registerWith, 
+  goFromHomePageToRegisterPage, 
+  loginWith, 
+  goFromHomePageToLoginPage,
+  goToHomePage 
+};

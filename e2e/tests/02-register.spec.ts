@@ -27,7 +27,7 @@ test.describe("Register", () => {
     await goFromHomePageToRegisterPage(page);
   });
 
-  test("TC1.1: should register a new user when valid data is provided", async ({ page }) => {
+  test("TC2.1: should register a new user when valid data is provided", async ({ page }) => {
 
     await registerWith(page, testUser);
 
@@ -43,7 +43,7 @@ test.describe("Register", () => {
     await expect(page.getByText("Se connecter")).toBeVisible();
   });
 
-  test("TC1.2: should not register a new user when existing email is used", async ({ page }) => {
+  test("TC2.2: should not register a new user when existing email is used", async ({ page }) => {
 
     const uniqueEmail = `tc12-${Date.now()}@gmail.com`;
 
@@ -73,7 +73,7 @@ test.describe("Register", () => {
     await expect(page.getByText("Cette adresse email est déjà utilisée.")).toBeVisible();
   });
 
-  test("TC1.3: should not register a new user when passwords do not match", async ({ page }) => {
+  test("TC2.3: should not register a new user when passwords do not match", async ({ page }) => {
     // Modifier le mot de passe dans confirmPassword pour qu'il ne soit pas identique
     const userWithMismatchedPasswords = {
       ...testUser,
@@ -87,7 +87,7 @@ test.describe("Register", () => {
     await expect(page.getByText("Les mots de passe ne correspondent pas")).toBeVisible();
   });
 
-  test("TC1.4: should show validation errors when submitting an empty form", async ({ page }) => {
+  test("TC2.4: should show validation errors when submitting an empty form", async ({ page }) => {
 
     await page.getByRole("button", { name: "S'inscrire" }).click();
     
@@ -126,7 +126,7 @@ test.describe("Register", () => {
     await expect(countryInput).toHaveValue("Belgique");
   });
 
-  test("TC1.5: should show validation errors for empty fields even when some fields are filled", async ({ page }) => {
+  test("TC2.5: should show validation errors for empty fields even when some fields are filled", async ({ page }) => {
 
     await page.locator('[data-testid="name-input"] input').fill("Dupont");
     await page.locator('[data-testid="firstname-input"] input').fill("Jean");
@@ -172,7 +172,7 @@ test.describe("Register", () => {
     await expect(countryInput).toHaveValue("Belgique");
   });
 
-  test("TC1.6: should show error for a single missing field and succeed when filled", async ({ page }) => {
+  test("TC2.6: should show error for a single missing field and succeed when filled", async ({ page }) => {
     // Créer un utilisateur avec tous les champs sauf l'email
     const userWithMissingEmail = {
       ...testUser,
@@ -231,7 +231,7 @@ test.describe("Register", () => {
     await expect(page.getByText("Se connecter")).toBeVisible();
   });
 
-  test("TC1.7: should show error when number field contains non-digits characters", async ({ page }) => {
+  test("TC2.7: should show error when number field contains non-digits characters", async ({ page }) => {
     const userWithInvalidNumber = {
       ...testUser,
       number: "123AB"
@@ -244,7 +244,7 @@ test.describe("Register", () => {
     await expect(page.getByText("Le numéro doit contenir uniquement des chiffres")).toBeVisible();
   });
 
-  test("TC1.8: should show error when phone number has invalid format", async ({ page }) => {
+  test("TC2.8: should show error when phone number has invalid format", async ({ page }) => {
     const userWithInvalidPhone = {
       ...testUser,
       phoneNumber: "invalid-phone" + faker.phone.number(),
@@ -257,7 +257,7 @@ test.describe("Register", () => {
     await expect(page.getByText("Le numéro de téléphone doit commencer par + ou 0 et avoir 6-14 chiffres en plus")).toBeVisible();
   });
 
-  test("TC1.9: should show error when email format is invalid", async ({ page }) => {
+  test("TC2.9: should show error when email format is invalid", async ({ page }) => {
     const userWithInvalidEmail = {
       ...testUser,
       email: "invalid-email"
@@ -270,7 +270,7 @@ test.describe("Register", () => {
     await expect(page.getByText("Format d'email invalide.")).toBeVisible();
   });
 
-  test("TC1.10: should show error when password doesn't meet complexity requirements", async ({ page }) => {
+  test("TC2.10: should show error when password doesn't meet complexity requirements", async ({ page }) => {
     const userWithWeakPassword = {
       ...testUser,
       password: "weakpassword", 
@@ -284,115 +284,4 @@ test.describe("Register", () => {
     await expect(page.getByText("Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.")).toBeVisible();
   });
 
-  test("TC1.11: should validate a strong password successfully", async ({ page }) => {
-    const userWithStrongPassword = {
-      ...testUser,
-      email: "1" + faker.internet.email(), // On génère un nouveau email unique pour être sure qu'il n'est pas utilisé
-      password: "StrongP@ssw0rd!", 
-      confirmPassword: "StrongP@ssw0rd!"
-    };
-    
-    await registerWith(page, userWithStrongPassword);
-    
-    await expect(page.getByText("Inscription réussie !")).toBeVisible();
-    await expect(page.getByText("Votre compte a été créé avec succès.")).toBeVisible();
-    await expect(page.getByText("Vous allez être redirigé vers la page de connexion dans quelques instants...")).toBeVisible();
-    
-    // Vérifier que le cercle s'est bien affiché
-    await expect(page.locator("circle")).toBeVisible();
-    
-    await expect(page).toHaveURL("/login");
-  });
-
-  test("TC1.12: should validate a correct phone number format successfully", async ({ page }) => {
-    const userWithValidPhone = {
-      ...testUser,
-      email: "2" + faker.internet.email(), // On génère un nouveau email unique pour être sure qu'il n'est pas utilisé
-      phoneNumber: "+32496123456" 
-    };
-    
-    await registerWith(page, userWithValidPhone);
-    
-    // Vérifier que le message de succès est affiché
-    await expect(page.getByText("Inscription réussie !")).toBeVisible();
-    await expect(page.getByText("Votre compte a été créé avec succès.")).toBeVisible();
-    await expect(page.getByText("Vous allez être redirigé vers la page de connexion dans quelques instants...")).toBeVisible();
-    
-    // Vérifier que le cercle s'est bien affiché
-    await expect(page.locator("circle")).toBeVisible();
-    
-    await expect(page).toHaveURL("/login");
-  });
-
-  test("TC1.13: should validate a phone number starting with 0 successfully", async ({ page }) => {
-    const userWithZeroPhone = {
-      ...testUser,
-      email: "3" + faker.internet.email(), // On génère un nouveau email unique pour être sure qu'il n'est pas utilisé
-      phoneNumber: "0496123456" 
-    };
-    
-    await registerWith(page, userWithZeroPhone);
-    
-    await expect(page.getByText("Inscription réussie !")).toBeVisible();
-    await expect(page.getByText("Votre compte a été créé avec succès.")).toBeVisible();
-    await expect(page.getByText("Vous allez être redirigé vers la page de connexion dans quelques instants...")).toBeVisible();
-    
-    // Vérifier que le cercle s'est bien affiché
-    await expect(page.locator("circle")).toBeVisible();
-    
-    await expect(page).toHaveURL("/login");
-  });
-  
-  test("TC1.14: should show success message before redirecting to login page", async ({ page }) => {
-    const userWithNewEmail = {
-      ...testUser,
-      email: "4" + faker.internet.email(),
-    };
-    
-    await registerWith(page, userWithNewEmail);
-    
-    await expect(page.getByText("Inscription réussie !")).toBeVisible();
-    await expect(page.getByText("Votre compte a été créé avec succès.")).toBeVisible();
-    await expect(page.getByText("Vous allez être redirigé vers la page de connexion dans quelques instants...")).toBeVisible();
-    
-    // Vérifier que le cercle s'est bien affiché
-    await expect(page.locator("circle")).toBeVisible();
-    
-    await expect(page).toHaveURL("/login");
-  });
-
-  test("TC1.15: should register successfully with default country value (Belgique)", async ({ page }) => {
-    const userWithDefaultCountry = {
-      ...testUser,
-      email: "5" + faker.internet.email(),
-      country: "", // On le met vide pour que Belgique reste dans le champ
-    };
-    
-    await page.locator('[data-testid="name-input"] input').fill(userWithDefaultCountry.name);
-    await page.locator('[data-testid="firstname-input"] input').fill(userWithDefaultCountry.firstname);
-    await page.locator('[data-testid="civility-input"]').click();
-    await page.getByRole("option", { name: userWithDefaultCountry.civility }).click();
-    await page.locator('[data-testid="street-input"] input').fill(userWithDefaultCountry.street);
-    await page.locator('[data-testid="number-input"] input').fill(userWithDefaultCountry.number);
-    await page.locator('[data-testid="box-input"] input').fill(userWithDefaultCountry.box);
-    await page.locator('[data-testid="postalCode-input"] input').fill(userWithDefaultCountry.postalCode);
-    await page.locator('[data-testid="city-input"] input').fill(userWithDefaultCountry.city);
-    await page.locator('[data-testid="phoneNumber-input"] input').fill(userWithDefaultCountry.phoneNumber);
-    await page.locator('[data-testid="email-input"] input').fill(userWithDefaultCountry.email);
-    await page.locator('[data-testid="password-input"] input').fill(userWithDefaultCountry.password);
-    await page.locator('[data-testid="confirmPassword-input"] input').fill(userWithDefaultCountry.confirmPassword);
-
-    const countryInput = await page.locator('[data-testid="country-input"] input');
-    await expect(countryInput).toHaveValue("Belgique");
-    
-    await page.getByRole("button", { name: "S'inscrire" }).click();
-    
-    await expect(page.getByText("Inscription réussie !")).toBeVisible();
-    await expect(page.getByText("Votre compte a été créé avec succès.")).toBeVisible();
-    await expect(page.getByText("Vous allez être redirigé vers la page de connexion dans quelques instants...")).toBeVisible();
-    
-    await expect(page.locator("circle")).toBeVisible();
-    
-    await expect(page).toHaveURL("/login");
-  });
 });

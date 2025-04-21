@@ -461,7 +461,7 @@ const HomePage = () => {
                   alt={product.productName}
                   sx={{ objectFit: 'cover' }}
                 />
-                <CardContent sx={{ flexGrow: 1, py: 1 }}>
+                <CardContent sx={{ flexGrow: 1, py: 1, position: 'relative' }}>
                   <Typography
                     gutterBottom
                     variant="h6"
@@ -479,6 +479,7 @@ const HomePage = () => {
                   >
                     {product.productName}
                   </Typography>
+
                   <Typography
                     variant="body2"
                     color="text.secondary"
@@ -486,6 +487,7 @@ const HomePage = () => {
                   >
                     {product.unitPrice} € / {product.saleUnit}
                   </Typography>
+
                   <Typography
                     variant="body2"
                     color="text.secondary"
@@ -498,9 +500,35 @@ const HomePage = () => {
                   >
                     {product.companyName}
                   </Typography>
+
                   <Typography variant="body2" color="text.secondary">
                     Disponible: {product.totalQuantity} {product.saleUnit}
                   </Typography>
+
+                  {/* Type de produit positionné en bas à gauche */}
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      bottom: '8px',
+                      left: '8px',
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        backgroundColor: '#2e7d32',
+                        color: 'white',
+                        fontSize: '0.8rem',
+                        py: 0.5,
+                        px: 2,
+                        borderRadius: '12px',
+                        display: 'inline-block',
+                        fontWeight: 500,
+                      }}
+                    >
+                      {product.productType}
+                    </Typography>
+                  </Box>
                 </CardContent>
                 <CardActions sx={{ p: 1, pt: 0, mt: 'auto' }}>
                   <Box
