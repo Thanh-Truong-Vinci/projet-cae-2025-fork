@@ -103,7 +103,7 @@ e2e tests:
   variables:
     BASE_URL: https://cae-group-09-staging-app-fhg0g0e3bzgudubp.centralus-01.azurewebsites.net/
     NODE_ENV: staging
-  image: mcr.microsoft.com/playwright:v1.51.0-jammy
+  image: mcr.microsoft.com/playwright:v1.52.0-jammy
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
   script:
