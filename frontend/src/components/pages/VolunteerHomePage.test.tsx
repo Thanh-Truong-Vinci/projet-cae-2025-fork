@@ -396,7 +396,9 @@ describe('VolunteerHomePage', () => {
         <MemoryRouter>
           <UserContext.Provider value={mockUserContextValue}>
             <BatchContext.Provider value={mockBatchContextValue}>
-              <ReservationContext.Provider value={null as any}>
+              <ReservationContext.Provider
+                value={null as unknown as ReservationContextType}
+              >
                 <VolunteerHomePage />
               </ReservationContext.Provider>
             </BatchContext.Provider>
@@ -416,7 +418,7 @@ describe('VolunteerHomePage', () => {
       render(
         <MemoryRouter>
           <UserContext.Provider value={mockUserContextValue}>
-            <BatchContext.Provider value={null as any}>
+            <BatchContext.Provider value={null as unknown as BatchContextType}>
               <ReservationContext.Provider value={mockReservationContextValue}>
                 <VolunteerHomePage />
               </ReservationContext.Provider>

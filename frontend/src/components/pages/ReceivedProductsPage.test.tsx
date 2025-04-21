@@ -313,12 +313,13 @@ describe('ReceivedProductsPage', () => {
   test('throws error when ProductContext is null', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
-    // Attempt to render with null ProductContext
     expect(() =>
       render(
         <MemoryRouter>
           <UserContext.Provider value={mockUserContextValue}>
-            <ProductContext.Provider value={null as any}>
+            <ProductContext.Provider
+              value={null as unknown as ProductContextType}
+            >
               <BatchContext.Provider value={mockBatchContextValue}>
                 <ReceivedProductsPage />
               </BatchContext.Provider>
@@ -328,7 +329,6 @@ describe('ReceivedProductsPage', () => {
       )
     ).toThrow()
 
-    // Restore console.error
     errorSpy.mockRestore()
   })
 
@@ -340,7 +340,9 @@ describe('ReceivedProductsPage', () => {
         <MemoryRouter>
           <UserContext.Provider value={mockUserContextValue}>
             <ProductContext.Provider value={mockProductContextValue}>
-              <BatchContext.Provider value={null as any}>
+              <BatchContext.Provider
+                value={null as unknown as BatchContextType}
+              >
                 <ReceivedProductsPage />
               </BatchContext.Provider>
             </ProductContext.Provider>

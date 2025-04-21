@@ -273,21 +273,19 @@ describe('ReservationsPage', () => {
   })
 
   test('throws error when ReservationContext is null', () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-
     expect(() =>
       render(
         <MemoryRouter>
           <UserContext.Provider value={mockUserContextValue}>
-            <ReservationContext.Provider value={null as any}>
+            <ReservationContext.Provider
+              value={null as unknown as ReservationContextType}
+            >
               <ReservationsPage />
             </ReservationContext.Provider>
           </UserContext.Provider>
         </MemoryRouter>
       )
     ).toThrow('ReservationContext must be used within a ReservationProvider')
-
-    errorSpy.mockRestore()
   })
 
   test('displays correct date format for reservations', () => {
