@@ -155,15 +155,24 @@ const NavBar = () => {
         </>
       )}
 
-      {/* Producer: Ajouter lot */}
+      {/* Producer: Ajouter lot + Notifications */}
       {authenticatedUser.role === 'Producer' && (
-        <IconButton
-          onClick={() => navigate('/add-batch')}
-          sx={{ mr: 1 }}
-          aria-label="ajouter-lot"
-        >
-          <AddBoxIcon />
-        </IconButton>
+        <>
+          <IconButton
+            onClick={() => navigate('/add-batch')}
+            sx={{ mr: 1 }}
+            aria-label="ajouter-lot"
+          >
+            <AddBoxIcon />
+          </IconButton>
+          <IconButton
+            onClick={() => navigate('/notifications')}
+            sx={{ mr: 1 }}
+            aria-label="notifications"
+          >
+            <AssignmentIcon />
+          </IconButton>
+        </>
       )}
 
       {/* Profil pour tous les rôles sauf Volunteer */}

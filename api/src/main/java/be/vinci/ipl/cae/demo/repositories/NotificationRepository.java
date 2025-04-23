@@ -1,20 +1,36 @@
 package be.vinci.ipl.cae.demo.repositories;
 
 import be.vinci.ipl.cae.demo.models.entities.Notification;
-import be.vinci.ipl.cae.demo.models.entities.Producer;
 import java.util.List;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-/** Repository interface for managing notifications. */
+/**
+ * Repository Notification.
+ */
 @Repository
 public interface NotificationRepository extends CrudRepository<Notification, Long> {
 
   /**
-   * Finds notifications by producer.
+   * Find all notifications by user id.
    *
-   * @param producer the producer whose notifications are to be found
-   * @return a list of notifications for the given producer
+   * @param producerId the user id
+   * @return the list of notifications
    */
-  List<Notification> findByProducer(Producer producer);
+  List<Notification> findByProducerIdUser(Long producerId);
+
+
+  /**
+   * Find all notifications by user id and read status.
+   *
+   * @param idNotification the user id
+   * @return the list of notifications
+   */
+  @Modifying
+  @Query("UPDATE Notification n SET n.read = true WHERE n.idNotification = :id")
+  Notification updateReadArgument(@Param("id") Long idNotification);
+
 }

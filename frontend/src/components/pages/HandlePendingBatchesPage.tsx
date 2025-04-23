@@ -26,6 +26,8 @@ import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import { BatchContext } from '../../contexts/BatchContext'
 import { PendingBatch } from '../../types'
+import { UserContext } from '../../contexts/UserContext'
+import { createNotification } from '../../contexts/NotificationProvider'
 
 const HandlePendingBatchesPage = () => {
   const [rejectionDialogOpen, setRejectionDialogOpen] = useState(false)
@@ -34,6 +36,7 @@ const HandlePendingBatchesPage = () => {
   const [rejectionReason, setRejectionReason] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { authenticatedUser } = useContext(UserContext)
 
   const batchContext = useContext(BatchContext)
   if (!batchContext) {
@@ -43,7 +46,7 @@ const HandlePendingBatchesPage = () => {
   }
 
   const {
-    pendingBatches, // Utilisation de pendingBatches au lieu de managerBatches
+    pendingBatches, 
     isLoading: batchesLoading,
     error: batchesError,
     fetchPendingBatches,
@@ -80,6 +83,22 @@ const HandlePendingBatchesPage = () => {
       setLoading(true)
       try {
         await acceptBatch(batchId)
+        
+        // Ajout de la notification après acceptation du lot
+        if (authenticatedUser) {
+          const notification = {
+            batchId: batchId,
+            message: 'Le lot a été accepté',
+          }
+          console.log('Notification construite :', notification)
+          try {
+            await createNotification(notification, authenticatedUser.token)
+            console.log('Notification envoyée avec succès')
+          } catch (err) {
+            console.error("Erreur lors de l'envoi de la notification :", err)
+          }
+        }
+        
         setError(null)
       } catch (err) {
         console.error("Erreur lors de l'acceptation du lot:", err)
@@ -88,7 +107,7 @@ const HandlePendingBatchesPage = () => {
         setLoading(false)
       }
     },
-    [acceptBatch]
+    [acceptBatch, authenticatedUser]
   )
 
   const handleRejectClick = (batch: PendingBatch) => {
@@ -102,6 +121,22 @@ const HandlePendingBatchesPage = () => {
     setLoading(true)
     try {
       await rejectBatch(selectedBatch.id, rejectionReason)
+
+      // Ajout de la notification après le rejet du lot
+      if (authenticatedUser) {
+        const notification = {
+          batchId: selectedBatch.id,
+          message: 'Le lot a été refusé',
+          reasonOfReject: rejectionReason || 'Aucune raison spécifiée',
+        }
+        console.log('Notification construite :', notification)
+        try {
+          await createNotification(notification, authenticatedUser.token)
+          console.log('Notification envoyée avec succès')
+        } catch (err) {
+          console.error("Erreur lors de l'envoi de la notification :", err)
+        }
+      }
 
       // Actions locales après le succès
       setRejectionDialogOpen(false)
@@ -315,6 +350,8 @@ const HandlePendingBatchesPage = () => {
             value={rejectionReason}
             onChange={(e) => setRejectionReason(e.target.value)}
             sx={{ mt: 2 }}
+            inputProps={{ maxLength: 255 }}
+            helperText={`${rejectionReason.length}/255 caractères`}
           />
         </DialogContent>
         <DialogActions>

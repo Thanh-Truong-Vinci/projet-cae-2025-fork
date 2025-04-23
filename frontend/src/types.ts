@@ -87,6 +87,29 @@ export interface ProductType {
   title: string
 }
 
+interface NotificationContextType {
+  fetchNotifications: (token: string) => Promise<Notification[]>;
+}
+
+interface Notification {
+  batchId: number;
+  id: number;
+  message: string;
+  reasonOfReject?: string;
+  batch: Batch;
+  producer: ProducerRegistrationData;
+  read: boolean;
+  date: Date;
+}
+
+type NewNotification = Omit<
+  Notification,
+  'id' | 'read' | 'date' | 'batch' | 'producer'
+> & {
+  idbatch: number;
+};
+
+
 export const categoryLabels: { [key: string]: string } = {
   legumes: 'Légumes',
   fruits: 'Fruits',
@@ -301,4 +324,7 @@ export type {
   MaybeAuthenticatedUser,
   UserContextType,
   LoginUser,
+  Notification,
+  NewNotification,
+  NotificationContextType,
 }

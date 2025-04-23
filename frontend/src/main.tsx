@@ -32,6 +32,7 @@ import { ProductTypeProvider } from './contexts/ProductTypeProvider.tsx'
 import { ReservationProvider } from './contexts/ReservationProvider'
 import HandlePendingBatchesPage from './components/pages/HandlePendingBatchesPage'
 import { StatisticsProvider } from './contexts/StatisticsProvider'
+import NotificationsPage from './components/pages/NotificationPage.tsx'
 
 const router = createBrowserRouter([
   {
@@ -152,6 +153,14 @@ const router = createBrowserRouter([
           </SimpleProtectedRoute>
         ),
       },
+      {
+        path: 'notifications',
+        element: (
+          <SimpleProtectedRoute requiredRole="Producer">
+            <NotificationsPage />
+          </SimpleProtectedRoute>
+        ),
+      },
       // Route de secours pour toutes les autres URL
       {
         path: '*',
@@ -170,9 +179,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <ProductProvider>
             <BatchProvider>
               <PhotoProvider>
-                <ReservationProvider>
-                  <RouterProvider router={router} />
-                </ReservationProvider>
+                  <ReservationProvider>
+                    <RouterProvider router={router} />
+                  </ReservationProvider>
               </PhotoProvider>
             </BatchProvider>
           </ProductProvider>
