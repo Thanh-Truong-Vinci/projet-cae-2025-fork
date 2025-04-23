@@ -466,13 +466,20 @@ const ProducerHomePage = () => {
                 const isOutOfStock = batch.availableQuantity === 0
 
                 switch (tabIndex) {
-                  case 0: return true // Tous
-                  case 1: return status === 'PENDING'
-                  case 2: return status === 'REJECTED'
-                  case 3: return status === 'APPROVED' && !isOutOfStock
-                  case 4: return status === 'RECEIVED'
-                  case 5: return isOutOfStock
-                  default: return true
+                  case 0:
+                    return true // Tous
+                  case 1:
+                    return status === 'PENDING'
+                  case 2:
+                    return status === 'REJECTED'
+                  case 3:
+                    return status === 'APPROVED' && !isOutOfStock
+                  case 4:
+                    return status === 'RECEIVED'
+                  case 5:
+                    return isOutOfStock
+                  default:
+                    return true
                 }
               })
 
