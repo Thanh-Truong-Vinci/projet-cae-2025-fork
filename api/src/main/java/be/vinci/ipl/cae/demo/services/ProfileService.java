@@ -32,7 +32,7 @@ public class ProfileService {
   public void changePassword(String email, String currentPassword, String newPassword) {
     if (!passwordEncoder.matches(
         currentPassword, userRepository.findByEmail(email).getPassword())) {
-      return ;
+      return;
     }
     userRepository.updatePassword(passwordEncoder.encode(newPassword), email);
   }

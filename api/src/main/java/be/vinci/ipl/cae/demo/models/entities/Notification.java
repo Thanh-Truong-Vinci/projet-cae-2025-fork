@@ -13,9 +13,7 @@ import java.time.LocalDate;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Notification entity.
- */
+/** Notification entity. */
 @Entity
 @Table(name = "notifications")
 @Data
@@ -38,43 +36,39 @@ public class Notification {
   @Column(nullable = true)
   private String reasonOfReject;
 
-  @ManyToOne
-  private User producer;
+  @ManyToOne private User producer;
 
-  @OneToOne
-  private Batch batch;
-  
-  /**
-   * Initialise les valeurs par défaut avant la persistance.
-   */
+  @OneToOne private Batch batch;
+
+  /** Initialise les valeurs par défaut avant la persistance. */
   @PrePersist
   public void prePersist() {
     if (date == null) {
       date = LocalDate.now();
     }
   }
-  
+
   /**
    * Alias pour getIdNotification() pour compatibilité.
-   * 
+   *
    * @return l'id de la notification
    */
   public Long getId() {
     return this.idNotification;
   }
-  
+
   /**
    * Alias pour setIdNotification() pour compatibilité.
-   * 
+   *
    * @param id l'id à définir
    */
   public void setId(Long id) {
     this.idNotification = id;
   }
-  
+
   /**
    * Alias pour setRead() pour compatibilité.
-   * 
+   *
    * @param value la valeur à définir
    */
   public void setIsRead(boolean value) {

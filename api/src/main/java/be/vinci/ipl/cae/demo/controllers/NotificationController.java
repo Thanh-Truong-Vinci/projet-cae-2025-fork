@@ -19,9 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * Notification controller.
- */
+/** Notification controller. */
 @RestController
 @RequestMapping("/notifications")
 public class NotificationController {
@@ -35,7 +33,8 @@ public class NotificationController {
    * @param notificationService the injected NotificationService.
    * @param authsService the injected AuthsService.
    */
-  public NotificationController(NotificationService notificationService, AuthsService authsService) {
+  public NotificationController(
+      NotificationService notificationService, AuthsService authsService) {
     this.notificationService = notificationService;
     this.authsService = authsService;
   }
@@ -47,15 +46,15 @@ public class NotificationController {
    * @return the created notification
    */
   @PostMapping("/create")
-  public ResponseEntity<Notification>
-      createNotification(@RequestBody NewNotification notification) {
+  public ResponseEntity<Notification> createNotification(
+      @RequestBody NewNotification notification) {
     System.out.println("Notification create appelé : " + notification);
     try {
       Notification createdNotification = notificationService.createNotification(notification);
       return ResponseEntity.status(HttpStatus.CREATED).body(createdNotification);
     } catch (Exception e) {
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-          "Error creating notification: " + e.getMessage(), e);
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Error creating notification: " + e.getMessage(), e);
     }
   }
 
@@ -71,16 +70,16 @@ public class NotificationController {
     if (authentication == null || !authentication.isAuthenticated()) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
-    
+
     // l'objet principal est notre User JPA
     Object principal = authentication.getPrincipal();
     List<Notification> notifs = notificationService.getNotificationsByUserPrincipal(principal);
     return ResponseEntity.ok(notifs);
   }
-  
+
   /**
-   * Alternative method to get notifications with token in header.
-   * This is useful for front-end applications that handle authentication via tokens.
+   * Alternative method to get notifications with token in header. This is useful for front-end
+   * applications that handle authentication via tokens.
    *
    * @param token the authentication token
    * @return a list of notifications for the producer
@@ -94,13 +93,13 @@ public class NotificationController {
       if (producer == null) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
       }
-      
+
       // Obtenir les notifications pour ce producteur
       List<Notification> notifs = notificationService.getNotificationsByUserPrincipal(producer);
       return ResponseEntity.ok(notifs);
     } catch (Exception e) {
-      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-          "Error retrieving notifications: " + e.getMessage(), e);
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Error retrieving notifications: " + e.getMessage(), e);
     }
   }
 }
