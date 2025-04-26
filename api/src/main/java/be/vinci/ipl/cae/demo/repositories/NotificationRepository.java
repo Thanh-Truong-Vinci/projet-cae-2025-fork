@@ -15,19 +15,20 @@ import org.springframework.stereotype.Repository;
 public interface NotificationRepository extends CrudRepository<Notification, Long> {
 
   /**
-   * Find all notifications by user id.
+   * Find all notifications by producer id.
    *
-   * @param producerId the user id
+   * @param producerId the producer id
    * @return the list of notifications
    */
-  List<Notification> findByProducerIdUser(Long producerId);
+  @Query("SELECT n FROM Notification n WHERE n.producer.id = :producerId")
+  List<Notification> findByProducerId(@Param("producerId") Long producerId);
 
 
   /**
-   * Find all notifications by user id and read status.
+   * Update notification read status.
    *
-   * @param idNotification the user id
-   * @return the list of notifications
+   * @param idNotification the notification id
+   * @return the updated notification
    */
   @Modifying
   @Query("UPDATE Notification n SET n.read = true WHERE n.idNotification = :id")

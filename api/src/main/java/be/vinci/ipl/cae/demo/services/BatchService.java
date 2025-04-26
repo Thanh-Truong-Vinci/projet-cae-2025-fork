@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Service class for managing batches. */
 @Service
@@ -185,39 +186,60 @@ public class BatchService {
   }
 
   /**
-   * Rejette un lot avec un message de notification optionnel.
-   *
-   * @param id l'identifiant du lot à rejeter
-   * @param message le message expliquant le rejet (peut être null ou vide)
-   * @return le lot rejeté ou null si non trouvé
-   */
-  public Batch rejectBatch(long id, String message) {
-    Batch batch = batchRepository.findById(id).orElse(null);
-    if (batch == null) {
-      return null;
-    }
-
-    batch.setStatus(BatchStatus.REJECTED);
-
-    // Création de la notification seulement si un message est fourni
-    if (message != null && !message.trim().isEmpty()) {
-      Notification notification = new Notification();
-      notification.setIsRead(false);
-      notification.setMessage(message);
-
-      Producer producer = producerRepository.findById(batch.getProducer().getId()).orElse(null);
-      if (producer == null) {
-        return null;
-      }
-
-      notification.setProducer(producer);
-      notification = notificationRepository.save(notification);
-      batch.setNotificationId(notification.getId());
-    }
-
-    return batchRepository.save(batch);
+ * Rejette un lot avec un message de notification optionnel.
+ *
+ * @param id l'identifiant du lot à rejeter
+ * @param message le message expliquant le rejet (peut être null ou vide)
+ * @return le lot rejeté ou null si non trouvé
+ */
+@Transactional
+public Batch rejectBatch(long id, String message) {
+  Batch batch = batchRepository.findById(id).orElse(null);
+  if (batch == null) {
+    return null;
   }
 
+  // Changer le statut du lot à REJECTED
+  batch.setStatus(BatchStatus.REJECTED);
+  
+  // Sauvegarder d'abord le lot
+  batch = batchRepository.save(batch);
+
+  // Création de la notification seulement si un message est fourni
+  if (message != null && !message.trim().isEmpty()) {
+    try {
+      Notification notification = new Notification();
+      notification.setRead(false);
+      notification.setMessage(message);
+      notification.setReasonOfReject(message);
+      notification.setDate(LocalDate.now());
+      
+      // Obtenir le producteur depuis le lot
+      Producer producer = batch.getProducer();
+      if (producer == null) {
+        producer = producerRepository.findById(batch.getProducer().getId()).orElse(null);
+      }
+      
+      if (producer != null) {
+        notification.setProducer(producer);
+        notification.setBatch(batch);
+        
+        // Sauvegarder la notification
+        notification = notificationRepository.save(notification);
+        
+        // Mettre à jour l'ID de notification dans le lot
+        batch.setNotificationId(notification.getId());
+        batch = batchRepository.save(batch);
+      }
+    } catch (Exception e) {
+      // Logger l'erreur, mais ne pas faire échouer le rejet du lot
+      System.err.println("Erreur lors de la création de la notification: " + e.getMessage());
+      e.printStackTrace();
+    }
+  }
+
+  return batch;
+}
   /**
    * Marque un lot comme reçu.
    *
