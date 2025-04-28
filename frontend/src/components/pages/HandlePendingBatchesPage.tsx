@@ -89,6 +89,7 @@ const HandlePendingBatchesPage = () => {
           const notification = {
             batchId: batchId,
             message: 'Le lot a été accepté',
+            reasonOfReject: rejectionReason || 'Aucune raison spécifiée',
           }
           console.log('Notification construite :', notification)
           try {

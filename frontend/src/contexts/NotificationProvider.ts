@@ -10,7 +10,7 @@ export const createNotification = async (
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      Authorization: token, // Ne pas ajouter "Bearer" ici
     },
     body: JSON.stringify(notification),
   });
@@ -34,7 +34,7 @@ export const fetchNotificationsAPI = async (
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      Authorization: token, // Ne pas ajouter "Bearer" ici
     },
   });
   console.log('notificationApi: response status=', response.status);
