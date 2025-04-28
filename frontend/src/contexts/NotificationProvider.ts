@@ -10,7 +10,7 @@ export const createNotification = async (
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: token,
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(notification),
   });
@@ -29,12 +29,12 @@ export const createNotification = async (
 export const fetchNotificationsAPI = async (
   token: string,
 ): Promise<Notification[]> => {
-  console.log('notificationApi: GET /api/notifications/all, token=', token);
-  const response = await fetch('/api/notifications/all', {
+  console.log('notificationApi: GET /api/notifications/producer, token=', token);
+  const response = await fetch('/api/notifications/producer', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: token, // i have changer here for token only and not bearer token
+      Authorization: `Bearer ${token}`,
     },
   });
   console.log('notificationApi: response status=', response.status);
@@ -46,14 +46,14 @@ export const fetchNotificationsAPI = async (
 
   const raw = await response.json();
   console.log('notificationApi: data reçue =', raw);
-  const data: Notification[] = raw.map((notification: Notification) => ({
-    id: notification.id,
-    message: notification.message,
+  const data: Notification[] = raw.map((notification: any) => ({
+    id: notification.idNotification || notification.id,
+    message: notification.message || '',
     reasonOfReject: notification.reasonOfReject,
-    batchId: notification.batch.id, // Assuming the correct property name is 'id'
-    producerid: notification.producer.email,
+    batchId: notification.batch ? notification.batch.id : null,
+    producer: notification.producer || null,
     read: notification.read,
-    date: new Date(notification.date), // be sure to convert to Date object
+    date: new Date(notification.date),
   }));
   console.log('notificationApi: data transformée =', data);
   return data;

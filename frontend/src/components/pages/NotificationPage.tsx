@@ -9,6 +9,7 @@ import {
   Card,
   CardContent,
   CircularProgress,
+  Alert,
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
 
@@ -18,20 +19,30 @@ const NotificationsPage = () => {
   const myBatches = batchContext?.myBatches || [];
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadNotifications = async () => {
       if (!authenticatedUser) return;
       try {
+        console.log('Chargement des notifications avec token:', authenticatedUser.token);
         const data = await fetchNotificationsAPI(authenticatedUser.token);
+        console.log('Notifications reçues:', data);
         setNotifications(data);
       } catch (err) {
         console.error('error fetching notifications:', err);
+        setError(err instanceof Error ? err.message : 'Erreur lors du chargement des notifications');
       } finally {
         setLoading(false);
       }
     };
-    loadNotifications();
+    
+    if (authenticatedUser) {
+      loadNotifications();
+    } else {
+      setLoading(false);
+      setError('Vous devez être connecté pour voir vos notifications');
+    }
   }, [authenticatedUser]);
 
   if (loading) {
@@ -45,6 +56,14 @@ const NotificationsPage = () => {
         }}
       >
         <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ padding: 3 }}>
+        <Alert severity="error">{error}</Alert>
       </Box>
     );
   }
@@ -80,12 +99,12 @@ const NotificationsPage = () => {
                       </>
                     ) : (
                       <Typography variant="body2" color="textSecondary">
-                        Lot introuvable
+                        Lot ID: {notification.batchId || 'Non spécifié'}
                       </Typography>
                     )}
                     <Typography variant="body2" color="textSecondary">
                       Date:{' '}
-                      {new Date(notification.date).toLocaleDateString('fr-FR')}
+                      {notification.date ? new Date(notification.date).toLocaleDateString('fr-FR') : 'Non spécifiée'}
                     </Typography>
                   </CardContent>
                 </Card>

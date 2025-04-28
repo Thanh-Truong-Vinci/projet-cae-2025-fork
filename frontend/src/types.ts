@@ -92,12 +92,12 @@ interface NotificationContextType {
 }
 
 interface Notification {
-  batchId: number;
   id: number;
   message: string;
   reasonOfReject?: string;
-  batch: Batch;
-  producer: ProducerRegistrationData;
+  batchId?: number;
+  batch?: any;
+  producer?: any;
   read: boolean;
   date: Date;
 }
