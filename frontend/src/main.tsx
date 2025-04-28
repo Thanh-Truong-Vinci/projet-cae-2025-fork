@@ -179,9 +179,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <ProductProvider>
             <BatchProvider>
               <PhotoProvider>
-                  <ReservationProvider>
-                    <RouterProvider router={router} />
-                  </ReservationProvider>
+                <ReservationProvider>
+                  <RouterProvider router={router} />
+                </ReservationProvider>
               </PhotoProvider>
             </BatchProvider>
           </ProductProvider>

@@ -88,27 +88,31 @@ export interface ProductType {
 }
 
 interface NotificationContextType {
-  fetchNotifications: (token: string) => Promise<Notification[]>;
+  fetchNotifications: (token: string) => Promise<Notification[]>
 }
 
 interface Notification {
-  id: number;
-  message: string;
-  reasonOfReject?: string;
-  batchId?: number;
-  batch?: any;
-  producer?: any;
-  read: boolean;
-  date: Date;
+  id: number
+  message: string
+  reasonOfReject?: string
+  batchId?: number | null
+  batch?: { id: number; [key: string]: unknown }
+  producer?: {
+    id?: number
+    email?: string
+    name?: string
+    firstname?: string
+    [key: string]: unknown
+  } | null
+  read: boolean
+  date: Date
 }
-
 type NewNotification = Omit<
   Notification,
   'id' | 'read' | 'date' | 'batch' | 'producer'
 > & {
-  idbatch: number;
-};
-
+  idbatch: number
+}
 
 export const categoryLabels: { [key: string]: string } = {
   legumes: 'Légumes',

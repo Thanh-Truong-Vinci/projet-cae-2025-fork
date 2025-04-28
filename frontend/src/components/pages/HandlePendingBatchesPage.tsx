@@ -46,7 +46,7 @@ const HandlePendingBatchesPage = () => {
   }
 
   const {
-    pendingBatches, 
+    pendingBatches,
     isLoading: batchesLoading,
     error: batchesError,
     fetchPendingBatches,
@@ -83,13 +83,12 @@ const HandlePendingBatchesPage = () => {
       setLoading(true)
       try {
         await acceptBatch(batchId)
-        
+
         // Ajout de la notification après acceptation du lot
         if (authenticatedUser) {
           const notification = {
             batchId: batchId,
             message: 'Le lot a été accepté',
-            reasonOfReject: rejectionReason || 'Aucune raison spécifiée',
           }
           console.log('Notification construite :', notification)
           try {
@@ -99,7 +98,7 @@ const HandlePendingBatchesPage = () => {
             console.error("Erreur lors de l'envoi de la notification :", err)
           }
         }
-        
+
         setError(null)
       } catch (err) {
         console.error("Erreur lors de l'acceptation du lot:", err)
@@ -116,7 +115,7 @@ const HandlePendingBatchesPage = () => {
     setRejectionDialogOpen(true)
   }
 
-  const handleRejectConfirm = async () => {
+  const handleRejectConfirm = useCallback(async () => {
     if (!selectedBatch) return
 
     setLoading(true)
@@ -150,7 +149,7 @@ const HandlePendingBatchesPage = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [authenticatedUser, rejectBatch, selectedBatch, rejectionReason])
 
   const handleViewDetails = (batch: PendingBatch) => {
     setSelectedBatch(batch)
