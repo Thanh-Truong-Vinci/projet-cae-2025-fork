@@ -299,6 +299,33 @@ const ReservationsPage = () => {
                   </TableBody>
                 </Table>
               </TableContainer>
+              {reservation.status === ReservationStatus.PENDING && (
+                <Box sx={{ mt: 2, textAlign: 'right' }}>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    size="small"
+                    onClick={() => {
+                      reservationContext
+                        .cancelReservation(reservation.id)
+                        .then(() => {
+                          setSnackbarMessage('Réservation annulée avec succès')
+                          setSnackbarSeverity('success')
+                          setOpenSnackbar(true)
+                        })
+                        .catch(() => {
+                          setSnackbarMessage(
+                            "Erreur lors de l'annulation de la réservation"
+                          )
+                          setSnackbarSeverity('error')
+                          setOpenSnackbar(true)
+                        })
+                    }}
+                  >
+                    Annuler
+                  </Button>
+                </Box>
+              )}
             </AccordionDetails>
           </Accordion>
         ))
