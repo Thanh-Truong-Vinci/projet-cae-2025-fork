@@ -23,15 +23,23 @@ public interface NotificationRepository extends CrudRepository<Notification, Lon
   @Query("SELECT n FROM Notification n WHERE n.producer.id = :producerId")
   List<Notification> findByProducerId(@Param("producerId") Long producerId);
 
-
   /**
    * Update notification read status.
    *
    * @param idNotification the notification id
-   * @return the updated notification
+   * @return the number of rows affected
    */
   @Modifying
   @Query("UPDATE Notification n SET n.read = true WHERE n.idNotification = :id")
-  Notification updateReadArgument(@Param("id") Long idNotification);
-
+  int updateReadStatus(@Param("id") Long idNotification);
+  
+  /**
+   * Update all notifications read status for a producer.
+   *
+   * @param producerId the producer id
+   * @return the number of rows affected
+   */
+  @Modifying
+  @Query("UPDATE Notification n SET n.read = true WHERE n.producer.id = :producerId AND n.read = false")
+  int markAllAsRead(@Param("producerId") Long producerId);
 }

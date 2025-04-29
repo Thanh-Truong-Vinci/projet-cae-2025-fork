@@ -12,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -78,6 +80,20 @@ public class NotificationController {
   }
 
   /**
+   * Validate token and get producer.
+   *
+   * @param token the authentication token
+   * @return the producer object
+   */
+  private Producer validateProducerToken(String token) {
+    Producer producer = authsService.isValidProducerToken(token);
+    if (producer == null) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
+    }
+    return producer;
+  }
+
+  /**
    * Alternative method to get notifications with token in header. This is useful for front-end
    * applications that handle authentication via tokens.
    *
@@ -88,18 +104,58 @@ public class NotificationController {
   public ResponseEntity<List<Notification>> getProducerNotifications(
       @RequestHeader("Authorization") String token) {
     try {
-      // Vérifier si le token est valide pour un producteur
-      Producer producer = authsService.isValidProducerToken(token);
-      if (producer == null) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-      }
-
-      // Obtenir les notifications pour ce producteur
+      Producer producer = validateProducerToken(token);
       List<Notification> notifs = notificationService.getNotificationsByUserPrincipal(producer);
       return ResponseEntity.ok(notifs);
+    } catch (ResponseStatusException e) {
+      throw e;
     } catch (Exception e) {
       throw new ResponseStatusException(
           HttpStatus.INTERNAL_SERVER_ERROR, "Error retrieving notifications: " + e.getMessage(), e);
+    }
+  }
+
+  /**
+   * Mark a notification as read.
+   *
+   * @param id the notification id
+   * @param token the authentication token
+   * @return the updated notification
+   */
+  @PutMapping("/{id}/read")
+  public ResponseEntity<Notification> markNotificationAsRead(
+      @PathVariable("id") Long id,
+      @RequestHeader("Authorization") String token) {
+    try {
+      Producer producer = validateProducerToken(token);
+      Notification notification = notificationService.markNotificationAsRead(id, producer.getId());
+      return ResponseEntity.ok(notification);
+    } catch (ResponseStatusException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Error marking notification as read: " + e.getMessage(), e);
+    }
+  }
+
+  /**
+   * Mark all notifications as read for a producer.
+   *
+   * @param token the authentication token
+   * @return a success response
+   */
+  @PutMapping("/read-all")
+  public ResponseEntity<Void> markAllNotificationsAsRead(
+      @RequestHeader("Authorization") String token) {
+    try {
+      Producer producer = validateProducerToken(token);
+      notificationService.markAllNotificationsAsRead(producer.getId());
+      return ResponseEntity.ok().build();
+    } catch (ResponseStatusException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new ResponseStatusException(
+          HttpStatus.INTERNAL_SERVER_ERROR, "Error marking all notifications as read: " + e.getMessage(), e);
     }
   }
 }

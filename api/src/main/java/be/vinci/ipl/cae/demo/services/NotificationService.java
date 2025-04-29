@@ -79,4 +79,42 @@ public class NotificationService {
     User user = (User) principal;
     return notificationRepository.findByProducerId(user.getId());
   }
+  
+  /**
+   * Mark a notification as read.
+   *
+   * @param id the notification id
+   * @param producerId the producer id
+   * @return the updated notification
+   */
+  @Transactional
+  public Notification markNotificationAsRead(Long id, Long producerId) {
+    Notification notification = notificationRepository.findById(id)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+            "Notification non trouvée avec l'ID: " + id));
+    
+    // Vérifier que la notification appartient au bon producteur
+    if (notification.getProducer() == null || !notification.getProducer().getId().equals(producerId)) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+          "Cette notification n'appartient pas au producteur connecté");
+    }
+    
+    notification.setRead(true);
+    return notificationRepository.save(notification);
+  }
+  
+  /**
+   * Mark all notifications as read for a producer.
+   *
+   * @param producerId the producer id
+   */
+  @Transactional
+  public void markAllNotificationsAsRead(Long producerId) {
+    List<Notification> notifications = notificationRepository.findByProducerId(producerId);
+    
+    for (Notification notification : notifications) {
+      notification.setRead(true);
+      notificationRepository.save(notification);
+    }
+  }
 }
