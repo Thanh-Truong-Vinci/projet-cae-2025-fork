@@ -153,43 +153,16 @@ const ReservationsPage = () => {
 
   // Calculate total price for a reservation
   const calculateReservationTotal = (reservation: ReservationView): string => {
-    // Si le prix est déjà défini et est un nombre, l'utiliser
-    if (typeof reservation.price === 'number' && reservation.price > 0) {
+    if (typeof reservation.price === 'number') {
       return reservation.price.toFixed(2) + '€'
     }
-
-    // Sinon, calculer le prix total à partir des lignes de réservation
+    // Calculate from reservation lines if price isn't available
     const total = reservation.reservationLines.reduce(
       (sum: number, line: ReservationLineView) =>
         sum + line.unitPrice * line.quantity,
       0
     )
     return total.toFixed(2) + '€'
-  }
-
-  // Ajouter une nouvelle row "Total" au tableau des lignes de réservation
-  const renderTotalRow = (reservation: ReservationView) => {
-    const totalAmount = reservation.reservationLines.reduce(
-      (sum: number, line: ReservationLineView) =>
-        sum + line.unitPrice * line.quantity,
-      0
-    )
-    return (
-      <TableRow sx={{ backgroundColor: '#f9f9f9', fontWeight: 'bold' }}>
-        <TableCell colSpan={3} sx={{ textAlign: 'right', fontWeight: 'bold' }}>
-          Total
-        </TableCell>
-        <TableCell align="center">
-          {reservation.reservationLines.reduce(
-            (sum: number, line: ReservationLineView) => sum + line.quantity,
-            0
-          )}
-        </TableCell>
-        <TableCell align="right" sx={{ fontWeight: 'bold' }}>
-          {totalAmount.toFixed(2)}€
-        </TableCell>
-      </TableRow>
-    )
   }
 
   // Filter reservations by status
@@ -241,12 +214,12 @@ const ReservationsPage = () => {
                 <Typography sx={{ fontWeight: 'bold' }}>
                   Réservation #{reservation.id} -
                   {reservation.saleDate
-                    ? ` Retiré le ${formatDate(reservation.saleDate)}`
-                    : ` Prévu le ${formatDate(reservation.reservationDate)}`}
+                    ? `Retiré le ${formatDate(reservation.saleDate)}`
+                    : `Prévu le ${formatDate(reservation.reservationDate)}`}
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Typography sx={{ fontWeight: 'bold' }}>
-                    Total: {calculateReservationTotal(reservation)}
+                  <Typography>
+                    {calculateReservationTotal(reservation)}
                   </Typography>
                   <Chip
                     label={getStatusDisplay(reservation.status)}
@@ -294,38 +267,9 @@ const ReservationsPage = () => {
                         </TableCell>
                       </TableRow>
                     ))}
-                    {/* Ajout de la ligne totale */}
-                    {renderTotalRow(reservation)}
                   </TableBody>
                 </Table>
               </TableContainer>
-              {reservation.status === ReservationStatus.PENDING && (
-                <Box sx={{ mt: 2, textAlign: 'right' }}>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    size="small"
-                    onClick={() => {
-                      reservationContext
-                        .cancelReservation(reservation.id)
-                        .then(() => {
-                          setSnackbarMessage('Réservation annulée avec succès')
-                          setSnackbarSeverity('success')
-                          setOpenSnackbar(true)
-                        })
-                        .catch(() => {
-                          setSnackbarMessage(
-                            "Erreur lors de l'annulation de la réservation"
-                          )
-                          setSnackbarSeverity('error')
-                          setOpenSnackbar(true)
-                        })
-                    }}
-                  >
-                    Annuler
-                  </Button>
-                </Box>
-              )}
             </AccordionDetails>
           </Accordion>
         ))

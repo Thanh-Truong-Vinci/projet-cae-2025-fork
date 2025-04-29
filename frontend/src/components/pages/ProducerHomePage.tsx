@@ -146,6 +146,29 @@ const ProducerHomePage = () => {
     }
   }
 
+  // Filter batches based on selected tab
+  const filteredBatches = myBatches.filter((batch) => {
+    const status = batch.status?.toUpperCase()
+    const isOutOfStock = batch.availableQuantity === 0
+
+    switch (tabValue) {
+      case 0: // All
+        return true
+      case 1: // En vente (APPROVED)
+        return status === 'APPROVED' && !isOutOfStock
+      case 2: // En attente (PENDING)
+        return status === 'PENDING'
+      case 3: // Refusé (REJECTED)
+        return status === 'REJECTED'
+      case 4: // Reçu (RECEIVED)
+        return status === 'RECEIVED'
+      case 5: // Épuisé (out of stock)
+        return isOutOfStock
+      default:
+        return true
+    }
+  })
+
   // Handle selecting an image from the gallery
   const handleImageSelect = (photo: Photo) => {
     setSelectedImage(photo)
@@ -200,12 +223,12 @@ const ProducerHomePage = () => {
 
     // Adaptation aux valeurs de status en majuscules venant de l'API
     switch (status?.toUpperCase()) {
+      case 'APPROVED':
+        return { label: 'Accepté', color: 'success' as const }
       case 'PENDING':
         return { label: 'En attente', color: 'warning' as const }
       case 'REJECTED':
         return { label: 'Refusé', color: 'error' as const }
-      case 'APPROVED':
-        return { label: 'Accepté', color: 'success' as const }
       case 'RECEIVED':
         return { label: 'Reçu', color: 'info' as const }
       default:
@@ -430,9 +453,9 @@ const ProducerHomePage = () => {
             scrollButtons="auto"
           >
             <Tab label="Tous" {...a11yProps(0)} />
-            <Tab label="En attente" {...a11yProps(1)} />
-            <Tab label="Refusé" {...a11yProps(2)} />
-            <Tab label="Accepté" {...a11yProps(3)} />
+            <Tab label="Accepté" {...a11yProps(1)} />
+            <Tab label="En attente" {...a11yProps(2)} />
+            <Tab label="Refusé" {...a11yProps(3)} />
             <Tab label="Reçu" {...a11yProps(4)} />
             <Tab label="Épuisé" {...a11yProps(5)} />
           </Tabs>
@@ -459,189 +482,164 @@ const ProducerHomePage = () => {
           </Box>
         ) : (
           <>
-            {[0, 1, 2, 3, 4, 5].map((tabIndex) => {
-              // Filtrer les lots pour chaque tabIndex
-              const tabFilteredBatches = myBatches.filter((batch) => {
-                const status = batch.status?.toUpperCase()
-                const isOutOfStock = batch.availableQuantity === 0
+            {[0, 1, 2, 3, 4, 5].map((tabIndex) => (
+              <TabPanel key={tabIndex} value={tabValue} index={tabIndex}>
+                {filteredBatches.length === 0 ? (
+                  <Box sx={{ p: 3, textAlign: 'center' }}>
+                    <Typography variant="body1" color="textSecondary">
+                      Aucun lot dans cette catégorie.
+                    </Typography>
+                  </Box>
+                ) : (
+                  <Grid container spacing={3}>
+                    {filteredBatches.map((batch) => {
+                      const statusInfo = getStatusLabel(
+                        batch.status,
+                        batch.availableQuantity
+                      )
 
-                switch (tabIndex) {
-                  case 0:
-                    return true // Tous
-                  case 1:
-                    return status === 'PENDING'
-                  case 2:
-                    return status === 'REJECTED'
-                  case 3:
-                    return status === 'APPROVED' && !isOutOfStock
-                  case 4:
-                    return status === 'RECEIVED'
-                  case 5:
-                    return isOutOfStock
-                  default:
-                    return true
-                }
-              })
-
-              return (
-                <TabPanel key={tabIndex} value={tabValue} index={tabIndex}>
-                  {tabFilteredBatches.length === 0 ? (
-                    <Box sx={{ p: 3, textAlign: 'center' }}>
-                      <Typography variant="body1" color="textSecondary">
-                        Aucun lot dans cette catégorie.
-                      </Typography>
-                    </Box>
-                  ) : (
-                    <Grid container spacing={3}>
-                      {tabFilteredBatches.map((batch) => {
-                        const statusInfo = getStatusLabel(
-                          batch.status,
-                          batch.availableQuantity
-                        )
-
-                        return (
-                          <Grid item xs={12} sm={6} md={4} key={batch.id}>
-                            <Card
-                              elevation={3}
-                              sx={{
-                                height: '100%',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                opacity:
-                                  batch.status === 'REJECTED' ||
-                                  batch.availableQuantity === 0
-                                    ? 0.7
-                                    : 1,
-                              }}
-                            >
-                              <CardMedia
-                                component="img"
-                                height="160"
-                                image={batch.imageUrl}
-                                alt={batch.productName}
-                              />
-                              <CardContent sx={{ flexGrow: 1 }}>
-                                <Box
-                                  sx={{
-                                    mb: 2,
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'flex-start',
-                                  }}
-                                >
-                                  <Typography
-                                    variant="h6"
-                                    component="h3"
-                                    gutterBottom
-                                  >
-                                    {batch.productName}
-                                  </Typography>
-                                  <Chip
-                                    label={statusInfo.label}
-                                    size="small"
-                                    color={statusInfo.color}
-                                  />
-                                </Box>
-
-                                <Box sx={{ mb: 1 }}>
-                                  <Chip
-                                    label={batch.productType}
-                                    size="small"
-                                    color="primary"
-                                    variant="outlined"
-                                    sx={{ mb: 1 }}
-                                  />
-                                  <Typography
-                                    variant="body2"
-                                    color="text.secondary"
-                                  >
-                                    <strong>Disponible:</strong>{' '}
-                                    {format(
-                                      new Date(batch.availabilityDate),
-                                      'dd MMMM yyyy',
-                                      { locale: fr }
-                                    )}
-                                  </Typography>
-                                  <Typography
-                                    variant="body2"
-                                    color="text.secondary"
-                                  >
-                                    <strong>Quantité:</strong>{' '}
-                                    {batch.availableQuantity} {batch.unitType}
-                                  </Typography>
-                                  <Typography
-                                    variant="body2"
-                                    color="text.secondary"
-                                  >
-                                    <strong>Prix:</strong>{' '}
-                                    {batch.unitPrice.toFixed(2)}€/
-                                    {batch.unitType}
-                                  </Typography>
-                                </Box>
-
-                                {batch.status === 'REJECTED' &&
-                                  batch.rejectionReason && (
-                                    <Box
-                                      sx={{
-                                        mt: 2,
-                                        p: 1,
-                                        bgcolor: 'error.light',
-                                        borderRadius: 1,
-                                      }}
-                                    >
-                                      <Typography
-                                        variant="caption"
-                                        color="error.dark"
-                                      >
-                                        <strong>Motif du refus:</strong>{' '}
-                                        {batch.rejectionReason}
-                                      </Typography>
-                                    </Box>
-                                  )}
-
-                                <Box sx={{ mt: 2 }}>
-                                  <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                  >
-                                    Ajouté le{' '}
-                                    {format(
-                                      new Date(batch.createdAt),
-                                      'dd/MM/yyyy',
-                                      {
-                                        locale: fr,
-                                      }
-                                    )}
-                                  </Typography>
-                                </Box>
-                              </CardContent>
-
-                              <Divider />
-
-                              <CardActions
-                                sx={{ justifyContent: 'center', p: 1 }}
+                      return (
+                        <Grid item xs={12} sm={6} md={4} key={batch.id}>
+                          <Card
+                            elevation={3}
+                            sx={{
+                              height: '100%',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              opacity:
+                                batch.status === 'REJECTED' ||
+                                batch.availableQuantity === 0
+                                  ? 0.7
+                                  : 1,
+                            }}
+                          >
+                            <CardMedia
+                              component="img"
+                              height="160"
+                              image={batch.imageUrl}
+                              alt={batch.productName}
+                            />
+                            <CardContent sx={{ flexGrow: 1 }}>
+                              <Box
+                                sx={{
+                                  mb: 2,
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'flex-start',
+                                }}
                               >
-                                {/* Ne montrer le bouton de modification que si le lot n'est pas refusé */}
-                                {batch.status !== 'REJECTED' && (
-                                  <Button
-                                    size="small"
-                                    startIcon={<EditIcon />}
-                                    onClick={() => handleEditBatch(batch)}
-                                    disabled={batch.availableQuantity === 0}
+                                <Typography
+                                  variant="h6"
+                                  component="h3"
+                                  gutterBottom
+                                >
+                                  {batch.productName}
+                                </Typography>
+                                <Chip
+                                  label={statusInfo.label}
+                                  size="small"
+                                  color={statusInfo.color}
+                                />
+                              </Box>
+
+                              <Box sx={{ mb: 1 }}>
+                                <Chip
+                                  label={batch.productType}
+                                  size="small"
+                                  color="primary"
+                                  variant="outlined"
+                                  sx={{ mb: 1 }}
+                                />
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                >
+                                  <strong>Disponible:</strong>{' '}
+                                  {format(
+                                    new Date(batch.availabilityDate),
+                                    'dd MMMM yyyy',
+                                    { locale: fr }
+                                  )}
+                                </Typography>
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                >
+                                  <strong>Quantité:</strong>{' '}
+                                  {batch.availableQuantity} {batch.unitType}
+                                </Typography>
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                >
+                                  <strong>Prix:</strong>{' '}
+                                  {batch.unitPrice.toFixed(2)}€/
+                                  {batch.unitType}
+                                </Typography>
+                              </Box>
+
+                              {batch.status === 'REJECTED' &&
+                                batch.rejectionReason && (
+                                  <Box
+                                    sx={{
+                                      mt: 2,
+                                      p: 1,
+                                      bgcolor: 'error.light',
+                                      borderRadius: 1,
+                                    }}
                                   >
-                                    Modifier
-                                  </Button>
+                                    <Typography
+                                      variant="caption"
+                                      color="error.dark"
+                                    >
+                                      <strong>Motif du refus:</strong>{' '}
+                                      {batch.rejectionReason}
+                                    </Typography>
+                                  </Box>
                                 )}
-                              </CardActions>
-                            </Card>
-                          </Grid>
-                        )
-                      })}
-                    </Grid>
-                  )}
-                </TabPanel>
-              )
-            })}
+
+                              <Box sx={{ mt: 2 }}>
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                >
+                                  Ajouté le{' '}
+                                  {format(
+                                    new Date(batch.createdAt),
+                                    'dd/MM/yyyy',
+                                    {
+                                      locale: fr,
+                                    }
+                                  )}
+                                </Typography>
+                              </Box>
+                            </CardContent>
+
+                            <Divider />
+
+                            <CardActions
+                              sx={{ justifyContent: 'center', p: 1 }}
+                            >
+                              {/* Ne montrer le bouton de modification que si le lot n'est pas refusé */}
+                              {batch.status !== 'REJECTED' && (
+                                <Button
+                                  size="small"
+                                  startIcon={<EditIcon />}
+                                  onClick={() => handleEditBatch(batch)}
+                                  disabled={batch.availableQuantity === 0}
+                                >
+                                  Modifier
+                                </Button>
+                              )}
+                            </CardActions>
+                          </Card>
+                        </Grid>
+                      )
+                    })}
+                  </Grid>
+                )}
+              </TabPanel>
+            ))}
           </>
         )}
       </Paper>

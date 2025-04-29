@@ -195,21 +195,11 @@ const HomePage = () => {
     }))
   }
 
-  // Fonction modifiée dans HomePage.tsx pour fournir un retour visuel lors de l'ajout au panier
-
   const handleAddToReservation = (productBatch: ProductBatch) => {
-    const qty = quantities[productBatch.productId] || 1
-    createReservation(productBatch.productId, qty)
-      .then(() => {
-        setMessage(
-          `${qty} ${qty > 1 ? 'articles' : 'article'} "${productBatch.productName}" ${qty > 1 ? 'ajoutés' : 'ajouté'} au panier`
-        )
-        setOpenSnackbar(true)
-      })
-      .catch((error) => {
-        setMessage(`Erreur lors de l'ajout au panier: ${error.message}`)
-        setOpenSnackbar(true)
-      })
+    createReservation(
+      productBatch.productId,
+      quantities[productBatch.productId] || 1
+    )
   }
 
   const handleProductClick = (product: ProductBatch) => {
