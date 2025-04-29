@@ -10,55 +10,116 @@ import {
   CardContent,
   CircularProgress,
   Alert,
+  Button,
   Chip,
   Divider,
+  Snackbar,
+  IconButton,
 } from '@mui/material'
 import Grid from '@mui/material/Grid'
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
+import DoneAllIcon from '@mui/icons-material/DoneAll'
+import MarkChatReadIcon from '@mui/icons-material/MarkChatRead'
 
 const NotificationsPage = () => {
   const { authenticatedUser } = useContext(UserContext)
   const batchContext = useContext(BatchContext)
-  const { fetchNotifications, markAllAsRead } = useContext(NotificationContext)
+  const { fetchNotifications, markAsRead, markAllAsRead, fetchUnreadCount } = useContext(NotificationContext)
   const myBatches = batchContext?.myBatches || []
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false)
+  const [snackbarMessage, setSnackbarMessage] = useState<string>('')
+
+  const loadNotifications = async () => {
+    if (!authenticatedUser) return
+    try {
+      console.log(
+        'Chargement des notifications avec token:',
+        authenticatedUser.token
+      )
+      const data = await fetchNotifications(authenticatedUser.token)
+      console.log('Notifications reçues:', data)
+      setNotifications(data)
+    } catch (err) {
+      console.error('error fetching notifications:', err)
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Erreur lors du chargement des notifications'
+      )
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const loadNotifications = async () => {
-      if (!authenticatedUser) return
-      try {
-        console.log(
-          'Chargement des notifications avec token:',
-          authenticatedUser.token
-        )
-        const data = await fetchNotifications(authenticatedUser.token)
-        console.log('Notifications reçues:', data)
-        setNotifications(data)
-
-        // Marquer toutes les notifications comme lues lorsque la page est chargée
-        if (data.some(notification => !notification.read)) {
-          await markAllAsRead(authenticatedUser.token)
-        }
-      } catch (err) {
-        console.error('error fetching notifications:', err)
-        setError(
-          err instanceof Error
-            ? err.message
-            : 'Erreur lors du chargement des notifications'
-        )
-      } finally {
-        setLoading(false)
-      }
-    }
-
     if (authenticatedUser) {
       loadNotifications()
     } else {
       setLoading(false)
       setError('Vous devez être connecté pour voir vos notifications')
     }
-  }, [authenticatedUser, fetchNotifications, markAllAsRead])
+  }, [authenticatedUser])
+
+  const handleMarkAsRead = async (notificationId: number) => {
+    if (!authenticatedUser) return
+    
+    try {
+      setLoading(true)
+      await markAsRead(notificationId, authenticatedUser.token)
+      
+      // Mettre à jour la liste des notifications
+      await loadNotifications()
+      
+      // Mettre à jour le compteur des notifications non lues
+      await fetchUnreadCount(authenticatedUser.token)
+      
+      setSnackbarMessage('Notification marquée comme lue')
+      setSnackbarOpen(true)
+    } catch (err) {
+      console.error('Erreur lors du marquage de la notification:', err)
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Erreur lors du marquage de la notification'
+      )
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleMarkAllAsRead = async () => {
+    if (!authenticatedUser) return
+    
+    try {
+      setLoading(true)
+      await markAllAsRead(authenticatedUser.token)
+      
+      // Mettre à jour la liste des notifications
+      await loadNotifications()
+      
+      // Mettre à jour le compteur des notifications non lues
+      await fetchUnreadCount(authenticatedUser.token)
+      
+      setSnackbarMessage('Toutes les notifications ont été marquées comme lues')
+      setSnackbarOpen(true)
+    } catch (err) {
+      console.error('Erreur lors du marquage de toutes les notifications:', err)
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Erreur lors du marquage de toutes les notifications'
+      )
+    } finally {
+      setLoading(false)
+    }
+  }
+  
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false)
+  }
 
   if (loading) {
     return (
@@ -83,12 +144,27 @@ const NotificationsPage = () => {
     )
   }
 
+  // Filtrer les notifications non lues
+  const unreadNotifications = notifications.filter(notification => !notification.read)
+  const hasUnreadNotifications = unreadNotifications.length > 0
+
   return (
     <Box sx={{ padding: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4">
           Mes Notifications
         </Typography>
+        {hasUnreadNotifications && (
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<DoneAllIcon />}
+            onClick={handleMarkAllAsRead}
+            disabled={loading}
+          >
+            Tout marquer comme lu
+          </Button>
+        )}
       </Box>
       
       {notifications.length === 0 ? (
@@ -109,17 +185,21 @@ const NotificationsPage = () => {
                   }}
                 >
                   {isNew && (
-                    <Chip 
-                      label="Nouveau" 
-                      color="error" 
-                      size="small" 
-                      sx={{ 
-                        position: 'absolute', 
-                        top: 10, 
-                        right: 10, 
-                        zIndex: 1 
-                      }} 
-                    />
+                    <Box sx={{ position: 'absolute', top: 10, right: 10, zIndex: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Chip 
+                        label="Nouveau" 
+                        color="error" 
+                        size="small"
+                      />
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={() => handleMarkAsRead(notification.id)}
+                        title="Marquer comme lu"
+                      >
+                        <MarkChatReadIcon />
+                      </IconButton>
+                    </Box>
                   )}
                   <CardContent>
                     <Typography variant="h6">{notification.message}</Typography>
@@ -157,6 +237,19 @@ const NotificationsPage = () => {
                           )
                         : 'Non spécifiée'}
                     </Typography>
+                    {isNew && (
+                      <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          size="small"
+                          startIcon={<CheckCircleOutlineIcon />}
+                          onClick={() => handleMarkAsRead(notification.id)}
+                        >
+                          Marquer comme lu
+                        </Button>
+                      </Box>
+                    )}
                   </CardContent>
                 </Card>
               </Grid>
@@ -164,6 +257,13 @@ const NotificationsPage = () => {
           })}
         </Grid>
       )}
+      
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        message={snackbarMessage}
+      />
     </Box>
   )
 }
