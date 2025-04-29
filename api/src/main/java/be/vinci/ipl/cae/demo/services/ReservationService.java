@@ -11,6 +11,7 @@ import be.vinci.ipl.cae.demo.repositories.ReservationRepository;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Service class for managing reservations. */
 @Service
@@ -47,6 +48,7 @@ public class ReservationService {
    * @param productId the ID of the product to reserve
    * @param quantity the quantity of the product to reserve
    */
+  @Transactional
   public void reserveProduct(Client client, Long productId, int quantity) {
     Product product = productService.getProductById(productId);
     if (product == null) {
@@ -96,6 +98,7 @@ public class ReservationService {
    * @param newStatus the new status for the reservation
    * @return the updated reservation
    */
+  @Transactional
   public Reservation changeStatus(Long reservationId, ReservationStatus newStatus) {
     Reservation reservation = reservationRepository.findById(reservationId).orElse(null);
     if (reservation == null) {

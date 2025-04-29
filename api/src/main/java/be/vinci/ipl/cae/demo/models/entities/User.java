@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import java.time.LocalDate;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -39,4 +40,6 @@ public abstract class User {
 
   @Column(name = "date_inscription", nullable = false)
   private LocalDate dateInscription;
+
+  @Version private Long version;
 }

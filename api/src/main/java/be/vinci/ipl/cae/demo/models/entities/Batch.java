@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import java.time.LocalDate;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -66,4 +67,6 @@ public class Batch {
 
   @Column(name = "production_date", nullable = false)
   private LocalDate productionDate;
+
+  @Version private Long version;
 }
