@@ -239,19 +239,25 @@ describe('ReservationsPage', () => {
   test('displays reservation line items when expanded', () => {
     renderWithContexts()
 
+    // Vérifier la présence initiale de l'en-tête "Prix unitaire" en utilisant getByText
     expect(screen.getByText('Prix unitaire')).toBeTruthy()
+
     const summaryButton = screen.getByRole('button', {
       name: /réservation #1/i,
     })
     fireEvent.click(summaryButton)
 
+    // Vérifier les en-têtes de colonne en utilisant getByText au lieu de getByRole
     expect(screen.getByText('Prix unitaire')).toBeTruthy()
     expect(screen.getByText('Quantité')).toBeTruthy()
-    expect(screen.getByText('Total')).toBeTruthy()
+    // Utiliser getAllByText pour gérer les multiples "Total"
+    const totalElements = screen.getAllByText('Total')
+    expect(totalElements.length).toBeGreaterThan(0)
 
+    // Vérifier les données de la ligne
     expect(screen.getByText('Test Product')).toBeTruthy()
-    expect(screen.getByText(/12\.50/)).toBeTruthy()
-    expect(screen.getByText('2')).toBeTruthy()
+    expect(screen.getAllByText(/12\.50/)[0]).toBeTruthy()
+    expect(screen.getAllByText('2')[0]).toBeTruthy()
   })
 
   test('navigates to home page when clicking discover products button', () => {
@@ -333,15 +339,19 @@ describe('ReservationsPage', () => {
     })
     fireEvent.click(summaryButton)
 
+    // Vérifier la présence des éléments de prix
     const priceElements = screen.getAllByText(/25\.00€/)
     expect(priceElements.length).toBeGreaterThan(0)
 
+    // Vérifier la présence des éléments de prix unitaire
     const unitPriceElements = screen.getAllByText((_content, element) => {
       return element?.textContent?.includes('12.50') || false
     })
     expect(unitPriceElements.length).toBeGreaterThan(0)
 
-    expect(screen.getByText('2')).toBeTruthy()
+    // Vérifier la présence des éléments de quantité
+    const quantityCells = screen.getAllByText('2')
+    expect(quantityCells.length).toBeGreaterThan(0)
   })
 
   test('shows placeholder image when imageLocation is null', () => {
