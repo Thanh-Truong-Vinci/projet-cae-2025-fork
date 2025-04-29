@@ -73,10 +73,12 @@ export const fetchNotificationsAPI = async (
 }
 
 // Fonction pour récupérer le nombre de notifications non lues
-export const fetchUnreadNotificationsCount = async (token: string): Promise<number> => {
+export const fetchUnreadNotificationsCount = async (
+  token: string
+): Promise<number> => {
   try {
     const notifications = await fetchNotificationsAPI(token)
-    return notifications.filter(notification => !notification.read).length
+    return notifications.filter((notification) => !notification.read).length
   } catch (error) {
     console.error('Erreur lors du comptage des notifications non lues:', error)
     return 0
@@ -98,16 +100,23 @@ export const markNotificationAsRead = async (
     })
 
     if (!response.ok) {
-      throw new Error(`Error marking notification as read: ${response.statusText}`)
+      throw new Error(
+        `Error marking notification as read: ${response.statusText}`
+      )
     }
   } catch (error) {
-    console.error('Erreur lors du marquage de la notification comme lue:', error)
+    console.error(
+      'Erreur lors du marquage de la notification comme lue:',
+      error
+    )
     throw error
   }
 }
 
 // Fonction pour marquer toutes les notifications comme lues
-export const markAllNotificationsAsRead = async (token: string): Promise<void> => {
+export const markAllNotificationsAsRead = async (
+  token: string
+): Promise<void> => {
   try {
     const response = await fetch('/api/notifications/read-all', {
       method: 'PUT',
@@ -118,10 +127,15 @@ export const markAllNotificationsAsRead = async (token: string): Promise<void> =
     })
 
     if (!response.ok) {
-      throw new Error(`Error marking all notifications as read: ${response.statusText}`)
+      throw new Error(
+        `Error marking all notifications as read: ${response.statusText}`
+      )
     }
   } catch (error) {
-    console.error('Erreur lors du marquage de toutes les notifications comme lues:', error)
+    console.error(
+      'Erreur lors du marquage de toutes les notifications comme lues:',
+      error
+    )
     throw error
   }
 }

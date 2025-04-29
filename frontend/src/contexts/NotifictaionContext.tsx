@@ -1,10 +1,10 @@
 import React, { createContext, useState, useEffect, useContext } from 'react'
 import { Notification, NotificationContextType } from '../types'
-import { 
-  fetchNotificationsAPI, 
-  fetchUnreadNotificationsCount, 
-  markNotificationAsRead, 
-  markAllNotificationsAsRead 
+import {
+  fetchNotificationsAPI,
+  fetchUnreadNotificationsCount,
+  markNotificationAsRead,
+  markAllNotificationsAsRead,
 } from './NotificationProvider'
 import { UserContext } from './UserContext'
 
@@ -17,7 +17,9 @@ export const NotificationContext = createContext<NotificationContextType>({
   markAllAsRead: async () => {},
 })
 
-export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [unreadCount, setUnreadCount] = useState<number>(0)
   const { authenticatedUser } = useContext(UserContext)
 
@@ -36,18 +38,27 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const count = await fetchUnreadNotificationsCount(token)
       setUnreadCount(count)
     } catch (error) {
-      console.error('Erreur lors du comptage des notifications non lues:', error)
+      console.error(
+        'Erreur lors du comptage des notifications non lues:',
+        error
+      )
       setUnreadCount(0)
     }
   }
 
-  const markAsRead = async (notificationId: number, token: string): Promise<void> => {
+  const markAsRead = async (
+    notificationId: number,
+    token: string
+  ): Promise<void> => {
     try {
       await markNotificationAsRead(notificationId, token)
       // Mise à jour du compteur après le marquage
       fetchUnreadCount(token)
     } catch (error) {
-      console.error('Erreur lors du marquage de la notification comme lue:', error)
+      console.error(
+        'Erreur lors du marquage de la notification comme lue:',
+        error
+      )
     }
   }
 
@@ -57,7 +68,10 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       // Mise à jour du compteur après le marquage de toutes les notifications
       setUnreadCount(0)
     } catch (error) {
-      console.error('Erreur lors du marquage de toutes les notifications comme lues:', error)
+      console.error(
+        'Erreur lors du marquage de toutes les notifications comme lues:',
+        error
+      )
     }
   }
 

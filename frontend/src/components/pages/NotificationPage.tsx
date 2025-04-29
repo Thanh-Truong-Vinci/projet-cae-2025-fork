@@ -24,7 +24,8 @@ import MarkChatReadIcon from '@mui/icons-material/MarkChatRead'
 const NotificationsPage = () => {
   const { authenticatedUser } = useContext(UserContext)
   const batchContext = useContext(BatchContext)
-  const { fetchNotifications, markAsRead, markAllAsRead, fetchUnreadCount } = useContext(NotificationContext)
+  const { fetchNotifications, markAsRead, markAllAsRead, fetchUnreadCount } =
+    useContext(NotificationContext)
   const myBatches = batchContext?.myBatches || []
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState<boolean>(true)
@@ -65,17 +66,17 @@ const NotificationsPage = () => {
 
   const handleMarkAsRead = async (notificationId: number) => {
     if (!authenticatedUser) return
-    
+
     try {
       setLoading(true)
       await markAsRead(notificationId, authenticatedUser.token)
-      
+
       // Mettre à jour la liste des notifications
       await loadNotifications()
-      
+
       // Mettre à jour le compteur des notifications non lues
       await fetchUnreadCount(authenticatedUser.token)
-      
+
       setSnackbarMessage('Notification marquée comme lue')
       setSnackbarOpen(true)
     } catch (err) {
@@ -92,17 +93,17 @@ const NotificationsPage = () => {
 
   const handleMarkAllAsRead = async () => {
     if (!authenticatedUser) return
-    
+
     try {
       setLoading(true)
       await markAllAsRead(authenticatedUser.token)
-      
+
       // Mettre à jour la liste des notifications
       await loadNotifications()
-      
+
       // Mettre à jour le compteur des notifications non lues
       await fetchUnreadCount(authenticatedUser.token)
-      
+
       setSnackbarMessage('Toutes les notifications ont été marquées comme lues')
       setSnackbarOpen(true)
     } catch (err) {
@@ -116,7 +117,7 @@ const NotificationsPage = () => {
       setLoading(false)
     }
   }
-  
+
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false)
   }
@@ -145,15 +146,22 @@ const NotificationsPage = () => {
   }
 
   // Filtrer les notifications non lues
-  const unreadNotifications = notifications.filter(notification => !notification.read)
+  const unreadNotifications = notifications.filter(
+    (notification) => !notification.read
+  )
   const hasUnreadNotifications = unreadNotifications.length > 0
 
   return (
     <Box sx={{ padding: 3 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4">
-          Mes Notifications
-        </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 3,
+        }}
+      >
+        <Typography variant="h4">Mes Notifications</Typography>
         {hasUnreadNotifications && (
           <Button
             variant="contained"
@@ -166,7 +174,7 @@ const NotificationsPage = () => {
           </Button>
         )}
       </Box>
-      
+
       {notifications.length === 0 ? (
         <Typography variant="body1">Aucune notification disponible.</Typography>
       ) : (
@@ -174,23 +182,29 @@ const NotificationsPage = () => {
           {notifications.map((notification) => {
             const batch = myBatches.find((b) => b.id === notification.batchId)
             const isNew = !notification.read
-            
+
             return (
               <Grid item xs={12} key={notification.id}>
-                <Card 
-                  sx={{ 
+                <Card
+                  sx={{
                     position: 'relative',
                     border: isNew ? '1px solid #f50057' : 'none',
-                    boxShadow: isNew ? 3 : 1
+                    boxShadow: isNew ? 3 : 1,
                   }}
                 >
                   {isNew && (
-                    <Box sx={{ position: 'absolute', top: 10, right: 10, zIndex: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Chip 
-                        label="Nouveau" 
-                        color="error" 
-                        size="small"
-                      />
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: 10,
+                        right: 10,
+                        zIndex: 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                      }}
+                    >
+                      <Chip label="Nouveau" color="error" size="small" />
                       <IconButton
                         size="small"
                         color="primary"
@@ -204,9 +218,17 @@ const NotificationsPage = () => {
                   <CardContent>
                     <Typography variant="h6">{notification.message}</Typography>
                     {notification.reasonOfReject && (
-                      <Box sx={{ mt: 1, p: 1.5, bgcolor: 'error.light', borderRadius: 1 }}>
+                      <Box
+                        sx={{
+                          mt: 1,
+                          p: 1.5,
+                          bgcolor: 'error.light',
+                          borderRadius: 1,
+                        }}
+                      >
                         <Typography variant="body2" color="error.dark">
-                          <strong>Raison du rejet:</strong> {notification.reasonOfReject}
+                          <strong>Raison du rejet:</strong>{' '}
+                          {notification.reasonOfReject}
                         </Typography>
                       </Box>
                     )}
@@ -219,7 +241,8 @@ const NotificationsPage = () => {
                       </>
                     ) : (
                       <Typography variant="body2" color="textSecondary">
-                        <strong>Lot ID:</strong> {notification.batchId || 'Non spécifié'}
+                        <strong>Lot ID:</strong>{' '}
+                        {notification.batchId || 'Non spécifié'}
                       </Typography>
                     )}
                     <Typography variant="body2" color="textSecondary">
@@ -227,18 +250,24 @@ const NotificationsPage = () => {
                       {notification.date
                         ? new Date(notification.date).toLocaleDateString(
                             'fr-FR',
-                            { 
-                              day: '2-digit', 
-                              month: '2-digit', 
+                            {
+                              day: '2-digit',
+                              month: '2-digit',
                               year: 'numeric',
                               hour: '2-digit',
-                              minute: '2-digit'
+                              minute: '2-digit',
                             }
                           )
                         : 'Non spécifiée'}
                     </Typography>
                     {isNew && (
-                      <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                      <Box
+                        sx={{
+                          mt: 2,
+                          display: 'flex',
+                          justifyContent: 'flex-end',
+                        }}
+                      >
                         <Button
                           variant="outlined"
                           color="primary"
@@ -257,7 +286,7 @@ const NotificationsPage = () => {
           })}
         </Grid>
       )}
-      
+
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}

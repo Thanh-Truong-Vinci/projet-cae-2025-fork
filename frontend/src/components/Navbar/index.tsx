@@ -179,8 +179,8 @@ const NavBar = () => {
             sx={{ mr: 1 }}
             aria-label="notifications"
           >
-            <Badge 
-              badgeContent={unreadCount} 
+            <Badge
+              badgeContent={unreadCount}
               color="error"
               invisible={unreadCount === 0}
             >
