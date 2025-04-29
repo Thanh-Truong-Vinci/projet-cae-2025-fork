@@ -33,6 +33,7 @@ import { ReservationProvider } from './contexts/ReservationProvider'
 import HandlePendingBatchesPage from './components/pages/HandlePendingBatchesPage'
 import { StatisticsProvider } from './contexts/StatisticsProvider'
 import NotificationsPage from './components/pages/NotificationPage.tsx'
+import { NotificationProvider } from './contexts/NotifictaionContext.tsx'
 
 const router = createBrowserRouter([
   {
@@ -175,17 +176,19 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <UserContextProvider>
-        <ProductTypeProvider>
-          <ProductProvider>
-            <BatchProvider>
-              <PhotoProvider>
-                <ReservationProvider>
-                  <RouterProvider router={router} />
-                </ReservationProvider>
-              </PhotoProvider>
-            </BatchProvider>
-          </ProductProvider>
-        </ProductTypeProvider>
+        <NotificationProvider>
+          <ProductTypeProvider>
+            <ProductProvider>
+              <BatchProvider>
+                <PhotoProvider>
+                  <ReservationProvider>
+                    <RouterProvider router={router} />
+                  </ReservationProvider>
+                </PhotoProvider>
+              </BatchProvider>
+            </ProductProvider>
+          </ProductTypeProvider>
+        </NotificationProvider>
       </UserContextProvider>
     </ThemeProvider>
   </React.StrictMode>

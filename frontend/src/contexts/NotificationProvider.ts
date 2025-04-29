@@ -71,3 +71,57 @@ export const fetchNotificationsAPI = async (
   console.log('notificationApi: data transformée =', data)
   return data
 }
+
+// Fonction pour récupérer le nombre de notifications non lues
+export const fetchUnreadNotificationsCount = async (token: string): Promise<number> => {
+  try {
+    const notifications = await fetchNotificationsAPI(token)
+    return notifications.filter(notification => !notification.read).length
+  } catch (error) {
+    console.error('Erreur lors du comptage des notifications non lues:', error)
+    return 0
+  }
+}
+
+// Fonction pour marquer une notification comme lue
+export const markNotificationAsRead = async (
+  notificationId: number,
+  token: string
+): Promise<void> => {
+  try {
+    const response = await fetch(`/api/notifications/${notificationId}/read`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token,
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`Error marking notification as read: ${response.statusText}`)
+    }
+  } catch (error) {
+    console.error('Erreur lors du marquage de la notification comme lue:', error)
+    throw error
+  }
+}
+
+// Fonction pour marquer toutes les notifications comme lues
+export const markAllNotificationsAsRead = async (token: string): Promise<void> => {
+  try {
+    const response = await fetch('/api/notifications/read-all', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token,
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`Error marking all notifications as read: ${response.statusText}`)
+    }
+  } catch (error) {
+    console.error('Erreur lors du marquage de toutes les notifications comme lues:', error)
+    throw error
+  }
+}

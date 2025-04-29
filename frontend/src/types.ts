@@ -89,6 +89,10 @@ export interface ProductType {
 
 interface NotificationContextType {
   fetchNotifications: (token: string) => Promise<Notification[]>
+  unreadCount: number
+  fetchUnreadCount: (token: string) => Promise<void>
+  markAsRead: (notificationId: number, token: string) => Promise<void>
+  markAllAsRead: (token: string) => Promise<void>
 }
 
 interface Notification {

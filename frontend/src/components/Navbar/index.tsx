@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
-import { useContext } from 'react'
-import { Button, Box, IconButton } from '@mui/material'
+import { useContext, useEffect } from 'react'
+import { Button, Box, IconButton, Badge } from '@mui/material'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import ReceiptIcon from '@mui/icons-material/Receipt'
 import AddBoxIcon from '@mui/icons-material/AddBox'
@@ -9,12 +9,21 @@ import AssignmentIcon from '@mui/icons-material/Assignment'
 import LogoutIcon from '@mui/icons-material/Logout'
 import { Link } from 'react-router-dom'
 import { UserContext } from '../../contexts/UserContext'
+import { NotificationContext } from '../../contexts/NotifictaionContext'
 import { UserContextType } from '../../types'
 
 const NavBar = () => {
   const { authenticatedUser, clearUser } =
     useContext<UserContextType>(UserContext)
+  const { unreadCount, fetchUnreadCount } = useContext(NotificationContext)
   const navigate = useNavigate()
+
+  // Récupérer le nombre de notifications non lues au chargement du composant
+  useEffect(() => {
+    if (authenticatedUser && authenticatedUser.role === 'Producer') {
+      fetchUnreadCount(authenticatedUser.token)
+    }
+  }, [authenticatedUser, fetchUnreadCount])
 
   const handleLogout = async () => {
     document.cookie = 'token=; path=/; max-age=-1'
@@ -170,7 +179,13 @@ const NavBar = () => {
             sx={{ mr: 1 }}
             aria-label="notifications"
           >
-            <AssignmentIcon />
+            <Badge 
+              badgeContent={unreadCount} 
+              color="error"
+              invisible={unreadCount === 0}
+            >
+              <AssignmentIcon />
+            </Badge>
           </IconButton>
         </>
       )}
