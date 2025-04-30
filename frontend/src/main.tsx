@@ -33,7 +33,7 @@ import { ReservationProvider } from './contexts/ReservationProvider'
 import HandlePendingBatchesPage from './components/pages/HandlePendingBatchesPage'
 import { StatisticsProvider } from './contexts/StatisticsProvider'
 import NotificationsPage from './components/pages/NotificationPage.tsx'
-import { NotificationProvider } from './contexts/NotifictaionContext.tsx'
+import { NotificationProvider } from './contexts/NotificationProvider.tsx'
 
 const router = createBrowserRouter([
   {

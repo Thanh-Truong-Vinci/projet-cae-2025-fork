@@ -1,5 +1,5 @@
-import React, { createContext, useState, useEffect, useContext } from 'react'
-import { Notification, NotificationContextType } from '../types'
+import { useState, useEffect, useContext, ReactNode } from 'react'
+import { Notification } from '../types'
 import {
   fetchNotificationsAPI,
   fetchUnreadNotificationsCount,
@@ -7,19 +7,15 @@ import {
   markAllNotificationsAsRead,
 } from './NotificationProvider'
 import { UserContext } from './UserContext'
+import { NotificationContext } from './NotificationContext'
 
-// Création du contexte avec une valeur par défaut
-export const NotificationContext = createContext<NotificationContextType>({
-  fetchNotifications: async () => [],
-  unreadCount: 0,
-  fetchUnreadCount: async () => {},
-  markAsRead: async () => {},
-  markAllAsRead: async () => {},
-})
+interface NotificationProviderProps {
+  children: ReactNode
+}
 
-export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
+export const NotificationProvider = ({
   children,
-}) => {
+}: NotificationProviderProps) => {
   const [unreadCount, setUnreadCount] = useState<number>(0)
   const { authenticatedUser } = useContext(UserContext)
 

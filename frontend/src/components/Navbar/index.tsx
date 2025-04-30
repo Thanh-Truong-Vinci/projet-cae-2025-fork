@@ -9,7 +9,7 @@ import AssignmentIcon from '@mui/icons-material/Assignment'
 import LogoutIcon from '@mui/icons-material/Logout'
 import { Link } from 'react-router-dom'
 import { UserContext } from '../../contexts/UserContext'
-import { NotificationContext } from '../../contexts/NotifictaionContext'
+import { NotificationContext } from '../../contexts/NotificationContext'
 import { UserContextType } from '../../types'
 
 const NavBar = () => {

@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect, useCallback } from 'react'
 import { UserContext } from '../../contexts/UserContext'
 import { BatchContext } from '../../contexts/BatchContext'
-import { NotificationContext } from '../../contexts/NotifictaionContext'
+import { NotificationContext } from '../../contexts/NotificationContext'
 import { Notification } from '../../types'
 import {
   Box,
