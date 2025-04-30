@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from 'react'
+import { useContext, useState, useEffect, useCallback } from 'react'
 import { UserContext } from '../../contexts/UserContext'
 import { BatchContext } from '../../contexts/BatchContext'
 import { NotificationContext } from '../../contexts/NotifictaionContext'
@@ -33,7 +33,7 @@ const NotificationsPage = () => {
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false)
   const [snackbarMessage, setSnackbarMessage] = useState<string>('')
 
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     if (!authenticatedUser) return
     try {
       console.log(
@@ -53,7 +53,7 @@ const NotificationsPage = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [authenticatedUser, fetchNotifications])
 
   useEffect(() => {
     if (authenticatedUser) {
@@ -62,7 +62,7 @@ const NotificationsPage = () => {
       setLoading(false)
       setError('Vous devez être connecté pour voir vos notifications')
     }
-  }, [authenticatedUser])
+  }, [authenticatedUser, loadNotifications])
 
   const handleMarkAsRead = async (notificationId: number) => {
     if (!authenticatedUser) return
