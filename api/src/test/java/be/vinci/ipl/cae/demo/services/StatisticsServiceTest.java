@@ -527,7 +527,7 @@ public class StatisticsServiceTest {
         lastYearBatch.setProduct(testProduct);
         lastYearBatch.setUnitPrice(2.50);
         lastYearBatch.setSaleUnit("kg");
-        lastYearBatch.setAvailableQuantité(20);
+        lastYearBatch.setAvailableQuantity(20);
         lastYearBatch.setStatus(BatchStatus.RECEIVED);
         lastYearBatch.setDepositDate(LocalDate.now().minusYears(1)); // Année précédente
 
