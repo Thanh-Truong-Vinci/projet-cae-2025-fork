@@ -633,8 +633,8 @@ public class StatisticsServiceTest {
         anotherBatchSameProduct.setSaleUnit("kg");
         anotherBatchSameProduct.setAvailableQuantity(30);
         anotherBatchSameProduct.setStatus(BatchStatus.RECEIVED);
-        // Même date de dépôt que le premier lot
-        anotherBatchSameProduct.setDepositDate(testBatch.getDepositDate());
+        // IMPORTANT : Utiliser la même date que le premier lot pour qu'ils soient regroupés
+        anotherBatchSameProduct.setDepositDate(testBatch.getDepositDate()); // Même date
         
         ReservationLine line2 = new ReservationLine();
         line2.setId(2L);
@@ -647,52 +647,31 @@ public class StatisticsServiceTest {
         lines.add(line1);
         lines.add(line2);
         reservation.setReservationLines(lines);
-    
+
         List<Batch> receivedBatches = Arrays.asList(testBatch, anotherBatchSameProduct);
         List<Reservation> confirmedReservations = Collections.singletonList(reservation);
-    
+
         when(batchRepository.findByStatus(BatchStatus.RECEIVED)).thenReturn(receivedBatches);
         when(reservationRepository.findByStatus(ReservationStatus.CONFIRMED)).thenReturn(confirmedReservations);
-    
+
         // Act - Test spécifique pour les lignes 114 et 118 (incrémentation des quantités et du revenu)
         List<SalesStatisticsView> result = statisticsService.getSalesStatistics(null, null);
-    
+
         // Assert
         assertNotNull(result);
         
-        // Il PEUT y avoir 2 statistiques si les dates ne sont pas alignées correctement
-        // Vérifions d'abord ce que nous avons
-        if (result.size() == 2) {
-            // Si nous avons 2 statistiques, c'est parce que les dates ne sont pas alignées
-            // Calculons manuellement le total
-            int totalSoldQuantity = 0;
-            double totalRevenue = 0.0;
-            
-            for (SalesStatisticsView stats : result) {
-                totalSoldQuantity += stats.getSoldQuantity();
-                totalRevenue += stats.getTotalRevenue();
-            }
-            
-            // Vérifier que les totaux sont corrects
-            int expectedSoldQuantity = line1.getQuantity() + line2.getQuantity();
-            double expectedRevenue = (line1.getQuantity() * testBatch.getUnitPrice()) + 
-                                   (line2.getQuantity() * anotherBatchSameProduct.getUnitPrice());
-            
-            assertEquals(expectedSoldQuantity, totalSoldQuantity);
-            assertEquals(expectedRevenue, totalRevenue, 0.001);
-        } else if (result.size() == 1) {
-            // Si nous avons une seule statistique, c'est que tout est correctement regroupé
-            SalesStatisticsView stats = result.get(0);
-            
-            // Vérifier que les quantités ont été additionnées (ligne 114)
-            int expectedSoldQuantity = line1.getQuantity() + line2.getQuantity();
-            assertEquals(expectedSoldQuantity, stats.getSoldQuantity());
-            
-            // Vérifier que les revenus ont été additionnés correctement (ligne 118)
-            double expectedRevenue = (line1.getQuantity() * testBatch.getUnitPrice()) + 
-                                   (line2.getQuantity() * anotherBatchSameProduct.getUnitPrice());
-            assertEquals(expectedRevenue, stats.getTotalRevenue(), 0.001);
-        } else {
-            fail("Expected 1 or 2 statistics, but got " + result.size());
-        }
+        // Attendu : 1 statistique pour les deux lignes car elles ont le même produit et les mêmes dates
+        assertEquals(1, result.size());
+        
+        SalesStatisticsView stats = result.get(0);
+        
+        // Vérifier que les quantités ont été additionnées (ligne 114)
+        int expectedSoldQuantity = line1.getQuantity() + line2.getQuantity();
+        assertEquals(expectedSoldQuantity, stats.getSoldQuantity());
+        
+        // Vérifier que les revenus ont été additionnés correctement (ligne 118)
+        double expectedRevenue = (line1.getQuantity() * testBatch.getUnitPrice()) + 
+                               (line2.getQuantity() * anotherBatchSameProduct.getUnitPrice());
+        assertEquals(expectedRevenue, stats.getTotalRevenue(), 0.001);
     }
+}
