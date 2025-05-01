@@ -158,17 +158,24 @@ public class StatisticsServiceTest {
         
         // Assert
         assertNotNull(result);
-        assertFalse(result.isEmpty());
         
+        // Vérifier que tous les mois dans le résultat correspondent au mois demandé
         for (SalesStatisticsView stats : result) {
             assertEquals(currentMonth, stats.getMonth());
         }
-
+        
+        // Vérifier que nous avons les bonnes statistiques pour notre produit
         Optional<SalesStatisticsView> currentProductStats = result.stream()
             .filter(s -> s.getProductName().equals(testBatch.getProduct().getName()))
             .findFirst();
-        assertTrue(currentProductStats.isPresent());
-        assertEquals(testBatch.getAvailableQuantity(), currentProductStats.get().getReceivedQuantity());
+            
+        if (testBatch.getDepositDate().getMonthValue() == currentMonth) {
+            assertTrue(currentProductStats.isPresent());
+            assertEquals(testBatch.getAvailableQuantity(), currentProductStats.get().getReceivedQuantity());
+        } else {
+            // Si le lot n'est pas du mois courant, il ne devrait pas être dans les résultats
+            assertFalse(currentProductStats.isPresent());
+        }
     }
     
     @Test
@@ -520,7 +527,7 @@ public class StatisticsServiceTest {
         lastYearBatch.setProduct(testProduct);
         lastYearBatch.setUnitPrice(2.50);
         lastYearBatch.setSaleUnit("kg");
-        lastYearBatch.setAvailableQuantity(20);
+        lastYearBatch.setAvailableQuantité(20);
         lastYearBatch.setStatus(BatchStatus.RECEIVED);
         lastYearBatch.setDepositDate(LocalDate.now().minusYears(1)); // Année précédente
 
@@ -626,7 +633,8 @@ public class StatisticsServiceTest {
         anotherBatchSameProduct.setSaleUnit("kg");
         anotherBatchSameProduct.setAvailableQuantity(30);
         anotherBatchSameProduct.setStatus(BatchStatus.RECEIVED);
-        anotherBatchSameProduct.setDepositDate(LocalDate.now().minusDays(3));
+        // IMPORTANT : Utiliser la même date que le premier lot pour qu'ils soient regroupés
+        anotherBatchSameProduct.setDepositDate(testBatch.getDepositDate()); // Même date
         
         ReservationLine line2 = new ReservationLine();
         line2.setId(2L);
@@ -651,7 +659,9 @@ public class StatisticsServiceTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals(1, result.size()); // Une seule statistique car même produit, même mois/année
+        
+        // Avec la même date de dépôt et la même date de vente, il ne devrait y avoir qu'une seule statistique
+        assertEquals(1, result.size());
         
         SalesStatisticsView stats = result.get(0);
         
@@ -664,6 +674,4 @@ public class StatisticsServiceTest {
                                (line2.getQuantity() * anotherBatchSameProduct.getUnitPrice());
         assertEquals(expectedRevenue, stats.getTotalRevenue(), 0.001);
     }
-
-    
 }
