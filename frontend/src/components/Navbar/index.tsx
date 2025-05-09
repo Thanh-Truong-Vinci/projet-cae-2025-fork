@@ -19,7 +19,7 @@ const NavBar = () => {
   const handleLogout = async () => {
     document.cookie = 'token=; path=/; max-age=-1'
     clearUser()
-  } 
+  }
 
   // Si l'utilisateur n'est pas connecté
   if (!authenticatedUser) {
