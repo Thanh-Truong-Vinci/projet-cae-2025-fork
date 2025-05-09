@@ -6,7 +6,6 @@ import be.vinci.ipl.cae.demo.repositories.UserRepository;
 import java.time.LocalDate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /** Service class for managing managers. */
 @Service
@@ -61,7 +60,6 @@ public class ManagerService {
    * @param password the password
    * @return true if the registration is successful, false otherwise
    */
-  @Transactional
   public boolean register(
       String name, String firstname, String email, String password, String requesterEmail) {
     if (userRepository.findByEmail(email) != null) {

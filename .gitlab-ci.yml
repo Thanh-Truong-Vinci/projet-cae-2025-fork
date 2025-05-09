@@ -2,6 +2,7 @@ stages:
   - test
   - build
   - staging
+  - e2e
   - production
 
 variables:
@@ -95,6 +96,25 @@ deploy to staging:
     AZURE_WEBAPP_NAME: cae-group-09-staging-app
     BASE_URL: https://cae-group-09-staging-app-fhg0g0e3bzgudubp.centralus-01.azurewebsites.net/
   extends: .deploy
+
+e2e tests:
+  stage: e2e
+  environment: staging
+  variables:
+    BASE_URL: https://cae-group-09-staging-app-fhg0g0e3bzgudubp.centralus-01.azurewebsites.net/
+    NODE_ENV: staging
+  image: mcr.microsoft.com/playwright:v1.52.0-jammy
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
+  script:
+    - cd ./e2e
+    - npm ci
+    - npx playwright test
+    - if [ $? -ne 0 ]; then echo "E2E tests failed"; exit 1; fi
+  artifacts:
+    paths:
+      - e2e/playwright-report/
+      - e2e/test-results/
 
 deploy to production:
   stage: production

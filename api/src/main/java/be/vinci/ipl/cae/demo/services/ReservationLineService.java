@@ -10,7 +10,6 @@ import be.vinci.ipl.cae.demo.repositories.ReservationLineRepository;
 import be.vinci.ipl.cae.demo.repositories.ReservationRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /** Service class for managing reservation lines. */
 @Service
@@ -37,7 +36,6 @@ public class ReservationLineService {
    * @param batch the batch of the product
    * @param quantity the quantity of the product
    */
-  @Transactional
   public void createReservationLine(Reservation reservation, Batch batch, int quantity) {
     ReservationLine reservationLine = new ReservationLine();
     reservationLine.setReservation(reservation);
@@ -53,7 +51,6 @@ public class ReservationLineService {
    * @param product the product to add
    * @param quantity the quantity of the product to add
    */
-  @Transactional
   public void addProduct(Reservation reservation, Product product, int quantity) {
 
     List<ReservationLine> existingLines =
@@ -115,7 +112,6 @@ public class ReservationLineService {
    * @param reservationLine the reservation line to change
    * @param newQuantity the new quantity for the reservation line
    */
-  @Transactional
   public Reservation changeQuantity(ReservationLine reservationLine, int newQuantity) {
     if (newQuantity == 0) {
       deleteReservationLine(reservationLine);
@@ -137,7 +133,6 @@ public class ReservationLineService {
    *
    * @param reservationLine the reservation line to delete
    */
-  @Transactional
   public void deleteReservationLine(ReservationLine reservationLine) {
     // update batch available quantity
     Batch batch = reservationLine.getBatch();

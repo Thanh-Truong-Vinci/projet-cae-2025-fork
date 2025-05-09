@@ -6,7 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.persistence.Version;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -24,6 +23,4 @@ public class ProductType {
 
   @Column(name = "title", nullable = false, unique = true)
   private String title;
-
-  @Version private Long version;
 }

@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /** Service class for managing batches. */
 @Service
@@ -61,7 +60,6 @@ public class BatchService {
    * @param newBatch les données du lot à créer
    * @return le lot créé
    */
-  @Transactional
   public Batch createBatch(NewBatch newBatch, Product product, Photo photo) {
     Producer producer = producerRepository.findByEmail(newBatch.getEmail());
     return createBatchInternal(producer, product, photo, newBatch);
@@ -74,7 +72,6 @@ public class BatchService {
    * @param productId the ID of the existing product
    * @return the created batch
    */
-  @Transactional
   public Batch createBatchWithExistingProduct(NewBatch newBatch, Long productId) {
     Producer producer = producerRepository.findByEmail(newBatch.getEmail());
 
@@ -98,7 +95,6 @@ public class BatchService {
    * @param photoId the ID of the existing photo to use
    * @return the created batch
    */
-  @Transactional
   public Batch createBatchWithExistingImage(NewBatch newBatch, Long photoId) {
     // Find the existing photo
     Photo photo = photoService.getPhotoById(photoId);
@@ -178,7 +174,6 @@ public class BatchService {
    * @param id l'ID du lot à accepter
    * @return le lot accepté ou null si non trouvé
    */
-  @Transactional
   public Batch acceptBatch(long id) {
     Batch batch = batchRepository.findById(id).orElse(null);
     if (batch == null) {
@@ -196,7 +191,6 @@ public class BatchService {
    * @param message le message expliquant le rejet (peut être null ou vide)
    * @return le lot rejeté ou null si non trouvé
    */
-  @Transactional
   public Batch rejectBatch(long id, String message) {
     Batch batch = batchRepository.findById(id).orElse(null);
     if (batch == null) {
@@ -230,7 +224,6 @@ public class BatchService {
    * @param id l'ID du lot à marquer comme reçu
    * @return le lot mis à jour ou null si non trouvé ou status incorrect
    */
-  @Transactional
   public Batch receiveBatch(long id) {
     Batch batch = batchRepository.findById(id).orElse(null);
     if (batch == null) {

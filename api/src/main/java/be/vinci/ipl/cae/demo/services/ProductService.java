@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /** Service class for managing products. */
 @Service
@@ -46,7 +45,6 @@ public class ProductService {
    * @param description the description of the product
    * @param photo the photo associated with the product
    */
-  @Transactional
   public Product createProduct(String name, ProductType type, String description, Photo photo) {
     Product product = new Product();
     product.setName(name);
@@ -141,8 +139,7 @@ public class ProductService {
    * @param id l'identifiant du produit à supprimer
    * @return le produit supprimé ou null si aucun produit ne correspond
    */
-  @Transactional
-  public Product deleteProduct(Long id) {
+  public Product deleteProduct(long id) {
     Product product = getProductById(id);
     if (product != null) {
       productRepository.delete(product);
@@ -157,8 +154,7 @@ public class ProductService {
    * @param newProduct the DTO containing updated product information
    * @return the updated product if found, null otherwise
    */
-  @Transactional
-  public Product updateProduct(Long id, NewProduct newProduct) {
+  public Product updateProduct(long id, NewProduct newProduct) {
     Product existingProduct = getProductById(id);
     if (existingProduct != null) {
       if (newProduct.getName() != null) {

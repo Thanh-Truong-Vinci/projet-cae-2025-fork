@@ -1,6 +1,5 @@
 package be.vinci.ipl.cae.demo.exceptions;
 
-import jakarta.persistence.OptimisticLockException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,26 +127,5 @@ public class GlobalExceptionHandler {
     logger.error("Internal server error: {}", errorDetailsLog);
 
     return new ResponseEntity<>(errorDetailsClient, HttpStatus.INTERNAL_SERVER_ERROR);
-  }
-
-  /**
-   * Handle OptimisticLockException.
-   *
-   * @param ex the exception.
-   * @param request the request.
-   * @return the response entity.
-   */
-  @ExceptionHandler(OptimisticLockException.class)
-  public ResponseEntity<?> handleOptimisticLockException(
-      OptimisticLockException ex, WebRequest request, HttpServletRequest httpRequest) {
-
-    ErrorDetails errorDetailsClient =
-        createErrorDetails(HttpStatus.CONFLICT, ex, request, httpRequest, false);
-    ErrorDetails errorDetailsLog =
-        createErrorDetails(HttpStatus.CONFLICT, ex, request, httpRequest, true);
-
-    logger.error("Optimistic lock exception: {}", errorDetailsLog);
-
-    return new ResponseEntity<>(errorDetailsClient, HttpStatus.CONFLICT);
   }
 }

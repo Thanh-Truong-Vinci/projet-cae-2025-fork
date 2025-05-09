@@ -75,7 +75,8 @@ const mockProductContext = {
   getCategoryLabel: vi.fn(),
 }
 
-const mockCreateReservation = vi.fn()
+// Modifier cette ligne pour faire en sorte que mockCreateReservation retourne une Promise
+const mockCreateReservation = vi.fn().mockResolvedValue({})
 const mockReservationContext = {
   createReservation: mockCreateReservation,
   reservations: [],
@@ -192,7 +193,7 @@ describe('HomePage', () => {
     })
   })
 
-  test('ajoute un produit à la réservation', () => {
+  test('ajoute un produit à la réservation', async () => {
     render(
       <MemoryRouter>
         <ProductContext.Provider value={mockProductContext}>
@@ -209,7 +210,11 @@ describe('HomePage', () => {
       btn.innerHTML.includes('AddShoppingCartIcon')
     )
     if (cartButton) fireEvent.click(cartButton)
-    expect(mockCreateReservation).toHaveBeenCalled()
+
+    // Attendre que le mock soit appelé
+    await waitFor(() => {
+      expect(mockCreateReservation).toHaveBeenCalled()
+    })
   })
 
   test("navigue vers la page détaillée d'un produit lors du clic", () => {

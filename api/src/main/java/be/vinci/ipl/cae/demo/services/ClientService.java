@@ -6,7 +6,6 @@ import be.vinci.ipl.cae.demo.repositories.UserRepository;
 import java.time.LocalDate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /** Client service. */
 @Service
@@ -48,7 +47,6 @@ public class ClientService {
    * @param phoneNumber the phone number (optional)
    * @return the created client
    */
-  @Transactional
   public Client createClient(
       String name,
       String firstname,
@@ -95,7 +93,6 @@ public class ClientService {
    * @param phoneNumber the phone number (optional)
    * @return true if the registration is successful, false otherwise
    */
-  @Transactional
   public boolean register(
       String name,
       String firstname,

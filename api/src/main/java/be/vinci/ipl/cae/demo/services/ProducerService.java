@@ -6,7 +6,6 @@ import be.vinci.ipl.cae.demo.repositories.UserRepository;
 import java.time.LocalDate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /** Producer Service. */
 @Service
@@ -95,7 +94,6 @@ public class ProducerService {
    * @param phoneNumber the phoneNumber
    * @return true if the registration is successful, false otherwise
    */
-  @Transactional
   public boolean registerProducer(
       String name,
       String firstname,

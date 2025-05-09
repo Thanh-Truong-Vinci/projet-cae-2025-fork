@@ -17,68 +17,75 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @ExtendWith(MockitoExtension.class)
 class ProfileServiceTest {
 
-  private static final String TEST_EMAIL = "test@example.com";
-  private static final String CURRENT_PASSWORD = "currentPassword";
-  private static final String NEW_PASSWORD = "newPassword";
-  private static final String ENCODED_PASSWORD = "encodedCurrentPassword";
-  private static final String NEW_ENCODED_PASSWORD = "encodedNewPassword";
-  @Mock private UserRepository userRepository;
-  @Mock private BCryptPasswordEncoder passwordEncoder;
-  @InjectMocks private ProfileService profileService;
-  private User testUser;
+    @Mock
+    private UserRepository userRepository;
 
-  @BeforeEach
-  void setUp() {
-    // Don't use mock() for testUser if you plan to call real methods on it
-    testUser = new Client(); // Use a real User object instead of a mock
-    testUser.setEmail(TEST_EMAIL);
-    testUser.setPassword(ENCODED_PASSWORD);
-  }
+    @Mock
+    private BCryptPasswordEncoder passwordEncoder;
 
-  @Test
-  void whenCurrentPasswordMatches_thenUpdatePassword() {
-    // Arrange
-    when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(testUser);
-    when(passwordEncoder.matches(CURRENT_PASSWORD, ENCODED_PASSWORD)).thenReturn(true);
-    when(passwordEncoder.encode(NEW_PASSWORD)).thenReturn(NEW_ENCODED_PASSWORD);
+    @InjectMocks
+    private ProfileService profileService;
 
-    // Act
-    profileService.changePassword(TEST_EMAIL, CURRENT_PASSWORD, NEW_PASSWORD);
+    private static final String TEST_EMAIL = "test@example.com";
+    private static final String CURRENT_PASSWORD = "currentPassword";
+    private static final String NEW_PASSWORD = "newPassword";
+    private static final String ENCODED_PASSWORD = "encodedCurrentPassword";
+    private static final String NEW_ENCODED_PASSWORD = "encodedNewPassword";
 
-    // Assert
-    verify(userRepository).updatePassword(NEW_ENCODED_PASSWORD, TEST_EMAIL);
-  }
+    private User testUser;
 
-  @Test
-  void whenCurrentPasswordDoesNotMatch_thenDoNotUpdatePassword() {
-    // Arrange
-    when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(testUser);
-    when(passwordEncoder.matches(CURRENT_PASSWORD, ENCODED_PASSWORD)).thenReturn(false);
-
-    // Act
-    profileService.changePassword(TEST_EMAIL, CURRENT_PASSWORD, NEW_PASSWORD);
-
-    // Assert
-    verify(userRepository, never()).updatePassword(anyString(), anyString());
-  }
-
-  @Test
-  void whenUserNotFound_thenHandleNullPointerException() {
-    // Arrange
-    when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(null);
-
-    // We expect a NullPointerException when trying to get the password from a null user
-    try {
-      // Act
-      profileService.changePassword(TEST_EMAIL, CURRENT_PASSWORD, NEW_PASSWORD);
-
-      // If we get here, no exception was thrown, which is unexpected
-      fail("Should have thrown NullPointerException");
-    } catch (NullPointerException e) {
-      // This is expected
+    @BeforeEach
+    void setUp() {
+        // Don't use mock() for testUser if you plan to call real methods on it
+        testUser = new Client();  // Use a real User object instead of a mock
+        testUser.setEmail(TEST_EMAIL);
+        testUser.setPassword(ENCODED_PASSWORD);
     }
 
-    // Assert
-    verify(userRepository, never()).updatePassword(anyString(), anyString());
-  }
+    @Test
+    void whenCurrentPasswordMatches_thenUpdatePassword() {
+        // Arrange
+        when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(testUser);
+        when(passwordEncoder.matches(CURRENT_PASSWORD, ENCODED_PASSWORD)).thenReturn(true);
+        when(passwordEncoder.encode(NEW_PASSWORD)).thenReturn(NEW_ENCODED_PASSWORD);
+
+        // Act
+        profileService.changePassword(TEST_EMAIL, CURRENT_PASSWORD, NEW_PASSWORD);
+
+        // Assert
+        verify(userRepository).updatePassword(NEW_ENCODED_PASSWORD, TEST_EMAIL);
+    }
+
+    @Test
+    void whenCurrentPasswordDoesNotMatch_thenDoNotUpdatePassword() {
+        // Arrange
+        when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(testUser);
+        when(passwordEncoder.matches(CURRENT_PASSWORD, ENCODED_PASSWORD)).thenReturn(false);
+
+        // Act
+        profileService.changePassword(TEST_EMAIL, CURRENT_PASSWORD, NEW_PASSWORD);
+
+        // Assert
+        verify(userRepository, never()).updatePassword(anyString(), anyString());
+    }
+
+    @Test
+    void whenUserNotFound_thenHandleNullPointerException() {
+        // Arrange
+        when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(null);
+        
+        // We expect a NullPointerException when trying to get the password from a null user
+        try {
+            // Act
+            profileService.changePassword(TEST_EMAIL, CURRENT_PASSWORD, NEW_PASSWORD);
+            
+            // If we get here, no exception was thrown, which is unexpected
+            fail("Should have thrown NullPointerException");
+        } catch (NullPointerException e) {
+            // This is expected
+        }
+        
+        // Assert
+        verify(userRepository, never()).updatePassword(anyString(), anyString());
+    }
 }
