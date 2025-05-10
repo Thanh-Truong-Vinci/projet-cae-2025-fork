@@ -209,6 +209,10 @@ const ReservationsPage = () => {
     (res) => res.status === ReservationStatus.CANCELLED
   )
 
+  const abandonedReservations = reservations.filter(
+    (res) => res.status === ReservationStatus.ABANDONED
+  )
+
   // Create reservation list component to avoid code duplication
   const renderReservationList = (reservationList: ReservationView[]) => (
     <>
@@ -401,16 +405,16 @@ const ReservationsPage = () => {
                     : 'inherit',
                 }}
               />
-            <Tab
+              <Tab
                 label="Abandonnées"
                 {...a11yProps(3)}
                 sx={{
-                  color: cancelledReservations.length
+                  color: abandonedReservations.length
                     ? 'error.main'
                     : 'inherit',
                 }}
               />
-              </Tabs>
+            </Tabs>
           </Box>
 
           {/* Pending Reservations Tab */}
@@ -426,6 +430,11 @@ const ReservationsPage = () => {
           {/* Cancelled Reservations Tab */}
           <TabPanel value={tabValue} index={2}>
             {renderReservationList(cancelledReservations)}
+          </TabPanel>
+
+          {/* Abandoned Reservations Tab */}
+          <TabPanel value={tabValue} index={3}>
+            {renderReservationList(abandonedReservations)}
           </TabPanel>
         </Box>
       )}

@@ -198,6 +198,7 @@ export interface PendingBatch {
   unitType: string
   producerId: number
   producerName: string
+  producerCompany: string
   createdAt: string
 }
 
@@ -262,7 +263,7 @@ export enum ReservationStatus {
   PENDING = 'PENDING',
   CONFIRMED = 'CONFIRMED',
   CANCELLED = 'CANCELLED',
-  ABANDONED = "ABANDONED",
+  ABANDONED = 'ABANDONED',
 }
 /* eslint-enable no-unused-vars */
 
@@ -301,6 +302,7 @@ export interface ReservationContextType {
   toPendingReservation: (reservationId: number) => Promise<void>
   toConfirmReservation: (reservationId: number) => Promise<void>
   cancelReservation: (reservationId: number) => Promise<void>
+  abandonReservation: (reservationId: number) => Promise<void>
   clearReservation: (reservationId: number) => Promise<ReservationView>
   changeReservationLineQuantity: (
     lineId: number,

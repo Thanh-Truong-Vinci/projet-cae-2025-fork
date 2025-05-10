@@ -199,6 +199,7 @@ describe('HandlePendingBatchesPage', () => {
       createdAt: '2025-04-15',
       producerId: 1,
       createdBy: 1,
+      producerCompany: 'Nom de la société',
     },
     {
       id: 2,
@@ -214,6 +215,7 @@ describe('HandlePendingBatchesPage', () => {
       createdAt: '2025-04-10',
       producerId: 2,
       createdBy: 2,
+      producerCompany: 'Nom de la société',
     },
   ]
 
