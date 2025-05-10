@@ -20,5 +20,6 @@ public interface ReservationLineRepository extends CrudRepository<ReservationLin
    * @return Une liste de lignes de réservation correspondant à la réservation et au produit
    *     spécifiés, triées par date de production du lot en ordre croissant
    */
-  List<ReservationLine> findByReservationAndBatchOrderByBatchProductionDateAsc(Reservation reservation, Batch batch);
+  List<ReservationLine> findByReservationAndBatchOrderByBatchProductionDateAsc(
+      Reservation reservation, Batch batch);
 }
