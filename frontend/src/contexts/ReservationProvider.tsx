@@ -334,7 +334,7 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
       }
 
       const response = await axios.post(
-        '/api/reservation/toAbandon',
+        '/reservation/toAbandon',
         reservationId,
         {
           headers: {

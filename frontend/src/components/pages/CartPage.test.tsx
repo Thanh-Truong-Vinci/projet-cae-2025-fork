@@ -299,7 +299,7 @@ describe('CartPage', () => {
     }
 
     const reservationContextValue = {
-      reservations: reservation ? [reservation] : [],
+      reservations: [reservation],
       isLoading: false,
       error: null,
       fetchReservations: mockFetchReservations,
@@ -308,9 +308,9 @@ describe('CartPage', () => {
       toPendingReservation: mockToPendingReservation,
       toConfirmReservation: vi.fn(),
       cancelReservation: vi.fn(),
+      abandonReservation: vi.fn(), // Ajout de cette ligne
       clearReservation: mockClearReservation,
       changeReservationLineQuantity: mockChangeReservationLineQuantity,
-      abandonReservation: vi.fn(),
     }
 
     const result = render(

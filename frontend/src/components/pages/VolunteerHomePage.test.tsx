@@ -126,6 +126,10 @@ describe('VolunteerHomePage', () => {
     toReadyReservation: vi.fn(),
     toCompletedReservation: vi.fn(),
     toCancelledReservation: vi.fn(),
+    cancelReservation: vi.fn(),
+    abandonReservation: vi.fn(),
+    clearReservation: vi.fn(),
+    changeReservationLineQuantity: vi.fn(),
   } as unknown as ReservationContextType
 
   beforeEach(() => {
@@ -357,7 +361,9 @@ describe('VolunteerHomePage', () => {
       mockBatchContextValue,
       emptyReservationsContext
     )
-    expect(screen.getByText('0')).toBeTruthy()
+    expect(
+      screen.getByText('Aucune réservation en attente pour le moment.')
+    ).toBeTruthy()
   })
 
   test('handles null selectedBatchId in confirm dialog', async () => {
@@ -480,7 +486,9 @@ describe('VolunteerHomePage', () => {
     expect(
       screen.getByText('Aucun lot approuvé à recevoir pour le moment.')
     ).toBeTruthy()
-    expect(screen.getByText('0')).toBeTruthy()
+    expect(
+      screen.getByText('Aucune réservation en attente pour le moment.')
+    ).toBeTruthy()
   })
 
   test('directly tests the handleReceiveClick function', () => {

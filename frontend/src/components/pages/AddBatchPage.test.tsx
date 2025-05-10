@@ -67,6 +67,19 @@ vi.mock('@mui/x-date-pickers/DatePicker', () => ({
   ),
 }))
 
+vi.mock('dayjs', () => {
+  return {
+    default: vi.fn().mockReturnValue({
+      add: vi.fn().mockReturnValue({
+        format: vi.fn().mockReturnValue('2023-01-01'),
+      }),
+      format: () => '2025-04-20',
+      toDate: () => new Date(2025, 3, 20),
+      isValid: () => true,
+    }),
+  }
+})
+
 // Mock des hooks de navigation
 const mockedUsedNavigate = vi.fn()
 vi.mock('react-router-dom', async (importOriginal) => {
@@ -75,20 +88,6 @@ vi.mock('react-router-dom', async (importOriginal) => {
   return {
     ...actual, // Maintenant TypeScript sait que actual est un objet
     useNavigate: () => mockedUsedNavigate,
-  }
-})
-
-// Mock pour dayjs - Correction de l'erreur TypeScript
-vi.mock('dayjs', () => {
-  return {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    default: (_date: string | number | Date | null | undefined) => {
-      return {
-        format: () => '2025-04-20',
-        toDate: () => new Date(2025, 3, 20),
-        isValid: () => true,
-      }
-    },
   }
 })
 
