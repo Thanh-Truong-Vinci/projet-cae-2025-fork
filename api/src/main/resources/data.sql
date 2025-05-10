@@ -730,3 +730,356 @@ INSERT INTO client (id_user)
 SELECT id_user
 FROM users
 WHERE email = 'mario.rossi@example.com';
+
+-- DEMO
+
+-- Créer le gestionnaire Dubois Manu
+INSERT INTO users (name, firstname, email, password, date_inscription)
+VALUES ('Dubois', 'Manu', 'manu.dubois@example.com',
+        '$2a$10$8Cv0QyLMQ.dDlswhLhd8peiW6.KWnQLl0VmL5lw41/trJgprkg2vm',
+        '2025-02-01');
+
+-- Ajouter l'entrée de gestionnaire pour Dubois Manu
+INSERT INTO manager (id_user, manager)
+SELECT id_user, NULL
+FROM users
+WHERE email = 'manu.dubois@example.com';
+
+-- Créer les producteurs corrects: Roger Maerckx
+INSERT INTO users (name, firstname, email, password, date_inscription)
+VALUES ('Maerckx', 'Roger', 'roger.maerckx@example.com',
+        '$2a$10$8Cv0QyLMQ.dDlswhLhd8peiW6.KWnQLl0VmL5lw41/trJgprkg2vm',
+        '2025-02-15');
+
+INSERT INTO user_with_address (id_user, street, number, box, postal_code, city, country, phone_number)
+SELECT id_user,
+       'Rue des Producteurs',
+       '10',
+       '',
+       '5000',
+       'Namur',
+       'Belgique',
+       '+32478456123'
+FROM users
+WHERE email = 'roger.maerckx@example.com';
+
+INSERT INTO producer (id_user, company)
+SELECT id_user, 'Ferme Maerckx'
+FROM users
+WHERE email = 'roger.maerckx@example.com';
+
+-- Créer les producteurs corrects: Amandine Tasset
+INSERT INTO users (name, firstname, email, password, date_inscription)
+VALUES ('Tasset', 'Amandine', 'amandine.tasset@example.com',
+        '$2a$10$8Cv0QyLMQ.dDlswhLhd8peiW6.KWnQLl0VmL5lw41/trJgprkg2vm',
+        '2025-02-20');
+
+INSERT INTO user_with_address (id_user, street, number, box, postal_code, city, country, phone_number)
+SELECT id_user,
+       'Chemin des Cultures',
+       '25',
+       '',
+       '4000',
+       'Liège',
+       'Belgique',
+       '+32496789012'
+FROM users
+WHERE email = 'amandine.tasset@example.com';
+
+INSERT INTO producer (id_user, company)
+SELECT id_user, 'Productions Tasset'
+FROM users
+WHERE email = 'amandine.tasset@example.com';
+
+-- Créer la cliente Suzanne Droity
+INSERT INTO users (name, firstname, email, password, date_inscription)
+VALUES ('Droity', 'Suzanne', 'suzanne.droity@example.com',
+        '$2a$10$8Cv0QyLMQ.dDlswhLhd8peiW6.KWnQLl0VmL5lw41/trJgprkg2vm',
+        '2025-03-01');
+
+INSERT INTO user_with_address (id_user, street, number, box, postal_code, city, country, phone_number)
+SELECT id_user,
+       'Avenue des Clients',
+       '42',
+       'B',
+       '1050',
+       'Bruxelles',
+       'Belgique',
+       '+32498765432'
+FROM users
+WHERE email = 'suzanne.droity@example.com';
+
+INSERT INTO client (id_user, civility)
+SELECT id_user, 'Mme'
+FROM users
+WHERE email = 'suzanne.droity@example.com';
+
+-- Ajouter les nouvelles photos pour les produits supplémentaires
+INSERT INTO photos (product_name, url)
+VALUES 
+('miel_pissenlit', 'https://imagestoragecae09.blob.core.windows.net/dev/d5fcf24a-7744-4f45-9e0d-0a9d964e4041'),
+('laitue_blonde', 'https://imagestoragecae09.blob.core.windows.net/dev/bad5f397-2f27-4c58-8b90-28de7be2ca5e'),
+('carottes_cosmic', 'https://imagestoragecae09.blob.core.windows.net/dev/f962063f-acf3-4e86-a38d-a728f983f02f'),
+('courgette_blanche', 'https://imagestoragecae09.blob.core.windows.net/dev/d24d89a5-a77f-485f-9e4c-949115d63399'),
+('cerise_napoleon', 'https://imagestoragecae09.blob.core.windows.net/dev/2468799f-ba1b-4ae9-aad6-5e35d7dac415'),
+('haricots_mistik', 'https://imagestoragecae09.blob.core.windows.net/dev/abe1c8dd-1a7e-4d70-9522-3c750c398b20');
+
+-- Insérer les nouveaux produits avec leurs types et photos
+INSERT INTO products (id_product_type, name, description, photo_id)
+SELECT pt.id_product_type,
+       'Laitue Blonde de Paris',
+       'Excellente laitue de printemps, d''été et d''automne verte clair, pommée, ondulée et croquante',
+       p.id_photo
+FROM product_types pt,
+     photos p
+WHERE pt.title = 'Légumes'
+  AND p.product_name = 'laitue_blonde';
+
+INSERT INTO products (id_product_type, name, description, photo_id)
+SELECT pt.id_product_type,
+       'Carottes Cosmic Purple',
+       'Carottes à la saveur sucrée, de couleur pourpre violet dont la chair est orangée',
+       p.id_photo
+FROM product_types pt,
+     photos p
+WHERE pt.title = 'Légumes'
+  AND p.product_name = 'carottes_cosmic';
+
+INSERT INTO products (id_product_type, name, description, photo_id)
+SELECT pt.id_product_type,
+       'Courgette Blanche d''Egypte',
+       'Courgette ventrue à peau vert très pâle',
+       p.id_photo
+FROM product_types pt,
+     photos p
+WHERE pt.title = 'Légumes'
+  AND p.product_name = 'courgette_blanche';
+
+INSERT INTO products (id_product_type, name, description, photo_id)
+SELECT pt.id_product_type,
+       'Cerise Napoléon',
+       'Cerise de couleur jaune marbrée de rouge, ferme et croquante',
+       p.id_photo
+FROM product_types pt,
+     photos p
+WHERE pt.title = 'Fruits'
+  AND p.product_name = 'cerise_napoleon';
+
+INSERT INTO products (id_product_type, name, description, photo_id)
+SELECT pt.id_product_type,
+       'Miel de Pissenlit Bio 250gr',
+       'Texture onctueuse cristallisée, arômes rappellant la richesse florale des prairies printanières',
+       p.id_photo
+FROM product_types pt,
+     photos p
+WHERE pt.title = 'Autres'
+  AND p.product_name = 'miel_pissenlit';
+
+INSERT INTO products (id_product_type, name, description, photo_id)
+SELECT pt.id_product_type,
+       'Haricots Mistik',
+       'Haricots extra-fins d''un beau pourpre foncé',
+       p.id_photo
+FROM product_types pt,
+     photos p
+WHERE pt.title = 'Légumes'
+  AND p.product_name = 'haricots_mistik';
+
+-- Créer des lots pour les produits de Roger Maerckx
+-- Laitue Blonde de Paris - En vente
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit, available_quantity, status, deposit_date, production_date)
+SELECT (SELECT id_user FROM users WHERE email = 'manu.dubois@example.com'),
+       (SELECT id_user FROM users WHERE email = 'roger.maerckx@example.com'),
+       p.id_product,
+       ph.id_photo,
+       '2025-05-01',
+       0.78,
+       'piece',
+       67,
+       'RECEIVED',
+       '2025-04-15',
+       '2025-04-10'
+FROM products p
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
+WHERE p.name = 'Laitue Blonde de Paris';
+
+-- Courgette Blanche d'Egypte - En vente
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit, available_quantity, status, deposit_date, production_date)
+SELECT (SELECT id_user FROM users WHERE email = 'manu.dubois@example.com'),
+       (SELECT id_user FROM users WHERE email = 'roger.maerckx@example.com'),
+       p.id_product,
+       ph.id_photo,
+       '2025-05-05',
+       3.75,
+       'kg',
+       300,
+       'RECEIVED',
+       '2025-04-20',
+       '2025-04-15'
+FROM products p
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
+WHERE p.name = 'Courgette Blanche d''Egypte';
+
+-- Haricots Mistik - Vente terminée
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit, available_quantity, status, deposit_date, production_date)
+SELECT (SELECT id_user FROM users WHERE email = 'manu.dubois@example.com'),
+       (SELECT id_user FROM users WHERE email = 'roger.maerckx@example.com'),
+       p.id_product,
+       ph.id_photo,
+       '2025-04-15',
+       2.99,
+       'kg',
+       220,
+       'RECEIVED',
+       '2025-04-10',
+       '2025-04-05'
+FROM products p
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
+WHERE p.name = 'Haricots Mistik';
+
+-- Carottes Cosmic Purple - Vente terminée
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit, available_quantity, status, deposit_date, production_date)
+SELECT (SELECT id_user FROM users WHERE email = 'manu.dubois@example.com'),
+       (SELECT id_user FROM users WHERE email = 'roger.maerckx@example.com'),
+       p.id_product,
+       ph.id_photo,
+       '2025-04-20',
+       3.22,
+       'kg',
+       185,
+       'RECEIVED',
+       '2025-04-12',
+       '2025-04-08'
+FROM products p
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
+WHERE p.name = 'Carottes Cosmic Purple';
+
+-- Miel de Pissenlit Bio 250gr - En vente
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit, available_quantity, status, deposit_date, production_date)
+SELECT (SELECT id_user FROM users WHERE email = 'manu.dubois@example.com'),
+       (SELECT id_user FROM users WHERE email = 'roger.maerckx@example.com'),
+       p.id_product,
+       ph.id_photo,
+       '2025-05-10',
+       11.9,
+       'piece',
+       8,
+       'RECEIVED',
+       '2025-04-25',
+       '2025-04-15'
+FROM products p
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
+WHERE p.name = 'Miel de Pissenlit Bio 250gr';
+
+-- Cerise Napoléon - Refusé
+INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
+                     sale_unit, available_quantity, status, deposit_date, production_date)
+SELECT (SELECT id_user FROM users WHERE email = 'manu.dubois@example.com'),
+       (SELECT id_user FROM users WHERE email = 'roger.maerckx@example.com'),
+       p.id_product,
+       ph.id_photo,
+       '2025-06-01',
+       32,
+       'kg',
+       105,
+       'REJECTED',
+       '2025-04-28',
+       '2025-04-25'
+FROM products p
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
+WHERE p.name = 'Cerise Napoléon';
+
+-- Réservation 1 - À récupérer (jour de la démo)
+INSERT INTO reservation (client, status, reservation_date, sale_date, price)
+SELECT (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com'),
+       'PENDING',
+       CURRENT_DATE,
+       NULL,
+       3 * 0.78;
+
+-- Réservation 2 - À récupérer (jour de la démo)
+INSERT INTO reservation (client, status, reservation_date, sale_date, price)
+SELECT (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com'),
+       'PENDING',
+       CURRENT_DATE,
+       NULL,
+       2 * 11.9;
+
+-- Réservation 3 - À récupérer (jour de la démo)
+INSERT INTO reservation (client, status, reservation_date, sale_date, price)
+SELECT (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com'),
+       'PENDING',
+       CURRENT_DATE,
+       NULL,
+       4 * 3.75;
+
+-- Réservation 4 - Récupérée (06-05-25)
+INSERT INTO reservation (client, status, reservation_date, sale_date, price)
+SELECT (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com'),
+       'CONFIRMED',
+       '2025-05-05',
+       '2025-05-06',
+       15.50;
+
+-- Réservation 5 - Abandonnée (29-04-25)
+INSERT INTO reservation (client, status, reservation_date, sale_date, price)
+SELECT (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com'),
+       'CANCELLED',
+       '2025-04-25',
+       '2025-04-29',
+       8.25;
+
+-- Réservation 6 - Annulée (28-04-25)
+INSERT INTO reservation (client, status, reservation_date, sale_date, price)
+SELECT (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com'),
+       'CANCELLED',
+       '2025-04-25',
+       '2025-04-28',
+       12.75;
+
+-- Ajout des lignes de réservation pour la réservation 1 (laitue)
+INSERT INTO reservation_lines (reservation_id, batch_id, quantity)
+SELECT 
+  (SELECT id_reservation FROM reservation WHERE client = (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com') AND status = 'PENDING' ORDER BY id_reservation LIMIT 1),
+  (SELECT id FROM batches WHERE product_id = (SELECT id_product FROM products WHERE name = 'Laitue Blonde de Paris') AND status = 'RECEIVED' LIMIT 1),
+  3;
+
+-- Mettre à jour la quantité du lot de laitue
+UPDATE batches 
+SET available_quantity = available_quantity - 3 
+WHERE id = (SELECT id FROM batches WHERE product_id = (SELECT id_product FROM products WHERE name = 'Laitue Blonde de Paris') AND status = 'RECEIVED' LIMIT 1);
+
+-- Ajout des lignes de réservation pour la réservation 2 (miel)
+INSERT INTO reservation_lines (reservation_id, batch_id, quantity)
+SELECT 
+  (SELECT id_reservation FROM reservation WHERE client = (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com') AND status = 'PENDING' ORDER BY id_reservation OFFSET 1 LIMIT 1),
+  (SELECT id FROM batches WHERE product_id = (SELECT id_product FROM products WHERE name = 'Miel de Pissenlit Bio 250gr') AND status = 'RECEIVED' LIMIT 1),
+  2;
+
+-- Mettre à jour la quantité du lot de miel
+UPDATE batches 
+SET available_quantity = available_quantity - 2 
+WHERE id = (SELECT id FROM batches WHERE product_id = (SELECT id_product FROM products WHERE name = 'Miel de Pissenlit Bio 250gr') AND status = 'RECEIVED' LIMIT 1);
+
+-- Ajout des lignes de réservation pour la réservation 3 (courgette)
+INSERT INTO reservation_lines (reservation_id, batch_id, quantity)
+SELECT 
+  (SELECT id_reservation FROM reservation WHERE client = (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com') AND status = 'PENDING' ORDER BY id_reservation OFFSET 2 LIMIT 1),
+  (SELECT id FROM batches WHERE product_id = (SELECT id_product FROM products WHERE name = 'Courgette Blanche d''Egypte') AND status = 'RECEIVED' LIMIT 1),
+  4;
+
+-- Mettre à jour la quantité du lot de courgettes
+UPDATE batches 
+SET available_quantity = available_quantity - 4 
+WHERE id = (SELECT id FROM batches WHERE product_id = (SELECT id_product FROM products WHERE name = 'Courgette Blanche d''Egypte') AND status = 'RECEIVED' LIMIT 1);
