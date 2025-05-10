@@ -34,7 +34,8 @@ import {
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-import { Dayjs } from 'dayjs'
+// Import de l'instance dayjs (pas juste le type)
+import dayjs, { Dayjs } from 'dayjs'
 import 'dayjs/locale/fr'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'
 import SearchIcon from '@mui/icons-material/Search'
@@ -100,6 +101,9 @@ const AddBatchPage = () => {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedImage, setSelectedImage] = useState<Photo | null>(null)
+
+  // Date minimum = aujourd'hui + 3 jours
+  const minAvailabilityDate = dayjs().add(3, 'day')
 
   useEffect(() => {
     if (!batchContext) {
@@ -285,16 +289,20 @@ const AddBatchPage = () => {
 
     if (!productType) newErrors.productType = 'Le type de produit est requis'
 
-    if (productDescription && productDescription.length > 500) {
+    if (productDescription && productDescription.length > 120) {
       newErrors.productDescription =
-        'La description ne doit pas dépasser 500 caractères'
+        'La description ne doit pas dépasser 120 caractères'
     }
 
     if (!fieldsLocked && !productImage && !imagePreview)
       newErrors.productImage = 'Une image est requise'
 
-    if (!availabilityDate)
+    if (!availabilityDate) {
       newErrors.availabilityDate = 'La date de disponibilité est requise'
+    } else if (availabilityDate.isBefore(minAvailabilityDate)) {
+      newErrors.availabilityDate =
+        "La date doit être au moins 3 jours après aujourd'hui"
+    }
 
     if (
       !availableQuantity ||
@@ -618,7 +626,7 @@ const AddBatchPage = () => {
               <TextField
                 fullWidth
                 label="Description du produit"
-                placeholder="Ajoutez une description (max 500 caractères)"
+                placeholder="Ajoutez une description (max 120 caractères)"
                 value={productDescription}
                 onChange={(e) => setProductDescription(e.target.value)}
                 error={!!errors.productDescription}
@@ -707,11 +715,14 @@ const AddBatchPage = () => {
                   label="Date de disponibilité *"
                   value={availabilityDate}
                   onChange={(newValue) => setAvailabilityDate(newValue)}
+                  minDate={minAvailabilityDate}
                   slotProps={{
                     textField: {
                       fullWidth: true,
                       error: !!errors.availabilityDate,
-                      helperText: errors.availabilityDate,
+                      helperText:
+                        errors.availabilityDate ||
+                        "La date doit être au moins 3 jours après aujourd'hui",
                     },
                   }}
                 />
