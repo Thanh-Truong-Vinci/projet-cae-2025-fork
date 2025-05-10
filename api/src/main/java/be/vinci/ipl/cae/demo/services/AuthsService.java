@@ -198,6 +198,30 @@ public class AuthsService {
     return authenticatedUser;
   }
 
+  /**
+   * Vérifie si un token JWT est valide, sans vérifier le rôle associé.
+   *
+   * @param token Le token JWT à vérifier
+   * @return true si le token est valide, false sinon
+   */
+  public boolean isValidToken(String token) {
+    return verifyJwtToken(token) != null;
+  }
+
+  /**
+   * Extrait le rôle associé à un token JWT.
+   *
+   * @param token Le token JWT à analyser
+   * @return Le rôle sous forme de chaîne, ou null si le token est invalide
+   */
+  public String getRoleFromToken(String token) {
+    String email = verifyJwtToken(token);
+    if (email == null) {
+      return null;
+    }
+    return determineUserRole(email);
+  }
+
   /** Enum representing user roles in the system. */
   public enum Role {
     CLIENT("Client"),

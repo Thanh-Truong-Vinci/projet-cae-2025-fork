@@ -310,6 +310,7 @@ describe('CartPage', () => {
       cancelReservation: vi.fn(),
       clearReservation: mockClearReservation,
       changeReservationLineQuantity: mockChangeReservationLineQuantity,
+      abandonReservation: vi.fn(),
     }
 
     const result = render(

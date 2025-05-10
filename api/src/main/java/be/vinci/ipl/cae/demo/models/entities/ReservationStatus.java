@@ -5,5 +5,6 @@ public enum ReservationStatus {
   BUILDING,
   PENDING,
   CONFIRMED,
-  CANCELLED
+  CANCELLED,
+  ABANDONED
 }

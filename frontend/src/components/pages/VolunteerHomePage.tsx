@@ -45,8 +45,12 @@ const VolunteerHomePage = () => {
     )
   }
 
-  const { reservations, fetchAllReservations, toConfirmReservation } =
-    reservationContext
+  const {
+    reservations,
+    fetchAllReservations,
+    toConfirmReservation,
+    abandonReservation,
+  } = reservationContext
 
   useEffect(() => {
     fetchAllReservations()
@@ -123,6 +127,23 @@ const VolunteerHomePage = () => {
         error instanceof Error
           ? error.message
           : 'Erreur lors de la confirmation de la réservation'
+      )
+      setSnackbarSeverity('error')
+    } finally {
+      setOpenSnackbar(true)
+    }
+  }
+
+  const handleAbandonReservation = async (reservationId: number) => {
+    try {
+      await abandonReservation(reservationId)
+      setSnackbarMessage('Réservation abandonnée avec succès')
+      setSnackbarSeverity('success')
+    } catch (error) {
+      setSnackbarMessage(
+        error instanceof Error
+          ? error.message
+          : "Erreur lors de l'abandon de la réservation"
       )
       setSnackbarSeverity('error')
     } finally {
@@ -276,8 +297,7 @@ const VolunteerHomePage = () => {
         ) : pendingReservations.length === 0 ? (
           <Box sx={{ p: 4, textAlign: 'center' }}>
             <Typography variant="body1" color="textSecondary">
-              Aucune réservation en attente pour le moment.{' '}
-              {reservations.length}
+              Aucune réservation en attente pour le moment.
             </Typography>
           </Box>
         ) : (
@@ -337,15 +357,26 @@ const VolunteerHomePage = () => {
                         </Button>
                       </TableCell>
                       <TableCell>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={() =>
-                            handleConfirmReservation(reservation.id)
-                          }
-                        >
-                          Confirmer
-                        </Button>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() =>
+                              handleConfirmReservation(reservation.id)
+                            }
+                          >
+                            Confirmer
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            color="error"
+                            onClick={() =>
+                              handleAbandonReservation(reservation.id)
+                            }
+                          >
+                            Abandonner
+                          </Button>
+                        </Box>
                       </TableCell>
                     </TableRow>
                     {expandedReservationId === reservation.id && (
