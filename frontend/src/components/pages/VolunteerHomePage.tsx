@@ -94,6 +94,7 @@ const VolunteerHomePage = () => {
             productName: 'Produit de test',
             unitPrice: 10,
             imageLocation: 'https://via.placeholder.com/150',
+            unitType: 'kg',
           },
         ],
       },
@@ -404,7 +405,10 @@ const VolunteerHomePage = () => {
                                         />
                                       </TableCell>
                                       <TableCell>{line.productName}</TableCell>
-                                      <TableCell>{line.quantity}</TableCell>
+                                      <TableCell>
+                                        {line.quantity}
+                                        {line.unitType}
+                                      </TableCell>
                                       <TableCell>
                                         {(
                                           line.quantity * line.unitPrice

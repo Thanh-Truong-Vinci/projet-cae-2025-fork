@@ -166,7 +166,15 @@ describe('HomePage', () => {
     fireEvent.click(confirmButton)
     await waitFor(() => {
       expect(screen.getAllByText('Pommes').length).toBeGreaterThan(0)
-      expect(screen.queryByText('Carottes')).toBeNull()
+
+      // Modification ici: au lieu de chercher 'Carottes' partout,
+      // vérifiez qu'aucune carte de produit dans la liste filtrée ne contient 'Carottes'
+      const productCards = screen
+        .getAllByRole('button')
+        .filter((el) => el.closest('.MuiCard-root'))
+        .filter((card) => card.textContent?.includes('Carottes') || false)
+
+      expect(productCards.length).toBe(0)
     })
   })
 

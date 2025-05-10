@@ -288,7 +288,10 @@ const ReservationsPage = () => {
                         <TableCell align="right">
                           {line.unitPrice.toFixed(2)}€
                         </TableCell>
-                        <TableCell align="center">{line.quantity}</TableCell>
+                        <TableCell align="center">
+                          {line.quantity}
+                          {line.unitType}
+                        </TableCell>
                         <TableCell align="right">
                           {calculateLineTotal(line.unitPrice, line.quantity)}
                         </TableCell>
