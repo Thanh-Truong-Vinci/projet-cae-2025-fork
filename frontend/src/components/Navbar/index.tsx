@@ -7,6 +7,7 @@ import AddBoxIcon from '@mui/icons-material/AddBox'
 import PersonIcon from '@mui/icons-material/Person'
 import AssignmentIcon from '@mui/icons-material/Assignment'
 import LogoutIcon from '@mui/icons-material/Logout'
+import NotificationsIcon from '@mui/icons-material/Notifications'
 import { Link } from 'react-router-dom'
 import { UserContext } from '../../contexts/UserContext'
 import { NotificationContext } from '../../contexts/NotificationContext'
@@ -221,7 +222,7 @@ const NavBar = () => {
               color="error"
               invisible={unreadCount === 0}
             >
-              <AssignmentIcon />
+              <NotificationsIcon />
             </Badge>
           </IconButton>
         </>
