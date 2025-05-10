@@ -31,13 +31,14 @@ public class ReservationLineService {
    * Adds a product to a reservation with the specified batch ID and quantity.
    *
    * @param reservation the reservation to add the product to
-   * @param batch       the batch to add
-   * @param quantity    the quantity of the product to add
+   * @param batch the batch to add
+   * @param quantity the quantity of the product to add
    */
   public void addProduct(Reservation reservation, Batch batch, int quantity) {
 
-    List<ReservationLine> existingLines = reservationLineRepository
-        .findByReservationAndBatchOrderByBatchProductionDateAsc(reservation, batch);
+    List<ReservationLine> existingLines =
+        reservationLineRepository.findByReservationAndBatchOrderByBatchProductionDateAsc(
+            reservation, batch);
 
     for (ReservationLine existingLine : existingLines) {
       if (existingLine.getBatch().getId().equals(batch.getId())) {
@@ -51,13 +52,15 @@ public class ReservationLineService {
     reservationLine.setBatch(batch);
     reservationLine.setQuantity(quantity);
     reservationLineRepository.save(reservationLine);
+    batch.setAvailableQuantity(batch.getAvailableQuantity() - quantity);
+    batchRepository.save(batch);
   }
 
   /**
    * Changes the quantity of a reservation line.
    *
    * @param reservationLine the reservation line to change
-   * @param newQuantity     the new quantity for the reservation line
+   * @param newQuantity the new quantity for the reservation line
    */
   public Reservation changeQuantity(ReservationLine reservationLine, int newQuantity) {
     if (newQuantity == 0) {
@@ -66,6 +69,8 @@ public class ReservationLineService {
     }
     // update batch available quantity
     Batch batch = reservationLine.getBatch();
+    batch.setAvailableQuantity(
+        batch.getAvailableQuantity() - (newQuantity - reservationLine.getQuantity()));
     batchRepository.save(batch);
 
     reservationLine.setQuantity(newQuantity);
@@ -74,8 +79,7 @@ public class ReservationLineService {
   }
 
   /**
-   * Deletes a reservation line and updates the available quantity of the
-   * associated batch.
+   * Deletes a reservation line and updates the available quantity of the associated batch.
    *
    * @param reservationLine the reservation line to delete
    */
@@ -88,5 +92,7 @@ public class ReservationLineService {
     reservationLine.getReservation().getReservationLines().remove(reservationLine);
     reservationRepository.save(reservationLine.getReservation());
     reservationLineRepository.delete(reservationLine);
+    batch.setAvailableQuantity(batch.getAvailableQuantity() + reservationLine.getQuantity());
+    batchRepository.save(batch);
   }
 }

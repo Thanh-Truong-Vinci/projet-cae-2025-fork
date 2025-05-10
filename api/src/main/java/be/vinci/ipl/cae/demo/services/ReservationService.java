@@ -101,6 +101,7 @@ public class ReservationService {
         && reservation.getStatus() != ReservationStatus.CANCELLED) {
       for (ReservationLine line : reservation.getReservationLines()) {
         Batch batch = line.getBatch();
+        batch.setAvailableQuantity(batch.getAvailableQuantity() + line.getQuantity());
         batchRepository.save(batch);
       }
     }
