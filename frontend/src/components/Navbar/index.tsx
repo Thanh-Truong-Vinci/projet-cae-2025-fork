@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Button, Box, IconButton, Badge } from '@mui/material'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import ReceiptIcon from '@mui/icons-material/Receipt'
@@ -11,12 +11,16 @@ import { Link } from 'react-router-dom'
 import { UserContext } from '../../contexts/UserContext'
 import { NotificationContext } from '../../contexts/NotificationContext'
 import { UserContextType } from '../../types'
+import { ReservationContext } from '../../contexts/ReservationContext'
+import { ReservationStatus } from '../../types'
 
 const NavBar = () => {
   const { authenticatedUser, clearUser } =
     useContext<UserContextType>(UserContext)
+  const reservationContext = useContext(ReservationContext)
   const { unreadCount, fetchUnreadCount } = useContext(NotificationContext)
   const navigate = useNavigate()
+  const [cartItemCount, setCartItemCount] = useState(0)
 
   // Récupérer le nombre de notifications non lues au chargement du composant
   useEffect(() => {
@@ -29,6 +33,27 @@ const NavBar = () => {
     document.cookie = 'token=; path=/; max-age=-1'
     clearUser()
   }
+
+  // Calculer le nombre d'articles dans le panier
+  useEffect(() => {
+    if (reservationContext && authenticatedUser) {
+      // Trouver la réservation en cours (BUILDING)
+      const currentCart = reservationContext.reservations.find(
+        (res) => res.status === ReservationStatus.BUILDING
+      )
+
+      if (currentCart && currentCart.reservationLines) {
+        // Calculer le nombre total de produits (sum des quantités)
+        const total = currentCart.reservationLines.reduce(
+          (sum, line) => sum + line.quantity,
+          0
+        )
+        setCartItemCount(total)
+      } else {
+        setCartItemCount(0)
+      }
+    }
+  }, [reservationContext, authenticatedUser])
 
   // Si l'utilisateur n'est pas connecté
   if (!authenticatedUser) {
@@ -84,7 +109,19 @@ const NavBar = () => {
             sx={{ mr: 1 }}
             aria-label="panier"
           >
-            <ShoppingCartIcon sx={{ color: 'green' }} />
+            <Badge
+              badgeContent={cartItemCount}
+              color="success"
+              overlap="circular"
+              sx={{
+                '& .MuiBadge-badge': {
+                  fontWeight: 'bold',
+                  fontSize: '0.8rem',
+                },
+              }}
+            >
+              <ShoppingCartIcon sx={{ color: 'green' }} />
+            </Badge>
           </IconButton>
           <IconButton
             onClick={() => navigate('/reservations')}
