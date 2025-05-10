@@ -30,16 +30,19 @@ public class StatisticsController {
   }
 
   /**
-   * Récupère les statistiques de ventes, optionnellement filtrées par année et/ou mois.
+   * Récupère les statistiques de ventes, optionnellement filtrées par année, mois et/ou produit.
    *
    * @param year l'année pour laquelle récupérer les statistiques (optionnel)
    * @param month le mois pour lequel récupérer les statistiques (optionnel)
+   * @param productId l'identifiant du produit pour lequel récupérer les statistiques (optionnel)
    * @return la liste des statistiques de ventes
    */
   @GetMapping("/sales")
   @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
   public List<SalesStatisticsView> getSalesStatistics(
-      @RequestParam(required = false) Integer year, @RequestParam(required = false) Integer month) {
-    return statisticsService.getSalesStatistics(year, month);
+      @RequestParam(required = false) Integer year, 
+      @RequestParam(required = false) Integer month,
+      @RequestParam(required = false) Long productId) {
+    return statisticsService.getSalesStatistics(year, month, productId);
   }
 }

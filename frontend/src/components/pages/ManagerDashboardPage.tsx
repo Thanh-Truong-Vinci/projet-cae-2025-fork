@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {
   Container,
   Typography,
@@ -276,6 +276,14 @@ const ManagerDashboardPage = () => {
   const [selectedMonth, setSelectedMonth] = useState<number | undefined>(
     undefined
   )
+  const [selectedProductId, setSelectedProductId] = useState<
+    number | undefined
+  >(undefined)
+
+  // Ajouter cet état pour stocker tous les produits uniques
+  const [allUniqueProducts, setAllUniqueProducts] = useState<
+    Array<{ productId: number; productName: string }>
+  >([])
 
   // États généraux
   const { authenticatedUser } = useContext(UserContext)
@@ -297,6 +305,22 @@ const ManagerDashboardPage = () => {
   // Générateur d'années pour le filtre (5 dernières années)
   const currentYear = new Date().getFullYear()
   const availableYears = Array.from({ length: 5 }, (_, i) => currentYear - i)
+
+  // Gestionnaires d'événements pour les filtres
+  const handleYearChange = (event: SelectChangeEvent<number | ''>) => {
+    const value = event.target.value
+    setSelectedYear(value === '' ? undefined : Number(value))
+  }
+
+  const handleMonthChange = (event: SelectChangeEvent<number | ''>) => {
+    const value = event.target.value
+    setSelectedMonth(value === '' ? undefined : Number(value))
+  }
+
+  const handleProductChange = (event: SelectChangeEvent<number | ''>) => {
+    const value = event.target.value
+    setSelectedProductId(value === '' ? undefined : Number(value))
+  }
 
   // Rediriger si non authentifié ou non gestionnaire
   useEffect(() => {
@@ -406,9 +430,39 @@ const ManagerDashboardPage = () => {
   // Chargement des statistiques
   useEffect(() => {
     if (tabValue === 2) {
-      fetchSalesStatistics(selectedYear, selectedMonth)
+      fetchSalesStatistics(selectedYear, selectedMonth, selectedProductId)
     }
-  }, [fetchSalesStatistics, selectedYear, selectedMonth, tabValue])
+  }, [
+    fetchSalesStatistics,
+    selectedYear,
+    selectedMonth,
+    selectedProductId,
+    tabValue,
+  ])
+
+  // Ajouter un nouvel effet pour capturer tous les produits uniques la première fois que les statistiques sont chargées
+  useEffect(() => {
+    if (salesStatistics.length > 0 && allUniqueProducts.length === 0) {
+      const productMap = new Map<
+        string,
+        { productId: number; productName: string }
+      >()
+      salesStatistics.forEach((stat) => {
+        if (!productMap.has(stat.productName)) {
+          productMap.set(stat.productName, {
+            productId: stat.productId,
+            productName: stat.productName,
+          })
+        }
+      })
+
+      const sortedProducts = Array.from(productMap.values()).sort((a, b) =>
+        a.productName.localeCompare(b.productName)
+      )
+
+      setAllUniqueProducts(sortedProducts)
+    }
+  }, [salesStatistics, allUniqueProducts])
 
   // Calculer les totaux pour les métriques
   const totalReceived = salesStatistics.reduce(
@@ -423,17 +477,6 @@ const ManagerDashboardPage = () => {
     (sum, stat) => sum + (stat.totalRevenue || 0),
     0
   )
-
-  // Gestionnaires d'événements pour les filtres
-  const handleYearChange = (event: SelectChangeEvent<number | ''>) => {
-    const value = event.target.value
-    setSelectedYear(value === '' ? undefined : Number(value))
-  }
-
-  const handleMonthChange = (event: SelectChangeEvent<number | ''>) => {
-    const value = event.target.value
-    setSelectedMonth(value === '' ? undefined : Number(value))
-  }
 
   // Grouper les statistiques par type de produit
   const statsByProductType = salesStatistics.reduce(
@@ -861,6 +904,27 @@ const ManagerDashboardPage = () => {
 
         {/* Filtres */}
         <Grid container spacing={2} sx={{ mb: 4 }}>
+          {/* Sélecteur de produit */}
+          <Grid item xs={12}>
+            <FormControl fullWidth>
+              <InputLabel id="product-select-label">Produit</InputLabel>
+              <Select
+                labelId="product-select-label"
+                value={selectedProductId || ''}
+                label="Produit"
+                onChange={handleProductChange}
+              >
+                <MenuItem value="">Tous les produits</MenuItem>
+                {allUniqueProducts.map((product) => (
+                  <MenuItem key={product.productId} value={product.productId}>
+                    {product.productName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          {/* Sélecteur d'année */}
           <Grid item xs={12} md={6}>
             <FormControl fullWidth>
               <InputLabel id="year-select-label">Année</InputLabel>
@@ -879,6 +943,8 @@ const ManagerDashboardPage = () => {
               </Select>
             </FormControl>
           </Grid>
+
+          {/* Sélecteur de mois */}
           <Grid item xs={12} md={6}>
             <FormControl fullWidth>
               <InputLabel id="month-select-label">Mois</InputLabel>
@@ -899,6 +965,15 @@ const ManagerDashboardPage = () => {
             </FormControl>
           </Grid>
         </Grid>
+
+        {/* Affichage du titre avec le produit sélectionné */}
+        {selectedProductId && (
+          <Typography variant="h6" color="primary" sx={{ mb: 2 }}>
+            Statistiques pour:{' '}
+            {products.find((p) => p.productId === selectedProductId)
+              ?.productName || 'Produit sélectionné'}
+          </Typography>
+        )}
 
         {/* Cartes récapitulatives */}
         <Grid container spacing={4} sx={{ mb: 4 }}>
@@ -937,41 +1012,45 @@ const ManagerDashboardPage = () => {
         </Grid>
 
         {/* Tableau par type de produit */}
-        <Paper elevation={3} sx={{ p: 2, mb: 4 }}>
-          <Typography variant="h6" gutterBottom>
-            Récapitulatif par Type de Produit
-          </Typography>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Type de Produit</TableCell>
-                  <TableCell align="right">Unités Reçues</TableCell>
-                  <TableCell align="right">Unités Vendues</TableCell>
-                  <TableCell align="right">Taux de Conversion</TableCell>
-                  <TableCell align="right">Revenu Total</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {Object.values(statsByProductType).map((stat) => (
-                  <TableRow key={stat.productType}>
-                    <TableCell>{stat.productType}</TableCell>
-                    <TableCell align="right">{stat.receivedQuantity}</TableCell>
-                    <TableCell align="right">{stat.soldQuantity}</TableCell>
-                    <TableCell align="right">
-                      {stat.receivedQuantity > 0
-                        ? `${((stat.soldQuantity / stat.receivedQuantity) * 100).toFixed(1)}%`
-                        : 'N/A'}
-                    </TableCell>
-                    <TableCell align="right">
-                      {stat.totalRevenue.toFixed(2)} €
-                    </TableCell>
+        {!selectedProductId && (
+          <Paper elevation={3} sx={{ p: 2, mb: 4 }}>
+            <Typography variant="h6" gutterBottom>
+              Récapitulatif par Type de Produit
+            </Typography>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Type de Produit</TableCell>
+                    <TableCell align="right">Unités Reçues</TableCell>
+                    <TableCell align="right">Unités Vendues</TableCell>
+                    <TableCell align="right">Taux de Conversion</TableCell>
+                    <TableCell align="right">Revenu Total</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
+                </TableHead>
+                <TableBody>
+                  {Object.values(statsByProductType).map((stat) => (
+                    <TableRow key={stat.productType}>
+                      <TableCell>{stat.productType}</TableCell>
+                      <TableCell align="right">
+                        {stat.receivedQuantity}
+                      </TableCell>
+                      <TableCell align="right">{stat.soldQuantity}</TableCell>
+                      <TableCell align="right">
+                        {stat.receivedQuantity > 0
+                          ? `${((stat.soldQuantity / stat.receivedQuantity) * 100).toFixed(1)}%`
+                          : 'N/A'}
+                      </TableCell>
+                      <TableCell align="right">
+                        {stat.totalRevenue.toFixed(2)} €
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
+        )}
 
         {/* Tableau détaillé par produit */}
         <Paper elevation={3} sx={{ p: 2 }}>
