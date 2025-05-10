@@ -45,65 +45,29 @@ public class ReservationLineService {
   }
 
   /**
-   * Adds a product to a reservation with the specified quantity.
+   * Adds a product to a reservation with the specified batch ID and quantity.
    *
    * @param reservation the reservation to add the product to
-   * @param product the product to add
+   * @param batch the batch to add
    * @param quantity the quantity of the product to add
    */
-  public void addProduct(Reservation reservation, Product product, int quantity) {
+  public void addProduct(Reservation reservation, Batch batch, int quantity) {
 
     List<ReservationLine> existingLines =
-        reservationLineRepository.findByReservationAndBatchProductOrderByBatchProductionDateAsc(
-            reservation, product);
+        reservationLineRepository.findByReservationAndBatchOrderByBatchDateDesc(reservation, batch);
 
-    int remainingQuantity = quantity;
-
-    // augmenter la quantité si le produit existe déjà
-    for (ReservationLine line : existingLines) {
-      Batch batch = line.getBatch();
-      if (batch.getAvailableQuantity() > 0) {
-        int additionalQuantity = Math.min(batch.getAvailableQuantity(), remainingQuantity);
-        if (additionalQuantity > 0) {
-          line.setQuantity(line.getQuantity() + additionalQuantity);
-          reservationLineRepository.save(line);
-
-          batch.setAvailableQuantity(batch.getAvailableQuantity() - additionalQuantity);
-          batchRepository.save(batch);
-
-          remainingQuantity -= additionalQuantity;
-          if (remainingQuantity <= 0) {
-            return;
-          }
-        }
+    for (ReservationLine existingLine : existingLines) {
+      if (existingLine.getBatch().getId() == batch.getId()) {
+        changeQuantity(existingLine, existingLine.getQuantity() + quantity);
+        return;
       }
     }
 
-    if (remainingQuantity > 0) {
-      List<Batch> batches =
-          batchRepository.findByProductIdAndAvailableQuantityGreaterThanOrderByProductionDateAsc(
-              product.getId(), 0);
-
-      for (Batch batch : batches) {
-        // Vérifier que ce lot n'est pas déjà utilisé dans des lignes existantes
-        if (existingLines.stream()
-            .noneMatch(line -> line.getBatch().getId().equals(batch.getId()))) {
-          int batchQuantity = Math.min(batch.getAvailableQuantity(), remainingQuantity);
-          createReservationLine(reservation, batch, batchQuantity);
-          remainingQuantity -= batchQuantity;
-          batch.setAvailableQuantity(batch.getAvailableQuantity() - batchQuantity);
-          batchRepository.save(batch);
-
-          if (remainingQuantity <= 0) {
-            break;
-          }
-        }
-      }
-    }
-
-    if (remainingQuantity > 0) {
-      throw new ConflictException("Not enough stock available for product: " + product.getName());
-    }
+    ReservationLine reservationLine = new ReservationLine();
+    reservationLine.setReservation(reservation);
+    reservationLine.setBatch(batch);
+    reservationLine.setQuantity(quantity);
+    reservationLineRepository.save(reservationLine);
   }
 
   /**
