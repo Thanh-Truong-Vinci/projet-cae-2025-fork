@@ -288,7 +288,7 @@ const CartPage = () => {
                       />
                     </TableCell>
                     <TableCell>{item.productName}</TableCell>
-                    <TableCell align="right">{item.unitPrice}</TableCell>
+
                     <TableCell align="center">
                       <Box
                         sx={{
@@ -323,6 +323,9 @@ const CartPage = () => {
                           <AddIcon />
                         </IconButton>
                       </Box>
+                      <Typography variant="caption" color="text.secondary">
+                        {item.unitType}
+                      </Typography>
                     </TableCell>
                     <TableCell align="right">
                       {`${(item.unitPrice * item.quantity).toFixed(2)}€`}

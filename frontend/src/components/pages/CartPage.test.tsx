@@ -210,6 +210,7 @@ describe('CartPage', () => {
       productName: 'Tomates Bio',
       unitPrice: 2.5,
       imageLocation: 'https://example.com/tomates.jpg',
+      unitType: 'kg',
     },
     {
       id: 2,
@@ -219,6 +220,7 @@ describe('CartPage', () => {
       productName: 'Pommes Golden',
       unitPrice: 1.8,
       imageLocation: 'https://example.com/pommes.jpg',
+      unitType: 'kg',
     },
   ]
 

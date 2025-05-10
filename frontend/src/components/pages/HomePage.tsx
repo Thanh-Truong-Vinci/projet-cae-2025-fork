@@ -64,7 +64,7 @@ const HomePage = () => {
   // Produits filtrés
   const [filteredProducts, setFilteredProducts] = useState<ProductBatch[]>([])
 
-  // Produits aléatoires "plus vendus"
+  // Produits récents (5 derniers lots reçus)
   const [topProducts, setTopProducts] = useState<ProductBatch[]>([])
 
   // Ajouter un useEffect pour charger les types depuis l'API
@@ -92,17 +92,19 @@ const HomePage = () => {
     fetchProductTypes()
   }, [])
 
-  // Générer des produits aléatoires pour les "plus vendus"
+  // Sélectionner les 5 lots les plus récents en état RECEIVED
   useEffect(() => {
     if (products.length > 0) {
-      // Si moins de 3 produits, tous les utiliser
-      if (products.length <= 3) {
-        setTopProducts([...products])
-      } else {
-        // Sinon, sélectionner 3 aléatoirement
-        const shuffledProducts = [...products].sort(() => 0.5 - Math.random())
-        setTopProducts(shuffledProducts.slice(0, 3))
-      }
+      // Trier les produits par date de production (les plus récents en premier)
+      const sortedProducts = [...products].sort((a, b) => {
+        const dateA = new Date(a.earliestProductionDate).getTime()
+        const dateB = new Date(b.earliestProductionDate).getTime()
+        return dateB - dateA // Ordre décroissant (plus récent d'abord)
+      })
+
+      // Prendre les 5 premiers (ou moins s'il y a moins de 5 produits)
+      const recentCount = Math.min(5, sortedProducts.length)
+      setTopProducts(sortedProducts.slice(0, recentCount))
     }
   }, [products])
 
@@ -194,8 +196,6 @@ const HomePage = () => {
       [productId]: Math.max(1, (prev[productId] || 1) + value),
     }))
   }
-
-  // Fonction modifiée dans HomePage.tsx pour fournir un retour visuel lors de l'ajout au panier
 
   const handleAddToReservation = (productBatch: ProductBatch) => {
     const qty = quantities[productBatch.productId] || 1
@@ -335,7 +335,7 @@ const HomePage = () => {
               flexShrink: 0,
             }}
           >
-            <Typography variant="h5">Produits les plus vendus</Typography>
+            <Typography variant="h5">Produits les plus récents</Typography>
             <Box
               sx={{
                 display: 'flex',

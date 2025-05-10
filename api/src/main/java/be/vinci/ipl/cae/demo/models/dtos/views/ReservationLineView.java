@@ -17,6 +17,7 @@ public class ReservationLineView {
   private String productName;
   private double unitPrice;
   private String imageLocation;
+  private String unitType;
 
   /**
    * Constructor for ReservationLineView. Creates a reservation line view from a ReservationLine
@@ -32,5 +33,6 @@ public class ReservationLineView {
     this.productName = reservationLine.getBatch().getProduct().getName();
     this.unitPrice = reservationLine.getBatch().getUnitPrice();
     this.imageLocation = reservationLine.getBatch().getPhoto().getImageLocation();
+    this.unitType = reservationLine.getBatch().getSaleUnit();
   }
 }
