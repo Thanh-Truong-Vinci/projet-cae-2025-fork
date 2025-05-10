@@ -67,7 +67,7 @@ public class ReservationController {
       throw new ResourceNotFoundException("Token not valid, expired or user is not client");
     }
     reservationService.reserveProduct(
-        client, reservationRequest.getProductId(), reservationRequest.getQuantity());
+        client, reservationRequest.getBatchId(), reservationRequest.getQuantity());
   }
 
   /**

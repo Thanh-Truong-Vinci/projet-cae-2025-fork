@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReservationRequest {
 
-  private Long productId;
+  private Long batchId;
   private int quantity;
 }
