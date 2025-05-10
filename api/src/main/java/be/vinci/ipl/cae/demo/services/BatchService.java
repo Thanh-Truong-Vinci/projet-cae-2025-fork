@@ -210,7 +210,10 @@ public class BatchService {
       try {
         Notification notification = new Notification();
         notification.setRead(false);
-        notification.setMessage(message);
+
+        notification.setMessage("Le lot a été refusé");
+
+        // La raison du rejet est stockée dans son champ
         notification.setReasonOfReject(message);
         notification.setDate(LocalDate.now());
 
