@@ -20,6 +20,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
       - AZURE_BLOB_SAS_TOKEN=${AZURE_BLOB_SAS_TOKEN}
+      - JWT_SECRET=${JWT_SECRET}
     entrypoint: ["java", "-jar", "app.jar", "--spring.profiles.active=staging"]
 
   reverse-proxy:

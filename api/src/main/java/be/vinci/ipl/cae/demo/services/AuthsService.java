@@ -13,17 +13,19 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import java.util.Date;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
 
 /** Service for handling authentication-related operations. */
 @Service
 public class AuthsService {
 
-  private static final String JWT_SECRET = "JWT_SECRET";
+  @Value("${JWT_SECRET}")
+  private String jwtSecret;
+
   private static final long LIFETIME_JWT = 24 * 60 * 60 * 1000; // 24 hours
-  private static final Algorithm algorithm = Algorithm.HMAC256(JWT_SECRET);
+  private Algorithm algorithm;
   private final UserRepository userRepository;
   private final ClientRepository clientRepository;
   private final ManagerRepository managerRepository;
@@ -42,6 +44,12 @@ public class AuthsService {
     this.managerRepository = managerRepository;
     this.producerRepository = producerRepository;
     this.passwordEncoder = passwordEncoder;
+  }
+
+  @Value("${JWT_SECRET}")
+  public void setJwtSecret(String jwtSecret) {
+    this.jwtSecret = jwtSecret;
+    this.algorithm = Algorithm.HMAC256(jwtSecret);
   }
 
   /**

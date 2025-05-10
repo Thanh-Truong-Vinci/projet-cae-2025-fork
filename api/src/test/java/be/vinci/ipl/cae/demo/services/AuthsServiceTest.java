@@ -1,4 +1,3 @@
-
 package be.vinci.ipl.cae.demo.services;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -88,6 +87,9 @@ public class AuthsServiceTest {
         mockManager.setPassword("hashedPassword");
         mockManager.setName("Manager");
         mockManager.setFirstname("User");
+        
+        // Set the JWT secret for testing
+        authsService.setJwtSecret("test_jwt_secret");
     }
     
     @Test
