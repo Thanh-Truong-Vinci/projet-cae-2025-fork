@@ -427,7 +427,8 @@ public class BatchService {
       view.setAvailabilityDate(batch.getAvailabilityDate());
       view.setAvailableQuantity(batch.getAvailableQuantity());
       view.setProducerId(batch.getProducer().getId());
-      view.setProducerName(batch.getProducer().getCompany());
+      view.setProducerName(batch.getProducer().getFirstname() + " " + batch.getProducer().getName());
+      view.setProducerCompany(batch.getProducer().getCompany());
 
       // Champ spécifique à ManagerBatchView
       view.setDescription(batch.getProduct().getDescription());

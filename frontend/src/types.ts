@@ -198,6 +198,7 @@ export interface PendingBatch {
   unitType: string
   producerId: number
   producerName: string
+  producerCompany?: string
   createdAt: string
 }
 

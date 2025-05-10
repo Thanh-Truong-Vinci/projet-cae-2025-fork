@@ -231,11 +231,20 @@ const HandlePendingBatchesPage = () => {
                             <Typography component="div" variant="h5">
                               {batch.productName}
                             </Typography>
+                            {batch.producerCompany && (
+                              <Typography
+                                variant="subtitle1"
+                                color="text.secondary"
+                              >
+                                {batch.producerCompany}
+                              </Typography>
+                            )}
                             <Typography
-                              variant="subtitle1"
+                              variant="body2"
                               color="text.secondary"
+                              sx={{ mt: 0.5 }}
                             >
-                              {batch.producerName}
+                              <strong>Producteur:</strong> {batch.producerName}
                             </Typography>
                             <Chip
                               label={batch.productType}
@@ -416,6 +425,10 @@ const HandlePendingBatchesPage = () => {
                       {new Date(
                         selectedBatch.availabilityDate
                       ).toLocaleDateString()}
+                    </Typography>
+                    <Typography variant="subtitle2">
+                      <strong>Entreprise:</strong>{' '}
+                      {selectedBatch.producerCompany}
                     </Typography>
                     <Typography variant="subtitle2">
                       <strong>Producteur:</strong> {selectedBatch.producerName}
