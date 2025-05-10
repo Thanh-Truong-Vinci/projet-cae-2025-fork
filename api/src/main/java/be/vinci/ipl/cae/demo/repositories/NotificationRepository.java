@@ -8,9 +8,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-/**
- * Repository Notification.
- */
+/** Repository Notification. */
 @Repository
 public interface NotificationRepository extends CrudRepository<Notification, Long> {
 
@@ -32,7 +30,7 @@ public interface NotificationRepository extends CrudRepository<Notification, Lon
   @Modifying
   @Query("UPDATE Notification n SET n.read = true WHERE n.idNotification = :id")
   int updateReadStatus(@Param("id") Long idNotification);
-  
+
   /**
    * Update all notifications read status for a producer.
    *
@@ -40,6 +38,7 @@ public interface NotificationRepository extends CrudRepository<Notification, Lon
    * @return the number of rows affected
    */
   @Modifying
-  @Query("UPDATE Notification n SET n.read = true WHERE n.producer.id = :producerId AND n.read = false")
+  @Query(
+      "UPDATE Notification n SET n.read = true WHERE n.producer.id = :producerId AND n.read = false")
   int markAllAsRead(@Param("producerId") Long producerId);
 }

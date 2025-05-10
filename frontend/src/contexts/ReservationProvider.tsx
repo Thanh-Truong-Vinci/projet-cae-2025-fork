@@ -115,7 +115,7 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
 
   // Create a new reservation
   const createReservation = async (
-    productId: number,
+    batchId: number,
     quantity: number
   ): Promise<void> => {
     setIsLoading(true)
@@ -129,7 +129,7 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
       }
 
       const reservationRequest: ReservationRequest = {
-        productId,
+        batchId,
         quantity,
       }
 

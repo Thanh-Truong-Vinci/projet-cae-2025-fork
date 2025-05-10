@@ -16,7 +16,6 @@ import java.util.Date;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
 /** Service for handling authentication-related operations. */
 @Service
 public class AuthsService {

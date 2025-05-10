@@ -199,7 +199,18 @@ const HomePage = () => {
 
   const handleAddToReservation = (productBatch: ProductBatch) => {
     const qty = quantities[productBatch.productId] || 1
-    createReservation(productBatch.productId, qty)
+    reserveBatch(productBatch, qty, 0)
+  }
+
+  const reserveBatch = (productBatch: ProductBatch, qty: number, index: number) => {
+    if (qty > productBatch.batchQuantities[index]) {
+      reserveBatch(
+        productBatch,
+        qty - productBatch.batchQuantities[index],
+        index + 1
+      )
+    }
+    createReservation(productBatch.batchIds[index], qty)
       .then(() => {
         setMessage(
           `${qty} ${qty > 1 ? 'articles' : 'article'} "${productBatch.productName}" ${qty > 1 ? 'ajoutés' : 'ajouté'} au panier`

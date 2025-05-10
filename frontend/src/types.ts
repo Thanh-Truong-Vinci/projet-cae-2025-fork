@@ -283,7 +283,7 @@ export interface ReservationLineView {
 }
 
 export interface ReservationRequest {
-  productId: number
+  batchId: number
   quantity: number
 }
 

@@ -13,56 +13,58 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * Service for managing notifications.
- */
+/** Service for managing notifications. */
 @Service
 public class NotificationService {
   private final NotificationRepository notificationRepository;
   private final BatchRepository batchRepository;
 
   /**
-  * Constructor for NotificationService.
-  *
-  * @param notificationRepository the notification repository
-  * @param batchRepository        the batch repository
-  */
-  public NotificationService(NotificationRepository notificationRepository,
-      BatchRepository batchRepository) {
+   * Constructor for NotificationService.
+   *
+   * @param notificationRepository the notification repository
+   * @param batchRepository the batch repository
+   */
+  public NotificationService(
+      NotificationRepository notificationRepository, BatchRepository batchRepository) {
     this.notificationRepository = notificationRepository;
     this.batchRepository = batchRepository;
   }
 
   /**
-  * Creates a new notification.
-  *
-  * @param notification the notification to create
-  * @return the created notification
-  */
+   * Creates a new notification.
+   *
+   * @param notification the notification to create
+   * @return the created notification
+   */
   @Transactional
   public Notification createNotification(NewNotification notification) {
     System.out.println("Sout batch " + notification.getBatchId());
     System.out.println("Sout reject " + notification.getReasonOfReject());
     System.out.println("Sout message " + notification.getMessage());
-    
+
     Notification newNotification = new Notification();
     newNotification.setMessage(notification.getMessage());
     newNotification.setRead(false);
     newNotification.setDate(LocalDate.now()); // S'assurer que la date est toujours définie
     newNotification.setReasonOfReject(notification.getReasonOfReject());
-    
+
     if (notification.getBatchId() != null && notification.getBatchId() > 0) {
-      Batch batchNotification = batchRepository.findById(notification.getBatchId())
-          .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, 
-                    "Le lot avec l'ID " + notification.getBatchId() + " n'a pas été trouvé"));
-                    
+      Batch batchNotification =
+          batchRepository
+              .findById(notification.getBatchId())
+              .orElseThrow(
+                  () ->
+                      new ResponseStatusException(
+                          HttpStatus.NOT_FOUND,
+                          "Le lot avec l'ID " + notification.getBatchId() + " n'a pas été trouvé"));
+
       newNotification.setBatch(batchNotification);
       newNotification.setProducer(batchNotification.getProducer());
     }
-    
+
     return notificationRepository.save(newNotification);
   }
-
 
   /**
    * Get notifications for an user.
@@ -72,14 +74,13 @@ public class NotificationService {
    */
   @Transactional(readOnly = true)
   public List<Notification> getNotificationsByUserPrincipal(Object principal) {
-    if (!(principal instanceof User)) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-              "Principal n'est pas un utilisateur valide");
+    if (!(principal instanceof User user)) {
+      throw new ResponseStatusException(
+          HttpStatus.UNAUTHORIZED, "Principal n'est pas un utilisateur valide");
     }
-    User user = (User) principal;
     return notificationRepository.findByProducerId(user.getId());
   }
-  
+
   /**
    * Mark a notification as read.
    *
@@ -89,20 +90,25 @@ public class NotificationService {
    */
   @Transactional
   public Notification markNotificationAsRead(Long id, Long producerId) {
-    Notification notification = notificationRepository.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-            "Notification non trouvée avec l'ID: " + id));
-    
+    Notification notification =
+        notificationRepository
+            .findById(id)
+            .orElseThrow(
+                () ->
+                    new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Notification non trouvée avec l'ID: " + id));
+
     // Vérifier que la notification appartient au bon producteur
-    if (notification.getProducer() == null || !notification.getProducer().getId().equals(producerId)) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-          "Cette notification n'appartient pas au producteur connecté");
+    if (notification.getProducer() == null
+        || !notification.getProducer().getId().equals(producerId)) {
+      throw new ResponseStatusException(
+          HttpStatus.FORBIDDEN, "Cette notification n'appartient pas au producteur connecté");
     }
-    
+
     notification.setRead(true);
     return notificationRepository.save(notification);
   }
-  
+
   /**
    * Mark all notifications as read for a producer.
    *
@@ -111,7 +117,7 @@ public class NotificationService {
   @Transactional
   public void markAllNotificationsAsRead(Long producerId) {
     List<Notification> notifications = notificationRepository.findByProducerId(producerId);
-    
+
     for (Notification notification : notifications) {
       notification.setRead(true);
       notificationRepository.save(notification);

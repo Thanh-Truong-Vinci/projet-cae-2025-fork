@@ -2,7 +2,6 @@ package be.vinci.ipl.cae.demo.services;
 
 import be.vinci.ipl.cae.demo.models.entities.Batch;
 import be.vinci.ipl.cae.demo.models.entities.Client;
-import be.vinci.ipl.cae.demo.models.entities.Product;
 import be.vinci.ipl.cae.demo.models.entities.Reservation;
 import be.vinci.ipl.cae.demo.models.entities.ReservationLine;
 import be.vinci.ipl.cae.demo.models.entities.ReservationStatus;
@@ -44,15 +43,10 @@ public class ReservationService {
    * Reserves a product for a client with the specified quantity.
    *
    * @param client the client making the reservation
-   * @param productId the ID of the product to reserve
+   * @param batch the batch to reserve
    * @param quantity the quantity of the product to reserve
    */
-  public void reserveProduct(Client client, Long productId, int quantity) {
-    Product product = productService.getProductById(productId);
-    if (product == null) {
-      return;
-    }
-
+  public void reserveProduct(Client client, Batch batch, int quantity) {
     Reservation reservation =
         reservationRepository
             .findByClientAndStatus(client, ReservationStatus.BUILDING)
@@ -66,7 +60,7 @@ public class ReservationService {
                   return reservationRepository.save(newReservation);
                 });
 
-    reservationLineService.addProduct(reservation, product, quantity);
+    reservationLineService.addProduct(reservation, batch, quantity);
     reservationRepository.save(reservation);
   }
 
