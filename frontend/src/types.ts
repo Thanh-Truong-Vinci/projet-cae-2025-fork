@@ -263,6 +263,7 @@ export enum ReservationStatus {
   PENDING = 'PENDING',
   CONFIRMED = 'CONFIRMED',
   CANCELLED = 'CANCELLED',
+  ABANDONED = "ABANDONED",
 }
 /* eslint-enable no-unused-vars */
 
