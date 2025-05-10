@@ -182,6 +182,10 @@ export interface ProductBatch {
   batchQuantities: number[]
 }
 
+export interface ProductWithBatches extends ProductBatch {
+  batches: Batch[]
+}
+
 export interface PendingBatch {
   id: number
   productName: string
@@ -320,6 +324,59 @@ export interface StatisticsContextType {
   isLoading: boolean
   error: string | null
   fetchSalesStatistics: (year?: number, month?: number) => Promise<void>
+}
+
+export interface TabPanelProps {
+  children?: React.ReactNode
+  index: number
+  value: number
+}
+
+export interface RawBatch {
+  id?: number
+  // Données produceur
+  producer?:
+    | {
+        id?: number
+        firstname?: string
+        name?: string
+        company?: string
+      }
+    | string
+    | number
+  producerName?: string
+  producerId?: number
+
+  // Données produit
+  product?: {
+    id?: number
+    name?: string
+    type?: {
+      title?: string
+    }
+    description?: string
+  }
+  productName?: string
+  productType?: string
+
+  // Données photo
+  photo?: {
+    id?: number
+    imageLocation?: string
+  }
+  imageUrl?: string
+  imageLocation?: string
+
+  // Autres propriétés
+  availabilityDate?: string | Date
+  availableQuantity?: number
+  unitPrice?: number
+  saleUnit?: string
+  unitType?: string
+  productionDate?: string | Date
+  createdAt?: string | Date
+  status?: string
+  rejectionReason?: string
 }
 
 type MaybeAuthenticatedUser = AuthenticatedUser | undefined
