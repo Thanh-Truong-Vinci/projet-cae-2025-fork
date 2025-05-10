@@ -422,7 +422,10 @@ const VolunteerHomePage = () => {
                                         />
                                       </TableCell>
                                       <TableCell>{line.productName}</TableCell>
-                                      <TableCell>{line.quantity}</TableCell>
+                                      <TableCell>
+                                        {line.quantity}
+                                        {line.unitType}
+                                      </TableCell>
                                       <TableCell>
                                         {(
                                           line.quantity * line.unitPrice

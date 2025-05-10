@@ -1,3 +1,113 @@
 ### Get all photos (no trailing slash)
 GET http://localhost:3000/photo
 Accept: application/json
+
+#### Create a photo with the admin token
+POST http://localhost:3000/photo
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="photo"
+Content-Type: application/json
+
+{
+  "product":"Miel pissenlit"
+}
+--boundary
+Content-Disposition: form-data; name="image"; filename="miel.jpg"
+Content-Type: image/jpg
+
+< ./miel.png
+
+--boundary--
+#### Create a photo with the admin token
+POST http://localhost:3000/photo
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="photo"
+Content-Type: application/json
+
+{
+  "product":"Laitue Blonde de Paris"
+}
+--boundary
+Content-Disposition: form-data; name="image"; filename="ibuki-tsubo-7iRMOXXxH7c-unsplash.png"
+Content-Type: image/jpg
+
+< ./ibuki-tsubo-7iRMOXXxH7c-unsplash.jpg
+
+--boundary--
+
+#### Create a photo with the admin token
+POST http://localhost:3000/photo
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="photo"
+Content-Type: application/json
+
+{
+  "product":"Carottes Cosmic Purple"
+}
+--boundary
+Content-Disposition: form-data; name="image"; filename="k8-GHRT9j21m2M-unsplash.png"
+Content-Type: image/jpg
+
+< ./k8-GHRT9j21m2M-unsplash.jpg
+
+--boundary--
+#### Create a photo with the admin token
+POST http://localhost:3000/photo
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="photo"
+Content-Type: application/json
+
+{
+  "product":"Courgette Blanche d'Egypte"
+}
+--boundary
+Content-Disposition: form-data; name="image"; filename="maria-kovalets-yZkyPWxFAJk-unsplash.png"
+Content-Type: image/jpg
+
+< ./maria-kovalets-yZkyPWxFAJk-unsplash.jpg
+
+--boundary--
+#### Create a photo with the admin token
+POST http://localhost:3000/photo
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="photo"
+Content-Type: application/json
+
+{
+  "product":"Cerise Napoléon"
+}
+--boundary
+Content-Disposition: form-data; name="image"; filename="neha-deshmukh-GoKXJaQoLQs-unsplash.png"
+Content-Type: image/jpg
+
+< ./neha-deshmukh-GoKXJaQoLQs-unsplash.jpg
+
+--boundary--
+#### Create a photo with the admin token
+POST http://localhost:3000/photo
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="photo"
+Content-Type: application/json
+
+{
+  "product":"Haricots Mistik"
+}
+--boundary
+Content-Disposition: form-data; name="image"; filename="rebeca-g-sendroiu-EhFYC9ATRXU-unsplash.png"
+Content-Type: image/jpg
+
+< ./rebeca-g-sendroiu-EhFYC9ATRXU-unsplash.jpg
+
+--boundary--

@@ -285,10 +285,11 @@ export interface ReservationLineView {
   productName: string
   unitPrice: number
   imageLocation: string
+  unitType: string
 }
 
 export interface ReservationRequest {
-  productId: number
+  batchId: number
   quantity: number
 }
 

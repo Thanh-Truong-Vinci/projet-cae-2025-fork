@@ -5,10 +5,12 @@ import be.vinci.ipl.cae.demo.exceptions.ResourceNotFoundException;
 import be.vinci.ipl.cae.demo.models.dtos.ChangeQuantityRequest;
 import be.vinci.ipl.cae.demo.models.dtos.ReservationRequest;
 import be.vinci.ipl.cae.demo.models.dtos.views.ReservationView;
+import be.vinci.ipl.cae.demo.models.entities.Batch;
 import be.vinci.ipl.cae.demo.models.entities.Client;
 import be.vinci.ipl.cae.demo.models.entities.Reservation;
 import be.vinci.ipl.cae.demo.models.entities.ReservationLine;
 import be.vinci.ipl.cae.demo.models.entities.ReservationStatus;
+import be.vinci.ipl.cae.demo.repositories.BatchRepository;
 import be.vinci.ipl.cae.demo.repositories.ReservationLineRepository;
 import be.vinci.ipl.cae.demo.services.AuthsService;
 import be.vinci.ipl.cae.demo.services.ReservationLineService;
@@ -31,6 +33,7 @@ public class ReservationController {
   private final ReservationService reservationService;
   private final ReservationLineService reservationLineService;
   private final ReservationLineRepository reservationLineRepository;
+  private final BatchRepository batchRepository;
 
   /**
    * Constructs a ReservationController with the specified AuthsService and ReservationService.
@@ -44,11 +47,13 @@ public class ReservationController {
       AuthsService authsService,
       ReservationService reservationService,
       ReservationLineService reservationLineService,
-      ReservationLineRepository reservationLineRepository) {
+      ReservationLineRepository reservationLineRepository,
+      BatchRepository batchRepository) {
     this.authsService = authsService;
     this.reservationService = reservationService;
     this.reservationLineService = reservationLineService;
     this.reservationLineRepository = reservationLineRepository;
+    this.batchRepository = batchRepository;
   }
 
   /**
@@ -66,8 +71,16 @@ public class ReservationController {
     if (client == null) {
       throw new ResourceNotFoundException("Token not valid, expired or user is not client");
     }
-    reservationService.reserveProduct(
-        client, reservationRequest.getProductId(), reservationRequest.getQuantity());
+
+    Batch batch = batchRepository.getBatchById(reservationRequest.getBatchId());
+    if (batch == null) {
+      throw new ResourceNotFoundException("Batch not found");
+    }
+    if (reservationRequest.getQuantity() > batch.getAvailableQuantity()) {
+      throw new ConflictException("Not enough available quantity in the batch");
+    }
+
+    reservationService.reserveProduct(client, batch, reservationRequest.getQuantity());
   }
 
   /**

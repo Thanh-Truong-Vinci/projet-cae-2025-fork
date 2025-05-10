@@ -20,47 +20,41 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.quality.Strictness;
 import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class AuthsServiceTest {
 
-    @Mock
-    private UserRepository userRepository;
-    
-    @Mock
-    private ClientRepository clientRepository;
-    
-    @Mock
-    private ProducerRepository producerRepository;
-    
-    @Mock
-    private ManagerRepository managerRepository;
-    
-    @Mock
-    private BCryptPasswordEncoder passwordEncoder;
-    
-    @InjectMocks
-    private AuthsService authsService;
-    
-    private User mockUser;
-    private Client mockClient;
-    private Producer mockProducer;
-    private Manager mockManager;
-    
-    @BeforeEach
-    public void setUp() {
-        // Replace existing stubbing lines like:
-        // when(repository.findByX()).thenReturn(y);
-        
-        // With lenient versions:
-        // lenient().when(repository.findByX()).thenReturn(y);
-        
-        // For example:
-        lenient().when(userRepository.findByEmail("admin@example.com")).thenReturn(mockUser);
+  @Mock private UserRepository userRepository;
+
+  @Mock private ClientRepository clientRepository;
+
+  @Mock private ProducerRepository producerRepository;
+
+  @Mock private ManagerRepository managerRepository;
+
+  @Mock private BCryptPasswordEncoder passwordEncoder;
+
+  @InjectMocks private AuthsService authsService;
+
+  private User mockUser;
+  private Client mockClient;
+  private Producer mockProducer;
+  private Manager mockManager;
+
+  @BeforeEach
+  public void setUp() {
+    // Replace existing stubbing lines like:
+    // when(repository.findByX()).thenReturn(y);
+
+    // With lenient versions:
+    // lenient().when(repository.findByX()).thenReturn(y);
+
+    // For example:
+    lenient().when(userRepository.findByEmail("admin@example.com")).thenReturn(mockUser);
 
         // C'est la bonne approche pour une classe abstraite
         mockUser = mock(User.class);
@@ -396,68 +390,67 @@ public class AuthsServiceTest {
         verify(passwordEncoder).matches(password, mockUser.getPassword());
     }
 
-    @Test
-    void login_ValidCredentials_ReturnsFullAuthenticatedUser() {
-        // Arrange
-        String email = "test@example.com";
-        String password = "correctpassword";
-        
-        when(userRepository.findByEmail(email)).thenReturn(mockUser);
-        when(passwordEncoder.matches(password, mockUser.getPassword())).thenReturn(true);
-        when(clientRepository.findByEmail(email)).thenReturn(mockClient);
-        
-        // Act
-        AuthenticatedUser result = authsService.login(email, password);
-        
-        // Assert
-        assertNotNull(result);
-        assertEquals(email, result.getEmail());
-        assertEquals(mockUser.getName(), result.getName());
-        assertEquals(mockUser.getFirstname(), result.getFirstname());
-        assertNotNull(result.getToken());
-        assertEquals("Client", result.getRole());
-    }
-    
-    @Test
-    void securityConstants_HasCorrectValues() {
-        // Assert
-        assertEquals("hasRole('ROLE_CLIENT')", AuthsService.SecurityConstants.HAS_ROLE_CLIENT);
-        assertEquals("hasRole('ROLE_MANAGER')", AuthsService.SecurityConstants.HAS_ROLE_MANAGER);
-        assertEquals("hasRole('ROLE_PRODUCER')", AuthsService.SecurityConstants.HAS_ROLE_PRODUCER);
-        assertEquals("hasRole('ROLE_VOLUNTEER')", AuthsService.SecurityConstants.HAS_ROLE_VOLUNTEER);
-        assertEquals("hasRole('ROLE_ADMIN')", AuthsService.SecurityConstants.HAS_ROLE_ADMIN);
-    }
-    
-    @Test
-    void determineUserRole_VolunteerEmail_ReturnsVolunteerRole_Optimized() {
-        // Arrange
-        String email = "volunteer@example.com";
-        
-        // Act
-        String result = authsService.determineUserRole(email);
-        
-        // Assert
-        assertEquals("Volunteer", result);
-    }
+  @Test
+  void login_ValidCredentials_ReturnsFullAuthenticatedUser() {
+    // Arrange
+    String email = "test@example.com";
+    String password = "correctpassword";
 
-    @Test
-    void roleEnum_GetAuthority_ReturnsCorrectFormat() {
-        // Test pour chaque valeur de l'enum
-        assertEquals("ROLE_CLIENT", AuthsService.Role.CLIENT.getAuthority());
-        assertEquals("ROLE_PRODUCER", AuthsService.Role.PRODUCER.getAuthority());
-        assertEquals("ROLE_MANAGER", AuthsService.Role.MANAGER.getAuthority());
-        assertEquals("ROLE_ADMIN", AuthsService.Role.ADMIN.getAuthority());
-        assertEquals("ROLE_VOLUNTEER", AuthsService.Role.VOLUNTEER.getAuthority());
-    }
+    when(userRepository.findByEmail(email)).thenReturn(mockUser);
+    when(passwordEncoder.matches(password, mockUser.getPassword())).thenReturn(true);
+    when(clientRepository.findByEmail(email)).thenReturn(mockClient);
 
-    @Test
-    void roleEnum_GetDisplayName_ReturnsCorrectValue() {
-        // Test pour vérifier que getDisplayName() fonctionne
-        assertEquals("Client", AuthsService.Role.CLIENT.getDisplayName());
-        assertEquals("Producer", AuthsService.Role.PRODUCER.getDisplayName());
-        assertEquals("Manager", AuthsService.Role.MANAGER.getDisplayName());
-        assertEquals("Admin", AuthsService.Role.ADMIN.getDisplayName());
-        assertEquals("Volunteer", AuthsService.Role.VOLUNTEER.getDisplayName());
-    }
+    // Act
+    AuthenticatedUser result = authsService.login(email, password);
+
+    // Assert
+    assertNotNull(result);
+    assertEquals(email, result.getEmail());
+    assertEquals(mockUser.getName(), result.getName());
+    assertEquals(mockUser.getFirstname(), result.getFirstname());
+    assertNotNull(result.getToken());
+    assertEquals("Client", result.getRole());
+  }
+
+  @Test
+  void securityConstants_HasCorrectValues() {
+    // Assert
+    assertEquals("hasRole('ROLE_CLIENT')", AuthsService.SecurityConstants.HAS_ROLE_CLIENT);
+    assertEquals("hasRole('ROLE_MANAGER')", AuthsService.SecurityConstants.HAS_ROLE_MANAGER);
+    assertEquals("hasRole('ROLE_PRODUCER')", AuthsService.SecurityConstants.HAS_ROLE_PRODUCER);
+    assertEquals("hasRole('ROLE_VOLUNTEER')", AuthsService.SecurityConstants.HAS_ROLE_VOLUNTEER);
+    assertEquals("hasRole('ROLE_ADMIN')", AuthsService.SecurityConstants.HAS_ROLE_ADMIN);
+  }
+
+  @Test
+  void determineUserRole_VolunteerEmail_ReturnsVolunteerRole_Optimized() {
+    // Arrange
+    String email = "volunteer@example.com";
+
+    // Act
+    String result = authsService.determineUserRole(email);
+
+    // Assert
+    assertEquals("Volunteer", result);
+  }
+
+  @Test
+  void roleEnum_GetAuthority_ReturnsCorrectFormat() {
+    // Test pour chaque valeur de l'enum
+    assertEquals("ROLE_CLIENT", AuthsService.Role.CLIENT.getAuthority());
+    assertEquals("ROLE_PRODUCER", AuthsService.Role.PRODUCER.getAuthority());
+    assertEquals("ROLE_MANAGER", AuthsService.Role.MANAGER.getAuthority());
+    assertEquals("ROLE_ADMIN", AuthsService.Role.ADMIN.getAuthority());
+    assertEquals("ROLE_VOLUNTEER", AuthsService.Role.VOLUNTEER.getAuthority());
+  }
+
+  @Test
+  void roleEnum_GetDisplayName_ReturnsCorrectValue() {
+    // Test pour vérifier que getDisplayName() fonctionne
+    assertEquals("Client", AuthsService.Role.CLIENT.getDisplayName());
+    assertEquals("Producer", AuthsService.Role.PRODUCER.getDisplayName());
+    assertEquals("Manager", AuthsService.Role.MANAGER.getDisplayName());
+    assertEquals("Admin", AuthsService.Role.ADMIN.getDisplayName());
+    assertEquals("Volunteer", AuthsService.Role.VOLUNTEER.getDisplayName());
+  }
 }
-

@@ -124,8 +124,7 @@ public class NotificationController {
    */
   @PutMapping("/{id}/read")
   public ResponseEntity<Notification> markNotificationAsRead(
-      @PathVariable("id") Long id,
-      @RequestHeader("Authorization") String token) {
+      @PathVariable("id") Long id, @RequestHeader("Authorization") String token) {
     try {
       Producer producer = validateProducerToken(token);
       Notification notification = notificationService.markNotificationAsRead(id, producer.getId());
@@ -134,7 +133,9 @@ public class NotificationController {
       throw e;
     } catch (Exception e) {
       throw new ResponseStatusException(
-          HttpStatus.INTERNAL_SERVER_ERROR, "Error marking notification as read: " + e.getMessage(), e);
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          "Error marking notification as read: " + e.getMessage(),
+          e);
     }
   }
 
@@ -155,7 +156,9 @@ public class NotificationController {
       throw e;
     } catch (Exception e) {
       throw new ResponseStatusException(
-          HttpStatus.INTERNAL_SERVER_ERROR, "Error marking all notifications as read: " + e.getMessage(), e);
+          HttpStatus.INTERNAL_SERVER_ERROR,
+          "Error marking all notifications as read: " + e.getMessage(),
+          e);
     }
   }
 }

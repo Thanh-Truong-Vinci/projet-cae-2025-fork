@@ -313,11 +313,13 @@ public class BatchService {
     List<Batch> batches =
         batchRepository.findByStatusAndAvailableQuantityGreaterThan(BatchStatus.RECEIVED, 0);
 
-    // Map pour regrouper les lots par productId + unitPrice + saleUnit + photoId + companyName
+    // Map pour regrouper les lots par productId + unitPrice + saleUnit + photoId +
+    // companyName
     Map<String, ProductBatchView> batchViewMap = new HashMap<>();
 
     for (Batch batch : batches) {
-      // Clé composite pour regroupement incluant l'ID de la photo et le nom d'entreprise
+      // Clé composite pour regroupement incluant l'ID de la photo et le nom
+      // d'entreprise
       String photoIdentifier =
           batch.getPhoto() != null ? String.valueOf(batch.getPhoto().getId()) : "null";
       String companyName =

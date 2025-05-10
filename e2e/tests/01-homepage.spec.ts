@@ -20,7 +20,7 @@ test.describe("HomePage", () => {
     }
 
     // Vérifier que le carrousel des produits les plus vendus est présent
-    await expect(page.getByText("Produits les plus vendus")).toBeVisible();
+    await expect(page.getByText("Produits les plus récents")).toBeVisible();
   });
 
   test("TC1.2: should filter products by type", async ({ page }) => {
