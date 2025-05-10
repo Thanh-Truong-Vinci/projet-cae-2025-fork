@@ -68,7 +68,7 @@ const ProductDetailPage = () => {
 
   const handleAddToReservation = () => {
     if (product) {
-      createReservation(product.productId, quantity)
+      createReservation(product.batchIds[0], quantity)
     }
   }
 
