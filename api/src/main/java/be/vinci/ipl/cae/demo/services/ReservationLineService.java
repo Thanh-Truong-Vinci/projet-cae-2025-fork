@@ -41,7 +41,7 @@ public class ReservationLineService {
             reservation, batch);
 
     for (ReservationLine existingLine : existingLines) {
-      if (existingLine.getBatch().getId().equals(batch.getId())) {
+      if (existingLine.getBatch().equals(batch)) {
         changeQuantity(existingLine, existingLine.getQuantity() + quantity);
         return;
       }
