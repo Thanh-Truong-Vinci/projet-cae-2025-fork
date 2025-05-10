@@ -120,6 +120,8 @@ const ReservationsPage = () => {
         return 'success'
       case ReservationStatus.CANCELLED:
         return 'error'
+      case ReservationStatus.ABANDONED:
+        return 'error'
       default:
         return 'default'
     }
@@ -136,6 +138,8 @@ const ReservationsPage = () => {
         return 'Confirmé'
       case ReservationStatus.CANCELLED:
         return 'Annulé'
+      case ReservationStatus.ABANDONED:
+        return 'Abandonné'
       default:
         return 'Inconnu'
     }
@@ -389,7 +393,7 @@ const ReservationsPage = () => {
                 }}
               />
               <Tab
-                label="Abandonnées"
+                label="Annulées"
                 {...a11yProps(2)}
                 sx={{
                   color: cancelledReservations.length
@@ -397,7 +401,16 @@ const ReservationsPage = () => {
                     : 'inherit',
                 }}
               />
-            </Tabs>
+            <Tab
+                label="Abandonnées"
+                {...a11yProps(3)}
+                sx={{
+                  color: cancelledReservations.length
+                    ? 'error.main'
+                    : 'inherit',
+                }}
+              />
+              </Tabs>
           </Box>
 
           {/* Pending Reservations Tab */}
