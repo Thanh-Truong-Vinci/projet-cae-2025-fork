@@ -72,33 +72,9 @@ const VolunteerHomePage = () => {
   >(null)
 
   // Filter reservations to only include those in 'Pending' state
-  let pendingReservations = reservations.filter(
+  const pendingReservations = reservations.filter(
     (reservation) => reservation.status === ReservationStatus.PENDING
   )
-
-  if (pendingReservations.length == 0) {
-    // TODO remove this after adding the add reservation functionality
-    pendingReservations = [
-      {
-        id: 0,
-        clientId: 0,
-        reservationDate: new Date().toISOString(),
-        price: 10,
-        status: ReservationStatus.PENDING,
-        reservationLines: [
-          {
-            id: 0,
-            quantity: 1,
-            batchId: 0,
-            productId: 0,
-            productName: 'Produit de test',
-            unitPrice: 10,
-            imageLocation: 'https://via.placeholder.com/150',
-          },
-        ],
-      },
-    ]
-  }
 
   // Redirect if not authenticated or not a volunteer
   useEffect(() => {
@@ -330,7 +306,18 @@ const VolunteerHomePage = () => {
                           }
                         )}
                       </TableCell>
-                      <TableCell>{reservation.price.toFixed(2)}€</TableCell>
+                      <TableCell>
+                        {reservation.price > 0
+                          ? reservation.price.toFixed(2)
+                          : reservation.reservationLines
+                              .reduce(
+                                (total, line) =>
+                                  total + line.quantity * line.unitPrice,
+                                0
+                              )
+                              .toFixed(2)}
+                        €
+                      </TableCell>
                       <TableCell>
                         <Button
                           variant="text"
