@@ -7,7 +7,7 @@ import static org.mockito.Mockito.*;
 import be.vinci.ipl.cae.demo.models.entities.Producer;
 import be.vinci.ipl.cae.demo.repositories.ProducerRepository;
 import be.vinci.ipl.cae.demo.repositories.UserRepository;
-
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,8 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 @ExtendWith(MockitoExtension.class)
 class ProducerServiceTest {

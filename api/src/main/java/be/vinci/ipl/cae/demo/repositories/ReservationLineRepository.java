@@ -1,7 +1,6 @@
 package be.vinci.ipl.cae.demo.repositories;
 
 import be.vinci.ipl.cae.demo.models.entities.Batch;
-import be.vinci.ipl.cae.demo.models.entities.Product;
 import be.vinci.ipl.cae.demo.models.entities.Reservation;
 import be.vinci.ipl.cae.demo.models.entities.ReservationLine;
 import java.util.List;
@@ -21,5 +20,5 @@ public interface ReservationLineRepository extends CrudRepository<ReservationLin
    * @return Une liste de lignes de réservation correspondant à la réservation et au produit
    *     spécifiés, triées par date de production du lot en ordre croissant
    */
-  List<ReservationLine> findByReservationAndBatchOrderByBatchDateDesc(Reservation reservation, Batch batch);
+  List<ReservationLine> findByReservationAndBatchOrderByBatchProductionDateAsc(Reservation reservation, Batch batch);
 }

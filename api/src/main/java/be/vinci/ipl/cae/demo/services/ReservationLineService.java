@@ -1,8 +1,6 @@
 package be.vinci.ipl.cae.demo.services;
 
-import be.vinci.ipl.cae.demo.exceptions.ConflictException;
 import be.vinci.ipl.cae.demo.models.entities.Batch;
-import be.vinci.ipl.cae.demo.models.entities.Product;
 import be.vinci.ipl.cae.demo.models.entities.Reservation;
 import be.vinci.ipl.cae.demo.models.entities.ReservationLine;
 import be.vinci.ipl.cae.demo.repositories.BatchRepository;
@@ -39,10 +37,10 @@ public class ReservationLineService {
   public void addProduct(Reservation reservation, Batch batch, int quantity) {
 
     List<ReservationLine> existingLines =
-        reservationLineRepository.findByReservationAndBatchOrderByBatchDateDesc(reservation, batch);
+        reservationLineRepository.findByReservationAndBatchOrderByBatchProductionDateAsc(reservation, batch);
 
     for (ReservationLine existingLine : existingLines) {
-      if (existingLine.getBatch().getId() == batch.getId()) {
+      if (existingLine.getBatch().getId().equals(batch.getId())) {
         changeQuantity(existingLine, existingLine.getQuantity() + quantity);
         batch.setAvailableQuantity(batch.getAvailableQuantity() - quantity);
         return;
@@ -96,3 +94,4 @@ public class ReservationLineService {
     reservationLineRepository.delete(reservationLine);
   }
 }
+

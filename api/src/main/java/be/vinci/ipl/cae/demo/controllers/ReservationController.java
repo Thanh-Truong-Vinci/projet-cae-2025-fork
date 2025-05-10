@@ -47,7 +47,8 @@ public class ReservationController {
       AuthsService authsService,
       ReservationService reservationService,
       ReservationLineService reservationLineService,
-      ReservationLineRepository reservationLineRepository, BatchRepository batchRepository) {
+      ReservationLineRepository reservationLineRepository,
+      BatchRepository batchRepository) {
     this.authsService = authsService;
     this.reservationService = reservationService;
     this.reservationLineService = reservationLineService;
@@ -76,11 +77,10 @@ public class ReservationController {
       throw new ResourceNotFoundException("Batch not found");
     }
     if (reservationRequest.getQuantity() > batch.getAvailableQuantity()) {
-        throw new ConflictException("Not enough available quantity in the batch");
+      throw new ConflictException("Not enough available quantity in the batch");
     }
 
-    reservationService.reserveProduct(
-        client, batch, reservationRequest.getQuantity());
+    reservationService.reserveProduct(client, batch, reservationRequest.getQuantity());
   }
 
   /**

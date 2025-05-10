@@ -249,7 +249,7 @@ public class BatchController {
   public Batch rejectBatch(@PathVariable long id, @RequestParam(required = false) String message) {
     System.out.println("Rejet du lot " + id + " avec message: " + message);
     return batchService.rejectBatch(id, message);
-}
+  }
 
   /**
    * Marque un lot comme reçu.
