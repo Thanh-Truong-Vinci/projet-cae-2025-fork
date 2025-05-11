@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Typography,
@@ -37,7 +37,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import { BatchContext } from '../../contexts/BatchContext'
 import { UserContext } from '../../contexts/UserContext'
 import { ReservationContext } from '../../contexts/ReservationContext'
-import { ReservationStatus } from '../../types'
+import { ProductBatch, ReservationStatus } from '../../types'
 
 const VolunteerHomePage = () => {
   const navigate = useNavigate()
@@ -56,7 +56,7 @@ const VolunteerHomePage = () => {
     fetchAllReservations,
     toConfirmReservation,
     cancelReservation,
-    reserveDirect, // Add this new method from context
+    reserveDirect,
   } = reservationContext
 
   useEffect(() => {
@@ -69,14 +69,7 @@ const VolunteerHomePage = () => {
     )
   }
 
-  const {
-    approvedBatches,
-    receivedBatches,
-    isLoading,
-    error,
-    receiveBatch,
-    fetchReceivedBatches,
-  } = batchContext
+  const { approvedBatches, isLoading, error, receiveBatch } = batchContext
 
   const [openDialog, setOpenDialog] = useState(false)
   const [selectedBatchId, setSelectedBatchId] = useState<number | null>(null)
@@ -89,7 +82,6 @@ const VolunteerHomePage = () => {
     number | null
   >(null)
 
-  // États pour la vente libre
   const [openVenteLibreDialog, setOpenVenteLibreDialog] = useState(false)
   const [selectedVenteBatchId, setSelectedVenteBatchId] = useState<
     number | null
@@ -97,26 +89,47 @@ const VolunteerHomePage = () => {
   const [venteLibreQuantity, setVenteLibreQuantity] = useState<number>(1)
   const [loadingReceivedBatches, setLoadingReceivedBatches] =
     useState<boolean>(false)
+  const [agglomeratedProducts, setAgglomeratedProducts] = useState<
+    ProductBatch[]
+  >([])
+  const [, setLoadingAgglomerated] = useState<boolean>(false)
 
-  // Filter reservations to only include those in 'Pending' state
-  const pendingReservations = reservations.filter(
-    (reservation) => reservation.status === ReservationStatus.PENDING
-  )
+  const fetchAgglomeratedProducts = useCallback(async () => {
+    try {
+      setLoadingAgglomerated(true)
+      const response = await fetch('/api/batches/received/available-view')
 
-  // Redirect if not authenticated or not a volunteer
-  useEffect(() => {
-    if (!authenticatedUser) {
-      navigate('/')
-    } else if (authenticatedUser.role !== 'Volunteer') {
-      navigate('/')
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      setAgglomeratedProducts(data)
+    } catch (err) {
+      console.error('Error fetching agglomerated products:', err)
+      setSnackbarMessage(
+        err instanceof Error
+          ? `Erreur: ${err.message}`
+          : 'Erreur lors du chargement des produits'
+      )
+      setSnackbarSeverity('error')
+      setOpenSnackbar(true)
+      setAgglomeratedProducts([])
+    } finally {
+      setLoadingAgglomerated(false)
     }
-  }, [authenticatedUser, navigate])
+  }, [setSnackbarMessage, setSnackbarSeverity, setOpenSnackbar])
 
-  // Load received batches when vente libre dialog opens
+  useEffect(() => {
+    if (authenticatedUser?.role === 'Volunteer') {
+      fetchAgglomeratedProducts()
+    }
+  }, [authenticatedUser, fetchAgglomeratedProducts])
+
   const handleOpenVenteLibre = async () => {
     setLoadingReceivedBatches(true)
     try {
-      await fetchReceivedBatches()
+      await fetchAgglomeratedProducts()
       setOpenVenteLibreDialog(true)
     } catch (err) {
       console.error('Erreur chargement produits:', err)
@@ -132,13 +145,23 @@ const VolunteerHomePage = () => {
     }
   }
 
-  // Handle receive button click
+  const pendingReservations = reservations.filter(
+    (reservation) => reservation.status === ReservationStatus.PENDING
+  )
+
+  useEffect(() => {
+    if (!authenticatedUser) {
+      navigate('/')
+    } else if (authenticatedUser.role !== 'Volunteer') {
+      navigate('/')
+    }
+  }, [authenticatedUser, navigate])
+
   const handleReceiveClick = (batchId: number) => {
     setSelectedBatchId(batchId)
     setOpenDialog(true)
   }
 
-  // Handle confirmation of receiving a batch
   const handleConfirmReceive = async () => {
     if (selectedBatchId === null) return
 
@@ -159,7 +182,6 @@ const VolunteerHomePage = () => {
     }
   }
 
-  // Handle confirm button click for reservations
   const handleConfirmReservation = async (reservationId: number) => {
     try {
       await toConfirmReservation(reservationId)
@@ -177,7 +199,6 @@ const VolunteerHomePage = () => {
     }
   }
 
-  // Handle cancel button click for reservations
   const handleCancelReservation = async (reservationId: number) => {
     try {
       await cancelReservation(reservationId)
@@ -201,7 +222,6 @@ const VolunteerHomePage = () => {
     )
   }
 
-  // Handle vente libre confirmation
   const handleConfirmVenteLibre = async () => {
     if (!selectedVenteBatchId || venteLibreQuantity <= 0) {
       setSnackbarMessage(
@@ -212,26 +232,53 @@ const VolunteerHomePage = () => {
       return
     }
 
-    // Store values locally before state changes
-    const batchId = selectedVenteBatchId
-    const quantity = venteLibreQuantity
+    // Find the selected agglomerated product
+    const selectedProduct = agglomeratedProducts.find(
+      (p) => p.productId === selectedVenteBatchId
+    )
+
+    if (!selectedProduct) {
+      setSnackbarMessage('Produit non trouvé')
+      setSnackbarSeverity('error')
+      setOpenSnackbar(true)
+      return
+    }
 
     // First close dialog and reset local state
     setOpenVenteLibreDialog(false)
     setSelectedVenteBatchId(null)
     setVenteLibreQuantity(1)
 
+    let remainingQuantity = venteLibreQuantity
+
     try {
-      // Use the new reserveDirect method instead of createReservation
-      await reserveDirect(batchId, quantity)
+      // The backend already provides batchIds and batchQuantities arrays
+      for (let i = 0; i < selectedProduct.batchIds.length; i++) {
+        if (remainingQuantity <= 0) break
+
+        const batchId = selectedProduct.batchIds[i]
+        const availableQuantity = selectedProduct.batchQuantities[i]
+
+        // Calculate how much to take from this batch
+        const quantityFromThisBatch = Math.min(
+          remainingQuantity,
+          availableQuantity
+        )
+
+        // Reserve this quantity
+        await reserveDirect(batchId, quantityFromThisBatch)
+
+        // Reduce the remaining quantity
+        remainingQuantity -= quantityFromThisBatch
+      }
 
       // Show success message
       setSnackbarMessage('Vente libre enregistrée avec succès')
       setSnackbarSeverity('success')
 
-      // Refresh data after a slight delay to ensure backend processing is complete
+      // Refresh data after a slight delay
       setTimeout(() => {
-        fetchReceivedBatches().catch(console.error)
+        fetchAgglomeratedProducts().catch(console.error)
         fetchAllReservations().catch(console.error)
       }, 500)
     } catch (error) {
@@ -247,7 +294,6 @@ const VolunteerHomePage = () => {
     }
   }
 
-  // If not authenticated or not a volunteer, don't render content
   if (!authenticatedUser || authenticatedUser.role !== 'Volunteer') {
     return null
   }
@@ -302,7 +348,6 @@ const VolunteerHomePage = () => {
                   <TableRow key={batch.id}>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        {/* Image handling similar to HomePage */}
                         <CardMedia
                           component="img"
                           image={
@@ -318,14 +363,12 @@ const VolunteerHomePage = () => {
                             boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                           }}
                         />
-                        {/* Product name with better formatting */}
                         <Typography variant="subtitle1" component="div">
                           {batch.productName}
                         </Typography>
                       </Box>
                     </TableCell>
                     <TableCell>
-                      {/* Product type with category formatting like in HomePage */}
                       <Chip
                         label={batch.productType}
                         size="small"
@@ -543,7 +586,6 @@ const VolunteerHomePage = () => {
         )}
       </Paper>
 
-      {/* Bouton Vente Libre en bas de page */}
       <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
         <Button
           variant="contained"
@@ -557,7 +599,6 @@ const VolunteerHomePage = () => {
         </Button>
       </Box>
 
-      {/* Confirmation Dialog for batch reception */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>Confirmer la réception</DialogTitle>
         <DialogContent>
@@ -585,7 +626,6 @@ const VolunteerHomePage = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Dialog for Vente Libre */}
       <Dialog
         open={openVenteLibreDialog}
         onClose={() => setOpenVenteLibreDialog(false)}
@@ -603,7 +643,7 @@ const VolunteerHomePage = () => {
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
               <CircularProgress />
             </Box>
-          ) : receivedBatches.length === 0 ? (
+          ) : agglomeratedProducts.length === 0 ? (
             <Alert severity="info">
               Aucun produit disponible en stock pour la vente libre.
             </Alert>
@@ -618,15 +658,16 @@ const VolunteerHomePage = () => {
                   }
                   label="Produit"
                 >
-                  {receivedBatches.map((batch) => (
-                    <MenuItem key={batch.id} value={batch.id}>
+                  {agglomeratedProducts.map((product) => (
+                    <MenuItem key={product.productId} value={product.productId}>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <CardMedia
                           component="img"
                           image={
-                            batch.imageUrl || 'https://via.placeholder.com/150'
+                            product.imageLocation ||
+                            'https://via.placeholder.com/150'
                           }
-                          alt={batch.productName}
+                          alt={product.productName}
                           sx={{
                             width: 40,
                             height: 40,
@@ -637,12 +678,12 @@ const VolunteerHomePage = () => {
                         />
                         <div>
                           <Typography variant="body1">
-                            {batch.productName}
+                            {product.productName}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            {batch.availableQuantity} {batch.unitType}{' '}
-                            disponible -{batch.unitPrice.toFixed(2)}€/
-                            {batch.unitType}
+                            {product.totalQuantity} {product.saleUnit}{' '}
+                            disponible - {product.unitPrice.toFixed(2)}€/
+                            {product.saleUnit}
                           </Typography>
                         </div>
                       </Box>
@@ -667,9 +708,10 @@ const VolunteerHomePage = () => {
                   helperText={
                     selectedVenteBatchId
                       ? `Quantité maximale disponible: ${
-                          receivedBatches.find(
-                            (batch) => batch.id === selectedVenteBatchId
-                          )?.availableQuantity || 0
+                          agglomeratedProducts.find(
+                            (product) =>
+                              product.productId === selectedVenteBatchId
+                          )?.totalQuantity || 0
                         }`
                       : ''
                   }
@@ -698,8 +740,8 @@ const VolunteerHomePage = () => {
                     <Typography>Produit:</Typography>
                     <Typography fontWeight="bold">
                       {
-                        receivedBatches.find(
-                          (b) => b.id === selectedVenteBatchId
+                        agglomeratedProducts.find(
+                          (p) => p.productId === selectedVenteBatchId
                         )?.productName
                       }
                     </Typography>
@@ -713,8 +755,8 @@ const VolunteerHomePage = () => {
                   >
                     <Typography>Prix unitaire:</Typography>
                     <Typography fontWeight="bold">
-                      {receivedBatches
-                        .find((b) => b.id === selectedVenteBatchId)
+                      {agglomeratedProducts
+                        .find((p) => p.productId === selectedVenteBatchId)
                         ?.unitPrice.toFixed(2)}
                       €
                     </Typography>
@@ -742,8 +784,8 @@ const VolunteerHomePage = () => {
                     <Typography fontWeight="bold" color="primary">
                       {(
                         venteLibreQuantity *
-                        (receivedBatches.find(
-                          (b) => b.id === selectedVenteBatchId
+                        (agglomeratedProducts.find(
+                          (p) => p.productId === selectedVenteBatchId
                         )?.unitPrice || 0)
                       ).toFixed(2)}
                       €
@@ -772,7 +814,6 @@ const VolunteerHomePage = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Snackbar for feedback */}
       <Snackbar
         open={openSnackbar}
         autoHideDuration={6000}
