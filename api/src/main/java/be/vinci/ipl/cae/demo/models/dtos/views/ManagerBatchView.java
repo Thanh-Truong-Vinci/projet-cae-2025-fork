@@ -23,5 +23,6 @@ public class ManagerBatchView {
   private String unitType;
   private Long producerId;
   private String producerName;
+  private String producerCompany;
   private LocalDate createdAt;
 }

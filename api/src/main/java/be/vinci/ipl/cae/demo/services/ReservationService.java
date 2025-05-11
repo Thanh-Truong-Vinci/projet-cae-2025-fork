@@ -96,9 +96,10 @@ public class ReservationService {
       return null;
     }
 
-    // If changing to CANCELLED status, return items to stock
-    if (newStatus == ReservationStatus.CANCELLED
-        && reservation.getStatus() != ReservationStatus.CANCELLED) {
+    // Si le statut est CANCELLED ou ABANDONED, retourner les produits au stock
+    if ((newStatus == ReservationStatus.CANCELLED || newStatus == ReservationStatus.ABANDONED)
+        && reservation.getStatus() != ReservationStatus.CANCELLED 
+        && reservation.getStatus() != ReservationStatus.ABANDONED) {
       for (ReservationLine line : reservation.getReservationLines()) {
         Batch batch = line.getBatch();
         batch.setAvailableQuantity(batch.getAvailableQuantity() + line.getQuantity());
@@ -106,7 +107,7 @@ public class ReservationService {
       }
     }
 
-    // If confirming a reservation, set the sale date
+    // Si la réservation est confirmée, calculer le prix et définir la date de vente
     if (newStatus == ReservationStatus.CONFIRMED) {
       double price = 0;
       for (ReservationLine line : reservation.getReservationLines()) {

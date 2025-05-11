@@ -96,6 +96,7 @@ const mockReservationContext = {
   clearReservation: vi.fn(),
   removeReservationLine: vi.fn(),
   changeReservationLineQuantity: vi.fn(),
+  abandonReservation: vi.fn(),
 }
 
 describe('HomePage', () => {
@@ -109,7 +110,9 @@ describe('HomePage', () => {
         <ProductContext.Provider
           value={{ ...mockProductContext, isLoading: true }}
         >
-          <ReservationContext.Provider value={mockReservationContext}>
+          <ReservationContext.Provider
+            value={{ ...mockReservationContext, abandonReservation: vi.fn() }}
+          >
             <HomePage />
           </ReservationContext.Provider>
         </ProductContext.Provider>
@@ -126,7 +129,9 @@ describe('HomePage', () => {
         <ProductContext.Provider
           value={{ ...mockProductContext, error: errorMessage }}
         >
-          <ReservationContext.Provider value={mockReservationContext}>
+          <ReservationContext.Provider
+            value={{ ...mockReservationContext, abandonReservation: vi.fn() }}
+          >
             <HomePage />
           </ReservationContext.Provider>
         </ProductContext.Provider>
@@ -139,7 +144,9 @@ describe('HomePage', () => {
     render(
       <MemoryRouter>
         <ProductContext.Provider value={mockProductContext}>
-          <ReservationContext.Provider value={mockReservationContext}>
+          <ReservationContext.Provider
+            value={{ ...mockReservationContext, abandonReservation: vi.fn() }}
+          >
             <HomePage />
           </ReservationContext.Provider>
         </ProductContext.Provider>
@@ -154,7 +161,9 @@ describe('HomePage', () => {
     render(
       <MemoryRouter>
         <ProductContext.Provider value={mockProductContext}>
-          <ReservationContext.Provider value={mockReservationContext}>
+          <ReservationContext.Provider
+            value={{ ...mockReservationContext, abandonReservation: vi.fn() }}
+          >
             <HomePage />
           </ReservationContext.Provider>
         </ProductContext.Provider>
@@ -182,7 +191,9 @@ describe('HomePage', () => {
     render(
       <MemoryRouter>
         <ProductContext.Provider value={mockProductContext}>
-          <ReservationContext.Provider value={mockReservationContext}>
+          <ReservationContext.Provider
+            value={{ ...mockReservationContext, abandonReservation: vi.fn() }}
+          >
             <HomePage />
           </ReservationContext.Provider>
         </ProductContext.Provider>
@@ -205,7 +216,9 @@ describe('HomePage', () => {
     render(
       <MemoryRouter>
         <ProductContext.Provider value={mockProductContext}>
-          <ReservationContext.Provider value={mockReservationContext}>
+          <ReservationContext.Provider
+            value={{ ...mockReservationContext, abandonReservation: vi.fn() }}
+          >
             <HomePage />
           </ReservationContext.Provider>
         </ProductContext.Provider>
@@ -229,7 +242,9 @@ describe('HomePage', () => {
     render(
       <MemoryRouter>
         <ProductContext.Provider value={mockProductContext}>
-          <ReservationContext.Provider value={mockReservationContext}>
+          <ReservationContext.Provider
+            value={{ ...mockReservationContext, abandonReservation: vi.fn() }}
+          >
             <HomePage />
           </ReservationContext.Provider>
         </ProductContext.Provider>
@@ -245,7 +260,9 @@ describe('HomePage', () => {
     render(
       <MemoryRouter>
         <ProductContext.Provider value={mockProductContext}>
-          <ReservationContext.Provider value={mockReservationContext}>
+          <ReservationContext.Provider
+            value={{ ...mockReservationContext, abandonReservation: vi.fn() }}
+          >
             <HomePage />
           </ReservationContext.Provider>
         </ProductContext.Provider>

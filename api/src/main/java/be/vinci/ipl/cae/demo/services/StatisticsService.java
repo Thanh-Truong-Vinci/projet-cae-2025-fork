@@ -43,9 +43,10 @@ public class StatisticsService {
    *
    * @param year l'année pour filtrer les données (optionnel)
    * @param month le mois pour filtrer les données (optionnel)
+   * @param productId l'identifiant du produit pour filtrer les données (optionnel)
    * @return la liste des statistiques de ventes
    */
-  public List<SalesStatisticsView> getSalesStatistics(Integer year, Integer month) {
+  public List<SalesStatisticsView> getSalesStatistics(Integer year, Integer month, Long productId) {
     // Récupérer les lots reçus
     List<Batch> receivedBatches = batchRepository.findByStatus(BatchStatus.RECEIVED);
 
@@ -60,6 +61,11 @@ public class StatisticsService {
     for (Batch batch : receivedBatches) {
       LocalDate depositDate = batch.getDepositDate();
       if (depositDate == null) {
+        continue;
+      }
+
+      // Filtre par productId si spécifié
+      if (productId != null && !batch.getProduct().getId().equals(productId)) {
         continue;
       }
 
@@ -95,6 +101,11 @@ public class StatisticsService {
         for (ReservationLine line : reservation.getReservationLines()) {
           Batch batch = line.getBatch();
           if (batch == null || batch.getProduct() == null) {
+            continue;
+          }
+
+          // Filtre par productId si spécifié
+          if (productId != null && !batch.getProduct().getId().equals(productId)) {
             continue;
           }
 

@@ -164,6 +164,35 @@ public class ReservationController {
   }
 
   /**
+   * Changes the status of a reservation to ABANDONED.
+   *
+   * @param reservationId the ID of the reservation to update.
+   * @param token the authorization token from the request header.
+   * @return the updated reservation as ReservationView.
+   * @throws ResourceNotFoundException if the token is invalid or expired.
+   * @throws ConflictException if the reservation ID is missing.
+   */
+  @PostMapping("/toAbandon")
+  public ReservationView toAbandon(
+      @RequestBody Long reservationId, @RequestHeader("Authorization") String token) {
+    if (!authsService.isValidToken(token)) {
+      throw new ResourceNotFoundException("Token not valid or expired");
+    }
+
+    String role = authsService.getRoleFromToken(token);
+    if (!"Volunteer".equals(role)) {
+      throw new ResourceNotFoundException("User is not a volunteer");
+    }
+
+    if (reservationId == null) {
+      throw new ConflictException("Reservation ID is required");
+    }
+
+    var updatedReservation = reservationService.changeStatus(reservationId, ReservationStatus.ABANDONED);
+    return new ReservationView(updatedReservation);
+  }
+
+  /**
    * Helper method to change a reservation's status and validate client token if needed.
    *
    * @param reservationId the ID of the reservation to update

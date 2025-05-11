@@ -210,7 +210,10 @@ public class BatchService {
       try {
         Notification notification = new Notification();
         notification.setRead(false);
-        notification.setMessage(message);
+
+        notification.setMessage("Le lot a été refusé");
+
+        // La raison du rejet est stockée dans son champ
         notification.setReasonOfReject(message);
         notification.setDate(LocalDate.now());
 
@@ -426,7 +429,8 @@ public class BatchService {
       view.setAvailabilityDate(batch.getAvailabilityDate());
       view.setAvailableQuantity(batch.getAvailableQuantity());
       view.setProducerId(batch.getProducer().getId());
-      view.setProducerName(batch.getProducer().getCompany());
+      view.setProducerName(batch.getProducer().getFirstname() + " " + batch.getProducer().getName());
+      view.setProducerCompany(batch.getProducer().getCompany());
 
       // Champ spécifique à ManagerBatchView
       view.setDescription(batch.getProduct().getDescription());

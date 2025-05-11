@@ -120,6 +120,8 @@ const ReservationsPage = () => {
         return 'success'
       case ReservationStatus.CANCELLED:
         return 'error'
+      case ReservationStatus.ABANDONED:
+        return 'error'
       default:
         return 'default'
     }
@@ -136,6 +138,8 @@ const ReservationsPage = () => {
         return 'Confirmé'
       case ReservationStatus.CANCELLED:
         return 'Annulé'
+      case ReservationStatus.ABANDONED:
+        return 'Abandonné'
       default:
         return 'Inconnu'
     }
@@ -203,6 +207,10 @@ const ReservationsPage = () => {
 
   const cancelledReservations = reservations.filter(
     (res) => res.status === ReservationStatus.CANCELLED
+  )
+
+  const abandonedReservations = reservations.filter(
+    (res) => res.status === ReservationStatus.ABANDONED
   )
 
   // Create reservation list component to avoid code duplication
@@ -392,10 +400,19 @@ const ReservationsPage = () => {
                 }}
               />
               <Tab
-                label="Abandonnées"
+                label="Annulées"
                 {...a11yProps(2)}
                 sx={{
                   color: cancelledReservations.length
+                    ? 'error.main'
+                    : 'inherit',
+                }}
+              />
+              <Tab
+                label="Abandonnées"
+                {...a11yProps(3)}
+                sx={{
+                  color: abandonedReservations.length
                     ? 'error.main'
                     : 'inherit',
                 }}
@@ -416,6 +433,11 @@ const ReservationsPage = () => {
           {/* Cancelled Reservations Tab */}
           <TabPanel value={tabValue} index={2}>
             {renderReservationList(cancelledReservations)}
+          </TabPanel>
+
+          {/* Abandoned Reservations Tab */}
+          <TabPanel value={tabValue} index={3}>
+            {renderReservationList(abandonedReservations)}
           </TabPanel>
         </Box>
       )}

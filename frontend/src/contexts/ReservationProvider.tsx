@@ -201,6 +201,7 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
             res.id === updatedReservation.id ? updatedReservation : res
           )
         )
+        await fetchAllReservations()
       } else {
         throw new Error(
           `Erreur lors du changement de statut de la réservation: ${response.status}`
@@ -281,11 +282,11 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
       }
 
       const response = await axios.post(
-        '/api/reservation/toCancel',
+        '/reservation/toCancel',
         reservationId,
         {
           headers: {
-            Authorization: authenticatedUser.token,
+            Authorization: authenticatedUser.token, // Ajout de l'en-tête d'autorisation
             'Content-Type': 'application/json',
           },
         }
@@ -314,6 +315,60 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
         setError(err.message)
       } else {
         setError("Erreur inconnue lors de l'annulation de la réservation")
+      }
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const abandonReservation = async (reservationId: number): Promise<void> => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      if (!authenticatedUser) {
+        throw new Error(
+          'Vous devez être authentifié pour abandonner une réservation'
+        )
+      }
+
+      const response = await axios.post(
+        '/reservation/toAbandon',
+        reservationId,
+        {
+          headers: {
+            Authorization: authenticatedUser.token,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (response.status >= 200 && response.status < 300) {
+        const updatedReservation = response.data
+        setReservations((prev) =>
+          prev.map((res) =>
+            res.id === updatedReservation.id ? updatedReservation : res
+          )
+        )
+        // Important: rafraîchir la liste des réservations pour mettre à jour l'interface
+        await fetchAllReservations()
+      } else {
+        throw new Error(
+          `Erreur lors de l'abandon de la réservation: ${response.status}`
+        )
+      }
+    } catch (err) {
+      console.error("Erreur lors de l'abandon de la réservation:", err)
+      if (axios.isAxiosError(err)) {
+        setError(
+          err.response?.data?.message ||
+            "Erreur lors de l'abandon de la réservation"
+        )
+      } else if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError("Erreur inconnue lors de l'abandon de la réservation")
       }
       throw err
     } finally {
@@ -446,6 +501,7 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
         toPendingReservation,
         toConfirmReservation,
         cancelReservation,
+        abandonReservation,
         clearReservation,
         changeReservationLineQuantity,
       }}

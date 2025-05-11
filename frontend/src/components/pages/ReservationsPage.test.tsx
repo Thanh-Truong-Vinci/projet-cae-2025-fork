@@ -85,6 +85,24 @@ describe('ReservationsPage', () => {
         },
       ],
     },
+    {
+      id: 4,
+      clientId: 123,
+      reservationDate: '2024-01-01T12:00:00',
+      price: 10.0,
+      status: ReservationStatus.ABANDONED,
+      reservationLines: [
+        {
+          id: 5,
+          quantity: 2,
+          batchId: 2,
+          productId: 2,
+          productName: 'Test Product',
+          unitPrice: 5.0,
+          imageLocation: null,
+        },
+      ],
+    },
   ]
 
   const fetchReservationsMock = vi.fn()
@@ -120,9 +138,11 @@ describe('ReservationsPage', () => {
     toReadyReservation: vi.fn(),
     toCompletedReservation: vi.fn(),
     toCancelledReservation: vi.fn(),
-    updateReservationLineQuantity: vi.fn(),
+    toPendingReservation: vi.fn(),
+    cancelReservation: vi.fn(),
+    abandonReservation: vi.fn(),
     clearReservation: vi.fn(),
-    removeReservationLine: vi.fn(),
+    changeReservationLineQuantity: vi.fn(),
   } as unknown as ReservationContextType
 
   beforeEach(() => {
@@ -212,18 +232,15 @@ describe('ReservationsPage', () => {
     expect(screen.getByRole('tab', { name: 'Abandonnées' })).toBeTruthy()
   })
 
-  test('switches between tabs when clicked', () => {
+  test('switches between tabs when clicked', async () => {
     renderWithContexts()
 
     expect(screen.getByRole('button', { name: /réservation #1/i })).toBeTruthy()
 
-    fireEvent.click(screen.getByRole('tab', { name: 'Récupérées' }))
-
-    expect(screen.getByRole('button', { name: /réservation #2/i })).toBeTruthy()
-
     fireEvent.click(screen.getByRole('tab', { name: 'Abandonnées' }))
 
-    expect(screen.getByRole('button', { name: /réservation #3/i })).toBeTruthy()
+    expect(screen.getByRole('button', { name: /réservation #4/i })).toBeTruthy()
+    expect(screen.getByText('Abandonné')).toBeTruthy()
   })
 
   test('displays reservation details with correct status labels', () => {
@@ -233,7 +250,7 @@ describe('ReservationsPage', () => {
     fireEvent.click(screen.getAllByText('Récupérées')[0])
     expect(screen.getByText('Confirmé')).toBeTruthy()
     fireEvent.click(screen.getAllByText('Abandonnées')[0])
-    expect(screen.getByText('Annulé')).toBeTruthy()
+    expect(screen.getByText('Abandonné')).toBeTruthy()
   })
 
   test('displays reservation line items when expanded', () => {
@@ -360,13 +377,13 @@ describe('ReservationsPage', () => {
     fireEvent.click(screen.getAllByText('Abandonnées')[0])
 
     const summaryButton = screen.getByRole('button', {
-      name: /réservation #3/i,
+      name: /réservation #4/i,
     })
     fireEvent.click(summaryButton)
 
     const images = screen.getAllByRole('img')
     const cancelledProductImage = images.find(
-      (img) => img.getAttribute('alt') === 'Cancelled Product'
+      (img) => img.getAttribute('alt') === 'Test Product'
     )
 
     expect(cancelledProductImage).toBeTruthy()

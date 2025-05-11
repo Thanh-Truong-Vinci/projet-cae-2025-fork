@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {
   Container,
   Typography,
@@ -25,6 +25,7 @@ import {
   Select,
   MenuItem,
   SelectChangeEvent,
+  Button,
 } from '@mui/material'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
@@ -32,7 +33,7 @@ import { ProductContext } from '../../contexts/ProductContext'
 import { BatchContext } from '../../contexts/BatchContext'
 import { UserContext } from '../../contexts/UserContext'
 import { StatisticsContext } from '../../contexts/StatisticsContext'
-import { Batch, ProductBatch } from '../../types' // Suppression de l'import SalesStatistics
+import { Batch, ProductBatch, RawBatch } from '../../types'
 import { useNavigate } from 'react-router-dom'
 
 interface ProductWithBatches extends ProductBatch {
@@ -83,11 +84,168 @@ const months = [
   { value: 12, label: 'Décembre' },
 ]
 
+const getStatusLabel = (
+  status: string | undefined,
+  availableQuantity: number
+) => {
+  if (availableQuantity === 0) {
+    return { label: 'Épuisé', color: 'error' as const }
+  }
+
+  switch (status?.toUpperCase()) {
+    case 'PENDING':
+      return { label: 'En attente', color: 'warning' as const }
+    case 'REJECTED':
+      return { label: 'Refusé', color: 'error' as const }
+    case 'APPROVED':
+      return { label: 'Accepté', color: 'success' as const }
+    case 'RECEIVED':
+      return { label: 'Reçu', color: 'info' as const }
+    default:
+      return { label: 'Indéterminé', color: 'default' as const }
+  }
+}
+
+// Fonction d'aide pour formater les dates de façon sécurisée
+const formatSafeDate = (
+  dateValue: string | Date | null | undefined,
+  formatStr: string
+) => {
+  if (!dateValue) return 'Date inconnue'
+
+  try {
+    const date = new Date(dateValue)
+    // Vérifier si la date est valide
+    if (isNaN(date.getTime())) return 'Date invalide'
+    return format(date, formatStr, { locale: fr })
+  } catch (error) {
+    console.error('Erreur de formatage de date:', error, dateValue)
+    return 'Date invalide'
+  }
+}
+
+const getSafeBatch = (batch: RawBatch): Batch => {
+  try {
+    console.log('Structure du lot brut:', batch)
+
+    // Extraire le nom du producteur
+    let producerName = 'Producteur inconnu'
+    if (batch.producer) {
+      // Vérifier si c'est le format d'entité BRUTE (non DTO)
+      if (typeof batch.producer === 'object' && batch.producer !== null) {
+        const firstName = batch.producer.firstname || ''
+        const lastName = batch.producer.name || ''
+        if (firstName || lastName) {
+          producerName = `${firstName} ${lastName}`.trim()
+        } else if (batch.producer.company) {
+          producerName = batch.producer.company
+        }
+      } else if (batch.producerName) {
+        producerName = batch.producerName
+      } else if (typeof batch.producer === 'string') {
+        producerName = batch.producer
+      }
+    } else if (batch.producerName) {
+      producerName = batch.producerName
+    }
+
+    // Récupération du nom du produit avec vérification des différents formats possibles
+    let productName = 'Produit sans nom'
+    if (typeof batch.product === 'object' && batch.product?.name) {
+      productName = batch.product.name
+    } else if (batch.productName) {
+      productName = batch.productName
+    }
+
+    // Récupération du type de produit avec vérification des différents formats possibles
+    let productType = 'Type inconnu'
+    if (typeof batch.product === 'object' && batch.product?.type?.title) {
+      productType = batch.product.type.title
+    } else if (batch.productType) {
+      productType = batch.productType
+    }
+
+    // Récupération de l'URL d'image avec vérification des différents formats possibles
+    let imageUrl = 'https://via.placeholder.com/150'
+    if (typeof batch.photo === 'object' && batch.photo?.imageLocation) {
+      imageUrl = batch.photo.imageLocation
+    } else if (batch.imageUrl) {
+      imageUrl = batch.imageUrl
+    } else if (batch.imageLocation) {
+      imageUrl = batch.imageLocation
+    }
+
+    // Vérifiez que le statut est une des valeurs valides
+    const validStatus = ['PENDING', 'APPROVED', 'REJECTED', 'RECEIVED']
+    const status =
+      batch.status && validStatus.includes(batch.status.toUpperCase())
+        ? batch.status.toUpperCase()
+        : 'PENDING'
+
+    // Définir une date par défaut pour les dates manquantes
+    const today = new Date().toISOString()
+    // S'assurer que les valeurs sont toujours des chaînes de caractères
+    const createdAtStr =
+      typeof batch.createdAt === 'object'
+        ? (batch.createdAt as Date).toISOString()
+        : String(batch.createdAt || batch.productionDate || today)
+    const availabilityDateStr =
+      typeof batch.availabilityDate === 'object'
+        ? (batch.availabilityDate as Date).toISOString()
+        : String(batch.availabilityDate || today)
+
+    return {
+      id: batch.id || 0,
+      productName: productName,
+      productType: productType,
+      imageUrl: imageUrl,
+      availabilityDate: availabilityDateStr,
+      availableQuantity:
+        typeof batch.availableQuantity === 'number'
+          ? batch.availableQuantity
+          : 0,
+      unitPrice: typeof batch.unitPrice === 'number' ? batch.unitPrice : 0,
+      unitType: batch.saleUnit || batch.unitType || 'unité',
+      producerId:
+        typeof batch.producer === 'object' && batch.producer !== null
+          ? batch.producer.id || 0
+          : batch.producerId || 0,
+      producerName: producerName,
+      createdAt: createdAtStr,
+      status: status as 'PENDING' | 'APPROVED' | 'REJECTED' | 'RECEIVED',
+      rejectionReason: batch.rejectionReason || '',
+    }
+  } catch (error) {
+    console.error('Erreur lors du nettoyage du batch:', error, batch)
+    // Objet par défaut inchangé...
+    return {
+      id: batch?.id || 0,
+      productName: 'Erreur: Données corrompues',
+      productType: 'Type inconnu',
+      imageUrl: 'https://via.placeholder.com/150',
+      availabilityDate: '',
+      availableQuantity: 0,
+      unitPrice: 0,
+      unitType: 'unité',
+      producerId: 0,
+      producerName: 'Producteur inconnu',
+      createdAt: '',
+      status: 'PENDING',
+      rejectionReason: '',
+    }
+  }
+}
+
+// Produits et lots
 const ManagerDashboardPage = () => {
   const navigate = useNavigate()
   const [tabValue, setTabValue] = useState(0)
+  const [batchStatusTabValue, setBatchStatusTabValue] = useState(0)
+  const [allBatches, setAllBatches] = useState<Batch[]>([])
+  const [isBatchesLoading, setIsBatchesLoading] = useState(false)
+  const [batchesError, setBatchesError] = useState<string | null>(null)
+  const [globalError, setGlobalError] = useState<string | null>(null)
 
-  // Produits et lots
   const {
     products,
     isLoading: productsLoading,
@@ -98,7 +256,7 @@ const ManagerDashboardPage = () => {
     receivedBatches,
     fetchReceivedBatches,
     isLoading: batchesLoading,
-    error: batchesError,
+    error: batchContextError,
   } = useContext(BatchContext)!
 
   const [productsWithBatches, setProductsWithBatches] = useState<
@@ -118,6 +276,14 @@ const ManagerDashboardPage = () => {
   const [selectedMonth, setSelectedMonth] = useState<number | undefined>(
     undefined
   )
+  const [selectedProductId, setSelectedProductId] = useState<
+    number | undefined
+  >(undefined)
+
+  // Ajouter cet état pour stocker tous les produits uniques
+  const [allUniqueProducts, setAllUniqueProducts] = useState<
+    Array<{ productId: number; productName: string }>
+  >([])
 
   // États généraux
   const { authenticatedUser } = useContext(UserContext)
@@ -129,9 +295,32 @@ const ManagerDashboardPage = () => {
     setTabValue(newValue)
   }
 
+  const handleBatchStatusTabChange = (
+    _event: React.SyntheticEvent,
+    newValue: number
+  ) => {
+    setBatchStatusTabValue(newValue)
+  }
+
   // Générateur d'années pour le filtre (5 dernières années)
   const currentYear = new Date().getFullYear()
   const availableYears = Array.from({ length: 5 }, (_, i) => currentYear - i)
+
+  // Gestionnaires d'événements pour les filtres
+  const handleYearChange = (event: SelectChangeEvent<number | ''>) => {
+    const value = event.target.value
+    setSelectedYear(value === '' ? undefined : Number(value))
+  }
+
+  const handleMonthChange = (event: SelectChangeEvent<number | ''>) => {
+    const value = event.target.value
+    setSelectedMonth(value === '' ? undefined : Number(value))
+  }
+
+  const handleProductChange = (event: SelectChangeEvent<number | ''>) => {
+    const value = event.target.value
+    setSelectedProductId(value === '' ? undefined : Number(value))
+  }
 
   // Rediriger si non authentifié ou non gestionnaire
   useEffect(() => {
@@ -141,6 +330,20 @@ const ManagerDashboardPage = () => {
       navigate('/')
     }
   }, [authenticatedUser, navigate])
+
+  // Intercepter les erreurs pour obtenir la pile d'appel
+  useEffect(() => {
+    const errorHandler = (event: ErrorEvent) => {
+      console.error('Erreur globale interceptée:', event.error)
+      event.preventDefault() // Empêcher le crash
+      setGlobalError(
+        event.error?.message || "Une erreur inconnue s'est produite"
+      )
+    }
+
+    window.addEventListener('error', errorHandler)
+    return () => window.removeEventListener('error', errorHandler)
+  }, [])
 
   // Charger les lots reçus
   useEffect(() => {
@@ -158,6 +361,43 @@ const ManagerDashboardPage = () => {
 
     loadData()
   }, [fetchReceivedBatches])
+
+  useEffect(() => {
+    const fetchAllBatches = async () => {
+      if (tabValue !== 1) return
+
+      setIsBatchesLoading(true)
+      setBatchesError(null)
+
+      try {
+        const response = await fetch('/api/batches', {
+          headers: {
+            Authorization: authenticatedUser?.token || '',
+          },
+        })
+
+        if (!response.ok) {
+          throw new Error(`Erreur: ${response.status}`)
+        }
+
+        const data = await response.json()
+        console.log('Données brutes des lots:', data)
+
+        // Nettoyage plus robuste des données
+        const safeData = Array.isArray(data) ? data.map(getSafeBatch) : []
+        console.log('Données sécurisées:', safeData)
+
+        setAllBatches(safeData)
+      } catch (err) {
+        console.error('Erreur lors de la récupération des lots:', err)
+        setBatchesError(err instanceof Error ? err.message : 'Erreur inconnue')
+      } finally {
+        setIsBatchesLoading(false)
+      }
+    }
+
+    fetchAllBatches()
+  }, [tabValue, authenticatedUser])
 
   // Lier les produits et lots
   useEffect(() => {
@@ -189,10 +429,40 @@ const ManagerDashboardPage = () => {
 
   // Chargement des statistiques
   useEffect(() => {
-    if (tabValue === 1) {
-      fetchSalesStatistics(selectedYear, selectedMonth)
+    if (tabValue === 2) {
+      fetchSalesStatistics(selectedYear, selectedMonth, selectedProductId)
     }
-  }, [fetchSalesStatistics, selectedYear, selectedMonth, tabValue])
+  }, [
+    fetchSalesStatistics,
+    selectedYear,
+    selectedMonth,
+    selectedProductId,
+    tabValue,
+  ])
+
+  // Ajouter un nouvel effet pour capturer tous les produits uniques la première fois que les statistiques sont chargées
+  useEffect(() => {
+    if (salesStatistics.length > 0 && allUniqueProducts.length === 0) {
+      const productMap = new Map<
+        string,
+        { productId: number; productName: string }
+      >()
+      salesStatistics.forEach((stat) => {
+        if (!productMap.has(stat.productName)) {
+          productMap.set(stat.productName, {
+            productId: stat.productId,
+            productName: stat.productName,
+          })
+        }
+      })
+
+      const sortedProducts = Array.from(productMap.values()).sort((a, b) =>
+        a.productName.localeCompare(b.productName)
+      )
+
+      setAllUniqueProducts(sortedProducts)
+    }
+  }, [salesStatistics, allUniqueProducts])
 
   // Calculer les totaux pour les métriques
   const totalReceived = salesStatistics.reduce(
@@ -207,17 +477,6 @@ const ManagerDashboardPage = () => {
     (sum, stat) => sum + (stat.totalRevenue || 0),
     0
   )
-
-  // Gestionnaires d'événements pour les filtres
-  const handleYearChange = (event: SelectChangeEvent<number | ''>) => {
-    const value = event.target.value
-    setSelectedYear(value === '' ? undefined : Number(value))
-  }
-
-  const handleMonthChange = (event: SelectChangeEvent<number | ''>) => {
-    const value = event.target.value
-    setSelectedMonth(value === '' ? undefined : Number(value))
-  }
 
   // Grouper les statistiques par type de produit
   const statsByProductType = salesStatistics.reduce(
@@ -247,6 +506,187 @@ const ManagerDashboardPage = () => {
     >
   )
 
+  const renderBatchesByStatus = (statusTabIndex: number) => {
+    try {
+      const filteredBatches = allBatches
+        .map(getSafeBatch) // Nettoyage supplémentaire par sécurité
+        .filter((batch) => {
+          const status = batch.status?.toUpperCase()
+          const isOutOfStock = batch.availableQuantity === 0
+
+          switch (statusTabIndex) {
+            case 0:
+              return true // Tous
+            case 1:
+              return status === 'PENDING'
+            case 2:
+              return status === 'REJECTED'
+            case 3:
+              return status === 'APPROVED' && !isOutOfStock
+            case 4:
+              return status === 'RECEIVED'
+            case 5:
+              return isOutOfStock
+            default:
+              return true
+          }
+        })
+
+      if (isBatchesLoading) {
+        return (
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+            <CircularProgress />
+          </Box>
+        )
+      }
+
+      if (batchesError) {
+        return (
+          <Alert severity="error" sx={{ m: 2 }}>
+            {batchesError}
+          </Alert>
+        )
+      }
+
+      if (filteredBatches.length === 0) {
+        return (
+          <Box sx={{ p: 3, textAlign: 'center' }}>
+            <Typography variant="body1" color="textSecondary">
+              Aucun lot dans cette catégorie.
+            </Typography>
+          </Box>
+        )
+      }
+
+      return (
+        <Grid container spacing={3}>
+          {filteredBatches.map((batch) => {
+            const statusInfo = getStatusLabel(
+              batch.status,
+              batch.availableQuantity
+            )
+
+            return (
+              <Grid item xs={12} sm={6} md={4} key={batch.id}>
+                <Card
+                  elevation={3}
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    opacity:
+                      batch.status === 'REJECTED' ||
+                      batch.availableQuantity === 0
+                        ? 0.7
+                        : 1,
+                  }}
+                >
+                  <CardMedia
+                    component="img"
+                    height="160"
+                    image={batch.imageUrl}
+                    alt={batch.productName}
+                  />
+                  <CardContent sx={{ flexGrow: 1 }}>
+                    <Box
+                      sx={{
+                        mb: 2,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
+                      }}
+                    >
+                      <Typography variant="h6" component="h3" gutterBottom>
+                        {batch.productName}
+                      </Typography>
+                      <Chip
+                        label={statusInfo.label}
+                        size="small"
+                        color={statusInfo.color}
+                      />
+                    </Box>
+
+                    <Box sx={{ mb: 1 }}>
+                      <Chip
+                        label={batch.productType}
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                        sx={{ mr: 1 }}
+                      />
+
+                      <Typography variant="body2" color="text.secondary">
+                        <strong>Disponible:</strong>{' '}
+                        {formatSafeDate(batch.availabilityDate, 'dd MMMM yyyy')}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        <strong>Quantité:</strong> {batch.availableQuantity}{' '}
+                        {batch.unitType}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        <strong>Prix:</strong> {batch.unitPrice.toFixed(2)}€/
+                        {batch.unitType}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        <strong>Producteur:</strong> {batch.producerName}
+                      </Typography>
+                    </Box>
+
+                    {batch.status === 'REJECTED' && batch.rejectionReason && (
+                      <Box
+                        sx={{
+                          mt: 2,
+                          p: 1,
+                          bgcolor: 'error.light',
+                          borderRadius: 1,
+                        }}
+                      >
+                        <Typography variant="caption" color="error.dark">
+                          <strong>Motif du refus:</strong>{' '}
+                          {batch.rejectionReason}
+                        </Typography>
+                      </Box>
+                    )}
+
+                    <Box sx={{ mt: 2 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Ajouté le{' '}
+                        {formatSafeDate(batch.createdAt, 'dd/MM/yyyy')}
+                      </Typography>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+            )
+          })}
+        </Grid>
+      )
+    } catch (error) {
+      console.error('Erreur dans le rendu des lots:', error)
+      setGlobalError(
+        "Une erreur s'est produite lors de l'affichage des lots. Veuillez réessayer."
+      )
+      return null
+    }
+  }
+
+  if (globalError) {
+    return (
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Alert severity="error" sx={{ m: 2 }}>
+          {globalError}
+          <Button
+            sx={{ ml: 2 }}
+            variant="outlined"
+            onClick={() => setGlobalError(null)}
+          >
+            Réessayer
+          </Button>
+        </Alert>
+      </Container>
+    )
+  }
+
   if (productsLoading || batchesLoading || statsLoading || isLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
@@ -255,10 +695,10 @@ const ManagerDashboardPage = () => {
     )
   }
 
-  if (productsError || batchesError || statsError || error) {
+  if (productsError || batchContextError || statsError || error) {
     return (
       <Alert severity="error" sx={{ m: 2 }}>
-        {productsError || batchesError || statsError || error}
+        {productsError || batchContextError || statsError || error}
       </Alert>
     )
   }
@@ -282,7 +722,8 @@ const ManagerDashboardPage = () => {
           aria-label="manager dashboard tabs"
         >
           <Tab label="Produits en Stock" {...a11yProps(0)} />
-          <Tab label="Statistiques des Ventes" {...a11yProps(1)} />
+          <Tab label="Tous les Lots" {...a11yProps(1)} />
+          <Tab label="Statistiques des Ventes" {...a11yProps(2)} />
         </Tabs>
       </Box>
 
@@ -393,10 +834,9 @@ const ManagerDashboardPage = () => {
                             {product.batches.map((batch) => (
                               <TableRow key={batch.id}>
                                 <TableCell>
-                                  {format(
-                                    new Date(batch.availabilityDate),
-                                    'dd MMM yyyy',
-                                    { locale: fr }
+                                  {formatSafeDate(
+                                    batch.availabilityDate,
+                                    'dd MMM yyyy'
                                   )}
                                 </TableCell>
                                 <TableCell>{batch.producerName}</TableCell>
@@ -421,14 +861,70 @@ const ManagerDashboardPage = () => {
         )}
       </TabPanel>
 
-      {/* Onglet des statistiques de ventes */}
+      {/* Onglet des lots */}
       <TabPanel value={tabValue} index={1}>
+        <Typography variant="h5" gutterBottom>
+          Tous les Lots des Producteurs
+        </Typography>
+
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs
+            value={batchStatusTabValue}
+            onChange={handleBatchStatusTabChange}
+            aria-label="batch status tabs"
+            variant="scrollable"
+            scrollButtons="auto"
+          >
+            <Tab label="Tous" {...a11yProps(0)} />
+            <Tab label="En attente" {...a11yProps(1)} />
+            <Tab label="Refusé" {...a11yProps(2)} />
+            <Tab label="Accepté" {...a11yProps(3)} />
+            <Tab label="Reçu" {...a11yProps(4)} />
+            <Tab label="Épuisé" {...a11yProps(5)} />
+          </Tabs>
+        </Box>
+
+        {/* Contenu pour chaque sous-onglet */}
+        {[0, 1, 2, 3, 4, 5].map((statusTabIndex) => (
+          <TabPanel
+            key={statusTabIndex}
+            value={batchStatusTabValue}
+            index={statusTabIndex}
+          >
+            {renderBatchesByStatus(statusTabIndex)}
+          </TabPanel>
+        ))}
+      </TabPanel>
+
+      {/* Onglet des statistiques de ventes */}
+      <TabPanel value={tabValue} index={2}>
         <Typography variant="h5" gutterBottom>
           Tableau de Bord des Ventes
         </Typography>
 
         {/* Filtres */}
         <Grid container spacing={2} sx={{ mb: 4 }}>
+          {/* Sélecteur de produit */}
+          <Grid item xs={12}>
+            <FormControl fullWidth>
+              <InputLabel id="product-select-label">Produit</InputLabel>
+              <Select
+                labelId="product-select-label"
+                value={selectedProductId || ''}
+                label="Produit"
+                onChange={handleProductChange}
+              >
+                <MenuItem value="">Tous les produits</MenuItem>
+                {allUniqueProducts.map((product) => (
+                  <MenuItem key={product.productId} value={product.productId}>
+                    {product.productName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          {/* Sélecteur d'année */}
           <Grid item xs={12} md={6}>
             <FormControl fullWidth>
               <InputLabel id="year-select-label">Année</InputLabel>
@@ -447,6 +943,8 @@ const ManagerDashboardPage = () => {
               </Select>
             </FormControl>
           </Grid>
+
+          {/* Sélecteur de mois */}
           <Grid item xs={12} md={6}>
             <FormControl fullWidth>
               <InputLabel id="month-select-label">Mois</InputLabel>
@@ -467,6 +965,15 @@ const ManagerDashboardPage = () => {
             </FormControl>
           </Grid>
         </Grid>
+
+        {/* Affichage du titre avec le produit sélectionné */}
+        {selectedProductId && (
+          <Typography variant="h6" color="primary" sx={{ mb: 2 }}>
+            Statistiques pour:{' '}
+            {products.find((p) => p.productId === selectedProductId)
+              ?.productName || 'Produit sélectionné'}
+          </Typography>
+        )}
 
         {/* Cartes récapitulatives */}
         <Grid container spacing={4} sx={{ mb: 4 }}>
@@ -505,41 +1012,45 @@ const ManagerDashboardPage = () => {
         </Grid>
 
         {/* Tableau par type de produit */}
-        <Paper elevation={3} sx={{ p: 2, mb: 4 }}>
-          <Typography variant="h6" gutterBottom>
-            Récapitulatif par Type de Produit
-          </Typography>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Type de Produit</TableCell>
-                  <TableCell align="right">Unités Reçues</TableCell>
-                  <TableCell align="right">Unités Vendues</TableCell>
-                  <TableCell align="right">Taux de Conversion</TableCell>
-                  <TableCell align="right">Revenu Total</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {Object.values(statsByProductType).map((stat) => (
-                  <TableRow key={stat.productType}>
-                    <TableCell>{stat.productType}</TableCell>
-                    <TableCell align="right">{stat.receivedQuantity}</TableCell>
-                    <TableCell align="right">{stat.soldQuantity}</TableCell>
-                    <TableCell align="right">
-                      {stat.receivedQuantity > 0
-                        ? `${((stat.soldQuantity / stat.receivedQuantity) * 100).toFixed(1)}%`
-                        : 'N/A'}
-                    </TableCell>
-                    <TableCell align="right">
-                      {stat.totalRevenue.toFixed(2)} €
-                    </TableCell>
+        {!selectedProductId && (
+          <Paper elevation={3} sx={{ p: 2, mb: 4 }}>
+            <Typography variant="h6" gutterBottom>
+              Récapitulatif par Type de Produit
+            </Typography>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Type de Produit</TableCell>
+                    <TableCell align="right">Unités Reçues</TableCell>
+                    <TableCell align="right">Unités Vendues</TableCell>
+                    <TableCell align="right">Taux de Conversion</TableCell>
+                    <TableCell align="right">Revenu Total</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
+                </TableHead>
+                <TableBody>
+                  {Object.values(statsByProductType).map((stat) => (
+                    <TableRow key={stat.productType}>
+                      <TableCell>{stat.productType}</TableCell>
+                      <TableCell align="right">
+                        {stat.receivedQuantity}
+                      </TableCell>
+                      <TableCell align="right">{stat.soldQuantity}</TableCell>
+                      <TableCell align="right">
+                        {stat.receivedQuantity > 0
+                          ? `${((stat.soldQuantity / stat.receivedQuantity) * 100).toFixed(1)}%`
+                          : 'N/A'}
+                      </TableCell>
+                      <TableCell align="right">
+                        {stat.totalRevenue.toFixed(2)} €
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
+        )}
 
         {/* Tableau détaillé par produit */}
         <Paper elevation={3} sx={{ p: 2 }}>
