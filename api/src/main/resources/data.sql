@@ -117,25 +117,23 @@ VALUES ('Légumes'),
 
 -- Insérer quelques photos
 INSERT INTO photos (product_name, url)
-VALUES ('tomates_bio',
+VALUES ('tomate bio',
         'https://imagestoragecae09.blob.core.windows.net/dev/640b2ba0-885c-4aa0-bff5-5f995f99e745'),
-       ('pommes_rouge',
+       ('pomme rouge',
         'https://imagestoragecae09.blob.core.windows.net/dev/97912d63-b931-4a0f-acaa-f1632cd742ad'),
-       ('pain_artisanal',
+       ('pain artisanal',
         'https://imagestoragecae09.blob.core.windows.net/dev/f2a0ec00-fc7e-45c5-9794-7320fc70c797'),
        ('fromage',
         'https://imagestoragecae09.blob.core.windows.net/dev/ff87dda5-99f9-4c96-a731-2c71dd884e2d'),
-       ('carottes',
-        'https://imagestoragecae09.blob.core.windows.net/dev/e9b1914d-343c-4b5f-b146-c8016f6e83ff'),
        ('biere',
         'https://imagestoragecae09.blob.core.windows.net/dev/f212f310-a62f-4ea6-be3a-e1ef2edf3321'),
        ('poulet',
         'https://imagestoragecae09.blob.core.windows.net/dev/601c557a-8862-410f-9d66-19c49f903e30'),
        ('yaourt',
         'https://imagestoragecae09.blob.core.windows.net/dev/52205241-37f2-4631-a7e7-f967a65fbee8'),
-       ('pommes_jonagold',
+       ('pomme jonagold',
         'https://imagestoragecae09.blob.core.windows.net/dev/758fcf0e-a66c-45e0-95ed-8f0aa6ecfd80'),
-       ('choufleur_cheddar',
+       ('choufleur cheddar',
         'https://imagestoragecae09.blob.core.windows.net/dev/007d32fb-7c1d-45ca-a917-48ce9f0db3ae');
 
 -- Insérer des produits
@@ -147,7 +145,7 @@ SELECT pt.id_product_type,
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Légumes'
-  AND p.product_name = 'tomate_bio';
+  AND p.product_name = 'tomate bio';
 
 INSERT INTO products (id_product_type, name, description, photo_id)
 SELECT pt.id_product_type,
@@ -157,7 +155,7 @@ SELECT pt.id_product_type,
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Fruits'
-  AND p.product_name = 'pomme_rouge';
+  AND p.product_name = 'pomme rouge';
 
 INSERT INTO products (id_product_type, name, description, photo_id)
 SELECT pt.id_product_type,
@@ -167,7 +165,7 @@ SELECT pt.id_product_type,
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Boulangerie'
-  AND p.product_name = 'pain_artisanal';
+  AND p.product_name = 'pain artisanal';
 
 INSERT INTO products (id_product_type, name, description, photo_id)
 SELECT pt.id_product_type,
@@ -178,16 +176,6 @@ FROM product_types pt,
      photos p
 WHERE pt.title = 'Produits laitiers'
   AND p.product_name = 'fromage';
-
-INSERT INTO products (id_product_type, name, description, photo_id)
-SELECT pt.id_product_type,
-       'Carottes Bio',
-       'Carottes fraîches cultivées en agriculture biologique, riches en bêta-carotène.',
-       p.id_photo
-FROM product_types pt,
-     photos p
-WHERE pt.title = 'Légumes'
-  AND p.product_name = 'carottes';
 
 INSERT INTO products (id_product_type, name, description, photo_id)
 SELECT pt.id_product_type,
@@ -227,7 +215,7 @@ SELECT pt.id_product_type,
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Fruits'
-  AND p.product_name = 'pomme_jonagold';
+  AND p.product_name = 'pomme jonagold';
 
 INSERT INTO products (id_product_type, name, description, photo_id)
 SELECT pt.id_product_type,
@@ -237,7 +225,7 @@ SELECT pt.id_product_type,
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Légumes'
-  AND p.product_name = 'choufleur_cheddar';
+  AND p.product_name = 'choufleur cheddar';
 
 -- Créer des lots pour chaque produit
 -- Fix all pending batches inserts
@@ -319,26 +307,6 @@ FROM products p
          JOIN photos ph
               ON p.photo_id = ph.id_photo
 WHERE p.name = 'Fromage fermier';
-
--- Pour le lot de Carottes Bio
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
-                     sale_unit,
-                     available_quantity, status, deposit_date, production_date)
-SELECT (SELECT id_user FROM manager LIMIT 1),
-       (SELECT id_user FROM producer LIMIT 1),
-       p.id_product,
-       ph.id_photo,
-       '2025-04-20',
-       2.80,
-       'kg',
-       60,
-       'PENDING',
-       '2025-03-22',
-       '2025-03-15' -- 7 jours avant la récolte
-FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
-WHERE p.name = 'Carottes Bio';
 
 -- Pour le lot de Bière artisanale
 INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
@@ -526,66 +494,6 @@ FROM products p
               ON p.photo_id = ph.id_photo
 WHERE p.name = 'Tomates Bio';
 
--- Pour le lot de Carottes Bio (RECEIVED)
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
-                     sale_unit,
-                     available_quantity, status, deposit_date, production_date)
-SELECT (SELECT id_user FROM manager LIMIT 1),
-       (SELECT id_user FROM producer LIMIT 1),
-       p.id_product,
-       ph.id_photo,
-       '2025-04-10',
-       2.50,
-       'kg',
-       35,
-       'RECEIVED',
-       '2025-03-15',
-       '2025-03-08' -- 7 jours avant le dépôt
-FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
-WHERE p.name = 'Carottes Bio';
-
--- Pour un deuxième lot de Carottes Bio (RECEIVED) - fusionnable avec le lot existant
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
-                     sale_unit,
-                     available_quantity, status, deposit_date, production_date)
-SELECT (SELECT id_user FROM manager LIMIT 1),
-       (SELECT id_user FROM producer LIMIT 1),
-       p.id_product,
-       ph.id_photo,
-       '2025-04-20', -- Date différente, mais même produit/prix/unité/photo
-       2.50,         -- MÊME unitPrice que le lot existant (2.50)
-       'kg',         -- MÊME saleUnit que le lot existant ('kg')
-       25,           -- Quantité différente qui s'additionnera (35 + 25 = 60 total)
-       'RECEIVED',   -- MÊME statut que le lot existant (RECEIVED)
-       '2025-03-25', -- Date de dépôt différente, pas importante pour la fusion
-       '2025-03-20'  -- Date de production différente
-FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
-WHERE p.name = 'Carottes Bio';
-
--- Pour un lot de Carottes Bio (RECEIVED) - presque fusionnable mais avec prix différent
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
-                     sale_unit,
-                     available_quantity, status, deposit_date, production_date)
-SELECT (SELECT id_user FROM manager LIMIT 1),
-       (SELECT id_user FROM producer LIMIT 1),
-       p.id_product,
-       ph.id_photo,
-       '2025-04-25', -- Date différente (pas importante pour la fusion)
-       2.49,         -- Prix LÉGÈREMENT DIFFÉRENT (2.49 vs 2.50) - empêche la fusion
-       'kg',         -- MÊME unité de vente que les autres lots
-       20,           -- Quantité disponible
-       'RECEIVED',   -- MÊME statut (nécessaire pour apparaître dans la vue)
-       '2025-03-28', -- Date de dépôt
-       '2025-03-22'  -- Date de production
-FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
-WHERE p.name = 'Carottes Bio';
-
 -- Pour le lot de Yaourt nature (RECEIVED)
 INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
                      sale_unit,
@@ -605,64 +513,6 @@ FROM products p
          JOIN photos ph
               ON p.photo_id = ph.id_photo
 WHERE p.name = 'Yaourt nature';
-
--- 1. Lot avec une unité de vente différente (tout le reste identique)
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
-                     sale_unit,
-                     available_quantity, status, deposit_date, production_date)
-SELECT (SELECT id_user FROM manager LIMIT 1),
-       (SELECT id_user FROM producer LIMIT 1),
-       p.id_product,
-       ph.id_photo,
-       '2025-04-30',
-       2.50,    -- MÊME prix que les lots de carottes existants
-       'piece', -- UNITÉ DIFFÉRENTE (piece vs kg) - empêche la fusion
-       15,
-       'RECEIVED',
-       '2025-04-01',
-       '2025-03-25'
-FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
-WHERE p.name = 'Carottes Bio';
-
--- 2. Lot avec une photo différente (tout le reste identique)
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
-                     sale_unit,
-                     available_quantity, status, deposit_date, production_date)
-SELECT (SELECT id_user FROM manager LIMIT 1),
-       (SELECT id_user FROM producer LIMIT 1),
-       p.id_product,
-       (SELECT id_photo FROM photos WHERE product_name = 'tomate_bio'), -- PHOTO DIFFÉRENTE - empêche la fusion
-       '2025-05-01',
-       2.50,                                                            -- MÊME prix
-       'kg',                                                            -- MÊME unité
-       18,
-       'RECEIVED',
-       '2025-04-02',
-       '2025-03-28'
-FROM products p
-WHERE p.name = 'Carottes Bio';
-
--- 3. Lot avec un producteur différent (paramètre hors clé de fusion - sera fusionné quand même)
-INSERT INTO batches (manager_id, producer_id, product_id, photo_id, availability_date, unit_price,
-                     sale_unit,
-                     available_quantity, status, deposit_date, production_date)
-SELECT (SELECT id_user FROM manager LIMIT 1),
-       (SELECT id_user FROM producer WHERE company = 'Les Vergers de Marie'), -- PRODUCTEUR DIFFÉRENT - SERA FUSIONNÉ quand même
-       p.id_product,
-       ph.id_photo,
-       '2025-05-05',
-       2.50,                                                                  -- MÊME prix
-       'kg',                                                                  -- MÊME unité
-       22,
-       'RECEIVED',
-       '2025-04-03',
-       '2025-03-30'
-FROM products p
-         JOIN photos ph
-              ON p.photo_id = ph.id_photo
-WHERE p.name = 'Carottes Bio';
 
 SELECT id_user, NULL
 FROM users
@@ -842,12 +692,12 @@ WHERE email = 'suzanne.droity@example.com';
 -- Ajouter les nouvelles photos pour les produits supplémentaires
 INSERT INTO photos (product_name, url)
 VALUES 
-('miel_pissenlit', 'https://imagestoragecae09.blob.core.windows.net/dev/d5fcf24a-7744-4f45-9e0d-0a9d964e4041'),
-('laitue_blonde', 'https://imagestoragecae09.blob.core.windows.net/dev/bad5f397-2f27-4c58-8b90-28de7be2ca5e'),
-('carottes_cosmic', 'https://imagestoragecae09.blob.core.windows.net/dev/f962063f-acf3-4e86-a38d-a728f983f02f'),
-('courgette_blanche', 'https://imagestoragecae09.blob.core.windows.net/dev/d24d89a5-a77f-485f-9e4c-949115d63399'),
-('cerise_napoleon', 'https://imagestoragecae09.blob.core.windows.net/dev/2468799f-ba1b-4ae9-aad6-5e35d7dac415'),
-('haricots_mistik', 'https://imagestoragecae09.blob.core.windows.net/dev/abe1c8dd-1a7e-4d70-9522-3c750c398b20');
+('miel pissenlit', 'https://imagestoragecae09.blob.core.windows.net/dev/d5fcf24a-7744-4f45-9e0d-0a9d964e4041'),
+('laitue blonde', 'https://imagestoragecae09.blob.core.windows.net/dev/bad5f397-2f27-4c58-8b90-28de7be2ca5e'),
+('carottes cosmic', 'https://imagestoragecae09.blob.core.windows.net/dev/f962063f-acf3-4e86-a38d-a728f983f02f'),
+('courgette blanche', 'https://imagestoragecae09.blob.core.windows.net/dev/d24d89a5-a77f-485f-9e4c-949115d63399'),
+('cerise napoleon', 'https://imagestoragecae09.blob.core.windows.net/dev/2468799f-ba1b-4ae9-aad6-5e35d7dac415'),
+('haricots mistik', 'https://imagestoragecae09.blob.core.windows.net/dev/abe1c8dd-1a7e-4d70-9522-3c750c398b20');
 
 -- Insérer les nouveaux produits avec leurs types et photos
 INSERT INTO products (id_product_type, name, description, photo_id)
@@ -858,7 +708,7 @@ SELECT pt.id_product_type,
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Légumes'
-  AND p.product_name = 'laitue_blonde';
+  AND p.product_name = 'laitue blonde';
 
 INSERT INTO products (id_product_type, name, description, photo_id)
 SELECT pt.id_product_type,
@@ -868,7 +718,7 @@ SELECT pt.id_product_type,
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Légumes'
-  AND p.product_name = 'carottes_cosmic';
+  AND p.product_name = 'carottes cosmic';
 
 INSERT INTO products (id_product_type, name, description, photo_id)
 SELECT pt.id_product_type,
@@ -878,7 +728,7 @@ SELECT pt.id_product_type,
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Légumes'
-  AND p.product_name = 'courgette_blanche';
+  AND p.product_name = 'courgette blanche';
 
 INSERT INTO products (id_product_type, name, description, photo_id)
 SELECT pt.id_product_type,
@@ -888,7 +738,7 @@ SELECT pt.id_product_type,
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Fruits'
-  AND p.product_name = 'cerise_napoleon';
+  AND p.product_name = 'cerise napoleon';
 
 INSERT INTO products (id_product_type, name, description, photo_id)
 SELECT pt.id_product_type,
@@ -898,7 +748,7 @@ SELECT pt.id_product_type,
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Autres'
-  AND p.product_name = 'miel_pissenlit';
+  AND p.product_name = 'miel pissenlit';
 
 INSERT INTO products (id_product_type, name, description, photo_id)
 SELECT pt.id_product_type,
@@ -908,7 +758,7 @@ SELECT pt.id_product_type,
 FROM product_types pt,
      photos p
 WHERE pt.title = 'Légumes'
-  AND p.product_name = 'haricots_mistik';
+  AND p.product_name = 'haricots mistik';
 
 -- Créer des lots pour les produits de Roger Maerckx
 -- Laitue Blonde de Paris - En vente
