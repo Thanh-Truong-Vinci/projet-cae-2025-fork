@@ -305,7 +305,7 @@ public class AuthsServiceTest {
   @Test
   void determineUserRole_VolunteerEmail_ReturnsVolunteerRole() {
     // Arrange
-    String email = "volunteer@example.com";
+    String email = "benevole@exemple.com";
 
     // Act
     String result = authsService.determineUserRole(email);
@@ -425,7 +425,7 @@ public class AuthsServiceTest {
   @Test
   void determineUserRole_VolunteerEmail_ReturnsVolunteerRole_Optimized() {
     // Arrange
-    String email = "volunteer@example.com";
+    String email = "benevole@exemple.com";
 
     // Act
     String result = authsService.determineUserRole(email);

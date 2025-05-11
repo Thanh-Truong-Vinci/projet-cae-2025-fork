@@ -146,7 +146,7 @@ describe('IndexRoute Component', () => {
     const volunteerUser: AuthenticatedUser = {
       role: 'Volunteer',
       name: 'Volunteer User',
-      email: 'volunteer@example.com',
+      email: 'benevole@exemple.com',
       firstname: 'Volunteer',
       token: 'volunteer-token-123',
     }

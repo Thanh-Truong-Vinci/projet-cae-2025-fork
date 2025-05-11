@@ -163,7 +163,7 @@ public class AuthsService {
    */
   public boolean isValidVolunteerToken(String token) {
     String email = verifyJwtToken(token);
-    return "volunteer@example.com".equals(email);
+    return "benevole@exemple.com".equals(email);
   }
 
   /**
@@ -183,7 +183,7 @@ public class AuthsService {
    * @return the role as an enum.
    */
   public Role determineUserRoleEnum(String email) {
-    if ("volunteer@example.com".equals(email)) {
+    if ("benevole@exemple.com".equals(email)) {
       return Role.VOLUNTEER;
     } else if (clientRepository.findByEmail(email) != null) {
       return Role.CLIENT;
