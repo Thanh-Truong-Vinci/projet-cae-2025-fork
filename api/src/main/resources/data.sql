@@ -278,7 +278,7 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        ph.id_photo,
        '2025-03-30',
        4.20,
-       'piece',
+       'pièce',
        30,
        'PENDING',
        '2025-03-25',
@@ -318,7 +318,7 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        ph.id_photo,
        '2025-04-18',
        4.50,
-       'bottle',
+       'bouteille',
        45,
        'PENDING',
        '2025-03-21',
@@ -463,7 +463,7 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        ph.id_photo,
        '2025-04-17',
        5.75,
-       'piece',
+       'pièce',
        30,
        'APPROVED',
        '2025-03-18',
@@ -642,29 +642,6 @@ INSERT INTO producer (id_user, company)
 SELECT id_user, 'Ferme Maerckx'
 FROM users
 WHERE email = 'roger.maerckx@example.com';
-
--- Créer les producteurs corrects: Amandine Tasset
-INSERT INTO users (name, firstname, email, password, date_inscription)
-VALUES ('Tasset', 'Amandine', 'amandine.tasset@example.com',
-        '$2a$10$8Cv0QyLMQ.dDlswhLhd8peiW6.KWnQLl0VmL5lw41/trJgprkg2vm',
-        '2025-02-20');
-
-INSERT INTO user_with_address (id_user, street, number, box, postal_code, city, country, phone_number)
-SELECT id_user,
-       'Chemin des Cultures',
-       '25',
-       '',
-       '4000',
-       'Liège',
-       'Belgique',
-       '+32496789012'
-FROM users
-WHERE email = 'amandine.tasset@example.com';
-
-INSERT INTO producer (id_user, company)
-SELECT id_user, 'Productions Tasset'
-FROM users
-WHERE email = 'amandine.tasset@example.com';
 
 -- Créer la cliente Suzanne Droity
 INSERT INTO users (name, firstname, email, password, date_inscription)
@@ -847,7 +824,7 @@ SELECT (SELECT id_user FROM users WHERE email = 'manu.dubois@example.com'),
        '2025-05-10',
        11.9,
        'piece',
-       8,
+       10,
        'RECEIVED',
        '2025-04-25',
        '2025-04-15'
@@ -875,86 +852,78 @@ FROM products p
               ON p.photo_id = ph.id_photo
 WHERE p.name = 'Cerise Napoléon';
 
--- Réservation 1 - À récupérer (jour de la démo)
+-- Supprimer d'abord les réservations PENDING existantes et leurs lignes
+DELETE FROM reservation_lines 
+WHERE reservation_id IN (
+    SELECT id_reservation 
+    FROM reservation 
+    WHERE client = (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com') 
+    AND status = 'PENDING'
+);
+
+DELETE FROM reservation
+WHERE client = (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com') 
+AND status = 'PENDING';
+
+-- Réinitialiser les quantités des lots
+UPDATE batches 
+SET available_quantity = available_quantity + 3 
+WHERE id = (SELECT id FROM batches WHERE product_id = (SELECT id_product FROM products WHERE name = 'Laitue Blonde de Paris') AND status = 'RECEIVED' LIMIT 1);
+
+UPDATE batches 
+SET available_quantity = available_quantity + 2 
+WHERE id = (SELECT id FROM batches WHERE product_id = (SELECT id_product FROM products WHERE name = 'Miel de Pissenlit Bio 250gr') AND status = 'RECEIVED' LIMIT 1);
+
+UPDATE batches 
+SET available_quantity = available_quantity + 4 
+WHERE id = (SELECT id FROM batches WHERE product_id = (SELECT id_product FROM products WHERE name = 'Courgette Blanche d''Egypte') AND status = 'RECEIVED' LIMIT 1);
+
+-- Créer la première réservation avec laitues et miel
 INSERT INTO reservation (client, status, reservation_date, sale_date, price)
 SELECT (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com'),
        'PENDING',
-       CURRENT_DATE,
+       '2025-05-13',
        NULL,
-       3 * 0.78;
+       (3 * 0.78) + (2 * 11.9);
 
--- Réservation 2 - À récupérer (jour de la démo)
-INSERT INTO reservation (client, status, reservation_date, sale_date, price)
-SELECT (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com'),
-       'PENDING',
-       CURRENT_DATE,
-       NULL,
-       2 * 11.9;
-
--- Réservation 3 - À récupérer (jour de la démo)
-INSERT INTO reservation (client, status, reservation_date, sale_date, price)
-SELECT (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com'),
-       'PENDING',
-       CURRENT_DATE,
-       NULL,
-       4 * 3.75;
-
--- Réservation 4 - Récupérée (06-05-25)
-INSERT INTO reservation (client, status, reservation_date, sale_date, price)
-SELECT (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com'),
-       'CONFIRMED',
-       '2025-05-05',
-       '2025-05-06',
-       15.50;
-
--- Réservation 5 - Abandonnée (29-04-25)
-INSERT INTO reservation (client, status, reservation_date, sale_date, price)
-SELECT (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com'),
-       'CANCELLED',
-       '2025-04-25',
-       '2025-04-29',
-       8.25;
-
--- Réservation 6 - Annulée (28-04-25)
-INSERT INTO reservation (client, status, reservation_date, sale_date, price)
-SELECT (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com'),
-       'CANCELLED',
-       '2025-04-25',
-       '2025-04-28',
-       12.75;
-
--- Ajout des lignes de réservation pour la réservation 1 (laitue)
+-- Ajouter les lignes de réservation pour les laitues
 INSERT INTO reservation_lines (reservation_id, batch_id, quantity)
 SELECT 
-  (SELECT id_reservation FROM reservation WHERE client = (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com') AND status = 'PENDING' ORDER BY id_reservation LIMIT 1),
+  (SELECT id_reservation FROM reservation WHERE client = (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com') AND status = 'PENDING' ORDER BY id_reservation DESC LIMIT 1),
   (SELECT id FROM batches WHERE product_id = (SELECT id_product FROM products WHERE name = 'Laitue Blonde de Paris') AND status = 'RECEIVED' LIMIT 1),
   3;
 
--- Mettre à jour la quantité du lot de laitue
+-- Ajouter les lignes de réservation pour le miel dans la même réservation
+INSERT INTO reservation_lines (reservation_id, batch_id, quantity)
+SELECT 
+  (SELECT id_reservation FROM reservation WHERE client = (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com') AND status = 'PENDING' ORDER BY id_reservation DESC LIMIT 1),
+  (SELECT id FROM batches WHERE product_id = (SELECT id_product FROM products WHERE name = 'Miel de Pissenlit Bio 250gr') AND status = 'RECEIVED' LIMIT 1),
+  2;
+
+-- Créer la deuxième réservation avec les courgettes
+INSERT INTO reservation (client, status, reservation_date, sale_date, price)
+SELECT (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com'),
+       'PENDING',
+       '2025-05-13',
+       NULL,
+       4 * 3.75;
+
+-- Ajouter les lignes de réservation pour les courgettes
+INSERT INTO reservation_lines (reservation_id, batch_id, quantity)
+SELECT 
+  (SELECT id_reservation FROM reservation WHERE client = (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com') AND status = 'PENDING' ORDER BY id_reservation DESC LIMIT 1),
+  (SELECT id FROM batches WHERE product_id = (SELECT id_product FROM products WHERE name = 'Courgette Blanche d''Egypte') AND status = 'RECEIVED' LIMIT 1),
+  4;
+
+-- Mettre à jour les quantités disponibles des lots
 UPDATE batches 
 SET available_quantity = available_quantity - 3 
 WHERE id = (SELECT id FROM batches WHERE product_id = (SELECT id_product FROM products WHERE name = 'Laitue Blonde de Paris') AND status = 'RECEIVED' LIMIT 1);
 
--- Ajout des lignes de réservation pour la réservation 2 (miel)
-INSERT INTO reservation_lines (reservation_id, batch_id, quantity)
-SELECT 
-  (SELECT id_reservation FROM reservation WHERE client = (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com') AND status = 'PENDING' ORDER BY id_reservation OFFSET 1 LIMIT 1),
-  (SELECT id FROM batches WHERE product_id = (SELECT id_product FROM products WHERE name = 'Miel de Pissenlit Bio 250gr') AND status = 'RECEIVED' LIMIT 1),
-  2;
-
--- Mettre à jour la quantité du lot de miel
 UPDATE batches 
 SET available_quantity = available_quantity - 2 
 WHERE id = (SELECT id FROM batches WHERE product_id = (SELECT id_product FROM products WHERE name = 'Miel de Pissenlit Bio 250gr') AND status = 'RECEIVED' LIMIT 1);
 
--- Ajout des lignes de réservation pour la réservation 3 (courgette)
-INSERT INTO reservation_lines (reservation_id, batch_id, quantity)
-SELECT 
-  (SELECT id_reservation FROM reservation WHERE client = (SELECT id_user FROM users WHERE email = 'suzanne.droity@example.com') AND status = 'PENDING' ORDER BY id_reservation OFFSET 2 LIMIT 1),
-  (SELECT id FROM batches WHERE product_id = (SELECT id_product FROM products WHERE name = 'Courgette Blanche d''Egypte') AND status = 'RECEIVED' LIMIT 1),
-  4;
-
--- Mettre à jour la quantité du lot de courgettes
 UPDATE batches 
 SET available_quantity = available_quantity - 4 
 WHERE id = (SELECT id FROM batches WHERE product_id = (SELECT id_product FROM products WHERE name = 'Courgette Blanche d''Egypte') AND status = 'RECEIVED' LIMIT 1);
