@@ -221,12 +221,45 @@ const HomePage = () => {
         index + 1
       )
     }
+
+    // Calculer la quantité qui va rester après l'achat
+    const remainingQuantity = productBatch.totalQuantity - qty
+
     createReservation(productBatch.batchIds[index], qty)
       .then(() => {
         setMessage(
           `${qty} ${qty > 1 ? 'articles' : 'article'} "${productBatch.productName}" ${qty > 1 ? 'ajoutés' : 'ajouté'} au panier`
         )
         setOpenSnackbar(true)
+
+        // Mise à jour de l'UI si le produit n'a plus de stock
+        if (remainingQuantity <= 0) {
+          // Retirer immédiatement ce produit de la liste filtrée
+          setFilteredProducts((prevProducts) =>
+            prevProducts.filter(
+              (p) =>
+                !(
+                  p.productId === productBatch.productId &&
+                  p.unitPrice === productBatch.unitPrice
+                )
+            )
+          )
+
+          // Retirer également ce produit du carrousel si il est présent
+          setTopProducts((prevProducts) =>
+            prevProducts.filter(
+              (p) =>
+                !(
+                  p.productId === productBatch.productId &&
+                  p.unitPrice === productBatch.unitPrice
+                )
+            )
+          )
+        }
+
+        if (productContext.fetchAllProducts) {
+          productContext.fetchAllProducts()
+        }
       })
       .catch((error) => {
         setMessage(`Erreur lors de l'ajout au panier: ${error.message}`)
