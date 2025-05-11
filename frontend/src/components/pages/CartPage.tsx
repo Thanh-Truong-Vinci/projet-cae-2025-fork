@@ -1,6 +1,6 @@
 import { useContext, useState, useEffect, useRef, useCallback } from 'react'
 import {
-  Box,
+  Container,
   Typography,
   Button,
   IconButton,
@@ -21,6 +21,7 @@ import {
   FormHelperText,
   Snackbar,
   Alert,
+  Box,
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
@@ -177,16 +178,43 @@ const CartPage = () => {
   const handleDirectQuantityChange = async (id: number, valueStr: string) => {
     try {
       const value = parseInt(valueStr, 10)
-      if (isNaN(value) || value < 1) return
+      if (isNaN(value)) return
 
       const line = reservation?.reservationLines.find((l) => l.id === id)
       if (!line) return
 
+      if (value === 0) {
+        if (reservation && reservationContext.changeReservationLineQuantity) {
+          setReservation({
+            ...reservation,
+            reservationLines: reservation.reservationLines.filter(
+              (l) => l.id !== id
+            ),
+          })
+
+          await reservationContext.changeReservationLineQuantity(id, 0)
+
+          window.dispatchEvent(
+            new CustomEvent('product-quantity-changed', {
+              detail: {
+                batchId: line.batchId,
+                productId: line.productId,
+                oldQuantity: line.quantity,
+                newQuantity: 0,
+                productName: line.productName,
+              },
+            })
+          )
+
+          forceRefresh()
+          return
+        }
+      }
+
       const maxQty = maxQuantities[id] || line.quantity
-      const safeValue = Math.min(value, maxQty)
+      const safeValue = Math.min(Math.max(1, value), maxQty)
 
       if (reservation) {
-        // Mise à jour optimiste dans l'UI
         const updatedLines = reservation.reservationLines.map((l) =>
           l.id === id ? { ...l, quantity: safeValue } : l
         )
@@ -197,10 +225,8 @@ const CartPage = () => {
         })
 
         if (reservationContext.changeReservationLineQuantity) {
-          // Appel au backend
           await reservationContext.changeReservationLineQuantity(id, safeValue)
 
-          // Envoyer un événement détaillé avec toutes les informations nécessaires
           window.dispatchEvent(
             new CustomEvent('product-quantity-changed', {
               detail: {
@@ -229,17 +255,27 @@ const CartPage = () => {
   const clearCart = async () => {
     try {
       if (reservation && reservationContext.clearReservation) {
-        const clearedReservation = await reservationContext.clearReservation(
-          reservation.id
-        )
-        setReservation(clearedReservation)
+        // Update UI optimistically
+        setReservation({
+          ...reservation,
+          reservationLines: [],
+        })
+
+        // Call backend
+        await reservationContext.clearReservation(reservation.id)
+
+        // Dispatch event to notify other components
+        window.dispatchEvent(new CustomEvent('cart-quantities-updated'))
+
         setMessage('Votre panier a été vidé')
         setOpenSnackbar(true)
+        forceRefresh()
       }
     } catch (error) {
       console.error('Erreur lors du vidage du panier:', error)
       setMessage('Impossible de vider le panier')
       setOpenSnackbar(true)
+      forceRefresh()
     }
   }
 
@@ -334,8 +370,8 @@ const CartPage = () => {
   }
 
   return (
-    <Box sx={{ width: '100%', p: 3 }}>
-      <Typography variant="h4" sx={{ mb: 3 }}>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Typography variant="h4" sx={{ mb: 3, textAlign: 'center' }}>
         Mon Panier
       </Typography>
 
@@ -377,7 +413,7 @@ const CartPage = () => {
                       />
                     </TableCell>
                     <TableCell>{item.productName}</TableCell>
-
+                    <TableCell align="right">{`${item.unitPrice.toFixed(2)}€`}</TableCell>
                     <TableCell align="center">
                       <Box
                         sx={{
@@ -570,7 +606,7 @@ const CartPage = () => {
           {message}
         </Alert>
       </Snackbar>
-    </Box>
+    </Container>
   )
 }
 
