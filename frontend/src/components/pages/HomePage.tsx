@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext, useCallback } from 'react'
 import {
   Typography,
   Box,
@@ -155,15 +155,15 @@ const HomePage = () => {
   }, [products])
 
   // ça va nous permettre de ne pas avoir soucis de différence de casse, d'espaces ou d'accents
-  const normalizeString = (str: string | undefined): string => {
+  const normalizeString = useCallback((str: string | undefined): string => {
     return (str || '')
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .trim()
-  }
+  }, [])
 
-  const handleFilter = () => {
+  const handleFilter = useCallback(() => {
     const seen = new Set()
     let results = products.filter((p) => {
       const key = `${p.productId}-${p.unitPrice}`
@@ -189,7 +189,7 @@ const HomePage = () => {
 
     setFilteredProducts(results)
     setVisibleProducts(productsPerLoad)
-  }
+  }, [products, type, productName, productsPerLoad, normalizeString])
 
   const handleQuantityChange = (
     productId: number,
@@ -319,13 +319,16 @@ const HomePage = () => {
     }
   }, [productContext])
 
-  // Sauvegarder les filtres avant rechargement
+  // Remplacer l'effet existant qui détecte la navigation vers "/"
   useEffect(() => {
+    // Si nous sommes sur la page d'accueil (chemin exact)
     if (location.pathname === '/') {
-      const fromCart = sessionStorage.getItem('fromCart') === 'true'
+      // Vérifier si nous venons juste de rafraîchir la page pour éviter une boucle infinie
+      const justRefreshed = sessionStorage.getItem('justRefreshed') === 'true'
 
-      if (fromCart) {
-        // Sauvegarder l'état des filtres
+      if (!justRefreshed) {
+        // Sauvegarder la position de défilement et les filtres avant rafraîchissement
+        sessionStorage.setItem('scrollPosition', window.scrollY.toString())
         sessionStorage.setItem(
           'productFilters',
           JSON.stringify({
@@ -335,46 +338,21 @@ const HomePage = () => {
           })
         )
 
-        sessionStorage.removeItem('fromCart')
+        // Marquer que nous allons rafraîchir
+        sessionStorage.setItem('justRefreshed', 'true')
+        setRefreshing(true)
+
+        // Rafraîchir la page
         window.location.reload()
+      } else {
+        // Nous venons juste de rafraîchir, donc nettoyer le marqueur
+        sessionStorage.removeItem('justRefreshed')
       }
+    } else {
+      // Si nous naviguons hors de la page d'accueil, réinitialiser pour le prochain retour
+      sessionStorage.removeItem('justRefreshed')
     }
-  }, [location.pathname, type, productName, visibleProducts])
-
-  // Restaurer les filtres après chargement
-  useEffect(() => {
-    const filtersJson = sessionStorage.getItem('productFilters')
-    if (filtersJson) {
-      try {
-        const filters = JSON.parse(filtersJson)
-        setType(filters.type || '')
-        setProductName(filters.productName || '')
-        setVisibleProducts(filters.visibleProducts || productsPerLoad)
-        sessionStorage.removeItem('productFilters')
-
-        // Appliquer les filtres sauvegardés
-        setTimeout(handleFilter, 100)
-      } catch (e) {
-        console.error('Erreur lors de la restauration des filtres:', e)
-      }
-    }
-  }, [products]) // Déclencher après chargement des produits
-
-  // Ajouter cet effet pour détecter quand l'utilisateur arrive sur la page
-  useEffect(() => {
-    if (location.pathname === '/') {
-      const fromCart = sessionStorage.getItem('fromCart') === 'true'
-
-      if (fromCart) {
-        // Sauvegarder la position de défilement
-        sessionStorage.setItem('scrollPosition', window.scrollY.toString())
-
-        sessionStorage.removeItem('fromCart')
-        setRefreshing(true) // Indiquer que le rafraîchissement commence
-        window.location.reload()
-      }
-    }
-  }, [location.pathname]) // Dépend du chemin d'URL
+  }, [location.pathname, type, productName, visibleProducts]) // Dépendances
 
   // Ajouter un effet pour restaurer la position de défilement après chargement
   useEffect(() => {

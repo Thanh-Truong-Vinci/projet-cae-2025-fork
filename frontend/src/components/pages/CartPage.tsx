@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect, useRef } from 'react'
+import { useContext, useState, useEffect, useRef, useCallback } from 'react'
 import {
   Box,
   Typography,
@@ -53,57 +53,35 @@ const CartPage = () => {
   const CACHE_DURATION = 5000 // 5 secondes
   const BATCH_CACHE_DURATION = 60000 // 1 minute de cache pour les lots
 
-  useEffect(() => {
-    const now = Date.now()
-    if (now - fetchTimestamp < CACHE_DURATION && reservation !== null) {
-      return
-    }
+  const getMaxQuantities = useCallback(
+    async (res: ReservationView) => {
+      if (!batchContext || !res?.reservationLines?.length) return
 
-    if (reservationContext?.fetchReservations) {
-      reservationContext.fetchReservations().then((r) => {
-        const buildingReservation = r.find(
-          (res) => res.status === ReservationStatus.BUILDING
-        )
-        setReservation(buildingReservation ?? null)
-        setFetchTimestamp(now)
+      const now = Date.now()
 
-        if (
-          buildingReservation &&
-          (!batchesCache.current.batches.length ||
-            now - batchesCache.current.timestamp > BATCH_CACHE_DURATION)
-        ) {
-          getMaxQuantities(buildingReservation)
-        }
-      })
-    }
-  }, [fetchTimestamp, reservationContext])
-
-  const getMaxQuantities = async (res: ReservationView) => {
-    if (!batchContext || !res?.reservationLines?.length) return
-
-    const now = Date.now()
-
-    if (
-      batchesCache.current.batches.length &&
-      now - batchesCache.current.timestamp < BATCH_CACHE_DURATION
-    ) {
-      updateMaxQuantitiesFromCache(res)
-      return
-    }
-
-    try {
-      const batches = await batchContext.fetchReceivedBatches()
-
-      batchesCache.current = {
-        batches: batches,
-        timestamp: now,
+      if (
+        batchesCache.current.batches.length &&
+        now - batchesCache.current.timestamp < BATCH_CACHE_DURATION
+      ) {
+        updateMaxQuantitiesFromCache(res)
+        return
       }
 
-      updateMaxQuantitiesFromCache(res)
-    } catch (error) {
-      console.error('Erreur lors du chargement des lots:', error)
-    }
-  }
+      try {
+        const batches = await batchContext.fetchReceivedBatches()
+
+        batchesCache.current = {
+          batches: batches,
+          timestamp: now,
+        }
+
+        updateMaxQuantitiesFromCache(res)
+      } catch (error) {
+        console.error('Erreur lors du chargement des lots:', error)
+      }
+    },
+    [batchContext, batchesCache]
+  )
 
   const updateMaxQuantitiesFromCache = (res: ReservationView) => {
     const quantities: { [lineId: number]: number } = {}
@@ -119,6 +97,27 @@ const CartPage = () => {
 
     setMaxQuantities(quantities)
   }
+
+  useEffect(() => {
+    const now = Date.now()
+    if (now - fetchTimestamp < CACHE_DURATION && reservation !== null) {
+      return
+    }
+
+    if (reservationContext?.fetchReservations) {
+      reservationContext.fetchReservations().then((r) => {
+        const buildingReservation = r.find(
+          (res) => res.status === ReservationStatus.BUILDING
+        )
+        setReservation(buildingReservation ?? null)
+        setFetchTimestamp(now)
+
+        if (buildingReservation) {
+          getMaxQuantities(buildingReservation)
+        }
+      })
+    }
+  }, [fetchTimestamp, reservationContext, getMaxQuantities, reservation])
 
   const forceRefresh = () => {
     setFetchTimestamp(Date.now())
