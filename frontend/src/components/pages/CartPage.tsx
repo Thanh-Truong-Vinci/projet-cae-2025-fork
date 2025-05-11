@@ -86,15 +86,21 @@ const CartPage = () => {
 
   // Nouvelle fonction pour trouver le prochain mardi ou jeudi à partir d'aujourd'hui
   const getNextTuesdayOrThursday = () => {
-    const date = new Date()
-    date.setDate(date.getDate() + 1) // On commence à demain
+    const today = new Date()
 
-    // Cherche jusqu'à trouver un mardi ou jeudi
+    // Créer une nouvelle date pour éviter de modifier today
+    const date = new Date(today)
+
+    // On commence à partir de demain
+    date.setDate(date.getDate() + 1)
+
+    // Cherche jusqu'à trouver un mardi (2) ou jeudi (4)
     while (date.getDay() !== 2 && date.getDay() !== 4) {
       date.setDate(date.getDate() + 1)
     }
 
-    return date.toISOString().split('T')[0] // Format YYYY-MM-DD
+    // Formater la date en YYYY-MM-DD
+    return date.toISOString().split('T')[0]
   }
 
   const calculateTotal = () => {
@@ -163,7 +169,12 @@ const CartPage = () => {
       return
     }
     setOpenCalendar(true)
-    setSelectedDate(getNextTuesdayOrThursday())
+
+    // Toujours utiliser la fonction getNextTuesdayOrThursday pour définir la date par défaut
+    const nextPickupDate = getNextTuesdayOrThursday()
+    setSelectedDate(nextPickupDate)
+
+    // Assurons-nous que la date est considérée comme valide
     setIsDateValid(true)
   }
 
