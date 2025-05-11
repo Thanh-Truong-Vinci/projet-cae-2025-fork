@@ -68,8 +68,17 @@ public class ReservationController {
       @RequestBody ReservationRequest reservationRequest,
       @RequestHeader("Authorization") String token) {
     Client client = authsService.isValidClientToken(token);
+    
     if (client == null) {
-      throw new ResourceNotFoundException("Token not valid, expired or user is not client");
+      boolean isVolunteer = authsService.isValidVolunteerToken(token);
+      if (isVolunteer) {
+        client = authsService.getClientByEmail("clientlibre@example.com");
+        if (client == null) {
+          throw new ResourceNotFoundException("Default client 'clientlibre@example.com' not found");
+        }
+      } else {
+        throw new ResourceNotFoundException("Token not valid, expired or user is not client or volunteer");
+      }
     }
 
     Batch batch = batchRepository.getBatchById(reservationRequest.getBatchId());

@@ -118,6 +118,16 @@ public class AuthsService {
   }
 
   /**
+   * Find a client by their email address.
+   *
+   * @param email the email address of the client to find
+   * @return the client if found, null otherwise
+   */
+  public Client getClientByEmail(String email) {
+    return clientRepository.findByEmail(email);
+  }
+
+  /**
    * Validate if the token is valid for a producer.
    *
    * @param token the JWT token to verify

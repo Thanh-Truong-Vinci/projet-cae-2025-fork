@@ -117,9 +117,9 @@ VALUES ('Légumes'),
 
 -- Insérer quelques photos
 INSERT INTO photos (product_name, url)
-VALUES ('tomate_bio',
+VALUES ('tomates_bio',
         'https://imagestoragecae09.blob.core.windows.net/dev/640b2ba0-885c-4aa0-bff5-5f995f99e745'),
-       ('pomme_rouge',
+       ('pommes_rouge',
         'https://imagestoragecae09.blob.core.windows.net/dev/97912d63-b931-4a0f-acaa-f1632cd742ad'),
        ('pain_artisanal',
         'https://imagestoragecae09.blob.core.windows.net/dev/f2a0ec00-fc7e-45c5-9794-7320fc70c797'),
@@ -133,7 +133,7 @@ VALUES ('tomate_bio',
         'https://imagestoragecae09.blob.core.windows.net/dev/601c557a-8862-410f-9d66-19c49f903e30'),
        ('yaourt',
         'https://imagestoragecae09.blob.core.windows.net/dev/52205241-37f2-4631-a7e7-f967a65fbee8'),
-       ('pomme_jonagold',
+       ('pommes_jonagold',
         'https://imagestoragecae09.blob.core.windows.net/dev/758fcf0e-a66c-45e0-95ed-8f0aa6ecfd80'),
        ('choufleur_cheddar',
         'https://imagestoragecae09.blob.core.windows.net/dev/007d32fb-7c1d-45ca-a917-48ce9f0db3ae');
@@ -704,6 +704,31 @@ INSERT INTO client (id_user)
 SELECT id_user
 FROM users
 WHERE email = 'client@example.com';
+
+INSERT INTO users (name, firstname, email, password, date_inscription)
+VALUES ('Dupont', 'Michel', 'clientlibre@example.com',
+        '$2a$10$8Cv0QyLMQ.dDlswhLhd8peiW6.KWnQLl0VmL5lw41/trJgprkg2vm',
+        CURRENT_DATE);
+
+-- 2. Ajouter l'adresse (obligatoire pour un UserWithAddress)
+INSERT INTO user_with_address (id_user, street, number, box, postal_code, city, country,
+                               phone_number)
+SELECT id_user,
+       'Avenue des Clients',
+       '25',
+       'A',
+       '1050',
+       'Bruxelles',
+       'Belgique',
+       '+32412345678'
+FROM users
+WHERE email = 'clientlibre@example.com';
+
+-- 3. Créer l'entrée client 
+INSERT INTO client (id_user)
+SELECT id_user
+FROM users
+WHERE email = 'clientlibre@example.com';
 
 -- Creare un utente cliente di base
 INSERT INTO users (name, firstname, email, password, date_inscription)
