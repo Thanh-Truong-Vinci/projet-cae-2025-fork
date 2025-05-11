@@ -31,8 +31,8 @@ import {
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import DoneIcon from '@mui/icons-material/Done'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import ExpandLessIcon from '@mui/icons-material/ExpandLess'
+import ExpandMoreIcon from '@mui/icons-material/ExpandLess'
+import ExpandLessIcon from '@mui/icons-material/ExpandMore'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import { BatchContext } from '../../contexts/BatchContext'
 import { UserContext } from '../../contexts/UserContext'
@@ -56,7 +56,7 @@ const VolunteerHomePage = () => {
     fetchAllReservations,
     toConfirmReservation,
     cancelReservation,
-    createReservation,
+    reserveDirect, // Add this new method from context
   } = reservationContext
 
   useEffect(() => {
@@ -118,9 +118,13 @@ const VolunteerHomePage = () => {
     try {
       await fetchReceivedBatches()
       setOpenVenteLibreDialog(true)
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      setSnackbarMessage('Erreur lors du chargement des produits disponibles')
+    } catch (err) {
+      console.error('Erreur chargement produits:', err)
+      setSnackbarMessage(
+        err instanceof Error
+          ? `Erreur: ${err.message}`
+          : 'Erreur lors du chargement des produits disponibles'
+      )
       setSnackbarSeverity('error')
       setOpenSnackbar(true)
     } finally {
@@ -208,15 +212,30 @@ const VolunteerHomePage = () => {
       return
     }
 
+    // Store values locally before state changes
+    const batchId = selectedVenteBatchId
+    const quantity = venteLibreQuantity
+
+    // First close dialog and reset local state
+    setOpenVenteLibreDialog(false)
+    setSelectedVenteBatchId(null)
+    setVenteLibreQuantity(1)
+
     try {
-      await createReservation(selectedVenteBatchId, venteLibreQuantity)
+      // Use the new reserveDirect method instead of createReservation
+      await reserveDirect(batchId, quantity)
+
+      // Show success message
       setSnackbarMessage('Vente libre enregistrée avec succès')
       setSnackbarSeverity('success')
-      setOpenVenteLibreDialog(false)
-      // Réinitialiser les valeurs
-      setSelectedVenteBatchId(null)
-      setVenteLibreQuantity(1)
+
+      // Refresh data after a slight delay to ensure backend processing is complete
+      setTimeout(() => {
+        fetchReceivedBatches().catch(console.error)
+        fetchAllReservations().catch(console.error)
+      }, 500)
     } catch (error) {
+      console.error('Erreur vente libre:', error)
       setSnackbarMessage(
         error instanceof Error
           ? error.message

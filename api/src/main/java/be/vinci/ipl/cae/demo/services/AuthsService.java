@@ -21,16 +21,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthsService {
 
-  @Value("${JWT_SECRET}")
-  private String jwtSecret;
-
   private static final long LIFETIME_JWT = 24 * 60 * 60 * 1000; // 24 hours
-  private Algorithm algorithm;
   private final UserRepository userRepository;
   private final ClientRepository clientRepository;
   private final ManagerRepository managerRepository;
   private final ProducerRepository producerRepository;
   private final BCryptPasswordEncoder passwordEncoder;
+  @Value("${JWT_SECRET}")
+  private String jwtSecret;
+  private Algorithm algorithm;
 
   /** Service for handling authentication-related operations. */
   public AuthsService(

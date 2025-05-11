@@ -334,7 +334,7 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
       }
 
       const response = await axios.post(
-        '/reservation/toAbandon',
+        '/api/reservation/toAbandon',
         reservationId,
         {
           headers: {
@@ -482,6 +482,64 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
     }
   }
 
+  const reserveDirect = async (
+    batchId: number,
+    quantity: number
+  ): Promise<ReservationView> => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      if (!authenticatedUser) {
+        throw new Error(
+          'Vous devez être authentifié comme bénévole pour créer une vente libre'
+        )
+      }
+
+      const reservationRequest: ReservationRequest = {
+        batchId,
+        quantity,
+      }
+
+      const response = await axios.post(
+        '/api/reservation/reserveDirect', // Add the '/api' prefix
+        reservationRequest,
+        {
+          headers: {
+            Authorization: authenticatedUser.token,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (response.status >= 200 && response.status < 300) {
+        console.log('Vente libre créée avec succès')
+        // Refresh the reservations list
+        await fetchAllReservations()
+        return response.data
+      } else {
+        throw new Error(
+          `Erreur lors de la création de la vente libre: ${response.status}`
+        )
+      }
+    } catch (err) {
+      console.error('Erreur lors de la création de la vente libre:', err)
+      if (axios.isAxiosError(err)) {
+        setError(
+          err.response?.data?.message ||
+            'Erreur lors de la création de la vente libre'
+        )
+      } else if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError('Erreur inconnue lors de la création de la vente libre')
+      }
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   // Load the user's reservations when the component mounts and the user is authenticated
   useEffect(() => {
     if (authenticatedUser && authenticatedUser.role === 'Client') {
@@ -504,6 +562,7 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
         abandonReservation,
         clearReservation,
         changeReservationLineQuantity,
+        reserveDirect,
       }}
     >
       {children}

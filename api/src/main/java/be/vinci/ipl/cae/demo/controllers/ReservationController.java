@@ -68,17 +68,8 @@ public class ReservationController {
       @RequestBody ReservationRequest reservationRequest,
       @RequestHeader("Authorization") String token) {
     Client client = authsService.isValidClientToken(token);
-    
     if (client == null) {
-      boolean isVolunteer = authsService.isValidVolunteerToken(token);
-      if (isVolunteer) {
-        client = authsService.getClientByEmail("clientlibre@example.com");
-        if (client == null) {
-          throw new ResourceNotFoundException("Default client 'clientlibre@example.com' not found");
-        }
-      } else {
-        throw new ResourceNotFoundException("Token not valid, expired or user is not client or volunteer");
-      }
+      throw new ResourceNotFoundException("Token not valid, expired or user is not client");
     }
 
     Batch batch = batchRepository.getBatchById(reservationRequest.getBatchId());
@@ -90,6 +81,51 @@ public class ReservationController {
     }
 
     reservationService.reserveProduct(client, batch, reservationRequest.getQuantity());
+  }
+
+  /**
+   * Creates a direct sale reservation for the default "vente libre" client.
+   *
+   * @param reservationRequest the reservation request containing batch ID and quantity
+   * @param token the authorization token from the request header
+   * @return the created reservation as ReservationView
+   * @throws ResourceNotFoundException if the token is invalid or expired or batch not found
+   * @throws ConflictException if there isn't enough quantity available
+   */
+  @PostMapping("/reserveDirect")
+  public ReservationView reserveProductDirect(
+      @RequestBody ReservationRequest reservationRequest,
+      @RequestHeader("Authorization") String token) {
+
+    // Validate volunteer token
+    if (!authsService.isValidVolunteerToken(token)) {
+      throw new ResourceNotFoundException("Authorization failed: Invalid token or not a volunteer");
+    }
+
+    // Get the default client - shouldn't use Optional as specified
+    Client defaultClient = authsService.getClientByEmail("clientlibre@example.com");
+    if (defaultClient == null) {
+      throw new ResourceNotFoundException("Cannot find default client account for direct sales");
+    }
+
+    // Get the batch
+    Batch productBatch = batchRepository.getBatchById(reservationRequest.getBatchId());
+    if (productBatch == null) {
+      throw new ResourceNotFoundException("Selected product batch could not be found");
+    }
+
+    // Check available quantity
+    if (reservationRequest.getQuantity() > productBatch.getAvailableQuantity()) {
+      throw new ConflictException("Requested quantity exceeds available stock");
+    }
+
+    // Create the reservation directly as CONFIRMED
+    Reservation reservation =
+        reservationService.reserveProductDirect(
+            defaultClient, productBatch, reservationRequest.getQuantity());
+
+    // Return view
+    return new ReservationView(reservation);
   }
 
   /**
@@ -154,21 +190,23 @@ public class ReservationController {
       @RequestBody Long reservationId, @RequestHeader("Authorization") String token) {
     // First check if it's a client
     Client client = authsService.isValidClientToken(token);
-    
+
     // If not a client, check if it's a volunteer
     boolean isVolunteer = false;
     if (client == null) {
       isVolunteer = authsService.isValidVolunteerToken(token);
       if (!isVolunteer) {
-        throw new ResourceNotFoundException("Token not valid, expired or user is not client or volunteer");
+        throw new ResourceNotFoundException(
+            "Token not valid, expired or user is not client or volunteer");
       }
     }
-    
+
     if (reservationId == null) {
       throw new ConflictException("Reservation ID is required");
     }
-    
-    var updatedReservation = reservationService.changeStatus(reservationId, ReservationStatus.CANCELLED);
+
+    var updatedReservation =
+        reservationService.changeStatus(reservationId, ReservationStatus.CANCELLED);
     return new ReservationView(updatedReservation);
   }
 
@@ -197,7 +235,8 @@ public class ReservationController {
       throw new ConflictException("Reservation ID is required");
     }
 
-    var updatedReservation = reservationService.changeStatus(reservationId, ReservationStatus.ABANDONED);
+    var updatedReservation =
+        reservationService.changeStatus(reservationId, ReservationStatus.ABANDONED);
     return new ReservationView(updatedReservation);
   }
 

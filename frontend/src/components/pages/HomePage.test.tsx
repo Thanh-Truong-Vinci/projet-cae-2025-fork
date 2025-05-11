@@ -92,11 +92,11 @@ const mockReservationContext = {
   toCompletedReservation: vi.fn(),
   updateReservation: vi.fn(),
   cancelReservation: vi.fn(),
-  updateReservationLineQuantity: vi.fn(),
+  abandonReservation: vi.fn(),
   clearReservation: vi.fn(),
   removeReservationLine: vi.fn(),
   changeReservationLineQuantity: vi.fn(),
-  abandonReservation: vi.fn(),
+  reserveDirect: vi.fn(),
 }
 
 describe('HomePage', () => {

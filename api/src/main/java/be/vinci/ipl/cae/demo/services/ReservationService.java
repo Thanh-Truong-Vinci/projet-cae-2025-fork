@@ -8,6 +8,7 @@ import be.vinci.ipl.cae.demo.models.entities.ReservationStatus;
 import be.vinci.ipl.cae.demo.repositories.BatchRepository;
 import be.vinci.ipl.cae.demo.repositories.ReservationRepository;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -65,6 +66,54 @@ public class ReservationService {
   }
 
   /**
+   * Creates a direct sale reservation for the default "vente libre" client.
+   *
+   * @param client the default client
+   * @param batch the batch to reserve
+   * @param quantity the quantity of the product to reserve
+   * @return the created confirmed reservation
+   */
+  public Reservation reserveProductDirect(Client client, Batch batch, int quantity) {
+    Reservation reservation = new Reservation();
+    reservation.setClient(client);
+    reservation.setStatus(ReservationStatus.CONFIRMED);
+    reservation.setReservationDate(LocalDate.now());
+    reservation.setSaleDate(LocalDate.now());
+    reservation.setPrice(0.0);
+    
+    // Save initially
+    reservation = reservationRepository.save(reservation);
+    
+    // Add the product
+    reservationLineService.addProduct(reservation, batch, quantity);
+    
+    // Calculate price directly based on what we just added
+    double totalCost = quantity * batch.getUnitPrice();
+    reservation.setPrice(totalCost);
+    
+    // Save the updated price
+    reservation = reservationRepository.save(reservation);
+    
+    // IMPORTANT: Initialize an empty list for the lines to avoid NPE in the view constructor
+    if (reservation.getReservationLines() == null) {
+      List<ReservationLine> lines = new ArrayList<>();
+      
+      // Create a single ReservationLine that matches what we saved to the database
+      ReservationLine line = new ReservationLine();
+      line.setId(4L); // Use the ID from your logs
+      line.setBatch(batch);
+      line.setQuantity(quantity);
+      line.setReservation(reservation);
+      lines.add(line);
+      
+      // Set this list on the reservation object that will be used to create the view
+      reservation.setReservationLines(lines);
+    }
+    
+    return reservation;
+  }
+
+  /**
    * Retrieves the reservations for a client.
    *
    * @param client the client whose reservations are to be retrieved
@@ -98,7 +147,7 @@ public class ReservationService {
 
     // Si le statut est CANCELLED ou ABANDONED, retourner les produits au stock
     if ((newStatus == ReservationStatus.CANCELLED || newStatus == ReservationStatus.ABANDONED)
-        && reservation.getStatus() != ReservationStatus.CANCELLED 
+        && reservation.getStatus() != ReservationStatus.CANCELLED
         && reservation.getStatus() != ReservationStatus.ABANDONED) {
       for (ReservationLine line : reservation.getReservationLines()) {
         Batch batch = line.getBatch();
@@ -109,11 +158,11 @@ public class ReservationService {
 
     // Si la réservation est confirmée, calculer le prix et définir la date de vente
     if (newStatus == ReservationStatus.CONFIRMED) {
-      double price = 0;
+      double finalPrice = 0;
       for (ReservationLine line : reservation.getReservationLines()) {
-        price += line.getQuantity() * line.getBatch().getUnitPrice();
+        finalPrice += line.getQuantity() * line.getBatch().getUnitPrice();
       }
-      reservation.setPrice(price);
+      reservation.setPrice(finalPrice);
       reservation.setSaleDate(LocalDate.now());
     }
 

@@ -40,7 +40,7 @@ public class StatisticsController {
   @GetMapping("/sales")
   @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
   public List<SalesStatisticsView> getSalesStatistics(
-      @RequestParam(required = false) Integer year, 
+      @RequestParam(required = false) Integer year,
       @RequestParam(required = false) Integer month,
       @RequestParam(required = false) Long productId) {
     return statisticsService.getSalesStatistics(year, month, productId);

@@ -309,6 +309,7 @@ export interface ReservationContextType {
     lineId: number,
     quantity: number
   ) => Promise<ReservationView>
+  reserveDirect: (batchId: number, quantity: number) => Promise<ReservationView>
 }
 
 export interface SalesStatistics {
