@@ -203,6 +203,9 @@ const CartPage = () => {
           }
         }
       }
+
+      // Marquer que les changements ont été effectués dans le panier
+      sessionStorage.setItem('fromCart', 'true')
     } catch (error) {
       console.error('Erreur lors de la mise à jour de la quantité:', error)
       setMessage('Impossible de mettre à jour la quantité')

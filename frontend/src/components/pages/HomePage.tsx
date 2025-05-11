@@ -60,6 +60,7 @@ const HomePage = () => {
   const location = useLocation()
   const [openSnackbar, setOpenSnackbar] = useState(false)
   const [message, setMessage] = useState('')
+  const [refreshing, setRefreshing] = useState(false)
 
   // Produits filtrés
   const [filteredProducts, setFilteredProducts] = useState<ProductBatch[]>([])
@@ -295,6 +296,95 @@ const HomePage = () => {
     setOpenSnackbar(false)
   }
 
+  // Ajouter cet useEffect pour détecter quand l'utilisateur revient à la HomePage
+  useEffect(() => {
+    // Fonction qui rafraîchit les données des produits
+    const refreshData = () => {
+      console.log('Rafraîchissement des données produits depuis HomePage')
+      if (productContext && productContext.fetchAllProducts) {
+        productContext.fetchAllProducts()
+      }
+    }
+
+    // Écouter l'événement de changement dans le panier
+    window.addEventListener('cart-quantities-updated', refreshData)
+
+    // Écouter l'événement 'focus' qui se déclenche quand l'utilisateur revient à cette page
+    window.addEventListener('focus', refreshData)
+
+    // Nettoyer les écouteurs d'événements
+    return () => {
+      window.removeEventListener('cart-quantities-updated', refreshData)
+      window.removeEventListener('focus', refreshData)
+    }
+  }, [productContext])
+
+  // Sauvegarder les filtres avant rechargement
+  useEffect(() => {
+    if (location.pathname === '/') {
+      const fromCart = sessionStorage.getItem('fromCart') === 'true'
+
+      if (fromCart) {
+        // Sauvegarder l'état des filtres
+        sessionStorage.setItem(
+          'productFilters',
+          JSON.stringify({
+            type,
+            productName,
+            visibleProducts,
+          })
+        )
+
+        sessionStorage.removeItem('fromCart')
+        window.location.reload()
+      }
+    }
+  }, [location.pathname, type, productName, visibleProducts])
+
+  // Restaurer les filtres après chargement
+  useEffect(() => {
+    const filtersJson = sessionStorage.getItem('productFilters')
+    if (filtersJson) {
+      try {
+        const filters = JSON.parse(filtersJson)
+        setType(filters.type || '')
+        setProductName(filters.productName || '')
+        setVisibleProducts(filters.visibleProducts || productsPerLoad)
+        sessionStorage.removeItem('productFilters')
+
+        // Appliquer les filtres sauvegardés
+        setTimeout(handleFilter, 100)
+      } catch (e) {
+        console.error('Erreur lors de la restauration des filtres:', e)
+      }
+    }
+  }, [products]) // Déclencher après chargement des produits
+
+  // Ajouter cet effet pour détecter quand l'utilisateur arrive sur la page
+  useEffect(() => {
+    if (location.pathname === '/') {
+      const fromCart = sessionStorage.getItem('fromCart') === 'true'
+
+      if (fromCart) {
+        // Sauvegarder la position de défilement
+        sessionStorage.setItem('scrollPosition', window.scrollY.toString())
+
+        sessionStorage.removeItem('fromCart')
+        setRefreshing(true) // Indiquer que le rafraîchissement commence
+        window.location.reload()
+      }
+    }
+  }, [location.pathname]) // Dépend du chemin d'URL
+
+  // Ajouter un effet pour restaurer la position de défilement après chargement
+  useEffect(() => {
+    const scrollPosition = sessionStorage.getItem('scrollPosition')
+    if (scrollPosition) {
+      window.scrollTo(0, parseInt(scrollPosition))
+      sessionStorage.removeItem('scrollPosition')
+    }
+  }, [products]) // Déclencher après chargement des produits
+
   if (isLoading) {
     return (
       <Box
@@ -336,6 +426,25 @@ const HomePage = () => {
         position: 'relative',
       }}
     >
+      {refreshing && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(255,255,255,0.7)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <CircularProgress />
+          <Typography sx={{ ml: 2 }}>Mise à jour des produits...</Typography>
+        </Box>
+      )}
       {/* Sidebar avec filtres */}
       <Box
         sx={{
