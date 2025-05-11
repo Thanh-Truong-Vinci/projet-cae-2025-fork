@@ -282,7 +282,7 @@ export const ReservationProvider = ({ children }: ReservationProviderProps) => {
       }
 
       const response = await axios.post(
-        '/reservation/toCancel',
+        '/api/reservation/toCancel',
         reservationId,
         {
           headers: {
