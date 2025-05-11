@@ -226,7 +226,7 @@ const NotificationsPage = () => {
                           borderRadius: 1,
                         }}
                       >
-                        <Typography variant="body2" color="error.dark">
+                        <Typography variant="body2" color="text.primary">
                           <strong>Raison du rejet:</strong>{' '}
                           {notification.reasonOfReject}
                         </Typography>

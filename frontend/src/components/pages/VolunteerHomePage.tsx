@@ -458,7 +458,6 @@ const VolunteerHomePage = () => {
         <DialogContent>
           <DialogContentText sx={{ mb: 2 }}>
             Sélectionnez un produit et une quantité pour créer une vente libre.
-            Le client par défaut "clientlibre@example.com" sera utilisé.
           </DialogContentText>
 
           {loadingReceivedBatches ? (
