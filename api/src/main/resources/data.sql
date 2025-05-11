@@ -246,7 +246,7 @@ WHERE pt.title = 'Fruits'
 INSERT INTO products (id_product_type, name, description, photo_id)
 SELECT pt.id_product_type,
        'tomate voyage',
-       'Variété de tomate ancienne plissée rouge-orangé. Goût riche et fruité, équilibré entre sucré et acidulé. Idéale en salade ou accompagnement.',
+       'Tomate ancienne plissée rouge-orangé. Goût fruité équilibré entre sucré et acidulé. Parfaite en salade.',
        p.id_photo
 FROM product_types pt,
      photos p
@@ -1116,3 +1116,89 @@ WHERE id = (SELECT id
             FROM batches
             WHERE product_id = (SELECT id_product FROM products WHERE name = 'courgette blanche d''egypte')
               AND status = 'RECEIVED' LIMIT 1);
+
+-- Création des notifications pour les lots de Roger Maerckx
+-- Notification pour Laitue Blonde de Paris
+INSERT INTO notifications (message, read, date, producer_id, batch_id)
+SELECT 
+  '',
+  true,
+  '2025-04-15',
+  (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com'),
+  b.id
+FROM batches b
+JOIN products p ON b.product_id = p.id_product
+WHERE p.name = 'laitue blonde de paris'
+AND b.producer_id = (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com')
+LIMIT 1;
+
+-- Notification pour Courgette Blanche d'Egypte
+INSERT INTO notifications (message, read, date, producer_id, batch_id)
+SELECT 
+  '',
+  true,
+  '2025-04-20',
+  (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com'),
+  b.id
+FROM batches b
+JOIN products p ON b.product_id = p.id_product
+WHERE p.name = 'courgette blanche d''egypte'
+AND b.producer_id = (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com')
+LIMIT 1;
+
+-- Notification pour Haricot Mistik
+INSERT INTO notifications (message, read, date, producer_id, batch_id)
+SELECT 
+  '',
+  true,
+  '2025-04-10',
+  (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com'),
+  b.id
+FROM batches b
+JOIN products p ON b.product_id = p.id_product
+WHERE p.name = 'haricot mistik'
+AND b.producer_id = (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com')
+LIMIT 1;
+
+-- Notification pour Carotte Cosmic Purple
+INSERT INTO notifications (message, read, date, producer_id, batch_id)
+SELECT 
+  '',
+  true,
+  '2025-04-12',
+  (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com'),
+  b.id
+FROM batches b
+JOIN products p ON b.product_id = p.id_product
+WHERE p.name = 'carotte cosmic purple'
+AND b.producer_id = (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com')
+LIMIT 1;
+
+-- Notification pour Miel de Pissenlit Bio
+INSERT INTO notifications (message, read, date, producer_id, batch_id)
+SELECT 
+  '',
+  true,
+  '2025-04-25',
+  (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com'),
+  b.id
+FROM batches b
+JOIN products p ON b.product_id = p.id_product
+WHERE p.name = 'miel de pissenlit bio'
+AND b.producer_id = (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com')
+LIMIT 1;
+
+-- Notification pour Cerise Napoleon
+INSERT INTO notifications (message, read, date, reason_of_reject, producer_id, batch_id)
+SELECT 
+  'Non conformité de votre lot concernant la politique d exportaion de  Terroir&Cie.',
+  true,
+  '2025-04-28',
+  'La qualité des cerises ne correspond pas à nos standards. Prix trop élevé par rapport au marché.',
+  (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com'),
+  b.id
+FROM batches b
+JOIN products p ON b.product_id = p.id_product
+WHERE p.name = 'cerise napoleon'
+AND b.producer_id = (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com')
+LIMIT 1;
