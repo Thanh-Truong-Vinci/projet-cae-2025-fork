@@ -12,7 +12,6 @@ import {
   TableHead,
   TableRow,
   Button,
-  Chip,
   CircularProgress,
   Snackbar,
   Alert,
@@ -30,11 +29,9 @@ import {
 } from '@mui/material'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
-import DoneIcon from '@mui/icons-material/Done'
 import ExpandMoreIcon from '@mui/icons-material/ExpandLess'
 import ExpandLessIcon from '@mui/icons-material/ExpandMore'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
-import { BatchContext } from '../../contexts/BatchContext'
 import { UserContext } from '../../contexts/UserContext'
 import { ReservationContext } from '../../contexts/ReservationContext'
 import { ProductBatch, ReservationStatus } from '../../types'
@@ -42,7 +39,6 @@ import { ProductBatch, ReservationStatus } from '../../types'
 const VolunteerHomePage = () => {
   const navigate = useNavigate()
   const { authenticatedUser } = useContext(UserContext)
-  const batchContext = useContext(BatchContext)
   const reservationContext = useContext(ReservationContext)
 
   if (!reservationContext) {
@@ -63,16 +59,6 @@ const VolunteerHomePage = () => {
     fetchAllReservations()
   }, [fetchAllReservations])
 
-  if (!batchContext) {
-    throw new Error(
-      'BatchContext doit être utilisé à l intérieur d un BatchProvider'
-    )
-  }
-
-  const { approvedBatches, isLoading, error, receiveBatch } = batchContext
-
-  const [openDialog, setOpenDialog] = useState(false)
-  const [selectedBatchId, setSelectedBatchId] = useState<number | null>(null)
   const [openSnackbar, setOpenSnackbar] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState('')
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>(
@@ -156,31 +142,6 @@ const VolunteerHomePage = () => {
       navigate('/')
     }
   }, [authenticatedUser, navigate])
-
-  const handleReceiveClick = (batchId: number) => {
-    setSelectedBatchId(batchId)
-    setOpenDialog(true)
-  }
-
-  const handleConfirmReceive = async () => {
-    if (selectedBatchId === null) return
-
-    try {
-      await receiveBatch(selectedBatchId)
-      setSnackbarMessage('Lot marqué comme reçu avec succès')
-      setSnackbarSeverity('success')
-    } catch (error) {
-      setSnackbarMessage(
-        error instanceof Error
-          ? error.message
-          : 'Erreur lors de la réception du lot'
-      )
-      setSnackbarSeverity('error')
-    } finally {
-      setOpenDialog(false)
-      setOpenSnackbar(true)
-    }
-  }
 
   const handleConfirmReservation = async (reservationId: number) => {
     try {
@@ -312,122 +273,10 @@ const VolunteerHomePage = () => {
 
       <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
         <Typography variant="h5" component="h2" gutterBottom>
-          Lots à recevoir
-        </Typography>
-
-        {isLoading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-            <CircularProgress />
-          </Box>
-        ) : error ? (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        ) : approvedBatches.length === 0 ? (
-          <Box sx={{ p: 4, textAlign: 'center' }}>
-            <Typography variant="body1" color="textSecondary">
-              Aucun lot approuvé à recevoir pour le moment.
-            </Typography>
-          </Box>
-        ) : (
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Produit</TableCell>
-                  <TableCell>Type</TableCell>
-                  <TableCell>Quantité</TableCell>
-                  <TableCell>Prix unitaire</TableCell>
-                  <TableCell>Disponible le</TableCell>
-                  <TableCell>Actions</TableCell>
-                  <TableCell></TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {approvedBatches.map((batch) => (
-                  <TableRow key={batch.id}>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <CardMedia
-                          component="img"
-                          image={
-                            batch.imageUrl || 'https://via.placeholder.com/150'
-                          }
-                          alt={batch.productName}
-                          sx={{
-                            width: 60,
-                            height: 60,
-                            mr: 2,
-                            objectFit: 'cover',
-                            borderRadius: 1,
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                          }}
-                        />
-                        <Typography variant="subtitle1" component="div">
-                          {batch.productName}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={batch.productType}
-                        size="small"
-                        color="primary"
-                        variant="outlined"
-                        sx={{ textTransform: 'capitalize' }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Typography>
-                        <strong>{batch.availableQuantity}</strong>{' '}
-                        {batch.unitType}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography fontWeight="medium">
-                        {batch.unitPrice.toFixed(2)}€/{batch.unitType}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      {format(
-                        new Date(batch.availabilityDate),
-                        'dd MMMM yyyy',
-                        { locale: fr }
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="contained"
-                        color="success"
-                        startIcon={<DoneIcon />}
-                        onClick={() => handleReceiveClick(batch.id)}
-                        sx={{ whiteSpace: 'nowrap' }}
-                      >
-                        Recevoir
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </Paper>
-
-      <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
-        <Typography variant="h5" component="h2" gutterBottom>
           Réservations en attente
         </Typography>
 
-        {isLoading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-            <CircularProgress />
-          </Box>
-        ) : error ? (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        ) : pendingReservations.length === 0 ? (
+        {pendingReservations.length === 0 ? (
           <Box sx={{ p: 4, textAlign: 'center' }}>
             <Typography variant="body1" color="textSecondary">
               Aucune réservation en attente pour le moment.
@@ -598,33 +447,6 @@ const VolunteerHomePage = () => {
           Vente libre
         </Button>
       </Box>
-
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>Confirmer la réception</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Êtes-vous sûr de vouloir marquer ce lot comme reçu? Cette action ne
-            peut pas être annulée.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => setOpenDialog(false)}
-            color="primary"
-            data-testid="dialog-cancel-button"
-          >
-            Annuler
-          </Button>
-          <Button
-            onClick={handleConfirmReceive}
-            color="primary"
-            variant="contained"
-            data-testid="dialog-confirm-button"
-          >
-            Confirmer
-          </Button>
-        </DialogActions>
-      </Dialog>
 
       <Dialog
         open={openVenteLibreDialog}

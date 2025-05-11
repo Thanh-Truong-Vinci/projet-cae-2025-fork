@@ -8,6 +8,7 @@ import PersonIcon from '@mui/icons-material/Person'
 import AssignmentIcon from '@mui/icons-material/Assignment'
 import LogoutIcon from '@mui/icons-material/Logout'
 import NotificationsIcon from '@mui/icons-material/Notifications'
+import LocalShippingIcon from '@mui/icons-material/LocalShipping'
 import { Link } from 'react-router-dom'
 import { UserContext } from '../../contexts/UserContext'
 import { NotificationContext } from '../../contexts/NotificationContext'
@@ -134,7 +135,7 @@ const NavBar = () => {
         </>
       )}
 
-      {/* Manager: Boutons d'inscription */}
+      {/* Manager: Boutons d'inscription et autres */}
       {authenticatedUser.role === 'Manager' && (
         <>
           <Button
@@ -198,6 +199,23 @@ const NavBar = () => {
             startIcon={<AssignmentIcon />}
           >
             Lots en attente
+          </Button>
+          <Button
+            variant="outlined"
+            sx={{
+              color: 'green',
+              borderColor: 'green',
+              '&:hover': {
+                borderColor: 'darkgreen',
+                backgroundColor: 'rgba(0, 128, 0, 0.04)',
+              },
+              mr: 1,
+            }}
+            component={Link}
+            to="/receive-batches"
+            startIcon={<LocalShippingIcon />}
+          >
+            Réception des lots
           </Button>
         </>
       )}

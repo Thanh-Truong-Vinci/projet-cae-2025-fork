@@ -258,7 +258,7 @@ public class BatchController {
    * @return le lot mis à jour
    */
   @PatchMapping("/{id}/receive")
-  @PreAuthorize(SecurityConstants.HAS_ROLE_VOLUNTEER)
+  @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
   public Batch receiveBatch(@PathVariable long id, @RequestHeader("Authorization") String token) {
     Batch batch = batchService.getBatchById(id);
 

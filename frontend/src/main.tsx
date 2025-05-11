@@ -34,6 +34,7 @@ import HandlePendingBatchesPage from './components/pages/HandlePendingBatchesPag
 import { StatisticsProvider } from './contexts/StatisticsProvider'
 import NotificationsPage from './components/pages/NotificationPage.tsx'
 import { NotificationProvider } from './contexts/NotificationProvider.tsx'
+import ReceiveBatchesPage from './components/pages/ReceiveBatchesPage.tsx'
 
 const router = createBrowserRouter([
   {
@@ -159,6 +160,14 @@ const router = createBrowserRouter([
         element: (
           <SimpleProtectedRoute requiredRole="Producer">
             <NotificationsPage />
+          </SimpleProtectedRoute>
+        ),
+      },
+      {
+        path: 'receive-batches',
+        element: (
+          <SimpleProtectedRoute requiredRole="Manager">
+            <ReceiveBatchesPage />
           </SimpleProtectedRoute>
         ),
       },
