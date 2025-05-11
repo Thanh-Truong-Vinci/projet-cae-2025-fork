@@ -309,15 +309,14 @@ public class BatchService {
    * @return la liste des BatchView fusionnés avec quantités additionnées
    */
   public List<ProductBatchView> getReceivedBatchesWithAvailableQuantity() {
-    // Récupérer les lots RECEIVED avec quantité > 0
-    List<Batch> batches =
-        batchRepository.findByStatusAndAvailableQuantityGreaterThan(BatchStatus.RECEIVED, 0);
+    // Récupérer les lots RECEIVED
+    List<Batch> receivedBatches = batchRepository.findByStatus(BatchStatus.RECEIVED);
 
     // Map pour regrouper les lots par productId + unitPrice + saleUnit + photoId +
     // companyName
     Map<String, ProductBatchView> batchViewMap = new HashMap<>();
 
-    for (Batch batch : batches) {
+    for (Batch batch : receivedBatches) {
       // Clé composite pour regroupement incluant l'ID de la photo et le nom
       // d'entreprise
       String photoIdentifier =
@@ -364,6 +363,8 @@ public class BatchService {
         batchView.setEarliestProductionDate(batch.getProductionDate());
         batchView.getBatchIds().add(batch.getId());
         batchView.getBatchQuantities().add(batch.getAvailableQuantity());
+
+        batchView.setOutOfStock(batch.getAvailableQuantity() <= 0);
 
         batchViewMap.put(key, batchView);
       }

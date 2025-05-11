@@ -186,6 +186,7 @@ const CartPage = () => {
       const safeValue = Math.min(value, maxQty)
 
       if (reservation) {
+        // Mise à jour optimiste dans l'UI
         const updatedLines = reservation.reservationLines.map((l) =>
           l.id === id ? { ...l, quantity: safeValue } : l
         )
@@ -196,15 +197,27 @@ const CartPage = () => {
         })
 
         if (reservationContext.changeReservationLineQuantity) {
+          // Appel au backend
           await reservationContext.changeReservationLineQuantity(id, safeValue)
+
+          // Envoyer un événement détaillé avec toutes les informations nécessaires
+          window.dispatchEvent(
+            new CustomEvent('product-quantity-changed', {
+              detail: {
+                batchId: line.batchId,
+                productId: line.productId,
+                oldQuantity: line.quantity,
+                newQuantity: safeValue,
+                productName: line.productName,
+              },
+            })
+          )
+
           if (safeValue === 0) {
             forceRefresh()
           }
         }
       }
-
-      // Marquer que les changements ont été effectués dans le panier
-      sessionStorage.setItem('fromCart', 'true')
     } catch (error) {
       console.error('Erreur lors de la mise à jour de la quantité:', error)
       setMessage('Impossible de mettre à jour la quantité')

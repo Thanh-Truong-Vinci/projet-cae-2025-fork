@@ -215,77 +215,109 @@ const HomePage = () => {
     qty: number,
     index: number
   ) => {
-    if (qty > productBatch.batchQuantities[index]) {
-      reserveBatch(
-        productBatch,
-        qty - productBatch.batchQuantities[index],
-        index + 1
-      )
+    // Si l'index dépasse le nombre de lots disponibles, on s'arrête
+    if (index >= productBatch.batchIds.length) {
+      return
     }
 
-    // Calculer la quantité qui va rester après l'achat
-    const remainingQuantity = productBatch.totalQuantity - qty
+    // Si on demande plus que ce qui est disponible dans ce lot
+    if (qty > productBatch.batchQuantities[index]) {
+      // Créer une réservation pour ce qui est disponible dans ce lot
+      createReservation(
+        productBatch.batchIds[index],
+        productBatch.batchQuantities[index]
+      )
+        .then(() => {
+          setMessage(
+            `${productBatch.batchQuantities[index]} ${productBatch.batchQuantities[index] > 1 ? 'articles' : 'article'} "${productBatch.productName}" ${productBatch.batchQuantities[index] > 1 ? 'ajoutés' : 'ajouté'} au panier`
+          )
+          setOpenSnackbar(true)
 
-    createReservation(productBatch.batchIds[index], qty)
-      .then(() => {
-        setMessage(
-          `${qty} ${qty > 1 ? 'articles' : 'article'} "${productBatch.productName}" ${qty > 1 ? 'ajoutés' : 'ajouté'} au panier`
+          // Mettre à jour l'UI
+          let remainingTotalQty =
+            productBatch.totalQuantity - productBatch.batchQuantities[index]
+          updateProductDisplay(productBatch, remainingTotalQty)
+
+          // Poursuivre avec le reste de la quantité sur le lot suivant
+          reserveBatch(
+            {
+              ...productBatch,
+              totalQuantity: remainingTotalQty,
+            },
+            qty - productBatch.batchQuantities[index],
+            index + 1
+          )
+        })
+        .catch((error) => {
+          setMessage(`Erreur lors de l'ajout au panier: ${error.message}`)
+          setOpenSnackbar(true)
+        })
+    } else {
+      // Si la quantité demandée est disponible dans ce lot
+      const remainingQuantity = productBatch.totalQuantity - qty
+
+      createReservation(productBatch.batchIds[index], qty)
+        .then(() => {
+          setMessage(
+            `${qty} ${qty > 1 ? 'articles' : 'article'} "${productBatch.productName}" ${qty > 1 ? 'ajoutés' : 'ajouté'} au panier`
+          )
+          setOpenSnackbar(true)
+
+          updateProductDisplay(productBatch, remainingQuantity)
+        })
+        .catch((error) => {
+          setMessage(`Erreur lors de l'ajout au panier: ${error.message}`)
+          setOpenSnackbar(true)
+        })
+    }
+  }
+
+  // Fonction utilitaire pour mettre à jour l'affichage des produits
+  const updateProductDisplay = (
+    productBatch: ProductBatch,
+    remainingQuantity: number
+  ) => {
+    if (remainingQuantity <= 0) {
+      // Marquer comme épuisé mais garder visible
+      setFilteredProducts((prevProducts) =>
+        prevProducts.map((p) =>
+          p.productId === productBatch.productId &&
+          p.unitPrice === productBatch.unitPrice
+            ? { ...p, totalQuantity: 0, outOfStock: true }
+            : p
         )
-        setOpenSnackbar(true)
+      )
 
-        // Mise à jour de l'UI si le produit n'a plus de stock
-        if (remainingQuantity <= 0) {
-          // Retirer immédiatement ce produit de la liste filtrée
-          setFilteredProducts((prevProducts) =>
-            prevProducts.filter(
-              (p) =>
-                !(
-                  p.productId === productBatch.productId &&
-                  p.unitPrice === productBatch.unitPrice
-                )
-            )
-          )
+      // Pareil pour le carrousel
+      setTopProducts((prevProducts) =>
+        prevProducts.map((p) =>
+          p.productId === productBatch.productId &&
+          p.unitPrice === productBatch.unitPrice
+            ? { ...p, totalQuantity: 0, outOfStock: true }
+            : p
+        )
+      )
+    } else {
+      // Si le produit a encore du stock, mettre à jour la quantité affichée
+      setFilteredProducts((prevProducts) =>
+        prevProducts.map((p) =>
+          p.productId === productBatch.productId &&
+          p.unitPrice === productBatch.unitPrice
+            ? { ...p, totalQuantity: remainingQuantity }
+            : p
+        )
+      )
 
-          // Retirer également ce produit du carrousel si il est présent
-          setTopProducts((prevProducts) =>
-            prevProducts.filter(
-              (p) =>
-                !(
-                  p.productId === productBatch.productId &&
-                  p.unitPrice === productBatch.unitPrice
-                )
-            )
-          )
-        } else {
-          // Si le produit a encore du stock, mettre à jour la quantité affichée
-          setFilteredProducts((prevProducts) =>
-            prevProducts.map((p) =>
-              p.productId === productBatch.productId &&
-              p.unitPrice === productBatch.unitPrice
-                ? { ...p, totalQuantity: remainingQuantity }
-                : p
-            )
-          )
-
-          // Mettre à jour également la quantité dans le carrousel si elle est présente
-          setTopProducts((prevProducts) =>
-            prevProducts.map((p) =>
-              p.productId === productBatch.productId &&
-              p.unitPrice === productBatch.unitPrice
-                ? { ...p, totalQuantity: remainingQuantity }
-                : p
-            )
-          )
-        }
-
-        if (productContext.fetchAllProducts) {
-          productContext.fetchAllProducts()
-        }
-      })
-      .catch((error) => {
-        setMessage(`Erreur lors de l'ajout au panier: ${error.message}`)
-        setOpenSnackbar(true)
-      })
+      // Mettre à jour également la quantité dans le carrousel
+      setTopProducts((prevProducts) =>
+        prevProducts.map((p) =>
+          p.productId === productBatch.productId &&
+          p.unitPrice === productBatch.unitPrice
+            ? { ...p, totalQuantity: remainingQuantity }
+            : p
+        )
+      )
+    }
   }
 
   const handleProductClick = (product: ProductBatch) => {
@@ -296,63 +328,80 @@ const HomePage = () => {
     setOpenSnackbar(false)
   }
 
-  // Ajouter cet useEffect pour détecter quand l'utilisateur revient à la HomePage
+  // IMPORTANT: Remplacer la fonction refreshProducts par celle-ci
+  const refreshProducts = useCallback(() => {
+    const now = Date.now()
+    console.log('Rafraîchissement forcé des produits...')
+    setRefreshing(true)
+
+    // Ajouter un paramètre nocache pour éviter les problèmes de mise en cache
+    return fetch('/api/batches/received/available-view?nocache=' + now, {
+      headers: {
+        pragma: 'no-cache',
+        'cache-control': 'no-cache',
+      },
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error(`Erreur: ${response.status}`)
+        return response.json()
+      })
+      .then((data) => {
+        console.log('Données fraîches reçues:', data)
+        setFilteredProducts(data)
+
+        // Mettre également à jour les produits du carrousel avec les données fraîches
+        const sortedProducts = [...data].sort((a, b) => {
+          const dateA = new Date(a.earliestProductionDate).getTime()
+          const dateB = new Date(b.earliestProductionDate).getTime()
+          return dateB - dateA
+        })
+
+        const recentCount = Math.min(5, sortedProducts.length)
+        setTopProducts(sortedProducts.slice(0, recentCount))
+
+        setRefreshing(false)
+      })
+      .catch((error) => {
+        console.error('Erreur de rafraîchissement:', error)
+        setRefreshing(false)
+      })
+  }, [])
+
+  // Modifier l'effet existant pour réagir à plus d'événements
   useEffect(() => {
-    // Fonction qui rafraîchit les données des produits
-    const refreshData = () => {
-      console.log('Rafraîchissement des données produits depuis HomePage')
-      if (productContext && productContext.fetchAllProducts) {
-        productContext.fetchAllProducts()
-      }
-    }
-
-    // Écouter l'événement de changement dans le panier
-    window.addEventListener('cart-quantities-updated', refreshData)
-
-    // Écouter l'événement 'focus' qui se déclenche quand l'utilisateur revient à cette page
-    window.addEventListener('focus', refreshData)
-
-    // Nettoyer les écouteurs d'événements
-    return () => {
-      window.removeEventListener('cart-quantities-updated', refreshData)
-      window.removeEventListener('focus', refreshData)
-    }
-  }, [productContext])
-
-  // Remplacer l'effet existant qui détecte la navigation vers "/"
-  useEffect(() => {
-    // Si nous sommes sur la page d'accueil (chemin exact)
+    // Rafraîchissement forcé lors du chargement initial de la page
     if (location.pathname === '/') {
-      // Vérifier si nous venons juste de rafraîchir la page pour éviter une boucle infinie
-      const justRefreshed = sessionStorage.getItem('justRefreshed') === 'true'
-
-      if (!justRefreshed) {
-        // Sauvegarder la position de défilement et les filtres avant rafraîchissement
-        sessionStorage.setItem('scrollPosition', window.scrollY.toString())
-        sessionStorage.setItem(
-          'productFilters',
-          JSON.stringify({
-            type,
-            productName,
-            visibleProducts,
-          })
-        )
-
-        // Marquer que nous allons rafraîchir
-        sessionStorage.setItem('justRefreshed', 'true')
-        setRefreshing(true)
-
-        // Rafraîchir la page
-        window.location.reload()
-      } else {
-        // Nous venons juste de rafraîchir, donc nettoyer le marqueur
-        sessionStorage.removeItem('justRefreshed')
-      }
-    } else {
-      // Si nous naviguons hors de la page d'accueil, réinitialiser pour le prochain retour
-      sessionStorage.removeItem('justRefreshed')
+      // Court délai pour laisser le temps à l'interface de s'afficher d'abord
+      setTimeout(() => refreshProducts(), 100)
     }
-  }, [location.pathname, type, productName, visibleProducts]) // Dépendances
+
+    // Écouteur d'événements pour le retour à la page via la navigation
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && location.pathname === '/') {
+        refreshProducts()
+      }
+    }
+
+    // Écouteur d'événements pour les changements dans le panier
+    const handleCartUpdate = () => {
+      if (location.pathname === '/') {
+        refreshProducts()
+      }
+    }
+
+    // Enregistrer TOUS les écouteurs possibles
+    window.addEventListener('product-quantity-changed', handleCartUpdate)
+    window.addEventListener('cart-quantities-updated', handleCartUpdate)
+    window.addEventListener('visibilitychange', handleVisibilityChange)
+    window.addEventListener('focus', handleCartUpdate)
+
+    return () => {
+      window.removeEventListener('product-quantity-changed', handleCartUpdate)
+      window.removeEventListener('cart-quantities-updated', handleCartUpdate)
+      window.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('focus', handleCartUpdate)
+    }
+  }, [location.pathname, refreshProducts])
 
   // Ajouter un effet pour restaurer la position de défilement après chargement
   useEffect(() => {
