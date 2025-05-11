@@ -202,11 +202,7 @@ const HomePage = () => {
     reserveBatch(productBatch, qty, 0)
   }
 
-  const reserveBatch = (
-    productBatch: ProductBatch,
-    qty: number,
-    index: number
-  ) => {
+  const reserveBatch = (productBatch: ProductBatch, qty: number, index: number) => {
     if (qty > productBatch.batchQuantities[index]) {
       reserveBatch(
         productBatch,
