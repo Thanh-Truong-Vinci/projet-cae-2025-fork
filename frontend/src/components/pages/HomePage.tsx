@@ -112,7 +112,7 @@ const HomePage = () => {
   // Initialiser les quantités
   useEffect(() => {
     const initialQuantities: { [key: number]: number } = {}
-    products.forEach((product) => {
+    products.forEach((product: ProductBatch) => {
       initialQuantities[product.productId] = 1
     })
     setQuantities(initialQuantities)
@@ -143,7 +143,7 @@ const HomePage = () => {
   useEffect(() => {
     if (products) {
       const seen = new Set()
-      const uniqueProducts = products.filter((p) => {
+      const uniqueProducts = products.filter((p: ProductBatch) => {
         const key = `${p.productId}-${p.unitPrice}`
         if (seen.has(key)) return false
         seen.add(key)
@@ -165,7 +165,7 @@ const HomePage = () => {
 
   const handleFilter = useCallback(() => {
     const seen = new Set()
-    let results = products.filter((p) => {
+    let results = products.filter((p: ProductBatch) => {
       const key = `${p.productId}-${p.unitPrice}`
       if (seen.has(key)) return false
       seen.add(key)
@@ -174,7 +174,7 @@ const HomePage = () => {
 
     if (type) {
       const normalizedType = normalizeString(type)
-      results = results.filter((product) => {
+      results = results.filter((product: ProductBatch) => {
         const normalizedCategory = normalizeString(product.productType)
         return normalizedCategory === normalizedType
       })
@@ -182,7 +182,7 @@ const HomePage = () => {
 
     if (productName.trim()) {
       const searchTerm = productName.toLowerCase().trim()
-      results = results.filter((product) =>
+      results = results.filter((product: ProductBatch) =>
         product.productName.toLowerCase().includes(searchTerm)
       )
     }
@@ -234,7 +234,7 @@ const HomePage = () => {
           setOpenSnackbar(true)
 
           // Mettre à jour l'UI
-          let remainingTotalQty =
+          const remainingTotalQty =
             productBatch.totalQuantity - productBatch.batchQuantities[index]
           updateProductDisplay(productBatch, remainingTotalQty)
 
@@ -278,29 +278,38 @@ const HomePage = () => {
     remainingQuantity: number
   ) => {
     if (remainingQuantity <= 0) {
-      // Marquer comme épuisé mais garder visible
+      // Supprimer complètement le produit de la liste filtrée
       setFilteredProducts((prevProducts) =>
-        prevProducts.map((p) =>
-          p.productId === productBatch.productId &&
-          p.unitPrice === productBatch.unitPrice
-            ? { ...p, totalQuantity: 0, outOfStock: true }
-            : p
+        prevProducts.filter(
+          (p: ProductBatch) =>
+            p.productId !== productBatch.productId ||
+            p.unitPrice !== productBatch.unitPrice
         )
       )
 
-      // Pareil pour le carrousel
-      setTopProducts((prevProducts) =>
-        prevProducts.map((p) =>
-          p.productId === productBatch.productId &&
-          p.unitPrice === productBatch.unitPrice
-            ? { ...p, totalQuantity: 0, outOfStock: true }
-            : p
+      // Également supprimer le produit du carrousel
+      setTopProducts((prevProducts) => {
+        const newTopProducts = prevProducts.filter(
+          (p: ProductBatch) =>
+            p.productId !== productBatch.productId ||
+            p.unitPrice !== productBatch.unitPrice
         )
-      )
+
+        // Si le produit actuel du carrousel a été supprimé, ajuster l'index
+        if (
+          newTopProducts.length < prevProducts.length &&
+          currentProductIndex >= newTopProducts.length &&
+          newTopProducts.length > 0
+        ) {
+          setCurrentProductIndex(0) // Réinitialiser à 0 si nécessaire
+        }
+
+        return newTopProducts
+      })
     } else {
       // Si le produit a encore du stock, mettre à jour la quantité affichée
       setFilteredProducts((prevProducts) =>
-        prevProducts.map((p) =>
+        prevProducts.map((p: ProductBatch) =>
           p.productId === productBatch.productId &&
           p.unitPrice === productBatch.unitPrice
             ? { ...p, totalQuantity: remainingQuantity }
@@ -310,7 +319,7 @@ const HomePage = () => {
 
       // Mettre à jour également la quantité dans le carrousel
       setTopProducts((prevProducts) =>
-        prevProducts.map((p) =>
+        prevProducts.map((p: ProductBatch) =>
           p.productId === productBatch.productId &&
           p.unitPrice === productBatch.unitPrice
             ? { ...p, totalQuantity: remainingQuantity }
@@ -328,7 +337,6 @@ const HomePage = () => {
     setOpenSnackbar(false)
   }
 
-  // IMPORTANT: Remplacer la fonction refreshProducts par celle-ci
   const refreshProducts = useCallback(() => {
     const now = Date.now()
     console.log('Rafraîchissement forcé des produits...')
@@ -347,10 +355,16 @@ const HomePage = () => {
       })
       .then((data) => {
         console.log('Données fraîches reçues:', data)
-        setFilteredProducts(data)
+
+        // IMPORTANT: Filtrer les produits avec quantité 0
+        const filteredData = data.filter(
+          (product: ProductBatch) => product.totalQuantity > 0
+        )
+
+        setFilteredProducts(filteredData)
 
         // Mettre également à jour les produits du carrousel avec les données fraîches
-        const sortedProducts = [...data].sort((a, b) => {
+        const sortedProducts = [...filteredData].sort((a, b) => {
           const dateA = new Date(a.earliestProductionDate).getTime()
           const dateB = new Date(b.earliestProductionDate).getTime()
           return dateB - dateA
@@ -403,14 +417,19 @@ const HomePage = () => {
     }
   }, [location.pathname, refreshProducts])
 
-  // Ajouter un effet pour restaurer la position de défilement après chargement
+  // Modifier l'effet qui restaure la position de défilement
+
+  // Avant l'effet, ajouter cette variable qui extrait l'assertion de type
+  const typedProducts = products as ProductBatch[]
+
+  // Puis modifier l'effet comme suit
   useEffect(() => {
     const scrollPosition = sessionStorage.getItem('scrollPosition')
     if (scrollPosition) {
       window.scrollTo(0, parseInt(scrollPosition))
       sessionStorage.removeItem('scrollPosition')
     }
-  }, [products]) // Déclencher après chargement des produits
+  }, [typedProducts]) // Utiliser la variable extraite au lieu de l'expression complexe
 
   if (isLoading) {
     return (
@@ -469,7 +488,6 @@ const HomePage = () => {
           }}
         >
           <CircularProgress />
-          <Typography sx={{ ml: 2 }}>Mise à jour des produits...</Typography>
         </Box>
       )}
       {/* Sidebar avec filtres */}
@@ -664,158 +682,162 @@ const HomePage = () => {
           }}
         >
           {filteredProducts.length > 0 ? (
-            filteredProducts.slice(0, visibleProducts).map((product) => (
-              <Card
-                key={`${product.productId}-${product.unitPrice}`}
-                sx={{
-                  width: 220,
-                  height: 340,
-                  mb: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  cursor: 'pointer',
-                }}
-                onClick={() => handleProductClick(product)}
-              >
-                <CardMedia
-                  component="img"
-                  height="120"
-                  image={product.imageLocation || '/placeholder.jpg'}
-                  alt={product.productName}
-                  sx={{ objectFit: 'cover' }}
-                />
-                <CardContent sx={{ flexGrow: 1, py: 1, position: 'relative' }}>
-                  <Typography
-                    gutterBottom
-                    variant="h6"
-                    component="div"
-                    sx={{
-                      fontSize: '1rem',
-                      height: '2.5rem',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                      mb: 1,
-                    }}
-                  >
-                    {product.productName}
-                  </Typography>
-
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mb: 0.5 }}
-                  >
-                    {product.unitPrice} € / {product.saleUnit}
-                  </Typography>
-
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      mb: 0.5,
-                    }}
-                  >
-                    {product.companyName}
-                  </Typography>
-
-                  <Typography variant="body2" color="text.secondary">
-                    Disponible: {product.totalQuantity} {product.saleUnit}
-                  </Typography>
-
-                  {/* Type de produit positionné en bas à gauche */}
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      bottom: '8px',
-                      left: '8px',
-                    }}
+            filteredProducts
+              .slice(0, visibleProducts)
+              .map((product: ProductBatch) => (
+                <Card
+                  key={`${product.productId}-${product.unitPrice}`}
+                  sx={{
+                    width: 220,
+                    height: 340,
+                    mb: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => handleProductClick(product)}
+                >
+                  <CardMedia
+                    component="img"
+                    height="120"
+                    image={product.imageLocation || '/placeholder.jpg'}
+                    alt={product.productName}
+                    sx={{ objectFit: 'cover' }}
+                  />
+                  <CardContent
+                    sx={{ flexGrow: 1, py: 1, position: 'relative' }}
                   >
                     <Typography
-                      variant="body2"
+                      gutterBottom
+                      variant="h6"
+                      component="div"
                       sx={{
-                        backgroundColor: '#2e7d32',
-                        color: 'white',
-                        fontSize: '0.8rem',
-                        py: 0.5,
-                        px: 2,
-                        borderRadius: '12px',
-                        display: 'inline-block',
-                        fontWeight: 500,
+                        fontSize: '1rem',
+                        height: '2.5rem',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        mb: 1,
                       }}
                     >
-                      {product.productType}
+                      {product.productName}
                     </Typography>
-                  </Box>
-                </CardContent>
-                <CardActions sx={{ p: 1, pt: 0, mt: 'auto' }}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      width: '100%',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <IconButton
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleQuantityChange(
-                            product.productId,
-                            -1,
-                            product.totalQuantity
-                          )
-                        }}
-                        size="small"
-                      >
-                        <RemoveIcon fontSize="small" />
-                      </IconButton>
+
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 0.5 }}
+                    >
+                      {product.unitPrice} € / {product.saleUnit}
+                    </Typography>
+
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        mb: 0.5,
+                      }}
+                    >
+                      {product.companyName}
+                    </Typography>
+
+                    <Typography variant="body2" color="text.secondary">
+                      Disponible: {product.totalQuantity} {product.saleUnit}
+                    </Typography>
+
+                    {/* Type de produit positionné en bas à gauche */}
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        bottom: '8px',
+                        left: '8px',
+                      }}
+                    >
                       <Typography
                         variant="body2"
                         sx={{
-                          mx: 0.5,
-                          minWidth: '1.5rem',
-                          textAlign: 'center',
+                          backgroundColor: '#2e7d32',
+                          color: 'white',
+                          fontSize: '0.8rem',
+                          py: 0.5,
+                          px: 2,
+                          borderRadius: '12px',
+                          display: 'inline-block',
+                          fontWeight: 500,
                         }}
                       >
-                        {quantities[product.productId] || 1}
+                        {product.productType}
                       </Typography>
-                      <IconButton
+                    </Box>
+                  </CardContent>
+                  <CardActions sx={{ p: 1, pt: 0, mt: 'auto' }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        width: '100%',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <IconButton
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleQuantityChange(
+                              product.productId,
+                              -1,
+                              product.totalQuantity
+                            )
+                          }}
+                          size="small"
+                        >
+                          <RemoveIcon fontSize="small" />
+                        </IconButton>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            mx: 0.5,
+                            minWidth: '1.5rem',
+                            textAlign: 'center',
+                          }}
+                        >
+                          {quantities[product.productId] || 1}
+                        </Typography>
+                        <IconButton
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleQuantityChange(
+                              product.productId,
+                              1,
+                              product.totalQuantity
+                            )
+                          }}
+                          size="small"
+                        >
+                          <AddIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        color="success"
                         onClick={(e) => {
                           e.stopPropagation()
-                          handleQuantityChange(
-                            product.productId,
-                            1,
-                            product.totalQuantity
-                          )
+                          handleAddToReservation(product)
                         }}
-                        size="small"
+                        sx={{ minWidth: 'unset', px: 1 }}
                       >
-                        <AddIcon fontSize="small" />
-                      </IconButton>
+                        <AddShoppingCartIcon fontSize="small" />
+                      </Button>
                     </Box>
-                    <Button
-                      size="small"
-                      variant="contained"
-                      color="success"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleAddToReservation(product)
-                      }}
-                      sx={{ minWidth: 'unset', px: 1 }}
-                    >
-                      <AddShoppingCartIcon fontSize="small" />
-                    </Button>
-                  </Box>
-                </CardActions>
-              </Card>
-            ))
+                  </CardActions>
+                </Card>
+              ))
           ) : (
             <Typography variant="body1" sx={{ py: 5 }}>
               Aucun produit ne correspond à vos critères de recherche.
