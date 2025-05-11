@@ -142,7 +142,6 @@ const CartPage = () => {
     return day === 2 || day === 4
   }
 
-
   const calculateTotal = () => {
     if (!reservation || !reservation.reservationLines) return 0
     return reservation.reservationLines.reduce(
@@ -270,22 +269,22 @@ const CartPage = () => {
   }
 
   const handleOpenCalendar = () => {
-  if (!authenticatedUser) {
-    setMessage('Vous devez vous connecter pour faire une réservation')
-    setOpenSnackbar(true)
-    setTimeout(() => {
-      navigate('/login', { state: { returnTo: '/cart' } })
-    }, 2000)
-    return
+    if (!authenticatedUser) {
+      setMessage('Vous devez vous connecter pour faire une réservation')
+      setOpenSnackbar(true)
+      setTimeout(() => {
+        navigate('/login', { state: { returnTo: '/cart' } })
+      }, 2000)
+      return
+    }
+    setOpenCalendar(true)
+
+    // Initialiser avec une chaîne vide au lieu d'une date par défaut
+    setSelectedDate('')
+
+    // La date est considérée comme invalide jusqu'à ce que l'utilisateur en choisisse une
+    setIsDateValid(false)
   }
-  setOpenCalendar(true)
-  
-  // Initialiser avec une chaîne vide au lieu d'une date par défaut
-  setSelectedDate('')
-  
-  // La date est considérée comme invalide jusqu'à ce que l'utilisateur en choisisse une
-  setIsDateValid(false)
-}
 
   const handleCloseCalendar = () => {
     setOpenCalendar(false)
