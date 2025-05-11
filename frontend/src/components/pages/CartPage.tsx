@@ -142,23 +142,6 @@ const CartPage = () => {
     return day === 2 || day === 4
   }
 
-  const getNextTuesdayOrThursday = () => {
-    const today = new Date()
-
-    // Créer une nouvelle date pour éviter de modifier today
-    const date = new Date(today)
-
-    // On commence à partir de demain
-    date.setDate(date.getDate() + 1)
-
-    // Cherche jusqu'à trouver un mardi (2) ou jeudi (4)
-    while (date.getDay() !== 2 && date.getDay() !== 4) {
-      date.setDate(date.getDate() + 1)
-    }
-
-    // Formater la date en YYYY-MM-DD
-    return date.toISOString().split('T')[0]
-  }
 
   const calculateTotal = () => {
     if (!reservation || !reservation.reservationLines) return 0
@@ -287,23 +270,22 @@ const CartPage = () => {
   }
 
   const handleOpenCalendar = () => {
-    if (!authenticatedUser) {
-      setMessage('Vous devez vous connecter pour faire une réservation')
-      setOpenSnackbar(true)
-      setTimeout(() => {
-        navigate('/login', { state: { returnTo: '/cart' } })
-      }, 2000)
-      return
-    }
-    setOpenCalendar(true)
-
-    // Toujours utiliser la fonction getNextTuesdayOrThursday pour définir la date par défaut
-    const nextPickupDate = getNextTuesdayOrThursday()
-    setSelectedDate(nextPickupDate)
-
-    // Assurons-nous que la date est considérée comme valide
-    setIsDateValid(true)
+  if (!authenticatedUser) {
+    setMessage('Vous devez vous connecter pour faire une réservation')
+    setOpenSnackbar(true)
+    setTimeout(() => {
+      navigate('/login', { state: { returnTo: '/cart' } })
+    }, 2000)
+    return
   }
+  setOpenCalendar(true)
+  
+  // Initialiser avec une chaîne vide au lieu d'une date par défaut
+  setSelectedDate('')
+  
+  // La date est considérée comme invalide jusqu'à ce que l'utilisateur en choisisse une
+  setIsDateValid(false)
+}
 
   const handleCloseCalendar = () => {
     setOpenCalendar(false)
