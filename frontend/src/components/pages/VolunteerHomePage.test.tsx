@@ -235,9 +235,9 @@ describe('VolunteerHomePage', () => {
       screen.getByText(/Êtes-vous sûr de vouloir marquer ce lot comme reçu/)
     ).toBeTruthy()
 
-    expect(screen.getByText('Annuler')).toBeTruthy()
-    const confirmDialogButton = screen.getAllByText('Confirmer')[1]
-    expect(confirmDialogButton).toBeTruthy()
+    // Use the test ID instead of text content
+    expect(screen.getByTestId('dialog-cancel-button')).toBeTruthy()
+    expect(screen.getByTestId('dialog-confirm-button')).toBeTruthy()
   })
 
   test('calls receiveBatch when confirm dialog button is clicked', async () => {
@@ -248,7 +248,7 @@ describe('VolunteerHomePage', () => {
     const receiveButton = screen.getByText('Recevoir')
     fireEvent.click(receiveButton)
 
-    const confirmDialogButton = screen.getAllByText('Confirmer')[1]
+    const confirmDialogButton = screen.getByTestId('dialog-confirm-button')
     fireEvent.click(confirmDialogButton)
 
     expect(receiveBatchMock).toHaveBeenCalledWith(1)
@@ -266,7 +266,7 @@ describe('VolunteerHomePage', () => {
     const receiveButton = screen.getByText('Recevoir')
     fireEvent.click(receiveButton)
 
-    const confirmDialogButton = screen.getAllByText('Confirmer')[1]
+    const confirmDialogButton = screen.getByTestId('dialog-confirm-button')
     fireEvent.click(confirmDialogButton)
 
     await waitFor(() => {
@@ -337,7 +337,8 @@ describe('VolunteerHomePage', () => {
 
     expect(screen.getByText('Confirmer la réception')).toBeTruthy()
 
-    const cancelButton = screen.getByText('Annuler')
+    // Use the test ID to get the correct cancel button
+    const cancelButton = screen.getByTestId('dialog-cancel-button')
     fireEvent.click(cancelButton)
 
     await waitFor(() => {
@@ -503,7 +504,7 @@ describe('VolunteerHomePage', () => {
     const receiveButton = screen.getByText('Recevoir')
     fireEvent.click(receiveButton)
 
-    const confirmDialogButton = screen.getAllByText('Confirmer')[1]
+    const confirmDialogButton = screen.getByTestId('dialog-confirm-button')
     fireEvent.click(confirmDialogButton)
 
     await waitFor(() => {
@@ -536,7 +537,7 @@ describe('VolunteerHomePage', () => {
     const receiveButton = getByText('Recevoir')
     fireEvent.click(receiveButton)
 
-    const confirmButton = screen.getAllByText('Confirmer')[1]
+    const confirmButton = screen.getByTestId('dialog-confirm-button')
     fireEvent.click(confirmButton)
 
     await waitFor(() => {
@@ -552,7 +553,7 @@ describe('VolunteerHomePage', () => {
     const receiveButton = screen.getByText('Recevoir')
     fireEvent.click(receiveButton)
 
-    const confirmButton = screen.getAllByText('Confirmer')[1]
+    const confirmButton = screen.getByTestId('dialog-confirm-button')
     fireEvent.click(confirmButton)
 
     await waitFor(() => {
@@ -629,7 +630,7 @@ describe('VolunteerHomePage', () => {
     const receiveButton = screen.getByText('Recevoir')
     fireEvent.click(receiveButton)
 
-    const confirmButton = screen.getAllByText('Confirmer')[1]
+    const confirmButton = screen.getByTestId('dialog-confirm-button')
     fireEvent.click(confirmButton)
 
     await waitFor(() => {

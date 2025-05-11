@@ -479,13 +479,18 @@ const VolunteerHomePage = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)} color="primary">
+          <Button
+            onClick={() => setOpenDialog(false)}
+            color="primary"
+            data-testid="dialog-cancel-button"
+          >
             Annuler
           </Button>
           <Button
             onClick={handleConfirmReceive}
             color="primary"
             variant="contained"
+            data-testid="dialog-confirm-button"
           >
             Confirmer
           </Button>
