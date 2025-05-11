@@ -255,6 +255,26 @@ const HomePage = () => {
                 )
             )
           )
+        } else {
+          // Si le produit a encore du stock, mettre à jour la quantité affichée
+          setFilteredProducts((prevProducts) =>
+            prevProducts.map((p) =>
+              p.productId === productBatch.productId &&
+              p.unitPrice === productBatch.unitPrice
+                ? { ...p, totalQuantity: remainingQuantity }
+                : p
+            )
+          )
+
+          // Mettre à jour également la quantité dans le carrousel si elle est présente
+          setTopProducts((prevProducts) =>
+            prevProducts.map((p) =>
+              p.productId === productBatch.productId &&
+              p.unitPrice === productBatch.unitPrice
+                ? { ...p, totalQuantity: remainingQuantity }
+                : p
+            )
+          )
         }
 
         if (productContext.fetchAllProducts) {
