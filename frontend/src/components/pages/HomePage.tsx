@@ -190,10 +190,17 @@ const HomePage = () => {
     setVisibleProducts(productsPerLoad)
   }
 
-  const handleQuantityChange = (productId: number, value: number) => {
+  const handleQuantityChange = (
+    productId: number,
+    value: number,
+    maxQuantity: number
+  ) => {
     setQuantities((prev) => ({
       ...prev,
-      [productId]: Math.max(1, (prev[productId] || 1) + value),
+      [productId]: Math.min(
+        maxQuantity,
+        Math.max(1, (prev[productId] || 1) + value)
+      ),
     }))
   }
 
@@ -202,7 +209,11 @@ const HomePage = () => {
     reserveBatch(productBatch, qty, 0)
   }
 
-  const reserveBatch = (productBatch: ProductBatch, qty: number, index: number) => {
+  const reserveBatch = (
+    productBatch: ProductBatch,
+    qty: number,
+    index: number
+  ) => {
     if (qty > productBatch.batchQuantities[index]) {
       reserveBatch(
         productBatch,
@@ -387,7 +398,8 @@ const HomePage = () => {
                       e.stopPropagation()
                       handleQuantityChange(
                         topProducts[currentProductIndex].productId,
-                        -1
+                        -1,
+                        topProducts[currentProductIndex].totalQuantity
                       )
                     }}
                     size="small"
@@ -403,7 +415,8 @@ const HomePage = () => {
                       e.stopPropagation()
                       handleQuantityChange(
                         topProducts[currentProductIndex].productId,
-                        1
+                        1,
+                        topProducts[currentProductIndex].totalQuantity
                       )
                     }}
                     size="small"
@@ -564,7 +577,11 @@ const HomePage = () => {
                       <IconButton
                         onClick={(e) => {
                           e.stopPropagation()
-                          handleQuantityChange(product.productId, -1)
+                          handleQuantityChange(
+                            product.productId,
+                            -1,
+                            product.totalQuantity
+                          )
                         }}
                         size="small"
                       >
@@ -583,7 +600,11 @@ const HomePage = () => {
                       <IconButton
                         onClick={(e) => {
                           e.stopPropagation()
-                          handleQuantityChange(product.productId, 1)
+                          handleQuantityChange(
+                            product.productId,
+                            1,
+                            product.totalQuantity
+                          )
                         }}
                         size="small"
                       >

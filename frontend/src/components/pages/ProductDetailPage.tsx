@@ -63,7 +63,10 @@ const ProductDetailPage = () => {
   }, [productId, location.state, getProductById])
 
   const handleQuantityChange = (change: number) => {
-    setQuantity((prev) => Math.max(1, prev + change))
+    setQuantity((prev) => {
+      if (!product) return prev
+      return Math.min(product.totalQuantity, Math.max(1, prev + change))
+    })
   }
 
   const handleAddToReservation = () => {
@@ -201,6 +204,7 @@ const ProductDetailPage = () => {
                 <IconButton
                   onClick={() => handleQuantityChange(-1)}
                   size="small"
+                  disabled={quantity <= 1}
                 >
                   <RemoveIcon />
                 </IconButton>
@@ -212,6 +216,7 @@ const ProductDetailPage = () => {
                 <IconButton
                   onClick={() => handleQuantityChange(1)}
                   size="small"
+                  disabled={product && quantity >= product.totalQuantity}
                 >
                   <AddIcon />
                 </IconButton>
@@ -225,6 +230,7 @@ const ProductDetailPage = () => {
               size="large"
               fullWidth
               onClick={handleAddToReservation}
+              disabled={!product || product.totalQuantity === 0}
             >
               Ajouter à la réservation
             </Button>

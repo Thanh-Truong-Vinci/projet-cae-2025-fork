@@ -220,6 +220,10 @@ const AddBatchPage = () => {
       } else if (product.productType && product.productType.title) {
         setProductType(product.productType.title)
       }
+
+      setFieldsLocked(false)
+      setSelectedImage(null)
+
       if (product.photo && product.photo.imageLocation) {
         const imageUrl = product.photo.imageLocation
         setImagePreview(imageUrl)
@@ -227,7 +231,6 @@ const AddBatchPage = () => {
       } else if (product.image) {
         setImagePreview(product.image)
       }
-      setFieldsLocked(true)
     } else {
       setSelectedProductId(null)
       setFieldsLocked(false)
@@ -246,15 +249,16 @@ const AddBatchPage = () => {
   }
 
   const handleOpenImageModal = () => {
-    if (fieldsLocked) {
+    if (fieldsLocked && !productImage && imagePreview) {
       setSnackbarMessage("Changez le nom du produit pour modifier l'image")
       setSnackbarSeverity('error')
       setOpenSnackbar(true)
       return
     }
 
+    const firstWord = productName.trim().split(' ')[0]
+    setSearchQuery(firstWord)
     setIsImageModalOpen(true)
-    setSearchQuery('')
 
     if (!photosLoaded) {
       fetchAllPhotos()
@@ -267,9 +271,12 @@ const AddBatchPage = () => {
 
   // Handle selecting an image from the gallery
   const handleImageSelect = (photo: Photo) => {
+    // Reset previous state completely
     setSelectedImage(photo)
     setProductImage(null)
     setImagePreview(photo.imageLocation)
+
+    console.log('Selected new image:', photo.id, photo.imageLocation)
   }
 
   // Confirm image selection and close modal
@@ -398,6 +405,11 @@ const AddBatchPage = () => {
   // Image selection modal component
   const ImageSelectionModal = () => {
     const [modalSearchQuery, setModalSearchQuery] = useState(searchQuery)
+
+    useEffect(() => {
+      setModalSearchQuery(searchQuery)
+    }, [])
+
     const modalFilteredPhotos = photos.filter((photo) =>
       photo.productName?.toLowerCase().includes(modalSearchQuery.toLowerCase())
     )

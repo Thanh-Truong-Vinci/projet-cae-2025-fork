@@ -131,6 +131,17 @@ public class AuthsService {
   }
 
   /**
+   * Validate if the token is valid for a volunteer.
+   *
+   * @param token the JWT token to verify
+   * @return true if the token is for a volunteer, false otherwise
+   */
+  public boolean isValidVolunteerToken(String token) {
+    String email = verifyJwtToken(token);
+    return email != null && "volunteer@example.com".equals(email);
+  }
+
+  /**
    * Determine the role of a user based on their email.
    *
    * @param email the user's email

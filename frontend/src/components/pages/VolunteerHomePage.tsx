@@ -45,8 +45,12 @@ const VolunteerHomePage = () => {
     )
   }
 
-  const { reservations, fetchAllReservations, toConfirmReservation } =
-    reservationContext
+  const {
+    reservations,
+    fetchAllReservations,
+    toConfirmReservation,
+    cancelReservation,
+  } = reservationContext
 
   useEffect(() => {
     fetchAllReservations()
@@ -148,6 +152,24 @@ const VolunteerHomePage = () => {
         error instanceof Error
           ? error.message
           : 'Erreur lors de la confirmation de la réservation'
+      )
+      setSnackbarSeverity('error')
+    } finally {
+      setOpenSnackbar(true)
+    }
+  }
+
+  // Handle cancel button click for reservations
+  const handleCancelReservation = async (reservationId: number) => {
+    try {
+      await cancelReservation(reservationId)
+      setSnackbarMessage('Réservation annulée avec succès')
+      setSnackbarSeverity('success')
+    } catch (error) {
+      setSnackbarMessage(
+        error instanceof Error
+          ? error.message
+          : "Erreur lors de l'annulation de la réservation"
       )
       setSnackbarSeverity('error')
     } finally {
@@ -351,15 +373,26 @@ const VolunteerHomePage = () => {
                         </Button>
                       </TableCell>
                       <TableCell>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={() =>
-                            handleConfirmReservation(reservation.id)
-                          }
-                        >
-                          Confirmer
-                        </Button>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() =>
+                              handleConfirmReservation(reservation.id)
+                            }
+                          >
+                            Confirmer
+                          </Button>
+                          <Button
+                            variant="contained"
+                            color="error"
+                            onClick={() =>
+                              handleCancelReservation(reservation.id)
+                            }
+                          >
+                            Annuler
+                          </Button>
+                        </Box>
                       </TableCell>
                     </TableRow>
                     {expandedReservationId === reservation.id && (

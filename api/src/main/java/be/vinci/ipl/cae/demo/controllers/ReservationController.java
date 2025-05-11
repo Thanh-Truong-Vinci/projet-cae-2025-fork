@@ -143,7 +143,24 @@ public class ReservationController {
   @PostMapping("/toCancel")
   public ReservationView toCancel(
       @RequestBody Long reservationId, @RequestHeader("Authorization") String token) {
-    return changeReservationStatus(reservationId, token, ReservationStatus.CANCELLED, true);
+    // First check if it's a client
+    Client client = authsService.isValidClientToken(token);
+    
+    // If not a client, check if it's a volunteer
+    boolean isVolunteer = false;
+    if (client == null) {
+      isVolunteer = authsService.isValidVolunteerToken(token);
+      if (!isVolunteer) {
+        throw new ResourceNotFoundException("Token not valid, expired or user is not client or volunteer");
+      }
+    }
+    
+    if (reservationId == null) {
+      throw new ConflictException("Reservation ID is required");
+    }
+    
+    var updatedReservation = reservationService.changeStatus(reservationId, ReservationStatus.CANCELLED);
+    return new ReservationView(updatedReservation);
   }
 
   /**
