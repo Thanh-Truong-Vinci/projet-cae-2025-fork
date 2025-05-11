@@ -110,6 +110,30 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * Handle BadRequestException.
+   *
+   * @param ex the exception.
+   * @param request the request.
+   * @return the response entity.
+   */
+  @ExceptionHandler(BadRequestException.class)
+  public ResponseEntity<?> handleBadRequestException(
+      BadRequestException ex, WebRequest request, HttpServletRequest httpRequest) {
+    ErrorDetails errorDetailsClient =
+        createErrorDetails(HttpStatus.BAD_REQUEST, ex, request, httpRequest, false);
+    ErrorDetails errorDetailsLog =
+        createErrorDetails(HttpStatus.BAD_REQUEST, ex, request, httpRequest, true);
+
+    logger.info("Bad request: {}", errorDetailsLog);
+
+    if (ex.getMessage() == null) {
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    return new ResponseEntity<>(errorDetailsClient, HttpStatus.BAD_REQUEST);
+  }
+
+  /**
    * Handle all other exceptions.
    *
    * @param ex the exception.

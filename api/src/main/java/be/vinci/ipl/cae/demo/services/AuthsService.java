@@ -27,8 +27,10 @@ public class AuthsService {
   private final ManagerRepository managerRepository;
   private final ProducerRepository producerRepository;
   private final BCryptPasswordEncoder passwordEncoder;
+
   @Value("${JWT_SECRET}")
   private String jwtSecret;
+
   private Algorithm algorithm;
 
   /** Service for handling authentication-related operations. */
@@ -45,6 +47,11 @@ public class AuthsService {
     this.passwordEncoder = passwordEncoder;
   }
 
+  /**
+   * Encrypts the secret.
+   *
+   * @param jwtSecret le secret
+   */
   @Value("${JWT_SECRET}")
   public void setJwtSecret(String jwtSecret) {
     this.jwtSecret = jwtSecret;
@@ -156,7 +163,7 @@ public class AuthsService {
    */
   public boolean isValidVolunteerToken(String token) {
     String email = verifyJwtToken(token);
-    return email != null && "volunteer@example.com".equals(email);
+    return "volunteer@example.com".equals(email);
   }
 
   /**
@@ -266,7 +273,7 @@ public class AuthsService {
     }
   }
 
-  /** Security constants for PreAuthorize expressions. */
+  /** Classe utilitaire contenant les constantes pour les autorisations de sécurité. */
   public static final class SecurityConstants {
 
     public static final String HAS_ROLE_CLIENT = "hasRole('ROLE_CLIENT')";
@@ -275,6 +282,7 @@ public class AuthsService {
     public static final String HAS_ROLE_VOLUNTEER = "hasRole('ROLE_VOLUNTEER')";
     public static final String HAS_ROLE_ADMIN = "hasRole('ROLE_ADMIN')";
 
-    private SecurityConstants() {}
+    private SecurityConstants() {
+    }
   }
 }

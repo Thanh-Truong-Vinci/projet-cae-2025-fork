@@ -265,6 +265,31 @@ public class BatchService {
   }
 
   /**
+   * Réduit la quantité disponible d'un lot.
+   *
+   * @param id l'ID du lot
+   * @param quantity la quantité à réduire (doit être positive)
+   * @return le lot mis à jour ou null si non trouvé ou quantité insuffisante
+   */
+  public Batch reduceQuantity(long id, int quantity) {
+    Batch batch = batchRepository.findById(id).orElse(null);
+    if (batch == null) {
+      return null;
+    }
+
+    if (batch.getStatus() != BatchStatus.RECEIVED) {
+      return null; // Le lot doit être à l'état RECEIVED
+    }
+
+    if (batch.getAvailableQuantity() < quantity) {
+      return null; // Quantité insuffisante
+    }
+
+    batch.setAvailableQuantity(batch.getAvailableQuantity() - quantity);
+    return batchRepository.save(batch);
+  }
+
+  /**
    * Récupère tous les lots ayant le statut APPROVED.
    *
    * @return la liste des lots approuvés

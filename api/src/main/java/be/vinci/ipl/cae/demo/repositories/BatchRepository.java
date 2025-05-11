@@ -59,7 +59,7 @@ public interface BatchRepository extends CrudRepository<Batch, Long> {
   List<Batch> findByStatusAndAvailableQuantityGreaterThan(BatchStatus status, int quantity);
 
   /**
-   * Finds batches by product id
+   * Finds batches by product id.
    *
    * @return the batch
    */

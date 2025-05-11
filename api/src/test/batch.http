@@ -81,6 +81,25 @@ Content-Type: application/json
 
 --boundary--
 
+#### Create a photo with the admin token
+POST {{baseUrl}}/photo
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="photo"
+Content-Type: application/json
+
+{
+  "product":"Tomate Voyage"
+}
+--boundary
+Content-Disposition: form-data; name="image"; filename="kate-laine-FDjlnM1RTsI-unsplash.jpg"
+Content-Type: image/jpg
+
+< ./kate-laine-FDjlnM1RTsI-unsplash.jpg
+
+--boundary--
+
 ### Obtenir les batchs du producteur connecté
 POST {{baseUrl}}/batches/mybatches
 Content-Type: application/json

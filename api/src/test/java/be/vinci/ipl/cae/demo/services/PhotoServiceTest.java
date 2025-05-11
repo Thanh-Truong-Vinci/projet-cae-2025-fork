@@ -2,7 +2,7 @@ package be.vinci.ipl.cae.demo.services;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 import be.vinci.ipl.cae.demo.models.entities.Photo;
 import be.vinci.ipl.cae.demo.repositories.PhotoRepository;

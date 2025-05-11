@@ -26,12 +26,14 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Avatar,
 } from '@mui/material'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import ExpandMoreIcon from '@mui/icons-material/ExpandLess'
 import ExpandLessIcon from '@mui/icons-material/ExpandMore'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import { UserContext } from '../../contexts/UserContext'
 import { ReservationContext } from '../../contexts/ReservationContext'
 import { ProductBatch, ReservationStatus } from '../../types'
@@ -80,6 +82,10 @@ const VolunteerHomePage = () => {
   >([])
   const [, setLoadingAgglomerated] = useState<boolean>(false)
 
+  const [openStockDialog, setOpenStockDialog] = useState(false)
+  const [selectedStockBatchId, setSelectedStockBatchId] = useState<number | null>(null)
+  const [stockReductionQuantity, setStockReductionQuantity] = useState(1)
+
   const fetchAgglomeratedProducts = useCallback(async () => {
     try {
       setLoadingAgglomerated(true)
@@ -117,6 +123,25 @@ const VolunteerHomePage = () => {
     try {
       await fetchAgglomeratedProducts()
       setOpenVenteLibreDialog(true)
+    } catch (err) {
+      console.error('Erreur chargement produits:', err)
+      setSnackbarMessage(
+        err instanceof Error
+          ? `Erreur: ${err.message}`
+          : 'Erreur lors du chargement des produits disponibles'
+      )
+      setSnackbarSeverity('error')
+      setOpenSnackbar(true)
+    } finally {
+      setLoadingReceivedBatches(false)
+    }
+  }
+
+  const handleOpenStockReduction = async () => {
+    setLoadingReceivedBatches(true)
+    try {
+      await fetchAgglomeratedProducts()
+      setOpenStockDialog(true)
     } catch (err) {
       console.error('Erreur chargement produits:', err)
       setSnackbarMessage(
@@ -248,6 +273,81 @@ const VolunteerHomePage = () => {
         error instanceof Error
           ? error.message
           : 'Erreur lors de la création de la vente libre'
+      )
+      setSnackbarSeverity('error')
+    } finally {
+      setOpenSnackbar(true)
+    }
+  }
+
+  const handleConfirmStockReduction = async () => {
+    if (!selectedStockBatchId || stockReductionQuantity <= 0) {
+      setSnackbarMessage('Veuillez sélectionner un produit et une quantité valide')
+      setSnackbarSeverity('error')
+      setOpenSnackbar(true)
+      return
+    }
+
+    const selectedProduct = agglomeratedProducts.find(
+      (p) => p.productId === selectedStockBatchId
+    )
+
+    if (!selectedProduct) {
+      setSnackbarMessage('Produit non trouvé')
+      setSnackbarSeverity('error')
+      setOpenSnackbar(true)
+      return
+    }
+
+    // Fermer le dialogue et réinitialiser les états
+    setOpenStockDialog(false)
+    setSelectedStockBatchId(null)
+    setStockReductionQuantity(1)
+
+    let remainingQuantity = stockReductionQuantity
+
+    try {
+      // Parcourir les lots et réduire la quantité
+      for (let i = 0; i < selectedProduct.batchIds.length; i++) {
+        if (remainingQuantity <= 0) break
+
+        const batchId = selectedProduct.batchIds[i]
+        const availableQuantity = selectedProduct.batchQuantities[i]
+
+        // Calculer combien prendre de ce lot
+        const quantityFromThisBatch = Math.min(remainingQuantity, availableQuantity)
+
+        // Appel API pour réduire la quantité
+        const response = await fetch(`/api/batches/${batchId}/reduce-quantity?quantity=${quantityFromThisBatch}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: authenticatedUser?.token || '',
+          },
+        })
+
+        if (!response.ok) {
+          throw new Error(`Erreur: ${response.status}`)
+        }
+
+        // Réduire la quantité restante à traiter
+        remainingQuantity -= quantityFromThisBatch
+      }
+
+      // Afficher un message de succès
+      setSnackbarMessage('Quantité retirée du stock avec succès')
+      setSnackbarSeverity('success')
+
+      // Rafraîchir les données après un court délai
+      setTimeout(() => {
+        fetchAgglomeratedProducts().catch(console.error)
+      }, 500)
+    } catch (error) {
+      console.error('Erreur lors de la réduction de stock:', error)
+      setSnackbarMessage(
+        error instanceof Error
+          ? error.message
+          : 'Erreur lors de la réduction de stock'
       )
       setSnackbarSeverity('error')
     } finally {
@@ -435,7 +535,7 @@ const VolunteerHomePage = () => {
         )}
       </Paper>
 
-      <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, my: 4 }}>
         <Button
           variant="contained"
           color="secondary"
@@ -445,6 +545,17 @@ const VolunteerHomePage = () => {
           sx={{ py: 1.5, px: 4, fontWeight: 'bold' }}
         >
           Vente libre
+        </Button>
+        
+        <Button
+          variant="contained"
+          color="warning"
+          size="large"
+          startIcon={<RemoveCircleOutlineIcon />}
+          onClick={handleOpenStockReduction}
+          sx={{ py: 1.5, px: 4, fontWeight: 'bold' }}
+        >
+          Retirer du stock
         </Button>
       </Box>
 
@@ -631,6 +742,94 @@ const VolunteerHomePage = () => {
             disabled={!selectedVenteBatchId || venteLibreQuantity <= 0}
           >
             Confirmer la vente
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openStockDialog}
+        onClose={() => setOpenStockDialog(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>Retirer des produits du stock</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ mb: 2 }}>
+            Sélectionnez un produit et une quantité à retirer du stock (pertes, produits périmés, etc.).
+          </DialogContentText>
+          
+          {loadingReceivedBatches ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+              <CircularProgress />
+            </Box>
+          ) : agglomeratedProducts.length === 0 ? (
+            <Alert severity="info">
+              Aucun produit disponible en stock pour le retrait.
+            </Alert>
+          ) : (
+            <Box sx={{ mt: 2 }}>
+              <FormControl fullWidth sx={{ mb: 2 }}>
+                <InputLabel>Produit</InputLabel>
+                <Select
+                  value={selectedStockBatchId || ''}
+                  onChange={(e) => setSelectedStockBatchId(e.target.value as number)}
+                  label="Produit"
+                >
+                  {agglomeratedProducts.map((product) => (
+                    <MenuItem key={product.productId} value={product.productId}>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        {product.imageLocation && (
+                          <Avatar
+                            src={product.imageLocation}
+                            alt={product.productName}
+                            sx={{ width: 40, height: 40, mr: 2 }}
+                          />
+                        )}
+                        <div>
+                          <Typography variant="subtitle1">
+                            {product.productName} ({product.companyName})
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {product.totalQuantity} {product.saleUnit} disponible - {product.unitPrice.toFixed(2)}€/{product.saleUnit}
+                          </Typography>
+                        </div>
+                      </Box>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              {selectedStockBatchId && (
+                <TextField
+                  label="Quantité à retirer"
+                  type="number"
+                  value={stockReductionQuantity}
+                  onChange={(e) => setStockReductionQuantity(Math.max(1, parseInt(e.target.value) || 0))}
+                  fullWidth
+                  InputProps={{ inputProps: { min: 1 } }}
+                  helperText={
+                    selectedStockBatchId
+                      ? `Quantité maximale disponible: ${
+                          agglomeratedProducts.find(
+                            (p) => p.productId === selectedStockBatchId
+                          )?.totalQuantity || 0
+                        }`
+                      : ''
+                  }
+                />
+              )}
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenStockDialog(false)}>Annuler</Button>
+          <Button
+            onClick={handleConfirmStockReduction}
+            variant="contained"
+            color="primary"
+            disabled={!selectedStockBatchId || stockReductionQuantity <= 0}
+          >
+            Confirmer
           </Button>
         </DialogActions>
       </Dialog>

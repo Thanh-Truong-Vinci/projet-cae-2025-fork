@@ -39,6 +39,9 @@ public interface NotificationRepository extends CrudRepository<Notification, Lon
    */
   @Modifying
   @Query(
-      "UPDATE Notification n SET n.read = true WHERE n.producer.id = :producerId AND n.read = false")
+      "UPDATE Notification n "
+          + "SET n.read = true "
+          + "WHERE n.producer.id = :producerId "
+          + "AND n.read = false")
   int markAllAsRead(@Param("producerId") Long producerId);
 }

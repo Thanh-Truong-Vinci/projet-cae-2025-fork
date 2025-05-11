@@ -27,7 +27,6 @@ public class ProfileService {
    * @param email the email that wants to change his password
    * @param currentPassword the current password
    * @param newPassword the new password
-   * @return 1 if the password changes, 0 otherwise
    */
   public void changePassword(String email, String currentPassword, String newPassword) {
     if (!passwordEncoder.matches(

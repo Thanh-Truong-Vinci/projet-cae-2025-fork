@@ -80,23 +80,23 @@ public class ReservationService {
     reservation.setReservationDate(LocalDate.now());
     reservation.setSaleDate(LocalDate.now());
     reservation.setPrice(0.0);
-    
+
     // Save initially
     reservation = reservationRepository.save(reservation);
-    
+
     // Add the product
     reservationLineService.addProduct(reservation, batch, quantity);
-    
+
     // Calculate price directly based on what we just added
     double totalCost = quantity * batch.getUnitPrice();
     reservation.setPrice(totalCost);
-    
+
     // Save the updated price
     reservation = reservationRepository.save(reservation);
-    
+
     // IMPORTANT: Initialize an empty list for the lines to avoid NPE in the view constructor
     if (reservation.getReservationLines() == null) {
-      List<ReservationLine> lines = new ArrayList<>();
+      final List<ReservationLine> lines = new ArrayList<>();
       
       // Create a single ReservationLine that matches what we saved to the database
       ReservationLine line = new ReservationLine();
@@ -105,11 +105,11 @@ public class ReservationService {
       line.setQuantity(quantity);
       line.setReservation(reservation);
       lines.add(line);
-      
+
       // Set this list on the reservation object that will be used to create the view
       reservation.setReservationLines(lines);
     }
-    
+
     return reservation;
   }
 

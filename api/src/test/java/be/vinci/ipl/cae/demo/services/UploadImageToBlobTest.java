@@ -1,10 +1,10 @@
 package be.vinci.ipl.cae.demo.services;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.anyString;
 
 import be.vinci.ipl.cae.demo.repositories.PhotoRepository;
 import com.azure.storage.blob.BlobClient;

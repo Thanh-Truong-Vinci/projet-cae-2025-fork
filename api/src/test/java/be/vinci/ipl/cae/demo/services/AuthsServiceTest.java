@@ -56,339 +56,339 @@ public class AuthsServiceTest {
     // For example:
     lenient().when(userRepository.findByEmail("admin@example.com")).thenReturn(mockUser);
 
-        // C'est la bonne approche pour une classe abstraite
-        mockUser = mock(User.class);
-        when(mockUser.getEmail()).thenReturn("test@example.com");
-        when(mockUser.getPassword()).thenReturn("hashedPassword");
-        when(mockUser.getName()).thenReturn("Test");
-        when(mockUser.getFirstname()).thenReturn("User");
-        
-        // Les autres initialisations peuvent rester avec new car ces classes sont concrètes
-        mockClient = new Client();
-        mockClient.setEmail("client@example.com");
-        mockClient.setPassword("hashedPassword");
-        mockClient.setName("Client");
-        mockClient.setFirstname("User");
-        
-        mockProducer = new Producer();
-        mockProducer.setEmail("producer@example.com");
-        mockProducer.setPassword("hashedPassword");
-        mockProducer.setName("Producer");
-        mockProducer.setFirstname("User");
-        
-        mockManager = new Manager();
-        mockManager.setEmail("manager@example.com");
-        mockManager.setPassword("hashedPassword");
-        mockManager.setName("Manager");
-        mockManager.setFirstname("User");
-        
-        // Set the JWT secret for testing
-        authsService.setJwtSecret("test_jwt_secret");
-    }
-    
-    @Test
-    void createJwtToken_NullEmail_ReturnsNull() {
-        // Act
-        String token = authsService.createJwtToken(null);
-        
-        // Assert
-        assertNull(token);
-    }
-    
-    @Test
-    void createJwtToken_BlankEmail_ReturnsNull() {
-        // Act
-        String token = authsService.createJwtToken("  ");
-        
-        // Assert
-        assertNull(token);
-    }
-    
-    @Test
-    void verifyJwtToken_NullToken_ReturnsNull() {
-        // Act
-        String result = authsService.verifyJwtToken(null);
-        
-        // Assert
-        assertNull(result);
-    }
-    
-    @Test
-    void verifyJwtToken_BlankToken_ReturnsNull() {
-        // Act
-        String result = authsService.verifyJwtToken("  ");
-        
-        // Assert
-        assertNull(result);
-    }
-    
-    @Test
-    void verifyJwtToken_InvalidToken_ReturnsNull() {
-        // Act
-        String result = authsService.verifyJwtToken("invalid.token.format");
-        
-        // Assert
-        assertNull(result);
-    }
-    
-    @Test
-    void isValidClientToken_ValidTokenAndClientExists_ReturnsClient() {
-        // Arrange
-        String email = "client@example.com";
-        String token = authsService.createJwtToken(email);
-        
-        when(clientRepository.findByEmail(email)).thenReturn(mockClient);
-        
-        // Act
-        Client result = authsService.isValidClientToken(token);
-        
-        // Assert
-        assertNotNull(result);
-        assertEquals(email, result.getEmail());
-        verify(clientRepository).findByEmail(email);
-    }
-    
-    @Test
-    void isValidClientToken_ValidTokenButClientDoesNotExist_ReturnsNull() {
-        // Arrange
-        String email = "nonexistent@example.com";
-        String token = authsService.createJwtToken(email);
-        
-        when(clientRepository.findByEmail(email)).thenReturn(null);
-        
-        // Act
-        Client result = authsService.isValidClientToken(token);
-        
-        // Assert
-        assertNull(result);
-        verify(clientRepository).findByEmail(email);
-    }
-    
-    @Test
-    void isValidClientToken_InvalidToken_ReturnsNull() {
-        // Act
-        Client result = authsService.isValidClientToken("invalid.token");
-        
-        // Assert
-        assertNull(result);
-        verify(clientRepository, never()).findByEmail(anyString());
-    }
-    
-    @Test
-    void isValidProducerToken_ValidTokenAndProducerExists_ReturnsProducer() {
-        // Arrange
-        String email = "producer@example.com";
-        String token = authsService.createJwtToken(email);
-        
-        when(producerRepository.findByEmail(email)).thenReturn(mockProducer);
-        
-        // Act
-        Producer result = authsService.isValidProducerToken(token);
-        
-        // Assert
-        assertNotNull(result);
-        assertEquals(email, result.getEmail());
-        verify(producerRepository).findByEmail(email);
-    }
-    
-    @Test
-    void isValidProducerToken_ValidTokenButProducerDoesNotExist_ReturnsNull() {
-        // Arrange
-        String email = "nonexistent@example.com";
-        String token = authsService.createJwtToken(email);
-        
-        when(producerRepository.findByEmail(email)).thenReturn(null);
-        
-        // Act
-        Producer result = authsService.isValidProducerToken(token);
-        
-        // Assert
-        assertNull(result);
-        verify(producerRepository).findByEmail(email);
-    }
-    
-    @Test
-    void isValidProducerToken_InvalidToken_ReturnsNull() {
-        // Act
-        Producer result = authsService.isValidProducerToken("invalid.token");
-        
-        // Assert
-        assertNull(result);
-        verify(producerRepository, never()).findByEmail(anyString());
-    }
-    
-    @Test
-    void isValidManagerToken_ValidTokenAndManagerExists_ReturnsManager() {
-        // Arrange
-        String email = "manager@example.com";
-        String token = authsService.createJwtToken(email);
-        
-        when(managerRepository.findByEmail(email)).thenReturn(mockManager);
-        
-        // Act
-        Manager result = authsService.isValidManagerToken(token);
-        
-        // Assert
-        assertNotNull(result);
-        assertEquals(email, result.getEmail());
-        verify(managerRepository).findByEmail(email);
-    }
-    
-    @Test
-    void isValidManagerToken_ValidTokenButManagerDoesNotExist_ReturnsNull() {
-        // Arrange
-        String email = "nonexistent@example.com";
-        String token = authsService.createJwtToken(email);
-        
-        when(managerRepository.findByEmail(email)).thenReturn(null);
-        
-        // Act
-        Manager result = authsService.isValidManagerToken(token);
-        
-        // Assert
-        assertNull(result);
-        verify(managerRepository).findByEmail(email);
-    }
-    
-    @Test
-    void isValidManagerToken_InvalidToken_ReturnsNull() {
-        // Act
-        Manager result = authsService.isValidManagerToken("invalid.token");
-        
-        // Assert
-        assertNull(result);
-        verify(managerRepository, never()).findByEmail(anyString());
-    }
-    
-    @Test
-    void determineUserRole_ClientEmail_ReturnsClientRole() {
-        // Arrange
-        String email = "client@example.com";
-        when(clientRepository.findByEmail(email)).thenReturn(mockClient);
-        
-        // Act
-        String result = authsService.determineUserRole(email);
-        
-        // Assert
-        assertEquals("Client", result);
-    }
-    
-    @Test
-    void determineUserRole_ProducerEmail_ReturnsProducerRole() {
-        // Arrange
-        String email = "producer@example.com";
-        when(clientRepository.findByEmail(email)).thenReturn(null);
-        when(managerRepository.findByEmail(email)).thenReturn(null);
-        when(producerRepository.findByEmail(email)).thenReturn(mockProducer);
-        
-        // Act
-        String result = authsService.determineUserRole(email);
-        
-        // Assert
-        assertEquals("Producer", result);
-    }
-    
-    @Test
-    void determineUserRole_ManagerEmail_ReturnsManagerRole() {
-        // Arrange
-        String email = "manager@example.com";
-        when(clientRepository.findByEmail(email)).thenReturn(null);
-        when(managerRepository.findByEmail(email)).thenReturn(mockManager);
-        
-        // Act
-        String result = authsService.determineUserRole(email);
-        
-        // Assert
-        assertEquals("Manager", result);
-    }
-    
-    @Test
-    void determineUserRole_VolunteerEmail_ReturnsVolunteerRole() {
-        // Arrange
-        String email = "volunteer@example.com";
-        
-        // Act
-        String result = authsService.determineUserRole(email);
-        
-        // Assert
-        assertEquals("Volunteer", result);
-    }
-    
-    @Test
-    void determineUserRole_AdminEmail_ReturnsAdminRole() {
-        // Arrange
-        String email = "admin@admin.com";
-        when(clientRepository.findByEmail(email)).thenReturn(null);
-        when(managerRepository.findByEmail(email)).thenReturn(null);
-        when(producerRepository.findByEmail(email)).thenReturn(null);
-        
-        // Act
-        String result = authsService.determineUserRole(email);
-        
-        // Assert
-        assertEquals("Admin", result);
-    }
-    
-    @Test
-    void determineUserRole_UnknownEmail_ReturnsUnknownRole() {
-        // Arrange
-        String email = "unknown@example.com";
-        when(clientRepository.findByEmail(email)).thenReturn(null);
-        when(managerRepository.findByEmail(email)).thenReturn(null);
-        when(producerRepository.findByEmail(email)).thenReturn(null);
-        
-        // Act
-        String result = authsService.determineUserRole(email);
-        
-        // Assert
-        assertEquals("Unknown", result);
-    }
-    
-    @Test
-    void determineUserRoleEnum_ClientEmail_ReturnsClientRole() {
-        // Arrange
-        String email = "client@example.com";
-        when(clientRepository.findByEmail(email)).thenReturn(mockClient);
-        
-        // Act
-        Role result = authsService.determineUserRoleEnum(email);
-        
-        // Assert
-        assertEquals(Role.CLIENT, result);
-    }
-    
-    @Test
-    void login_NonexistentUser_ReturnsNull() {
-        // Arrange
-        String email = "nonexistent@example.com";
-        String password = "password";
-        
-        when(userRepository.findByEmail(email)).thenReturn(null);
-        
-        // Act
-        AuthenticatedUser result = authsService.login(email, password);
-        
-        // Assert
-        assertNull(result);
-        verify(passwordEncoder, never()).matches(anyString(), anyString());
-    }
-    
-    @Test
-    void login_InvalidPassword_ReturnsNull() {
-        // Arrange
-        String email = "test@example.com";
-        String password = "wrongpassword";
-        
-        when(userRepository.findByEmail(email)).thenReturn(mockUser);
-        when(passwordEncoder.matches(password, mockUser.getPassword())).thenReturn(false);
-        
-        // Act
-        AuthenticatedUser result = authsService.login(email, password);
-        
-        // Assert
-        assertNull(result);
-        verify(passwordEncoder).matches(password, mockUser.getPassword());
-    }
+    // C'est la bonne approche pour une classe abstraite
+    mockUser = mock(User.class);
+    when(mockUser.getEmail()).thenReturn("test@example.com");
+    when(mockUser.getPassword()).thenReturn("hashedPassword");
+    when(mockUser.getName()).thenReturn("Test");
+    when(mockUser.getFirstname()).thenReturn("User");
+
+    // Les autres initialisations peuvent rester avec new car ces classes sont concrètes
+    mockClient = new Client();
+    mockClient.setEmail("client@example.com");
+    mockClient.setPassword("hashedPassword");
+    mockClient.setName("Client");
+    mockClient.setFirstname("User");
+
+    mockProducer = new Producer();
+    mockProducer.setEmail("producer@example.com");
+    mockProducer.setPassword("hashedPassword");
+    mockProducer.setName("Producer");
+    mockProducer.setFirstname("User");
+
+    mockManager = new Manager();
+    mockManager.setEmail("manager@example.com");
+    mockManager.setPassword("hashedPassword");
+    mockManager.setName("Manager");
+    mockManager.setFirstname("User");
+
+    // Set the JWT secret for testing
+    authsService.setJwtSecret("test_jwt_secret");
+  }
+
+  @Test
+  void createJwtToken_NullEmail_ReturnsNull() {
+    // Act
+    String token = authsService.createJwtToken(null);
+
+    // Assert
+    assertNull(token);
+  }
+
+  @Test
+  void createJwtToken_BlankEmail_ReturnsNull() {
+    // Act
+    String token = authsService.createJwtToken("  ");
+
+    // Assert
+    assertNull(token);
+  }
+
+  @Test
+  void verifyJwtToken_NullToken_ReturnsNull() {
+    // Act
+    String result = authsService.verifyJwtToken(null);
+
+    // Assert
+    assertNull(result);
+  }
+
+  @Test
+  void verifyJwtToken_BlankToken_ReturnsNull() {
+    // Act
+    String result = authsService.verifyJwtToken("  ");
+
+    // Assert
+    assertNull(result);
+  }
+
+  @Test
+  void verifyJwtToken_InvalidToken_ReturnsNull() {
+    // Act
+    String result = authsService.verifyJwtToken("invalid.token.format");
+
+    // Assert
+    assertNull(result);
+  }
+
+  @Test
+  void isValidClientToken_ValidTokenAndClientExists_ReturnsClient() {
+    // Arrange
+    String email = "client@example.com";
+    String token = authsService.createJwtToken(email);
+
+    when(clientRepository.findByEmail(email)).thenReturn(mockClient);
+
+    // Act
+    Client result = authsService.isValidClientToken(token);
+
+    // Assert
+    assertNotNull(result);
+    assertEquals(email, result.getEmail());
+    verify(clientRepository).findByEmail(email);
+  }
+
+  @Test
+  void isValidClientToken_ValidTokenButClientDoesNotExist_ReturnsNull() {
+    // Arrange
+    String email = "nonexistent@example.com";
+    String token = authsService.createJwtToken(email);
+
+    when(clientRepository.findByEmail(email)).thenReturn(null);
+
+    // Act
+    Client result = authsService.isValidClientToken(token);
+
+    // Assert
+    assertNull(result);
+    verify(clientRepository).findByEmail(email);
+  }
+
+  @Test
+  void isValidClientToken_InvalidToken_ReturnsNull() {
+    // Act
+    Client result = authsService.isValidClientToken("invalid.token");
+
+    // Assert
+    assertNull(result);
+    verify(clientRepository, never()).findByEmail(anyString());
+  }
+
+  @Test
+  void isValidProducerToken_ValidTokenAndProducerExists_ReturnsProducer() {
+    // Arrange
+    String email = "producer@example.com";
+    String token = authsService.createJwtToken(email);
+
+    when(producerRepository.findByEmail(email)).thenReturn(mockProducer);
+
+    // Act
+    Producer result = authsService.isValidProducerToken(token);
+
+    // Assert
+    assertNotNull(result);
+    assertEquals(email, result.getEmail());
+    verify(producerRepository).findByEmail(email);
+  }
+
+  @Test
+  void isValidProducerToken_ValidTokenButProducerDoesNotExist_ReturnsNull() {
+    // Arrange
+    String email = "nonexistent@example.com";
+    String token = authsService.createJwtToken(email);
+
+    when(producerRepository.findByEmail(email)).thenReturn(null);
+
+    // Act
+    Producer result = authsService.isValidProducerToken(token);
+
+    // Assert
+    assertNull(result);
+    verify(producerRepository).findByEmail(email);
+  }
+
+  @Test
+  void isValidProducerToken_InvalidToken_ReturnsNull() {
+    // Act
+    Producer result = authsService.isValidProducerToken("invalid.token");
+
+    // Assert
+    assertNull(result);
+    verify(producerRepository, never()).findByEmail(anyString());
+  }
+
+  @Test
+  void isValidManagerToken_ValidTokenAndManagerExists_ReturnsManager() {
+    // Arrange
+    String email = "manager@example.com";
+    String token = authsService.createJwtToken(email);
+
+    when(managerRepository.findByEmail(email)).thenReturn(mockManager);
+
+    // Act
+    Manager result = authsService.isValidManagerToken(token);
+
+    // Assert
+    assertNotNull(result);
+    assertEquals(email, result.getEmail());
+    verify(managerRepository).findByEmail(email);
+  }
+
+  @Test
+  void isValidManagerToken_ValidTokenButManagerDoesNotExist_ReturnsNull() {
+    // Arrange
+    String email = "nonexistent@example.com";
+    String token = authsService.createJwtToken(email);
+
+    when(managerRepository.findByEmail(email)).thenReturn(null);
+
+    // Act
+    Manager result = authsService.isValidManagerToken(token);
+
+    // Assert
+    assertNull(result);
+    verify(managerRepository).findByEmail(email);
+  }
+
+  @Test
+  void isValidManagerToken_InvalidToken_ReturnsNull() {
+    // Act
+    Manager result = authsService.isValidManagerToken("invalid.token");
+
+    // Assert
+    assertNull(result);
+    verify(managerRepository, never()).findByEmail(anyString());
+  }
+
+  @Test
+  void determineUserRole_ClientEmail_ReturnsClientRole() {
+    // Arrange
+    String email = "client@example.com";
+    when(clientRepository.findByEmail(email)).thenReturn(mockClient);
+
+    // Act
+    String result = authsService.determineUserRole(email);
+
+    // Assert
+    assertEquals("Client", result);
+  }
+
+  @Test
+  void determineUserRole_ProducerEmail_ReturnsProducerRole() {
+    // Arrange
+    String email = "producer@example.com";
+    when(clientRepository.findByEmail(email)).thenReturn(null);
+    when(managerRepository.findByEmail(email)).thenReturn(null);
+    when(producerRepository.findByEmail(email)).thenReturn(mockProducer);
+
+    // Act
+    String result = authsService.determineUserRole(email);
+
+    // Assert
+    assertEquals("Producer", result);
+  }
+
+  @Test
+  void determineUserRole_ManagerEmail_ReturnsManagerRole() {
+    // Arrange
+    String email = "manager@example.com";
+    when(clientRepository.findByEmail(email)).thenReturn(null);
+    when(managerRepository.findByEmail(email)).thenReturn(mockManager);
+
+    // Act
+    String result = authsService.determineUserRole(email);
+
+    // Assert
+    assertEquals("Manager", result);
+  }
+
+  @Test
+  void determineUserRole_VolunteerEmail_ReturnsVolunteerRole() {
+    // Arrange
+    String email = "volunteer@example.com";
+
+    // Act
+    String result = authsService.determineUserRole(email);
+
+    // Assert
+    assertEquals("Volunteer", result);
+  }
+
+  @Test
+  void determineUserRole_AdminEmail_ReturnsAdminRole() {
+    // Arrange
+    String email = "admin@admin.com";
+    when(clientRepository.findByEmail(email)).thenReturn(null);
+    when(managerRepository.findByEmail(email)).thenReturn(null);
+    when(producerRepository.findByEmail(email)).thenReturn(null);
+
+    // Act
+    String result = authsService.determineUserRole(email);
+
+    // Assert
+    assertEquals("Admin", result);
+  }
+
+  @Test
+  void determineUserRole_UnknownEmail_ReturnsUnknownRole() {
+    // Arrange
+    String email = "unknown@example.com";
+    when(clientRepository.findByEmail(email)).thenReturn(null);
+    when(managerRepository.findByEmail(email)).thenReturn(null);
+    when(producerRepository.findByEmail(email)).thenReturn(null);
+
+    // Act
+    String result = authsService.determineUserRole(email);
+
+    // Assert
+    assertEquals("Unknown", result);
+  }
+
+  @Test
+  void determineUserRoleEnum_ClientEmail_ReturnsClientRole() {
+    // Arrange
+    String email = "client@example.com";
+    when(clientRepository.findByEmail(email)).thenReturn(mockClient);
+
+    // Act
+    Role result = authsService.determineUserRoleEnum(email);
+
+    // Assert
+    assertEquals(Role.CLIENT, result);
+  }
+
+  @Test
+  void login_NonexistentUser_ReturnsNull() {
+    // Arrange
+    String email = "nonexistent@example.com";
+    String password = "password";
+
+    when(userRepository.findByEmail(email)).thenReturn(null);
+
+    // Act
+    AuthenticatedUser result = authsService.login(email, password);
+
+    // Assert
+    assertNull(result);
+    verify(passwordEncoder, never()).matches(anyString(), anyString());
+  }
+
+  @Test
+  void login_InvalidPassword_ReturnsNull() {
+    // Arrange
+    String email = "test@example.com";
+    String password = "wrongpassword";
+
+    when(userRepository.findByEmail(email)).thenReturn(mockUser);
+    when(passwordEncoder.matches(password, mockUser.getPassword())).thenReturn(false);
+
+    // Act
+    AuthenticatedUser result = authsService.login(email, password);
+
+    // Assert
+    assertNull(result);
+    verify(passwordEncoder).matches(password, mockUser.getPassword());
+  }
 
   @Test
   void login_ValidCredentials_ReturnsFullAuthenticatedUser() {

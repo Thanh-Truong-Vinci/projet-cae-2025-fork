@@ -20,6 +20,7 @@ Content-Type: image/jpg
 < ./miel.png
 
 --boundary--
+
 #### Create a photo with the admin token
 POST http://localhost:3000/photo
 Content-Type: multipart/form-data; boundary=boundary
@@ -57,6 +58,7 @@ Content-Type: image/jpg
 < ./k8-GHRT9j21m2M-unsplash.jpg
 
 --boundary--
+
 #### Create a photo with the admin token
 POST http://localhost:3000/photo
 Content-Type: multipart/form-data; boundary=boundary
@@ -75,6 +77,7 @@ Content-Type: image/jpg
 < ./maria-kovalets-yZkyPWxFAJk-unsplash.jpg
 
 --boundary--
+
 #### Create a photo with the admin token
 POST http://localhost:3000/photo
 Content-Type: multipart/form-data; boundary=boundary
@@ -93,6 +96,7 @@ Content-Type: image/jpg
 < ./neha-deshmukh-GoKXJaQoLQs-unsplash.jpg
 
 --boundary--
+
 #### Create a photo with the admin token
 POST http://localhost:3000/photo
 Content-Type: multipart/form-data; boundary=boundary

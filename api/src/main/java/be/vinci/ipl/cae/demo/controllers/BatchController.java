@@ -1,5 +1,6 @@
 package be.vinci.ipl.cae.demo.controllers;
 
+import be.vinci.ipl.cae.demo.exceptions.BadRequestException;
 import be.vinci.ipl.cae.demo.exceptions.ConflictException;
 import be.vinci.ipl.cae.demo.exceptions.ResourceNotFoundException;
 import be.vinci.ipl.cae.demo.models.dtos.NewBatch;
@@ -415,5 +416,32 @@ public class BatchController {
   @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
   public List<ManagerBatchView> getPendingBatches() {
     return batchService.getPendingBatches();
+  }
+
+  /**
+   * Réduit la quantité disponible d'un lot (pour retrait du stock).
+   *
+   * @param id l'identifiant du lot
+   * @param quantity la quantité à retirer
+   * @return le lot mis à jour
+   */
+  @PatchMapping("/{id}/reduce-quantity")
+  @PreAuthorize(SecurityConstants.HAS_ROLE_VOLUNTEER)
+  public Batch reduceQuantity(
+      @PathVariable long id,
+      @RequestParam int quantity,
+      @RequestHeader("Authorization") String token) {
+
+    if (quantity <= 0) {
+      throw new BadRequestException("La quantité à réduire doit être positive");
+    }
+
+    Batch batch = batchService.reduceQuantity(id, quantity);
+
+    if (batch == null) {
+      throw new ResourceNotFoundException("Lot non trouvé ou quantité insuffisante");
+    }
+
+    return batch;
   }
 }
