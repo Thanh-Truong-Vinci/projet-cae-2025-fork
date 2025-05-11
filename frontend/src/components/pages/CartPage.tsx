@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from 'react'
+import { useContext, useState, useEffect, useRef } from 'react'
 import {
   Box,
   Typography,
@@ -28,7 +28,8 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { useNavigate } from 'react-router-dom'
 import { UserContext } from '../../contexts/UserContext'
 import { ReservationContext } from '../../contexts/ReservationContext'
-import { ReservationStatus, ReservationView } from '../../types'
+import { BatchContext } from '../../contexts/BatchContext'
+import { ReservationStatus, ReservationView, Batch } from '../../types'
 
 const CartPage = () => {
   const { authenticatedUser } = useContext(UserContext)
@@ -39,9 +40,18 @@ const CartPage = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false)
   const [message, setMessage] = useState('')
   const reservationContext = useContext(ReservationContext)
+  const batchContext = useContext(BatchContext)
   const [reservation, setReservation] = useState<ReservationView | null>(null)
   const [fetchTimestamp, setFetchTimestamp] = useState(0)
+  const [maxQuantities, setMaxQuantities] = useState<{
+    [lineId: number]: number
+  }>({})
+  const batchesCache = useRef<{ batches: Batch[]; timestamp: number }>({
+    batches: [],
+    timestamp: 0,
+  })
   const CACHE_DURATION = 5000 // 5 secondes
+  const BATCH_CACHE_DURATION = 60000 // 1 minute de cache pour les lots
 
   useEffect(() => {
     const now = Date.now()
@@ -49,16 +59,66 @@ const CartPage = () => {
       return
     }
 
-    if (reservationContext && reservationContext.fetchReservations) {
+    if (reservationContext?.fetchReservations) {
       reservationContext.fetchReservations().then((r) => {
         const buildingReservation = r.find(
           (res) => res.status === ReservationStatus.BUILDING
         )
         setReservation(buildingReservation ?? null)
         setFetchTimestamp(now)
+
+        if (
+          buildingReservation &&
+          (!batchesCache.current.batches.length ||
+            now - batchesCache.current.timestamp > BATCH_CACHE_DURATION)
+        ) {
+          getMaxQuantities(buildingReservation)
+        }
       })
     }
-  }, [reservationContext, fetchTimestamp, reservation])
+  }, [fetchTimestamp, reservationContext])
+
+  const getMaxQuantities = async (res: ReservationView) => {
+    if (!batchContext || !res?.reservationLines?.length) return
+
+    const now = Date.now()
+
+    if (
+      batchesCache.current.batches.length &&
+      now - batchesCache.current.timestamp < BATCH_CACHE_DURATION
+    ) {
+      updateMaxQuantitiesFromCache(res)
+      return
+    }
+
+    try {
+      const batches = await batchContext.fetchReceivedBatches()
+
+      batchesCache.current = {
+        batches: batches,
+        timestamp: now,
+      }
+
+      updateMaxQuantitiesFromCache(res)
+    } catch (error) {
+      console.error('Erreur lors du chargement des lots:', error)
+    }
+  }
+
+  const updateMaxQuantitiesFromCache = (res: ReservationView) => {
+    const quantities: { [lineId: number]: number } = {}
+
+    res.reservationLines.forEach((line) => {
+      const batch = batchesCache.current.batches.find(
+        (b) => b.id === line.batchId
+      )
+      if (batch) {
+        quantities[line.id] = batch.availableQuantity + line.quantity
+      }
+    })
+
+    setMaxQuantities(quantities)
+  }
 
   const forceRefresh = () => {
     setFetchTimestamp(Date.now())
@@ -70,31 +130,27 @@ const CartPage = () => {
     )
   }
 
-  // Calcul de la date minimale (demain)
   const getTomorrowFormatted = () => {
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
-    return tomorrow.toISOString().split('T')[0] // Format YYYY-MM-DD
+    return tomorrow.toISOString().split('T')[0]
   }
 
-  // Nouvelle fonction pour vérifier si une date est un mardi ou jeudi
   const isTuesdayOrThursday = (dateString: string) => {
     const date = new Date(dateString)
-    const day = date.getDay() // 0 = dimanche, 1 = lundi, 2 = mardi, etc.
-    return day === 2 || day === 4 // 2 = mardi, 4 = jeudi
+    const day = date.getDay()
+    return day === 2 || day === 4
   }
 
-  // Nouvelle fonction pour trouver le prochain mardi ou jeudi à partir d'aujourd'hui
   const getNextTuesdayOrThursday = () => {
     const date = new Date()
-    date.setDate(date.getDate() + 1) // On commence à demain
+    date.setDate(date.getDate() + 1)
 
-    // Cherche jusqu'à trouver un mardi ou jeudi
     while (date.getDay() !== 2 && date.getDay() !== 4) {
       date.setDate(date.getDate() + 1)
     }
 
-    return date.toISOString().split('T')[0] // Format YYYY-MM-DD
+    return date.toISOString().split('T')[0]
   }
 
   const calculateTotal = () => {
@@ -111,26 +167,47 @@ const CartPage = () => {
     const line = reservation.reservationLines.find((l) => l.id === id)
     if (!line) return
 
-    const newQuantity = line.quantity + change
-    await handleDirectQuantityChange(id, newQuantity.toString())
+    const maxQty = maxQuantities[id] || line.quantity
+    const newQuantity = Math.min(Math.max(1, line.quantity + change), maxQty)
+
+    if (newQuantity !== line.quantity) {
+      await handleDirectQuantityChange(id, newQuantity.toString())
+    }
   }
 
   const handleDirectQuantityChange = async (id: number, valueStr: string) => {
     try {
       const value = parseInt(valueStr, 10)
-      if (isNaN(value) || value < 0) return
+      if (isNaN(value) || value < 1) return
 
-      if (reservation && reservationContext.changeReservationLineQuantity) {
-        setReservation(
-          (await reservationContext.changeReservationLineQuantity(id, value)) ??
-            null
+      const line = reservation?.reservationLines.find((l) => l.id === id)
+      if (!line) return
+
+      const maxQty = maxQuantities[id] || line.quantity
+      const safeValue = Math.min(value, maxQty)
+
+      if (reservation) {
+        const updatedLines = reservation.reservationLines.map((l) =>
+          l.id === id ? { ...l, quantity: safeValue } : l
         )
-        forceRefresh()
+
+        setReservation({
+          ...reservation,
+          reservationLines: updatedLines,
+        })
+
+        if (reservationContext.changeReservationLineQuantity) {
+          await reservationContext.changeReservationLineQuantity(id, safeValue)
+          if (safeValue === 0) {
+            forceRefresh()
+          }
+        }
       }
     } catch (error) {
       console.error('Erreur lors de la mise à jour de la quantité:', error)
       setMessage('Impossible de mettre à jour la quantité')
       setOpenSnackbar(true)
+      forceRefresh()
     }
   }
 
@@ -153,10 +230,8 @@ const CartPage = () => {
 
   const handleOpenCalendar = () => {
     if (!authenticatedUser) {
-      // Display a clear message when user isn't logged in
       setMessage('Vous devez vous connecter pour faire une réservation')
       setOpenSnackbar(true)
-      // Redirect to login after a short delay
       setTimeout(() => {
         navigate('/login', { state: { returnTo: '/cart' } })
       }, 2000)
@@ -175,7 +250,6 @@ const CartPage = () => {
     const dateValue = e.target.value
     setSelectedDate(dateValue)
 
-    // Vérification que la date est valide (au moins demain ET un mardi ou jeudi)
     const selectedDateObj = new Date(dateValue)
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
@@ -319,6 +393,10 @@ const CartPage = () => {
                         <IconButton
                           size="small"
                           onClick={() => handleQuantityChange(item.id, 1)}
+                          disabled={
+                            item.quantity >=
+                            (maxQuantities[item.id] || item.quantity)
+                          }
                         >
                           <AddIcon />
                         </IconButton>
@@ -326,6 +404,16 @@ const CartPage = () => {
                       <Typography variant="caption" color="text.secondary">
                         {item.unitType}
                       </Typography>
+                      {item.quantity >=
+                        (maxQuantities[item.id] || item.quantity) && (
+                        <Typography
+                          variant="caption"
+                          color="error"
+                          sx={{ display: 'block', fontSize: '0.7rem' }}
+                        >
+                          Max
+                        </Typography>
+                      )}
                     </TableCell>
                     <TableCell align="right">
                       {`${(item.unitPrice * item.quantity).toFixed(2)}€`}
@@ -384,7 +472,6 @@ const CartPage = () => {
             </Box>
           </Box>
 
-          {/* Dialogue pour la sélection de date */}
           <Dialog open={openCalendar} onClose={handleCloseCalendar}>
             <DialogTitle>Choisissez une date de retrait</DialogTitle>
             <DialogContent>
