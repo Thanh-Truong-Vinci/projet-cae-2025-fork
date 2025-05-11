@@ -60,7 +60,6 @@ const HomePage = () => {
   const location = useLocation()
   const [openSnackbar, setOpenSnackbar] = useState(false)
   const [message, setMessage] = useState('')
-  const [refreshing, setRefreshing] = useState(false)
 
   // Produits filtrés
   const [filteredProducts, setFilteredProducts] = useState<ProductBatch[]>([])
@@ -340,7 +339,6 @@ const HomePage = () => {
   const refreshProducts = useCallback(() => {
     const now = Date.now()
     console.log('Rafraîchissement forcé des produits...')
-    setRefreshing(true)
 
     // Ajouter un paramètre nocache pour éviter les problèmes de mise en cache
     return fetch('/api/batches/received/available-view?nocache=' + now, {
@@ -372,12 +370,9 @@ const HomePage = () => {
 
         const recentCount = Math.min(5, sortedProducts.length)
         setTopProducts(sortedProducts.slice(0, recentCount))
-
-        setRefreshing(false)
       })
       .catch((error) => {
         console.error('Erreur de rafraîchissement:', error)
-        setRefreshing(false)
       })
   }, [])
 
@@ -472,24 +467,6 @@ const HomePage = () => {
         position: 'relative',
       }}
     >
-      {refreshing && (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(255,255,255,0.7)',
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <CircularProgress />
-        </Box>
-      )}
       {/* Sidebar avec filtres */}
       <Box
         sx={{
