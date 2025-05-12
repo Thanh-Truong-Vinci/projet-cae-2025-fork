@@ -64,4 +64,12 @@ public interface BatchRepository extends CrudRepository<Batch, Long> {
    * @return the batch
    */
   Batch getBatchById(Long id);
+
+  /**
+   * Trouve tous les lots appartenant à un producteur spécifique, triés par date de production.
+   *
+   * @param producerId l'ID du producteur
+   * @return la liste de tous les lots du producteur, triés par date de production
+   */
+  List<Batch> findByProducerIdOrderByProductionDateAsc(Long producerId);
 }

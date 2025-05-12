@@ -207,7 +207,7 @@ const ProducerHomePage = () => {
       case 'APPROVED':
         return { label: 'Accepté', color: 'success' as const }
       case 'RECEIVED':
-        return { label: 'Reçu', color: 'info' as const }
+        return { label: 'En vente', color: 'info' as const }
       default:
         return { label: 'Indéterminé', color: 'default' as const }
     }
@@ -433,7 +433,7 @@ const ProducerHomePage = () => {
             <Tab label="En attente" {...a11yProps(1)} />
             <Tab label="Refusé" {...a11yProps(2)} />
             <Tab label="Accepté" {...a11yProps(3)} />
-            <Tab label="Reçu" {...a11yProps(4)} />
+            <Tab label="En vente" {...a11yProps(4)} />
             <Tab label="Épuisé" {...a11yProps(5)} />
           </Tabs>
         </Box>
@@ -469,15 +469,15 @@ const ProducerHomePage = () => {
                   case 0:
                     return true // Tous
                   case 1:
-                    return status === 'PENDING'
+                    return status === 'PENDING' && !isOutOfStock
                   case 2:
-                    return status === 'REJECTED'
+                    return status === 'REJECTED' && !isOutOfStock
                   case 3:
                     return status === 'APPROVED' && !isOutOfStock
                   case 4:
-                    return status === 'RECEIVED'
+                    return status === 'RECEIVED' && !isOutOfStock
                   case 5:
-                    return isOutOfStock
+                    return status === 'RECEIVED' && isOutOfStock;
                   default:
                     return true
                 }

@@ -156,8 +156,10 @@ describe('ManagerDashboardPage', () => {
       productType: 'Légume',
       receivedQuantity: 100,
       soldQuantity: 20,
+      reservedQuantity: 10, // Add this missing property
       unitType: 'kg',
       totalRevenue: 50,
+      potentialRevenue: 25, // Add this missing property
     },
     {
       productId: 2,
@@ -167,8 +169,10 @@ describe('ManagerDashboardPage', () => {
       productType: 'Fruit',
       receivedQuantity: 150,
       soldQuantity: 30,
+      reservedQuantity: 15, // Add this missing property
       unitType: 'kg',
       totalRevenue: 96,
+      potentialRevenue: 48, // Add this missing property
     },
   ]
 

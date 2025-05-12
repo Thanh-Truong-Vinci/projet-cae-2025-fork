@@ -97,7 +97,7 @@ public class ReservationService {
     // IMPORTANT: Initialize an empty list for the lines to avoid NPE in the view constructor
     if (reservation.getReservationLines() == null) {
       final List<ReservationLine> lines = new ArrayList<>();
-      
+
       // Create a single ReservationLine that matches what we saved to the database
       ReservationLine line = new ReservationLine();
       line.setId(4L); // Use the ID from your logs

@@ -24,5 +24,4 @@ public class ProductBatchView {
   private List<Long> batchIds = new ArrayList<>();
   private List<Integer> batchQuantities =
       new ArrayList<>(); // Quantités correspondant à chaque batch
-  private Boolean outOfStock;
 }

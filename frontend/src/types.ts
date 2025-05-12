@@ -317,11 +317,13 @@ export interface SalesStatistics {
   productName: string
   productType: string
   year: number
-  month: number
+  month?: number
   receivedQuantity: number
   soldQuantity: number
+  reservedQuantity: number
   unitType: string
   totalRevenue: number
+  potentialRevenue: number
 }
 
 export interface StatisticsContextType {

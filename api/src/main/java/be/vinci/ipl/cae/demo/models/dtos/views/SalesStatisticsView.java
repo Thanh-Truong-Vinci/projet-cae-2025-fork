@@ -18,6 +18,8 @@ public class SalesStatisticsView {
   private Integer month;
   private Integer receivedQuantity;
   private Integer soldQuantity;
+  private Integer reservedQuantity;  // Add this field
   private String unitType;
   private Double totalRevenue;
+  private Double potentialRevenue;  // Add this field
 }

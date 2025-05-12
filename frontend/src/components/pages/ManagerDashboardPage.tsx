@@ -26,6 +26,7 @@ import {
   MenuItem,
   SelectChangeEvent,
   Button,
+  LinearProgress,
 } from '@mui/material'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
@@ -100,7 +101,7 @@ const getStatusLabel = (
     case 'APPROVED':
       return { label: 'Accepté', color: 'success' as const }
     case 'RECEIVED':
-      return { label: 'Reçu', color: 'info' as const }
+      return { label: 'En vente', color: 'info' as const }
     default:
       return { label: 'Indéterminé', color: 'default' as const }
   }
@@ -473,8 +474,16 @@ const ManagerDashboardPage = () => {
     (sum, stat) => sum + (stat.soldQuantity || 0),
     0
   )
+  const totalReserved = salesStatistics.reduce(
+    (sum, stat) => sum + (stat.reservedQuantity || 0),
+    0
+  )
   const totalRevenue = salesStatistics.reduce(
     (sum, stat) => sum + (stat.totalRevenue || 0),
+    0
+  )
+  const totalPotentialRevenue = salesStatistics.reduce(
+    (sum, stat) => sum + (stat.potentialRevenue || 0),
     0
   )
 
@@ -487,12 +496,16 @@ const ManagerDashboardPage = () => {
           productType: key,
           receivedQuantity: 0,
           soldQuantity: 0,
+          reservedQuantity: 0,
           totalRevenue: 0,
+          potentialRevenue: 0,
         }
       }
       acc[key].receivedQuantity += stat.receivedQuantity || 0
       acc[key].soldQuantity += stat.soldQuantity || 0
+      acc[key].reservedQuantity += stat.reservedQuantity || 0
       acc[key].totalRevenue += stat.totalRevenue || 0
+      acc[key].potentialRevenue += stat.potentialRevenue || 0
       return acc
     },
     {} as Record<
@@ -501,7 +514,9 @@ const ManagerDashboardPage = () => {
         productType: string
         receivedQuantity: number
         soldQuantity: number
+        reservedQuantity: number
         totalRevenue: number
+        potentialRevenue: number
       }
     >
   )
@@ -518,13 +533,13 @@ const ManagerDashboardPage = () => {
             case 0:
               return true // Tous
             case 1:
-              return status === 'PENDING'
+              return status === 'PENDING' && !isOutOfStock
             case 2:
-              return status === 'REJECTED'
+              return status === 'REJECTED' && !isOutOfStock
             case 3:
               return status === 'APPROVED' && !isOutOfStock
             case 4:
-              return status === 'RECEIVED'
+              return status === 'RECEIVED' && !isOutOfStock
             case 5:
               return isOutOfStock
             default:
@@ -730,13 +745,13 @@ const ManagerDashboardPage = () => {
       {/* Onglet des produits en stock */}
       <TabPanel value={tabValue} index={0}>
         <Typography variant="h5" gutterBottom>
-          Produits Reçus en Stock
+          Produits en vente en Stock
         </Typography>
 
         {productsWithBatches.length === 0 ? (
           <Paper elevation={3} sx={{ p: 4, textAlign: 'center' }}>
             <Typography variant="h6" color="textSecondary">
-              Aucun produit reçu disponible actuellement
+              Aucun produit en vente disponible actuellement
             </Typography>
           </Paper>
         ) : (
@@ -879,7 +894,7 @@ const ManagerDashboardPage = () => {
             <Tab label="En attente" {...a11yProps(1)} />
             <Tab label="Refusé" {...a11yProps(2)} />
             <Tab label="Accepté" {...a11yProps(3)} />
-            <Tab label="Reçu" {...a11yProps(4)} />
+            <Tab label="En vente" {...a11yProps(4)} />
             <Tab label="Épuisé" {...a11yProps(5)} />
           </Tabs>
         </Box>
@@ -976,130 +991,194 @@ const ManagerDashboardPage = () => {
         )}
 
         {/* Cartes récapitulatives */}
-        <Grid container spacing={4} sx={{ mb: 4 }}>
-          <Grid item xs={12} md={4}>
+        <Grid container spacing={4} sx={{ mb: 4 }} justifyContent="center">
+          <Grid item xs={12} sm={6} md={3}>
             <Card raised>
               <CardContent>
                 <Typography variant="h6" color="textSecondary" gutterBottom>
-                  Unités Reçues
+                  Unités Reçues (Total)
                 </Typography>
                 <Typography variant="h3">{totalReceived}</Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  En stock disponible: {totalReceived - totalSold - totalReserved} unités
+                </Typography>
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} sm={6} md={3}>
             <Card raised>
               <CardContent>
                 <Typography variant="h6" color="textSecondary" gutterBottom>
                   Unités Vendues
                 </Typography>
                 <Typography variant="h3">{totalSold}</Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  {totalReceived > 0 ? ((totalSold / totalReceived) * 100).toFixed(1) : "0.0"}% du stock reçu
+                </Typography>
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card raised>
+              <CardContent>
+                <Typography variant="h6" color="textSecondary" gutterBottom>
+                  Unités Réservées
+                </Typography>
+                <Typography variant="h3">{totalReserved}</Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  {totalReceived > 0 ? ((totalReserved / totalReceived) * 100).toFixed(1) : "0.0"}% du stock reçu
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
             <Card raised>
               <CardContent>
                 <Typography variant="h6" color="textSecondary" gutterBottom>
                   Revenu Total
                 </Typography>
-                <Typography variant="h3">
-                  {totalRevenue.toFixed(2)} €
+                <Typography variant="h3">{totalRevenue.toFixed(2)} €</Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  Prix moyen: {totalSold > 0 ? (totalRevenue / totalSold).toFixed(2) : "0.00"} €/unité
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card raised>
+              <CardContent sx={{ textAlign: 'center' }}>
+                <Typography variant="h6" color="textSecondary" gutterBottom>
+                  Revenu Potentiel
+                </Typography>
+                <Typography variant="h3">{totalPotentialRevenue.toFixed(2)} €</Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  {totalRevenue > 0 ? 
+                    `+${((totalPotentialRevenue / totalRevenue) * 100).toFixed(1)}%` : 
+                    "100%"} du revenu actuel
                 </Typography>
               </CardContent>
             </Card>
           </Grid>
         </Grid>
 
-        {/* Tableau par type de produit */}
-        {!selectedProductId && (
-          <Paper elevation={3} sx={{ p: 2, mb: 4 }}>
-            <Typography variant="h6" gutterBottom>
-              Récapitulatif par Type de Produit
-            </Typography>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Type de Produit</TableCell>
-                    <TableCell align="right">Unités Reçues</TableCell>
-                    <TableCell align="right">Unités Vendues</TableCell>
-                    <TableCell align="right">Taux de Conversion</TableCell>
-                    <TableCell align="right">Revenu Total</TableCell>
+        {/* Tableau statistique par type de produit */}
+        <Paper elevation={3} sx={{ p: 2, mb: 4 }}>
+          <Typography variant="h6" gutterBottom>
+            Statistiques par Type de Produit
+          </Typography>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Type de Produit</TableCell>
+                  <TableCell align="right">Unités Reçues</TableCell>
+                  <TableCell align="right">Unités Vendues</TableCell>
+                  <TableCell align="right">Unités Réservées</TableCell>
+                  <TableCell align="right">Stock Disponible</TableCell>
+                  <TableCell align="right">Taux d'Occupation</TableCell>
+                  <TableCell align="right">Revenu</TableCell>
+                  <TableCell align="right">Revenu Potentiel</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {Object.values(statsByProductType).map((stat) => (
+                  <TableRow key={stat.productType}>
+                    <TableCell>{stat.productType}</TableCell>
+                    <TableCell align="right">{stat.receivedQuantity}</TableCell>
+                    <TableCell align="right">{stat.soldQuantity}</TableCell>
+                    <TableCell align="right">{stat.reservedQuantity}</TableCell>
+                    <TableCell align="right">
+                      {stat.receivedQuantity - stat.soldQuantity - stat.reservedQuantity > 0 
+                        ? stat.receivedQuantity - stat.soldQuantity - stat.reservedQuantity 
+                        : 0}
+                    </TableCell>
+                    <TableCell align="right">
+                      {stat.receivedQuantity > 0 ? (
+                        <Box display="flex" alignItems="center">
+                          <Box width="100%" mr={1}>
+                            <LinearProgress 
+                              variant="determinate" 
+                              value={Math.min(
+                                ((stat.soldQuantity + stat.reservedQuantity) / stat.receivedQuantity) * 100, 
+                                100
+                              )}
+                              sx={{ 
+                                height: 10, 
+                                borderRadius: 5,
+                                '& .MuiLinearProgress-bar': {
+                                  backgroundColor: ((stat.soldQuantity + stat.reservedQuantity) / stat.receivedQuantity) > 0.8 ? 
+                                    'success.main' : 'warning.main'
+                                }
+                              }}
+                            />
+                          </Box>
+                          <Box minWidth={35}>
+                            {Math.round(((stat.soldQuantity + stat.reservedQuantity) / stat.receivedQuantity) * 100)}%
+                          </Box>
+                        </Box>
+                      ) : 'N/A'}
+                    </TableCell>
+                    <TableCell align="right">{stat.totalRevenue.toFixed(2)} €</TableCell>
+                    <TableCell align="right">
+                      {(stat.totalRevenue + stat.potentialRevenue).toFixed(2)} €
+                    </TableCell>
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {Object.values(statsByProductType).map((stat) => (
-                    <TableRow key={stat.productType}>
-                      <TableCell>{stat.productType}</TableCell>
-                      <TableCell align="right">
-                        {stat.receivedQuantity}
-                      </TableCell>
-                      <TableCell align="right">{stat.soldQuantity}</TableCell>
-                      <TableCell align="right">
-                        {stat.receivedQuantity > 0
-                          ? `${((stat.soldQuantity / stat.receivedQuantity) * 100).toFixed(1)}%`
-                          : 'N/A'}
-                      </TableCell>
-                      <TableCell align="right">
-                        {stat.totalRevenue.toFixed(2)} €
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
-        )}
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
 
         {/* Tableau détaillé par produit */}
         <Paper elevation={3} sx={{ p: 2 }}>
           <Typography variant="h6" gutterBottom>
             Détails par Produit
           </Typography>
-          {salesStatistics.length === 0 ? (
-            <Typography color="textSecondary" align="center" sx={{ p: 2 }}>
-              Aucune donnée disponible pour cette période
-            </Typography>
-          ) : (
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Produit</TableCell>
-                    <TableCell>Type</TableCell>
-                    <TableCell>Période</TableCell>
-                    <TableCell align="right">Unités Reçues</TableCell>
-                    <TableCell align="right">Unités Vendues</TableCell>
-                    <TableCell>Unité</TableCell>
-                    <TableCell align="right">Revenu</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {salesStatistics.map((stat, index) => (
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Produit</TableCell>
+                  <TableCell>Type</TableCell>
+                  <TableCell align="right">Reçu</TableCell>
+                  <TableCell align="right">Vendu</TableCell>
+                  <TableCell align="right">Réservé</TableCell>
+                  <TableCell align="right">Disponible</TableCell>
+                  <TableCell>Unité</TableCell>
+                  <TableCell align="right">Revenu</TableCell>
+                  <TableCell align="right">Prévision</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {salesStatistics.map((stat, index) => {
+                  const available = Math.max(
+                    0,
+                    (stat.receivedQuantity || 0) - 
+                    (stat.soldQuantity || 0) - 
+                    (stat.reservedQuantity || 0)
+                  );
+                    
+                  return (
                     <TableRow key={index}>
                       <TableCell>{stat.productName}</TableCell>
                       <TableCell>{stat.productType}</TableCell>
-                      <TableCell>
-                        {months.find((m) => m.value === stat.month)?.label}{' '}
-                        {stat.year}
-                      </TableCell>
-                      <TableCell align="right">
-                        {stat.receivedQuantity || 0}
-                      </TableCell>
-                      <TableCell align="right">
-                        {stat.soldQuantity || 0}
-                      </TableCell>
+                      <TableCell align="right">{stat.receivedQuantity || 0}</TableCell>
+                      <TableCell align="right">{stat.soldQuantity || 0}</TableCell>
+                      <TableCell align="right">{stat.reservedQuantity || 0}</TableCell>
+                      <TableCell align="right">{available}</TableCell>
                       <TableCell>{stat.unitType}</TableCell>
                       <TableCell align="right">
                         {(stat.totalRevenue || 0).toFixed(2)} €
                       </TableCell>
+                      <TableCell align="right">
+                        {(stat.potentialRevenue || 0).toFixed(2)} €
+                      </TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Paper>
       </TabPanel>
     </Container>

@@ -282,7 +282,6 @@ public class AuthsService {
     public static final String HAS_ROLE_VOLUNTEER = "hasRole('ROLE_VOLUNTEER')";
     public static final String HAS_ROLE_ADMIN = "hasRole('ROLE_ADMIN')";
 
-    private SecurityConstants() {
-    }
+    private SecurityConstants() {}
   }
 }
