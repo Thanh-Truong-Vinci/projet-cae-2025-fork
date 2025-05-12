@@ -97,12 +97,16 @@ const AddBatchPage = () => {
     null
   )
 
-  // Image selection modal states
+  const [isProductTypeLocked, setIsProductTypeLocked] = useState(false)
+  const [isDescriptionLocked, setIsDescriptionLocked] = useState(false)
+  const [isNameLocked, setIsNameLocked] = useState(false)
+
   const [isImageModalOpen, setIsImageModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedImage, setSelectedImage] = useState<Photo | null>(null)
 
-  // Date minimum = aujourd'hui + 3 jours
+  const [resetKey, setResetKey] = useState(0)
+
   const minAvailabilityDate = dayjs().add(3, 'day')
 
   useEffect(() => {
@@ -181,8 +185,10 @@ const AddBatchPage = () => {
   }
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (fieldsLocked) {
-      setSnackbarMessage("Changez le nom du produit pour modifier l'image")
+    if (isNameLocked) {
+      setSnackbarMessage(
+        'Cliquez sur X à côté du nom pour réinitialiser le produit'
+      )
       setSnackbarSeverity('error')
       setOpenSnackbar(true)
       return
@@ -225,7 +231,12 @@ const AddBatchPage = () => {
         setProductType(product.productType.title)
       }
 
-      setFieldsLocked(false)
+      // Lock only product type and description, not the image
+      setIsProductTypeLocked(true)
+      setIsDescriptionLocked(true)
+      setIsNameLocked(true)
+      setFieldsLocked(true) // Keep for backward compatibility
+
       setSelectedImage(null)
 
       if (product.photo && product.photo.imageLocation) {
@@ -236,25 +247,42 @@ const AddBatchPage = () => {
         setImagePreview(product.image)
       }
     } else {
-      setSelectedProductId(null)
-      setFieldsLocked(false)
+      resetForm()
     }
+  }
+
+  const resetForm = () => {
+    setResetKey((prev) => prev + 1)
+
+    setSelectedProductId(null)
+    setProductName('')
+    setProductType('')
+    setProductDescription('')
+    setIsProductTypeLocked(false)
+    setIsDescriptionLocked(false)
+    setIsNameLocked(false)
+    setFieldsLocked(false)
+    setSelectedImage(null)
+    setProductImage(null)
+    setImagePreview(null)
   }
 
   const handleProductNameChange = (value: string) => {
     setProductName(value)
     if (
-      fieldsLocked &&
+      isNameLocked &&
       productContext &&
       !productContext.allProducts.some((p) => p.name === value)
     ) {
-      setFieldsLocked(false)
+      resetForm()
     }
   }
 
   const handleOpenImageModal = () => {
-    if (fieldsLocked && !productImage && imagePreview) {
-      setSnackbarMessage("Changez le nom du produit pour modifier l'image")
+    if (isNameLocked && !productImage && imagePreview) {
+      setSnackbarMessage(
+        'Cliquez sur X à côté du nom pour réinitialiser le produit'
+      )
       setSnackbarSeverity('error')
       setOpenSnackbar(true)
       return
@@ -372,17 +400,7 @@ const AddBatchPage = () => {
           )
         }
 
-        setProductName('')
-        setProductType('')
-        setProductDescription('')
-        setProductImage(null)
-        setImagePreview(null)
-        setAvailabilityDate(null)
-        setAvailableQuantity('')
-        setUnitPrice('')
-        setUnitType('')
-        setSelectedProductId(null)
-        setSelectedImage(null)
+        resetForm()
 
         setSnackbarMessage(
           'Lot ajouté avec succès! Il sera examiné par un gestionnaire.'
@@ -569,6 +587,7 @@ const AddBatchPage = () => {
           <Grid container spacing={3}>
             <Grid item xs={12} sm={6}>
               <Autocomplete
+                key={resetKey}
                 id="product-name-autocomplete"
                 options={productContext ? productContext.allProducts : []}
                 loading={
@@ -577,6 +596,7 @@ const AddBatchPage = () => {
                 getOptionLabel={(option: Product | string) => {
                   return typeof option === 'string' ? option : option.name
                 }}
+                disableClearable={isNameLocked}
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -585,6 +605,24 @@ const AddBatchPage = () => {
                     label="Nom du produit"
                     error={!!errors.productName}
                     helperText={errors.productName}
+                    InputProps={{
+                      ...params.InputProps,
+                      readOnly: isNameLocked,
+                      endAdornment: (
+                        <>
+                          {isNameLocked && (
+                            <IconButton
+                              size="small"
+                              onClick={resetForm}
+                              title="Réinitialiser"
+                            >
+                              <CloseIcon />
+                            </IconButton>
+                          )}
+                          {!isNameLocked && params.InputProps.endAdornment}
+                        </>
+                      ),
+                    }}
                   />
                 )}
                 onChange={(_, value) => {
@@ -597,12 +635,20 @@ const AddBatchPage = () => {
                   }
                 }}
                 freeSolo
-                onInputChange={(_, value) => handleProductNameChange(value)}
+                onInputChange={(_, value, reason) => {
+                  // Prevent changes when name is locked except for reset action
+                  if (!isNameLocked || reason === 'clear') {
+                    handleProductNameChange(value)
+                  }
+                }}
                 value={
-                  productContext?.allProducts.find(
-                    (p) => p.name === productName
-                  ) || null
+                  productName === ''
+                    ? null
+                    : productContext?.allProducts.find(
+                        (p) => p.name === productName
+                      ) || productName
                 }
+                readOnly={isNameLocked}
               />
             </Grid>
 
@@ -616,7 +662,7 @@ const AddBatchPage = () => {
                   value={productType}
                   label="Type de produit *"
                   onChange={handleTypeChange}
-                  disabled={loadingTypes || fieldsLocked}
+                  disabled={loadingTypes || isProductTypeLocked}
                 >
                   {loadingTypes ? (
                     <MenuItem disabled>Chargement des types...</MenuItem>
@@ -645,7 +691,7 @@ const AddBatchPage = () => {
                 helperText={errors.productDescription}
                 multiline
                 rows={4}
-                disabled={fieldsLocked}
+                disabled={isDescriptionLocked}
               />
             </Grid>
 
@@ -673,7 +719,6 @@ const AddBatchPage = () => {
                       variant="contained"
                       component="span"
                       startIcon={<CloudUploadIcon />}
-                      disabled={fieldsLocked}
                     >
                       Télécharger une image
                     </Button>
@@ -683,7 +728,6 @@ const AddBatchPage = () => {
                     variant="outlined"
                     startIcon={<PhotoLibraryIcon />}
                     onClick={handleOpenImageModal}
-                    disabled={fieldsLocked}
                   >
                     Choisir une image existante
                   </Button>
@@ -707,14 +751,12 @@ const AddBatchPage = () => {
                   <FormHelperText error>{errors.productImage}</FormHelperText>
                 )}
               </Box>
-              {fieldsLocked && (
+              {isNameLocked && (
                 <Typography
                   variant="caption"
                   color="text.secondary"
                   sx={{ mt: 1, display: 'block' }}
-                >
-                  Pour modifier ces champs, changez le nom du produit
-                </Typography>
+                ></Typography>
               )}
             </Grid>
 

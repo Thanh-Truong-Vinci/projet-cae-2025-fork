@@ -477,7 +477,7 @@ const ProducerHomePage = () => {
                   case 4:
                     return status === 'RECEIVED' && !isOutOfStock
                   case 5:
-                    return status === 'RECEIVED' && isOutOfStock;
+                    return status === 'RECEIVED' && isOutOfStock
                   default:
                     return true
                 }

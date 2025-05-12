@@ -641,31 +641,37 @@ const VolunteerHomePage = () => {
                   type="number"
                   value={venteLibreQuantity}
                   onChange={(e) => {
-                    const newValue = parseInt(e.target.value) || 0;
+                    const newValue = parseInt(e.target.value) || 0
                     const selectedProduct = agglomeratedProducts.find(
                       (p) => p.productId === selectedVenteBatchId
-                    );
-                    const maxQuantity = selectedProduct ? selectedProduct.totalQuantity : 0;
+                    )
+                    const maxQuantity = selectedProduct
+                      ? selectedProduct.totalQuantity
+                      : 0
                     // Limiter la quantité à la valeur maximale disponible
-                    setVenteLibreQuantity(Math.min(Math.max(1, newValue), maxQuantity));
+                    setVenteLibreQuantity(
+                      Math.min(Math.max(1, newValue), maxQuantity)
+                    )
                   }}
                   fullWidth
-                  InputProps={{ 
-                    inputProps: { 
-                      min: 1, 
-                      max: selectedVenteBatchId 
+                  InputProps={{
+                    inputProps: {
+                      min: 1,
+                      max: selectedVenteBatchId
                         ? agglomeratedProducts.find(
-                            (product) => product.productId === selectedVenteBatchId
+                            (product) =>
+                              product.productId === selectedVenteBatchId
                           )?.totalQuantity || 0
-                        : 1 
-                    } 
+                        : 1,
+                    },
                   }}
                   sx={{ mb: 2 }}
                   helperText={
                     selectedVenteBatchId
                       ? `Quantité maximale disponible: ${
                           agglomeratedProducts.find(
-                            (product) => product.productId === selectedVenteBatchId
+                            (product) =>
+                              product.productId === selectedVenteBatchId
                           )?.totalQuantity || 0
                         }`
                       : ''
@@ -833,31 +839,37 @@ const VolunteerHomePage = () => {
                   type="number"
                   value={stockReductionQuantity}
                   onChange={(e) => {
-                    const newValue = parseInt(e.target.value) || 0;
+                    const newValue = parseInt(e.target.value) || 0
                     const selectedProduct = agglomeratedProducts.find(
                       (p) => p.productId === selectedStockBatchId
-                    );
-                    const maxQuantity = selectedProduct ? selectedProduct.totalQuantity : 0;
+                    )
+                    const maxQuantity = selectedProduct
+                      ? selectedProduct.totalQuantity
+                      : 0
                     // Limiter la quantité à la valeur maximale disponible
-                    setStockReductionQuantity(Math.min(Math.max(1, newValue), maxQuantity));
+                    setStockReductionQuantity(
+                      Math.min(Math.max(1, newValue), maxQuantity)
+                    )
                   }}
                   fullWidth
-                  InputProps={{ 
-                    inputProps: { 
-                      min: 1, 
-                      max: selectedStockBatchId 
+                  InputProps={{
+                    inputProps: {
+                      min: 1,
+                      max: selectedStockBatchId
                         ? agglomeratedProducts.find(
-                            (product) => product.productId === selectedStockBatchId
+                            (product) =>
+                              product.productId === selectedStockBatchId
                           )?.totalQuantity || 0
-                        : 1 
-                    } 
+                        : 1,
+                    },
                   }}
                   sx={{ mb: 2 }}
                   helperText={
                     selectedStockBatchId
                       ? `Quantité maximale disponible: ${
                           agglomeratedProducts.find(
-                            (product) => product.productId === selectedStockBatchId
+                            (product) =>
+                              product.productId === selectedStockBatchId
                           )?.totalQuantity || 0
                         }`
                       : ''
