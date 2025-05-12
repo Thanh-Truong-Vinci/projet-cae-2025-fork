@@ -365,7 +365,7 @@ describe('ProducerHomePage', () => {
       expect(screen.getByTestId('mock-tab-accepté')).toBeTruthy()
       expect(screen.getByTestId('mock-tab-en-attente')).toBeTruthy()
       expect(screen.getByTestId('mock-tab-refusé')).toBeTruthy()
-      expect(screen.getByTestId('mock-tab-reçu')).toBeTruthy()
+      expect(screen.getByTestId('mock-tab-en-vente')).toBeTruthy()
       expect(screen.getByTestId('mock-tab-épuisé')).toBeTruthy()
     })
   })

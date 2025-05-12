@@ -410,7 +410,7 @@ describe('ManagerDashboardPage', () => {
 
     // Vérifier que les produits sont affichés
     await waitFor(() => {
-      expect(screen.getByText('Produits Reçus en Stock')).toBeTruthy()
+      expect(screen.getByText('Produits en vente en Stock')).toBeTruthy()
       expect(screen.getByText('Carotte')).toBeTruthy()
       expect(screen.getByText('Pomme')).toBeTruthy()
     })
@@ -429,7 +429,7 @@ describe('ManagerDashboardPage', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText('Aucun produit reçu disponible actuellement')
+        screen.getByText('Aucun produit en vente disponible actuellement')
       ).toBeTruthy()
     })
   })
