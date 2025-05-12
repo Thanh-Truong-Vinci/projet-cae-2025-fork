@@ -195,6 +195,7 @@ const CartPage = () => {
             })
           )
 
+          // Force le rafraîchissement après la suppression
           forceRefresh()
           return
         }
@@ -228,9 +229,8 @@ const CartPage = () => {
             })
           )
 
-          if (safeValue === 0) {
-            forceRefresh()
-          }
+          // Toujours forcer le rafraîchissement après modification
+          forceRefresh()
         }
       }
     } catch (error) {
@@ -244,27 +244,29 @@ const CartPage = () => {
   const clearCart = async () => {
     try {
       if (reservation && reservationContext.clearReservation) {
-        // Update UI optimistically
+        // Appel au backend d'abord
+        await reservationContext.clearReservation(reservation.id)
+
+        // Mise à jour de l'UI seulement après une réponse réussie du backend
         setReservation({
           ...reservation,
           reservationLines: [],
         })
 
-        // Call backend
-        await reservationContext.clearReservation(reservation.id)
-
-        // Dispatch event to notify other components
+        // Notification aux autres composants
         window.dispatchEvent(new CustomEvent('cart-quantities-updated'))
 
+        // Message de succès
         setMessage('Votre panier a été vidé')
         setOpenSnackbar(true)
+
+        // Force le rafraîchissement uniquement en cas de succès
         forceRefresh()
       }
     } catch (error) {
       console.error('Erreur lors du vidage du panier:', error)
       setMessage('Impossible de vider le panier')
       setOpenSnackbar(true)
-      forceRefresh()
     }
   }
 
