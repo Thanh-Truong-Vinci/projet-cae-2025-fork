@@ -24,8 +24,7 @@ public class ReservationLine {
   @Column(name = "id_reservation_line")
   private Long id;
 
-  @Version
-  private Long version;
+  @Version private Long version;
 
   @Column(name = "quantity", nullable = false)
   private Integer quantity;
@@ -38,4 +37,3 @@ public class ReservationLine {
   @JoinColumn(name = "batch_id", nullable = false)
   private Batch batch;
 }
-

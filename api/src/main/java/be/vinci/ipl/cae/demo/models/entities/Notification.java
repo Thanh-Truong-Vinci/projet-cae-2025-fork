@@ -26,8 +26,7 @@ public class Notification {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long idNotification;
 
-  @Version
-  private Long version;
+  @Version private Long version;
 
   @Column(nullable = false)
   private String message;

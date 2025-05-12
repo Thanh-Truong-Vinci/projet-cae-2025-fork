@@ -17,13 +17,13 @@ import be.vinci.ipl.cae.demo.services.ReservationLineService;
 import be.vinci.ipl.cae.demo.services.ReservationService;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.transaction.annotation.Transactional;
 
 /** Controller for handling reservation-related operations. */
 @RestController

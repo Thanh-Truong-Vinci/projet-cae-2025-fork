@@ -24,8 +24,7 @@ public class Product {
   @Column(name = "id_product")
   private Long id;
 
-  @Version
-  private Long version;
+  @Version private Long version;
 
   @ManyToOne
   @JoinColumn(name = "id_product_type", nullable = false)
@@ -41,4 +40,3 @@ public class Product {
   @JoinColumn(name = "photo_id", nullable = true)
   private Photo photo;
 }
-

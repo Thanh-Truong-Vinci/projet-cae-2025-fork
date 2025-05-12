@@ -27,8 +27,7 @@ public class Batch {
   @Column(name = "id")
   private Long id;
 
-  @Version
-  private Long version;
+  @Version private Long version;
 
   @ManyToOne
   @JoinColumn(name = "manager_id", nullable = true)
@@ -71,4 +70,3 @@ public class Batch {
   @Column(name = "production_date", nullable = false)
   private LocalDate productionDate;
 }
-

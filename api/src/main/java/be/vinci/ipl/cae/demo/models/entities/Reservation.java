@@ -29,8 +29,7 @@ public class Reservation {
   @Column(name = "id_reservation")
   private Long id;
 
-  @Version
-  private Long version;
+  @Version private Long version;
 
   @ManyToOne
   @JoinColumn(name = "client", nullable = true)
@@ -52,4 +51,3 @@ public class Reservation {
   @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   private List<ReservationLine> reservationLines;
 }
-
