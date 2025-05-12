@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -22,6 +23,8 @@ public class Product {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id_product")
   private Long id;
+
+  @Version private Long version;
 
   @ManyToOne
   @JoinColumn(name = "id_product_type", nullable = false)

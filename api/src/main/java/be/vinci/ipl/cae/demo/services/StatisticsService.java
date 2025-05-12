@@ -93,7 +93,8 @@ public class StatisticsService {
     }
 
     // Traiter les réservations en attente
-    List<Reservation> pendingReservations = reservationRepository.findByStatus(ReservationStatus.PENDING);
+    List<Reservation> pendingReservations =
+        reservationRepository.findByStatus(ReservationStatus.PENDING);
     for (Reservation reservation : pendingReservations) {
       processReservationForStatistics(statisticsMap, reservation, year, month, productId, true);
     }
@@ -174,23 +175,21 @@ public class StatisticsService {
    * @param isReservation indique si c'est une réservation ou une vente confirmée
    */
   private void updateQuantityAndRevenue(
-      SalesStatisticsView stats, 
-      int quantity, 
-      double unitPrice,
-      boolean isReservation) {
-    
+      SalesStatisticsView stats, int quantity, double unitPrice, boolean isReservation) {
+
     if (isReservation) {
       // For reservations (potential revenue)
       int currentReserved = stats.getReservedQuantity() != null ? stats.getReservedQuantity() : 0;
       stats.setReservedQuantity(currentReserved + quantity);
-      
-      double currentPotential = stats.getPotentialRevenue() != null ? stats.getPotentialRevenue() : 0.0;
+
+      double currentPotential =
+          stats.getPotentialRevenue() != null ? stats.getPotentialRevenue() : 0.0;
       stats.setPotentialRevenue(currentPotential + (quantity * unitPrice));
     } else {
       // For confirmed sales (actual revenue)
       int currentSold = stats.getSoldQuantity() != null ? stats.getSoldQuantity() : 0;
       stats.setSoldQuantity(currentSold + quantity);
-      
+
       double currentRevenue = stats.getTotalRevenue() != null ? stats.getTotalRevenue() : 0.0;
       stats.setTotalRevenue(currentRevenue + (quantity * unitPrice));
     }
@@ -213,35 +212,40 @@ public class StatisticsService {
       Integer month,
       Long productId,
       boolean isReservation) {
-      
+
     if (reservation.getReservationDate() == null) {
       return;
     }
 
     LocalDate reservationDate = LocalDate.parse(reservation.getReservationDate().toString());
-    
+
     if ((year == null || reservationDate.getYear() == year)
         && (month == null || reservationDate.getMonthValue() == month)) {
-        
+
       for (ReservationLine line : reservation.getReservationLines()) {
         Batch batch = line.getBatch();
         if (batch == null || batch.getProduct() == null) {
           continue;
         }
-        
+
         // Filtre par productId si spécifié
         if (productId != null && !batch.getProduct().getId().equals(productId)) {
           continue;
         }
-        
+
         String key = generateKey(batch.getProduct().getId(), reservationDate);
-        
-        SalesStatisticsView stats = getOrCreateStatistics(
-            statisticsMap, key, batch, reservationDate.getYear(), reservationDate.getMonthValue());
-        
+
+        SalesStatisticsView stats =
+            getOrCreateStatistics(
+                statisticsMap,
+                key,
+                batch,
+                reservationDate.getYear(),
+                reservationDate.getMonthValue());
+
         // Utiliser la méthode réutilisable avec isReservation
         updateQuantityAndRevenue(stats, line.getQuantity(), batch.getUnitPrice(), isReservation);
-        
+
         statisticsMap.put(key, stats);
       }
     }

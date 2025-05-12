@@ -330,8 +330,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-20',
        '2025-03-10' -- Date de production (antérieure à la date de dépôt)
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'tomate bio';
 
 -- Pour le lot des Pommes Royal Gala
@@ -350,8 +350,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-15',
        '2025-03-05' -- 10 jours avant le dépôt
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'pomme royal gala';
 
 -- Pour le lot de Pain au levain
@@ -370,8 +370,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-25',
        '2025-03-24' -- 1 jour avant (pain frais)
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'pain au levain';
 
 -- Pour le lot de Fromage fermier
@@ -390,8 +390,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-18',
        '2025-01-18' -- 2 mois avant (fromage affiné)
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'fromage fermier';
 
 -- Pour le lot de Bière artisanale
@@ -410,8 +410,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-21',
        '2025-02-21' -- 1 mois avant (temps de fermentation)
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'biere artisanale';
 
 -- Pour le lot de Poulet fermier
@@ -430,8 +430,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-19',
        '2025-03-18' -- 1 jour avant (fraîcheur)
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'poulet fermier';
 
 -- Pour le lot de Yaourt nature
@@ -450,8 +450,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-16',
        '2025-03-14' -- 2 jours avant
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'yaourt nature';
 
 -- Créer un lot pour ce nouveau producteur
@@ -472,8 +472,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-25',
        '2025-02-15' -- Production antérieure (vin qui a besoin d'être vieilli)
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'biere artisanale';
 
 -- Créer un lot pour ce nouveau producteur
@@ -494,8 +494,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-28',
        '2025-03-20' -- Production récente pour fruits frais
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'pomme royal gala';
 
 -- Fix all approved batches inserts
@@ -515,8 +515,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-10',
        '2025-03-01' -- 9 jours avant
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'pomme jonagold';
 
 -- Pour le lot de Chou-fleur cheddar (APPROVED)
@@ -535,8 +535,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-12',
        '2025-03-05' -- 7 jours avant
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'chou-fleur cheddar';
 
 -- Pour le lot de Fromage fermier (APPROVED)
@@ -555,8 +555,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-18',
        '2025-01-18' -- 2 mois avant (fromage affiné)
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'fromage fermier';
 
 -- Création de lots à l'état RECEIVED
@@ -576,8 +576,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-10',
        '2025-03-05' -- 5 jours avant le dépôt
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'tomate bio';
 
 -- Pour le lot de Yaourt nature (RECEIVED)
@@ -596,8 +596,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-03-20',
        '2025-03-18' -- 2 jours avant le dépôt
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'yaourt nature';
 
 -- Lot 1: Pommes Golden épuisées en 2024 (Jean Dupont)
@@ -610,13 +610,13 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2024-09-15',
        2.85,
        'kg',
-       0,  -- épuisé
+       0, -- épuisé
        'RECEIVED',
        '2024-09-01',
        '2024-08-25'
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'pomme golden';
 
 -- Lot 2: Pommes Golden épuisées en 2025 (Sophie Martin)
@@ -629,13 +629,13 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-04-01',
        3.15,
        'kg',
-       0,  -- épuisé
+       0, -- épuisé
        'RECEIVED',
        '2025-03-20',
        '2025-03-15'
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'pomme golden';
 
 -- Lot 3: Pommes Golden en attente (Marie Dubois)
@@ -653,8 +653,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-05-02',
        '2025-04-25'
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'pomme golden';
 
 -- Lot 4: Pommes Golden disponibles actuellement (Jean Dupont)
@@ -672,8 +672,8 @@ SELECT (SELECT id_user FROM manager LIMIT 1),
        '2025-04-15',
        '2025-04-10'
 FROM products p
-    JOIN photos ph
-ON p.photo_id = ph.id_photo
+         JOIN photos ph
+              ON p.photo_id = ph.id_photo
 WHERE p.name = 'pomme golden';
 
 SELECT id_user, NULL
@@ -1033,21 +1033,24 @@ SET available_quantity = available_quantity + 3
 WHERE id = (SELECT id
             FROM batches
             WHERE product_id = (SELECT id_product FROM products WHERE name = 'laitue blonde de paris')
-              AND status = 'RECEIVED' LIMIT 1);
+              AND status = 'RECEIVED'
+            LIMIT 1);
 
 UPDATE batches
 SET available_quantity = available_quantity + 2
 WHERE id = (SELECT id
             FROM batches
             WHERE product_id = (SELECT id_product FROM products WHERE name = 'miel de pissenlit bio')
-              AND status = 'RECEIVED' LIMIT 1);
+              AND status = 'RECEIVED'
+            LIMIT 1);
 
 UPDATE batches
 SET available_quantity = available_quantity + 4
 WHERE id = (SELECT id
             FROM batches
             WHERE product_id = (SELECT id_product FROM products WHERE name = 'courgette blanche d''egypte')
-              AND status = 'RECEIVED' LIMIT 1);
+              AND status = 'RECEIVED'
+            LIMIT 1);
 
 -- Créer la première réservation avec laitues et miel
 INSERT INTO reservation (client, status, reservation_date, sale_date, price)
@@ -1063,9 +1066,14 @@ SELECT (SELECT id_reservation
         FROM reservation
         WHERE client = (SELECT id_user FROM users WHERE email = 'suzanne.droity@exemple.com')
           AND status = 'PENDING'
-        ORDER BY id_reservation DESC LIMIT 1),
-  (SELECT id FROM batches WHERE product_id = (SELECT id_product FROM products WHERE name = 'laitue blonde de paris') AND status = 'RECEIVED' LIMIT 1),
-  3;
+        ORDER BY id_reservation DESC
+        LIMIT 1),
+       (SELECT id
+        FROM batches
+        WHERE product_id = (SELECT id_product FROM products WHERE name = 'laitue blonde de paris')
+          AND status = 'RECEIVED'
+        LIMIT 1),
+       3;
 
 -- Ajouter les lignes de réservation pour le miel dans la même réservation
 INSERT INTO reservation_lines (reservation_id, batch_id, quantity)
@@ -1073,9 +1081,14 @@ SELECT (SELECT id_reservation
         FROM reservation
         WHERE client = (SELECT id_user FROM users WHERE email = 'suzanne.droity@exemple.com')
           AND status = 'PENDING'
-        ORDER BY id_reservation DESC LIMIT 1),
-  (SELECT id FROM batches WHERE product_id = (SELECT id_product FROM products WHERE name = 'miel de pissenlit bio') AND status = 'RECEIVED' LIMIT 1),
-  2;
+        ORDER BY id_reservation DESC
+        LIMIT 1),
+       (SELECT id
+        FROM batches
+        WHERE product_id = (SELECT id_product FROM products WHERE name = 'miel de pissenlit bio')
+          AND status = 'RECEIVED'
+        LIMIT 1),
+       2;
 
 -- Créer la deuxième réservation avec les courgettes
 INSERT INTO reservation (client, status, reservation_date, sale_date, price)
@@ -1091,9 +1104,14 @@ SELECT (SELECT id_reservation
         FROM reservation
         WHERE client = (SELECT id_user FROM users WHERE email = 'suzanne.droity@exemple.com')
           AND status = 'PENDING'
-        ORDER BY id_reservation DESC LIMIT 1),
-  (SELECT id FROM batches WHERE product_id = (SELECT id_product FROM products WHERE name = 'courgette blanche d''egypte') AND status = 'RECEIVED' LIMIT 1),
-  4;
+        ORDER BY id_reservation DESC
+        LIMIT 1),
+       (SELECT id
+        FROM batches
+        WHERE product_id = (SELECT id_product FROM products WHERE name = 'courgette blanche d''egypte')
+          AND status = 'RECEIVED'
+        LIMIT 1),
+       4;
 
 -- Mettre à jour les quantités disponibles des lots
 UPDATE batches
@@ -1101,104 +1119,101 @@ SET available_quantity = available_quantity - 3
 WHERE id = (SELECT id
             FROM batches
             WHERE product_id = (SELECT id_product FROM products WHERE name = 'laitue blonde de paris')
-              AND status = 'RECEIVED' LIMIT 1);
+              AND status = 'RECEIVED'
+            LIMIT 1);
 
 UPDATE batches
 SET available_quantity = available_quantity - 2
 WHERE id = (SELECT id
             FROM batches
             WHERE product_id = (SELECT id_product FROM products WHERE name = 'miel de pissenlit bio')
-              AND status = 'RECEIVED' LIMIT 1);
+              AND status = 'RECEIVED'
+            LIMIT 1);
 
 UPDATE batches
 SET available_quantity = available_quantity - 4
 WHERE id = (SELECT id
             FROM batches
             WHERE product_id = (SELECT id_product FROM products WHERE name = 'courgette blanche d''egypte')
-              AND status = 'RECEIVED' LIMIT 1);
+              AND status = 'RECEIVED'
+            LIMIT 1);
 
 -- Création des notifications pour les lots de Roger Maerckx
 -- Notification pour Laitue Blonde de Paris
 INSERT INTO notifications (message, read, date, producer_id, batch_id)
-SELECT 
-  '',
-  true,
-  '2025-04-15',
-  (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com'),
-  b.id
+SELECT '',
+       true,
+       '2025-04-15',
+       (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com'),
+       b.id
 FROM batches b
-JOIN products p ON b.product_id = p.id_product
+         JOIN products p ON b.product_id = p.id_product
 WHERE p.name = 'laitue blonde de paris'
-AND b.producer_id = (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com')
+  AND b.producer_id = (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com')
 LIMIT 1;
 
 -- Notification pour Courgette Blanche d'Egypte
 INSERT INTO notifications (message, read, date, producer_id, batch_id)
-SELECT 
-  '',
-  true,
-  '2025-04-20',
-  (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com'),
-  b.id
+SELECT '',
+       true,
+       '2025-04-20',
+       (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com'),
+       b.id
 FROM batches b
-JOIN products p ON b.product_id = p.id_product
+         JOIN products p ON b.product_id = p.id_product
 WHERE p.name = 'courgette blanche d''egypte'
-AND b.producer_id = (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com')
+  AND b.producer_id = (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com')
 LIMIT 1;
 
 -- Notification pour Haricot Mistik
 INSERT INTO notifications (message, read, date, producer_id, batch_id)
-SELECT 
-  '',
-  true,
-  '2025-04-10',
-  (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com'),
-  b.id
+SELECT '',
+       true,
+       '2025-04-10',
+       (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com'),
+       b.id
 FROM batches b
-JOIN products p ON b.product_id = p.id_product
+         JOIN products p ON b.product_id = p.id_product
 WHERE p.name = 'haricot mistik'
-AND b.producer_id = (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com')
+  AND b.producer_id = (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com')
 LIMIT 1;
 
 -- Notification pour Carotte Cosmic Purple
 INSERT INTO notifications (message, read, date, producer_id, batch_id)
-SELECT 
-  '',
-  true,
-  '2025-04-12',
-  (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com'),
-  b.id
+SELECT '',
+       true,
+       '2025-04-12',
+       (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com'),
+       b.id
 FROM batches b
-JOIN products p ON b.product_id = p.id_product
+         JOIN products p ON b.product_id = p.id_product
 WHERE p.name = 'carotte cosmic purple'
-AND b.producer_id = (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com')
+  AND b.producer_id = (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com')
 LIMIT 1;
 
 -- Notification pour Miel de Pissenlit Bio
 INSERT INTO notifications (message, read, date, producer_id, batch_id)
-SELECT 
-  '',
-  true,
-  '2025-04-25',
-  (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com'),
-  b.id
+SELECT '',
+       true,
+       '2025-04-25',
+       (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com'),
+       b.id
 FROM batches b
-JOIN products p ON b.product_id = p.id_product
+         JOIN products p ON b.product_id = p.id_product
 WHERE p.name = 'miel de pissenlit bio'
-AND b.producer_id = (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com')
+  AND b.producer_id = (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com')
 LIMIT 1;
 
 -- Notification pour Cerise Napoleon
 INSERT INTO notifications (message, read, date, reason_of_reject, producer_id, batch_id)
-SELECT 
-  'Non conformité de votre lot concernant la politique d exportaion de  Terroir&Cie.',
-  true,
-  '2025-04-28',
-  'La qualité des cerises ne correspond pas à nos standards. Prix trop élevé par rapport au marché.',
-  (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com'),
-  b.id
+SELECT 'Non conformité de votre lot concernant la politique d exportaion de  Terroir&Cie.',
+       true,
+       '2025-04-28',
+       'La qualité des cerises ne correspond pas à nos standards. Prix trop élevé par rapport au marché.',
+       (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com'),
+       b.id
 FROM batches b
-JOIN products p ON b.product_id = p.id_product
+         JOIN products p ON b.product_id = p.id_product
 WHERE p.name = 'cerise napoleon'
-AND b.producer_id = (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com')
+  AND b.producer_id = (SELECT id_user FROM users WHERE email = 'roger.maerckx@exemple.com')
 LIMIT 1;

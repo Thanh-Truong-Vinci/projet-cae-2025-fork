@@ -21,6 +21,7 @@ import be.vinci.ipl.cae.demo.services.ProductService;
 import java.util.List;
 import java.util.Map;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -74,6 +75,7 @@ public class BatchController {
    */
   @PostMapping("/createbatch")
   @PreAuthorize(SecurityConstants.HAS_ROLE_PRODUCER)
+  @Transactional
   public Batch createBatch(
       @RequestPart("batch") NewBatch newBatch, @RequestPart("image") MultipartFile image) {
 
@@ -143,6 +145,7 @@ public class BatchController {
    */
   @PostMapping("/createbatch/existing")
   @PreAuthorize(SecurityConstants.HAS_ROLE_PRODUCER)
+  @Transactional
   public Batch createBatchWithExistingProduct(
       @RequestBody NewBatch newBatch, @RequestParam Long productId) {
 
@@ -167,6 +170,7 @@ public class BatchController {
    */
   @PostMapping("/createbatch/existingimage")
   @PreAuthorize(SecurityConstants.HAS_ROLE_PRODUCER)
+  @Transactional
   public Batch createBatchWithExistingImage(
       @RequestBody NewBatch newBatch, @RequestParam Long photoId) {
 
@@ -234,6 +238,7 @@ public class BatchController {
    */
   @PatchMapping("/{id}/accept")
   @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
+  @Transactional
   public Batch acceptBatch(@PathVariable long id) {
     return batchService.acceptBatch(id);
   }
@@ -247,6 +252,7 @@ public class BatchController {
    */
   @PatchMapping("/{id}/reject")
   @PreAuthorize("hasRole('ROLE_MANAGER')")
+  @Transactional
   public Batch rejectBatch(@PathVariable long id, @RequestParam(required = false) String message) {
     System.out.println("Rejet du lot " + id + " avec message: " + message);
     return batchService.rejectBatch(id, message);
@@ -260,6 +266,7 @@ public class BatchController {
    */
   @PatchMapping("/{id}/receive")
   @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
+  @Transactional
   public Batch receiveBatch(@PathVariable long id, @RequestHeader("Authorization") String token) {
     Batch batch = batchService.getBatchById(id);
 
@@ -285,6 +292,7 @@ public class BatchController {
    */
   @PatchMapping("/{id}/updateImage")
   @PreAuthorize(SecurityConstants.HAS_ROLE_PRODUCER)
+  @Transactional
   public Batch updateBatchImage(
       @PathVariable long id,
       @RequestPart("image") MultipartFile image,
@@ -311,6 +319,7 @@ public class BatchController {
    */
   @PatchMapping("/{id}/updateImageById")
   @PreAuthorize(SecurityConstants.HAS_ROLE_PRODUCER)
+  @Transactional
   public Batch updateBatchImageById(
       @PathVariable long id,
       @RequestBody Map<String, Long> requestBody,
@@ -427,6 +436,7 @@ public class BatchController {
    */
   @PatchMapping("/{id}/reduce-quantity")
   @PreAuthorize(SecurityConstants.HAS_ROLE_VOLUNTEER)
+  @Transactional
   public Batch reduceQuantity(
       @PathVariable long id,
       @RequestParam int quantity,
