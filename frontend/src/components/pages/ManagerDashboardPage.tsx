@@ -999,8 +999,13 @@ const ManagerDashboardPage = () => {
                   Unités Reçues (Total)
                 </Typography>
                 <Typography variant="h3">{totalReceived}</Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  En stock disponible: {totalReceived - totalSold - totalReserved} unités
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mt: 1 }}
+                >
+                  En stock disponible:{' '}
+                  {totalReceived - totalSold - totalReserved} unités
                 </Typography>
               </CardContent>
             </Card>
@@ -1012,8 +1017,15 @@ const ManagerDashboardPage = () => {
                   Unités Vendues
                 </Typography>
                 <Typography variant="h3">{totalSold}</Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  {totalReceived > 0 ? ((totalSold / totalReceived) * 100).toFixed(1) : "0.0"}% du stock reçu
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mt: 1 }}
+                >
+                  {totalReceived > 0
+                    ? ((totalSold / totalReceived) * 100).toFixed(1)
+                    : '0.0'}
+                  % du stock reçu
                 </Typography>
               </CardContent>
             </Card>
@@ -1025,8 +1037,15 @@ const ManagerDashboardPage = () => {
                   Unités Réservées
                 </Typography>
                 <Typography variant="h3">{totalReserved}</Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  {totalReceived > 0 ? ((totalReserved / totalReceived) * 100).toFixed(1) : "0.0"}% du stock reçu
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mt: 1 }}
+                >
+                  {totalReceived > 0
+                    ? ((totalReserved / totalReceived) * 100).toFixed(1)
+                    : '0.0'}
+                  % du stock reçu
                 </Typography>
               </CardContent>
             </Card>
@@ -1037,9 +1056,19 @@ const ManagerDashboardPage = () => {
                 <Typography variant="h6" color="textSecondary" gutterBottom>
                   Revenu Total
                 </Typography>
-                <Typography variant="h3">{totalRevenue.toFixed(2)} €</Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  Prix moyen: {totalSold > 0 ? (totalRevenue / totalSold).toFixed(2) : "0.00"} €/unité
+                <Typography variant="h3">
+                  {totalRevenue.toFixed(2)} €
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mt: 1 }}
+                >
+                  Prix moyen:{' '}
+                  {totalSold > 0
+                    ? (totalRevenue / totalSold).toFixed(2)
+                    : '0.00'}{' '}
+                  €/unité
                 </Typography>
               </CardContent>
             </Card>
@@ -1050,11 +1079,18 @@ const ManagerDashboardPage = () => {
                 <Typography variant="h6" color="textSecondary" gutterBottom>
                   Revenu Potentiel
                 </Typography>
-                <Typography variant="h3">{totalPotentialRevenue.toFixed(2)} €</Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  {totalRevenue > 0 ? 
-                    `+${((totalPotentialRevenue / totalRevenue) * 100).toFixed(1)}%` : 
-                    "100%"} du revenu actuel
+                <Typography variant="h3">
+                  {totalPotentialRevenue.toFixed(2)} €
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mt: 1 }}
+                >
+                  {totalRevenue > 0
+                    ? `+${((totalPotentialRevenue / totalRevenue) * 100).toFixed(1)}%`
+                    : '100%'}{' '}
+                  du revenu actuel
                 </Typography>
               </CardContent>
             </Card>
@@ -1088,37 +1124,58 @@ const ManagerDashboardPage = () => {
                     <TableCell align="right">{stat.soldQuantity}</TableCell>
                     <TableCell align="right">{stat.reservedQuantity}</TableCell>
                     <TableCell align="right">
-                      {stat.receivedQuantity - stat.soldQuantity - stat.reservedQuantity > 0 
-                        ? stat.receivedQuantity - stat.soldQuantity - stat.reservedQuantity 
+                      {stat.receivedQuantity -
+                        stat.soldQuantity -
+                        stat.reservedQuantity >
+                      0
+                        ? stat.receivedQuantity -
+                          stat.soldQuantity -
+                          stat.reservedQuantity
                         : 0}
                     </TableCell>
                     <TableCell align="right">
                       {stat.receivedQuantity > 0 ? (
                         <Box display="flex" alignItems="center">
                           <Box width="100%" mr={1}>
-                            <LinearProgress 
-                              variant="determinate" 
+                            <LinearProgress
+                              variant="determinate"
                               value={Math.min(
-                                ((stat.soldQuantity + stat.reservedQuantity) / stat.receivedQuantity) * 100, 
+                                ((stat.soldQuantity + stat.reservedQuantity) /
+                                  stat.receivedQuantity) *
+                                  100,
                                 100
                               )}
-                              sx={{ 
-                                height: 10, 
+                              sx={{
+                                height: 10,
                                 borderRadius: 5,
                                 '& .MuiLinearProgress-bar': {
-                                  backgroundColor: ((stat.soldQuantity + stat.reservedQuantity) / stat.receivedQuantity) > 0.8 ? 
-                                    'success.main' : 'warning.main'
-                                }
+                                  backgroundColor:
+                                    (stat.soldQuantity +
+                                      stat.reservedQuantity) /
+                                      stat.receivedQuantity >
+                                    0.8
+                                      ? 'success.main'
+                                      : 'warning.main',
+                                },
                               }}
                             />
                           </Box>
                           <Box minWidth={35}>
-                            {Math.round(((stat.soldQuantity + stat.reservedQuantity) / stat.receivedQuantity) * 100)}%
+                            {Math.round(
+                              ((stat.soldQuantity + stat.reservedQuantity) /
+                                stat.receivedQuantity) *
+                                100
+                            )}
+                            %
                           </Box>
                         </Box>
-                      ) : 'N/A'}
+                      ) : (
+                        'N/A'
+                      )}
                     </TableCell>
-                    <TableCell align="right">{stat.totalRevenue.toFixed(2)} €</TableCell>
+                    <TableCell align="right">
+                      {stat.totalRevenue.toFixed(2)} €
+                    </TableCell>
                     <TableCell align="right">
                       {(stat.totalRevenue + stat.potentialRevenue).toFixed(2)} €
                     </TableCell>
@@ -1153,18 +1210,24 @@ const ManagerDashboardPage = () => {
                 {salesStatistics.map((stat, index) => {
                   const available = Math.max(
                     0,
-                    (stat.receivedQuantity || 0) - 
-                    (stat.soldQuantity || 0) - 
-                    (stat.reservedQuantity || 0)
-                  );
-                    
+                    (stat.receivedQuantity || 0) -
+                      (stat.soldQuantity || 0) -
+                      (stat.reservedQuantity || 0)
+                  )
+
                   return (
                     <TableRow key={index}>
                       <TableCell>{stat.productName}</TableCell>
                       <TableCell>{stat.productType}</TableCell>
-                      <TableCell align="right">{stat.receivedQuantity || 0}</TableCell>
-                      <TableCell align="right">{stat.soldQuantity || 0}</TableCell>
-                      <TableCell align="right">{stat.reservedQuantity || 0}</TableCell>
+                      <TableCell align="right">
+                        {stat.receivedQuantity || 0}
+                      </TableCell>
+                      <TableCell align="right">
+                        {stat.soldQuantity || 0}
+                      </TableCell>
+                      <TableCell align="right">
+                        {stat.reservedQuantity || 0}
+                      </TableCell>
                       <TableCell align="right">{available}</TableCell>
                       <TableCell>{stat.unitType}</TableCell>
                       <TableCell align="right">
@@ -1174,7 +1237,7 @@ const ManagerDashboardPage = () => {
                         {(stat.potentialRevenue || 0).toFixed(2)} €
                       </TableCell>
                     </TableRow>
-                  );
+                  )
                 })}
               </TableBody>
             </Table>
