@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Service class for managing reservations. */
 @Service
@@ -47,6 +48,7 @@ public class ReservationService {
    * @param batch the batch to reserve
    * @param quantity the quantity of the product to reserve
    */
+  @Transactional
   public void reserveProduct(Client client, Batch batch, int quantity) {
     Reservation reservation =
         reservationRepository
@@ -73,6 +75,7 @@ public class ReservationService {
    * @param quantity the quantity of the product to reserve
    * @return the created confirmed reservation
    */
+  @Transactional
   public Reservation reserveProductDirect(Client client, Batch batch, int quantity) {
     Reservation reservation = new Reservation();
     reservation.setClient(client);
@@ -139,6 +142,7 @@ public class ReservationService {
    * @param newStatus the new status for the reservation
    * @return the updated reservation
    */
+  @Transactional
   public Reservation changeStatus(Long reservationId, ReservationStatus newStatus) {
     Reservation reservation = reservationRepository.findById(reservationId).orElse(null);
     if (reservation == null) {
@@ -186,6 +190,7 @@ public class ReservationService {
    * @param reservation the reservation to delete
    * @return the deleted reservation
    */
+  @Transactional
   public Reservation deleteReservation(Reservation reservation) {
     for (ReservationLine line : reservation.getReservationLines()) {
       reservationLineService.deleteReservationLine(line);
@@ -194,3 +199,4 @@ public class ReservationService {
     return reservation;
   }
 }
+
