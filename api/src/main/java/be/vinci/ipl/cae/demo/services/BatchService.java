@@ -305,7 +305,7 @@ public class BatchService {
   public Iterable<Batch> getBatchesByProducer(Long producerId) {
 
     return batchRepository.findByProducerIdAndAvailableQuantityGreaterThanOrderByProductionDateAsc(
-        producerId, 0);
+        producerId, -1);
   }
 
   /**
