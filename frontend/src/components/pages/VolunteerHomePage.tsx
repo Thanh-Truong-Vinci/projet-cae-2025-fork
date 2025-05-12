@@ -83,7 +83,9 @@ const VolunteerHomePage = () => {
   const [, setLoadingAgglomerated] = useState<boolean>(false)
 
   const [openStockDialog, setOpenStockDialog] = useState(false)
-  const [selectedStockBatchId, setSelectedStockBatchId] = useState<number | null>(null)
+  const [selectedStockBatchId, setSelectedStockBatchId] = useState<
+    number | null
+  >(null)
   const [stockReductionQuantity, setStockReductionQuantity] = useState(1)
 
   const fetchAgglomeratedProducts = useCallback(async () => {
@@ -171,6 +173,7 @@ const VolunteerHomePage = () => {
   const handleConfirmReservation = async (reservationId: number) => {
     try {
       await toConfirmReservation(reservationId)
+      await fetchAllReservations()
       setSnackbarMessage('Réservation confirmée avec succès')
       setSnackbarSeverity('success')
     } catch (error) {
@@ -282,7 +285,9 @@ const VolunteerHomePage = () => {
 
   const handleConfirmStockReduction = async () => {
     if (!selectedStockBatchId || stockReductionQuantity <= 0) {
-      setSnackbarMessage('Veuillez sélectionner un produit et une quantité valide')
+      setSnackbarMessage(
+        'Veuillez sélectionner un produit et une quantité valide'
+      )
       setSnackbarSeverity('error')
       setOpenSnackbar(true)
       return
@@ -315,16 +320,22 @@ const VolunteerHomePage = () => {
         const availableQuantity = selectedProduct.batchQuantities[i]
 
         // Calculer combien prendre de ce lot
-        const quantityFromThisBatch = Math.min(remainingQuantity, availableQuantity)
+        const quantityFromThisBatch = Math.min(
+          remainingQuantity,
+          availableQuantity
+        )
 
         // Appel API pour réduire la quantité
-        const response = await fetch(`/api/batches/${batchId}/reduce-quantity?quantity=${quantityFromThisBatch}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: authenticatedUser?.token || '',
-          },
-        })
+        const response = await fetch(
+          `/api/batches/${batchId}/reduce-quantity?quantity=${quantityFromThisBatch}`,
+          {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: authenticatedUser?.token || '',
+            },
+          }
+        )
 
         if (!response.ok) {
           throw new Error(`Erreur: ${response.status}`)
@@ -546,7 +557,7 @@ const VolunteerHomePage = () => {
         >
           Vente libre
         </Button>
-        
+
         <Button
           variant="contained"
           color="warning"
@@ -755,9 +766,10 @@ const VolunteerHomePage = () => {
         <DialogTitle>Retirer des produits du stock</DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ mb: 2 }}>
-            Sélectionnez un produit et une quantité à retirer du stock (pertes, produits périmés, etc.).
+            Sélectionnez un produit et une quantité à retirer du stock (pertes,
+            produits périmés, etc.).
           </DialogContentText>
-          
+
           {loadingReceivedBatches ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
               <CircularProgress />
@@ -772,7 +784,9 @@ const VolunteerHomePage = () => {
                 <InputLabel>Produit</InputLabel>
                 <Select
                   value={selectedStockBatchId || ''}
-                  onChange={(e) => setSelectedStockBatchId(e.target.value as number)}
+                  onChange={(e) =>
+                    setSelectedStockBatchId(e.target.value as number)
+                  }
                   label="Produit"
                 >
                   {agglomeratedProducts.map((product) => (
@@ -790,7 +804,9 @@ const VolunteerHomePage = () => {
                             {product.productName} ({product.companyName})
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            {product.totalQuantity} {product.saleUnit} disponible - {product.unitPrice.toFixed(2)}€/{product.saleUnit}
+                            {product.totalQuantity} {product.saleUnit}{' '}
+                            disponible - {product.unitPrice.toFixed(2)}€/
+                            {product.saleUnit}
                           </Typography>
                         </div>
                       </Box>
@@ -804,7 +820,11 @@ const VolunteerHomePage = () => {
                   label="Quantité à retirer"
                   type="number"
                   value={stockReductionQuantity}
-                  onChange={(e) => setStockReductionQuantity(Math.max(1, parseInt(e.target.value) || 0))}
+                  onChange={(e) =>
+                    setStockReductionQuantity(
+                      Math.max(1, parseInt(e.target.value) || 0)
+                    )
+                  }
                   fullWidth
                   InputProps={{ inputProps: { min: 1 } }}
                   helperText={
@@ -824,7 +844,11 @@ const VolunteerHomePage = () => {
         <DialogActions>
           <Button onClick={() => setOpenStockDialog(false)}>Annuler</Button>
           <Button
-            onClick={handleConfirmStockReduction}
+            onClick={async () => {
+              await handleConfirmStockReduction()
+              // Rafraîchir les données et les réservations après confirmation
+              fetchAllReservations().catch(console.error)
+            }}
             variant="contained"
             color="primary"
             disabled={!selectedStockBatchId || stockReductionQuantity <= 0}

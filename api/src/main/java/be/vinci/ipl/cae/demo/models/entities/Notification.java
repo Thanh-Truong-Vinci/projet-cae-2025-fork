@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
@@ -36,9 +37,13 @@ public class Notification {
   @Column(nullable = true)
   private String reasonOfReject;
 
-  @ManyToOne private User producer;
+  @ManyToOne
+  @JoinColumn(name = "producer_id", nullable = false)
+  private User producer;
 
-  @OneToOne private Batch batch;
+  @OneToOne
+  @JoinColumn(name = "batch_id", nullable = false)
+  private Batch batch;
 
   /** Initialise les valeurs par défaut avant la persistance. */
   @PrePersist
