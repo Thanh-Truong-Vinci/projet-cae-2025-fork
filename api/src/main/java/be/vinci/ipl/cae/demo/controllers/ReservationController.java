@@ -103,7 +103,7 @@ public class ReservationController {
     }
 
     // Get the default client - shouldn't use Optional as specified
-    Client defaultClient = authsService.getClientByEmail("clientlibre@example.com");
+    Client defaultClient = authsService.getClientByEmail("clientlibre@exemple.com");
     if (defaultClient == null) {
       throw new ResourceNotFoundException("Cannot find default client account for direct sales");
     }

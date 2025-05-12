@@ -335,7 +335,7 @@ public class BatchService {
    */
   public List<ProductBatchView> getReceivedBatchesWithAvailableQuantity() {
     // Récupérer les lots RECEIVED
-    List<Batch> receivedBatches = batchRepository.findByStatus(BatchStatus.RECEIVED);
+    List<Batch> receivedBatches = batchRepository.findByStatusAndAvailableQuantityGreaterThan(BatchStatus.RECEIVED, 0);
 
     // Map pour regrouper les lots par productId + unitPrice + saleUnit + photoId +
     // companyName

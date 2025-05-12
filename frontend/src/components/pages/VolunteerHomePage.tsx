@@ -640,20 +640,32 @@ const VolunteerHomePage = () => {
                   label="Quantité"
                   type="number"
                   value={venteLibreQuantity}
-                  onChange={(e) =>
-                    setVenteLibreQuantity(
-                      Math.max(1, parseInt(e.target.value) || 0)
-                    )
-                  }
+                  onChange={(e) => {
+                    const newValue = parseInt(e.target.value) || 0;
+                    const selectedProduct = agglomeratedProducts.find(
+                      (p) => p.productId === selectedVenteBatchId
+                    );
+                    const maxQuantity = selectedProduct ? selectedProduct.totalQuantity : 0;
+                    // Limiter la quantité à la valeur maximale disponible
+                    setVenteLibreQuantity(Math.min(Math.max(1, newValue), maxQuantity));
+                  }}
                   fullWidth
-                  InputProps={{ inputProps: { min: 1 } }}
+                  InputProps={{ 
+                    inputProps: { 
+                      min: 1, 
+                      max: selectedVenteBatchId 
+                        ? agglomeratedProducts.find(
+                            (product) => product.productId === selectedVenteBatchId
+                          )?.totalQuantity || 0
+                        : 1 
+                    } 
+                  }}
                   sx={{ mb: 2 }}
                   helperText={
                     selectedVenteBatchId
                       ? `Quantité maximale disponible: ${
                           agglomeratedProducts.find(
-                            (product) =>
-                              product.productId === selectedVenteBatchId
+                            (product) => product.productId === selectedVenteBatchId
                           )?.totalQuantity || 0
                         }`
                       : ''
@@ -817,21 +829,35 @@ const VolunteerHomePage = () => {
 
               {selectedStockBatchId && (
                 <TextField
-                  label="Quantité à retirer"
+                  label="Quantité"
                   type="number"
                   value={stockReductionQuantity}
-                  onChange={(e) =>
-                    setStockReductionQuantity(
-                      Math.max(1, parseInt(e.target.value) || 0)
-                    )
-                  }
+                  onChange={(e) => {
+                    const newValue = parseInt(e.target.value) || 0;
+                    const selectedProduct = agglomeratedProducts.find(
+                      (p) => p.productId === selectedStockBatchId
+                    );
+                    const maxQuantity = selectedProduct ? selectedProduct.totalQuantity : 0;
+                    // Limiter la quantité à la valeur maximale disponible
+                    setStockReductionQuantity(Math.min(Math.max(1, newValue), maxQuantity));
+                  }}
                   fullWidth
-                  InputProps={{ inputProps: { min: 1 } }}
+                  InputProps={{ 
+                    inputProps: { 
+                      min: 1, 
+                      max: selectedStockBatchId 
+                        ? agglomeratedProducts.find(
+                            (product) => product.productId === selectedStockBatchId
+                          )?.totalQuantity || 0
+                        : 1 
+                    } 
+                  }}
+                  sx={{ mb: 2 }}
                   helperText={
                     selectedStockBatchId
                       ? `Quantité maximale disponible: ${
                           agglomeratedProducts.find(
-                            (p) => p.productId === selectedStockBatchId
+                            (product) => product.productId === selectedStockBatchId
                           )?.totalQuantity || 0
                         }`
                       : ''
