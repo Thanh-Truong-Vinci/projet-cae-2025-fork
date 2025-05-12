@@ -22,6 +22,6 @@ public class ProductBatchView {
   private String companyName;
   private LocalDate earliestProductionDate; // Pour le tri
   private List<Long> batchIds = new ArrayList<>();
-  private List<Integer> batchQuantities =
-      new ArrayList<>(); // Quantités correspondant à chaque batch
+  private List<Integer> batchQuantities = new ArrayList<>(); // Quantités correspondant à chaque batch
+  private List<Long> batchVersions = new ArrayList<>(); // Added for optimistic locking
 }

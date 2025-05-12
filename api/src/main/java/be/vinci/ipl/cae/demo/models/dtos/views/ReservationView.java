@@ -22,6 +22,7 @@ public class ReservationView {
   private LocalDate saleDate;
   private Double price;
   private List<ReservationLineView> reservationLines;
+  private Long version; // Added for optimistic locking
 
   /**
    * Constructor for ReservationView. Creates a reservation view from a Reservation entity.
@@ -39,5 +40,6 @@ public class ReservationView {
         reservation.getReservationLines().stream()
             .map(ReservationLineView::new)
             .collect(Collectors.toList());
+    this.version = reservation.getVersion(); // Initialize the version field
   }
 }

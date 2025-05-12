@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,6 +49,7 @@ public class NotificationController {
    * @return the created notification
    */
   @PostMapping("/create")
+  @Transactional
   public ResponseEntity<Notification> createNotification(
       @RequestBody NewNotification notification) {
     System.out.println("Notification create appelé : " + notification);
@@ -123,6 +125,7 @@ public class NotificationController {
    * @return the updated notification
    */
   @PutMapping("/{id}/read")
+  @Transactional
   public ResponseEntity<Notification> markNotificationAsRead(
       @PathVariable("id") Long id, @RequestHeader("Authorization") String token) {
     try {
@@ -146,6 +149,7 @@ public class NotificationController {
    * @return a success response
    */
   @PutMapping("/read-all")
+  @Transactional
   public ResponseEntity<Void> markAllNotificationsAsRead(
       @RequestHeader("Authorization") String token) {
     try {
@@ -162,3 +166,4 @@ public class NotificationController {
     }
   }
 }
+

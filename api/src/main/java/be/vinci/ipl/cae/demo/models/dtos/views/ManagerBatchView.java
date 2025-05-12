@@ -25,4 +25,5 @@ public class ManagerBatchView {
   private String producerName;
   private String producerCompany;
   private LocalDate createdAt;
+  private Long version; // Added for optimistic locking
 }

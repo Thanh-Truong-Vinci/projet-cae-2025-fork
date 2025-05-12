@@ -17,6 +17,7 @@ import be.vinci.ipl.cae.demo.services.ReservationLineService;
 import be.vinci.ipl.cae.demo.services.ReservationService;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -64,6 +65,7 @@ public class ReservationController {
    * @throws ResourceNotFoundException if the token is invalid or expired.
    */
   @PostMapping("/reserve")
+  @Transactional
   public void reserveProduct(
       @RequestBody ReservationRequest reservationRequest,
       @RequestHeader("Authorization") String token) {
@@ -93,6 +95,7 @@ public class ReservationController {
    * @throws ConflictException if there isn't enough quantity available
    */
   @PostMapping("/reserveDirect")
+  @Transactional
   public ReservationView reserveProductDirect(
       @RequestBody ReservationRequest reservationRequest,
       @RequestHeader("Authorization") String token) {
@@ -156,6 +159,7 @@ public class ReservationController {
    * @throws ConflictException if the reservation ID is missing.
    */
   @PostMapping("/toPending")
+  @Transactional
   public ReservationView toPending(
       @RequestBody Long reservationId, @RequestHeader("Authorization") String token) {
     return changeReservationStatus(reservationId, token, ReservationStatus.PENDING, true);
@@ -169,6 +173,7 @@ public class ReservationController {
    * @throws ConflictException if the reservation ID is missing.
    */
   @PostMapping("/toConfirm")
+  @Transactional
   public void toConfirm(@RequestBody Long reservationId) {
     if (reservationId == null) {
       throw new ConflictException("Reservation ID is required");
@@ -186,6 +191,7 @@ public class ReservationController {
    * @throws ConflictException if the reservation ID is missing.
    */
   @PostMapping("/toCancel")
+  @Transactional
   public ReservationView toCancel(
       @RequestBody Long reservationId, @RequestHeader("Authorization") String token) {
     // First check if it's a client
@@ -220,6 +226,7 @@ public class ReservationController {
    * @throws ConflictException if the reservation ID is missing.
    */
   @PostMapping("/toAbandon")
+  @Transactional
   public ReservationView toAbandon(
       @RequestBody Long reservationId, @RequestHeader("Authorization") String token) {
     if (!authsService.isValidToken(token)) {
@@ -284,6 +291,7 @@ public class ReservationController {
    * @throws ResourceNotFoundException if the token is invalid or expired or reservation not found.
    */
   @PostMapping("/clear")
+  @Transactional
   public ReservationView clearReservation(
       @RequestBody Long reservationId, @RequestHeader("Authorization") String token) {
     Client client = validateClientToken(token);
@@ -311,6 +319,7 @@ public class ReservationController {
    *     found
    */
   @PostMapping("/changeQuantity")
+  @Transactional
   public ReservationView changeQuantity(
       @RequestBody ChangeQuantityRequest request, @RequestHeader("Authorization") String token) {
     Client client = authsService.isValidClientToken(token);
@@ -325,37 +334,4 @@ public class ReservationController {
     // Fetch the reservation line
     ReservationLine line =
         reservationLineRepository
-            .findById(request.getReservationLineId())
-            .orElseThrow(() -> new ResourceNotFoundException("Reservation line not found"));
-
-    // Verify the reservation belongs to the client
-    if (!line.getReservation().getClient().getId().equals(client.getId())) {
-      throw new ConflictException("This reservation doesn't belong to the authenticated client");
-    }
-
-    // If reservation is not in BUILDING status, don't allow changes
-    if (line.getReservation().getStatus() != ReservationStatus.BUILDING) {
-      throw new ConflictException("Cannot modify a reservation that is not in BUILDING status");
-    }
-
-    // Change quantity
-    Reservation updatedReservation =
-        reservationLineService.changeQuantity(line, request.getQuantity());
-    return new ReservationView(updatedReservation);
-  }
-
-  /**
-   * Validates the client token.
-   *
-   * @param token the authorization token from the request header.
-   * @return the validated client.
-   * @throws ResourceNotFoundException if the token is invalid or expired.
-   */
-  private Client validateClientToken(String token) {
-    Client client = authsService.isValidClientToken(token);
-    if (client == null) {
-      throw new ResourceNotFoundException("Token not valid, expired or user is not client");
-    }
-    return client;
-  }
-}
+            .findById(request.get
