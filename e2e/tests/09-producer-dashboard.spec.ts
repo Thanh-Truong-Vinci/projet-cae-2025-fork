@@ -9,7 +9,7 @@ test.describe("producer-dashboard", () => {
         await goFromHomePageToLoginPage(page);
 
         await loginWith(page, {
-          email: "producer@example.com",
+          email: "producteur@exemple.com",
           password: "Azqwazqw1@",
           rememberMe: true
         });
@@ -28,7 +28,7 @@ test.describe("producer-dashboard", () => {
         await expect(page.getByRole("tab", { name: "Accepté" })).toBeVisible();
         await expect(page.getByRole("tab", { name: "En attente" })).toBeVisible();
         await expect(page.getByRole("tab", { name: "Refusé" })).toBeVisible();
-        await expect(page.getByRole("tab", { name: "Reçu" })).toBeVisible();
+        await expect(page.getByRole("tab", { name: "En vente" })).toBeVisible();
         await expect(page.getByRole("tab", { name: "Épuisé" })).toBeVisible();
         
         await expect(page.getByRole("heading", { name: "Statistiques" })).toBeVisible();
@@ -50,8 +50,8 @@ test.describe("producer-dashboard", () => {
         await expect(page.getByRole("tab", { name: "Refusé" })).toHaveAttribute("aria-selected", "true");
         
         // Onglet "Reçu"
-        await page.getByRole("tab", { name: "Reçu" }).click();
-        await expect(page.getByRole("tab", { name: "Reçu" })).toHaveAttribute("aria-selected", "true");
+        await page.getByRole("tab", { name: "En vente" }).click();
+        await expect(page.getByRole("tab", { name: "En vente" })).toHaveAttribute("aria-selected", "true");
         
         // Onglet "Épuisé"
         await page.getByRole("tab", { name: "Épuisé" }).click();
