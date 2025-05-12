@@ -10,7 +10,7 @@ test.describe("manager-dashboard", () => {
     test.beforeEach(async ({ page }) => {
         await goFromHomePageToLoginPage(page);
         await loginWith(page, {
-          email: "admin@example.com",
+          email: "admin@exemple.com",
           password: "Azqwazqw1@",
           rememberMe: true
         });
@@ -20,14 +20,14 @@ test.describe("manager-dashboard", () => {
 
     test("TC4.1: should display stock information and access sales dashboard", async ({ page }) => {
       await expect(page.getByText("Produits en stock")).toBeVisible();
-      await expect(page.getByText("Produits reçus en Stock")).toBeVisible();
+      await expect(page.getByText("Produits en vente en Stock")).toBeVisible();
       
       await expect(page.getByText("Statistiques des ventes")).toBeVisible();
       await page.getByText("Statistiques des ventes").click();
       
       await expect(page.getByText("Tableau de bord des ventes")).toBeVisible();
 
-      await expect(page.getByText("Récapitulatif par Type de Produit")).toBeVisible();
+      await expect(page.getByText("Statistiques par Type de Produit")).toBeVisible();
 
       await expect(page.getByText("Détails par Produit")).toBeVisible();
     });

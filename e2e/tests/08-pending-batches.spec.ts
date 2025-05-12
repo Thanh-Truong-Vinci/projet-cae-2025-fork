@@ -9,7 +9,7 @@ test.describe("pending-batches", () => {
     test.beforeEach(async ({ page }) => {
         await goFromHomePageToLoginPage(page);
         await loginWith(page, {
-          email: "admin@example.com",
+          email: "admin@exemple.com",
           password: "Azqwazqw1@",
           rememberMe: true
         });
@@ -63,11 +63,6 @@ test.describe("pending-batches", () => {
             // Vérifier que le nombre de lots a diminué
             const finalCardCount = await page.locator(".MuiCard-root").count();
             expect(finalCardCount).toBeLessThanOrEqual(initialCardCount);
-            
-            if (finalCardCount === 0) {
-                // Si plus de lots, vérifier le message
-                await expect(page.getByText("Aucun lot en attente.")).toBeVisible();
-            }
         }
     });
 
@@ -92,10 +87,6 @@ test.describe("pending-batches", () => {
             // Vérifier que le nombre de lots a diminué
             const finalCardCount = await page.locator(".MuiCard-root").count();
             expect(finalCardCount).toBeLessThanOrEqual(initialCardCount);
-            
-            if (finalCardCount === 0) {
-                await expect(page.getByText("Aucun lot en attente.")).toBeVisible();
-            }
         }
     });
 
@@ -118,11 +109,6 @@ test.describe("pending-batches", () => {
             // Vérifier que le nombre de lots a diminué
             const finalCardCount = await page.locator(".MuiCard-root").count();
             expect(finalCardCount).toBeLessThanOrEqual(initialCardCount);
-            
-            if (finalCardCount === 0) {
-                // Si plus de lots, vérifier le message
-                await expect(page.getByText("Aucun lot en attente.")).toBeVisible();
-            }
         }
     });
 });

@@ -10,7 +10,7 @@ test.describe("register-producer", () => {
     test.beforeEach(async ({ page }) => {
         await goFromHomePageToLoginPage(page);
         await loginWith(page, {
-          email: "admin@example.com",
+          email: "admin@exemple.com",
           password: "Azqwazqw1@",
           rememberMe: true
         });
@@ -75,7 +75,7 @@ test.describe("register-producer", () => {
             city: faker.location.city(),
             country: "Belgique",
             phoneNumber: "+324" + faker.string.numeric(6),
-            email: "admin@example.com",
+            email: "admin@exemple.com",
             password: "Password123!",
             confirmPassword: "Password123!"
         };

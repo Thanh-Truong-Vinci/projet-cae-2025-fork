@@ -10,7 +10,7 @@ test.describe("register-manager", () => {
     test.beforeEach(async ({ page }) => {
         await goFromHomePageToLoginPage(page);
         await loginWith(page, {
-          email: "admin@example.com",
+          email: "admin@exemple.com",
           password: "Azqwazqw1@",
           rememberMe: true
         });
@@ -55,7 +55,7 @@ test.describe("register-manager", () => {
         const managerData = {
             name: faker.person.lastName(),
             firstname: faker.person.firstName(),
-            email: "admin@example.com", // Email déjà utilisé
+            email: "admin@exemple.com", // Email déjà utilisé
             password: "Password123!",
             confirmPassword: "Password123!"
         };

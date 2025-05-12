@@ -10,7 +10,7 @@ test.describe("manage-product-types", () => {
     test.beforeEach(async ({ page }) => {
         await goFromHomePageToLoginPage(page);
         await loginWith(page, {
-          email: "admin@example.com",
+          email: "admin@exemple.com",
           password: "Azqwazqw1@",
           rememberMe: true
         });
