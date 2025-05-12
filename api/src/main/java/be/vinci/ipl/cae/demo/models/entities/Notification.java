@@ -10,6 +10,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import java.time.LocalDate;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,9 @@ public class Notification {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long idNotification;
+
+  @Version
+  private Long version;
 
   @Column(nullable = false)
   private String message;

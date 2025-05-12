@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -23,6 +24,9 @@ public class ReservationLine {
   @Column(name = "id_reservation_line")
   private Long id;
 
+  @Version
+  private Long version;
+
   @Column(name = "quantity", nullable = false)
   private Integer quantity;
 
@@ -34,3 +38,4 @@ public class ReservationLine {
   @JoinColumn(name = "batch_id", nullable = false)
   private Batch batch;
 }
+

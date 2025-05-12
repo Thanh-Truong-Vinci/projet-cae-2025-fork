@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Version;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Data;
@@ -27,6 +28,9 @@ public class Reservation {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id_reservation")
   private Long id;
+
+  @Version
+  private Long version;
 
   @ManyToOne
   @JoinColumn(name = "client", nullable = true)
@@ -48,3 +52,4 @@ public class Reservation {
   @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   private List<ReservationLine> reservationLines;
 }
+
