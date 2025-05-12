@@ -22,5 +22,5 @@ public class BatchView {
   private LocalDate createdAt;
   private String status;
   private String rejectionReason;
-  private Long version; // Added for optimistic locking
+
 }

@@ -18,8 +18,6 @@ public class ReservationLineView {
   private double unitPrice;
   private String imageLocation;
   private String unitType;
-  private Long version; // Added for optimistic locking
-
   /**
    * Constructor for ReservationLineView. Creates a reservation line view from a ReservationLine
    * entity.
@@ -35,6 +33,5 @@ public class ReservationLineView {
     this.unitPrice = reservationLine.getBatch().getUnitPrice();
     this.imageLocation = reservationLine.getBatch().getPhoto().getImageLocation();
     this.unitType = reservationLine.getBatch().getSaleUnit();
-    this.version = reservationLine.getVersion(); // Initialize the version field
   }
 }

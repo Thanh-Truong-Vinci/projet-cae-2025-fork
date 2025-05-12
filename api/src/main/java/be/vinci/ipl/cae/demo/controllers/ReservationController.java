@@ -17,7 +17,6 @@ import be.vinci.ipl.cae.demo.services.ReservationLineService;
 import be.vinci.ipl.cae.demo.services.ReservationService;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -64,7 +63,6 @@ public class ReservationController {
    * @param token the authorization token from the request header.
    * @throws ResourceNotFoundException if the token is invalid or expired.
    */
-  @Transactional
   @PostMapping("/reserve")
   public void reserveProduct(
       @RequestBody ReservationRequest reservationRequest,
@@ -94,7 +92,6 @@ public class ReservationController {
    * @throws ResourceNotFoundException if the token is invalid or expired or batch not found
    * @throws ConflictException if there isn't enough quantity available
    */
-  @Transactional
   @PostMapping("/reserveDirect")
   public ReservationView reserveProductDirect(
       @RequestBody ReservationRequest reservationRequest,
@@ -170,8 +167,7 @@ public class ReservationController {
    * @param reservationId the ID of the reservation to update.
    * @throws ResourceNotFoundException if the token is invalid or expired.
    * @throws ConflictException if the reservation ID is missing.
-   */
-  @Transactional
+   */  
   @PostMapping("/toConfirm")
   public void toConfirm(@RequestBody Long reservationId) {
     if (reservationId == null) {
@@ -189,7 +185,7 @@ public class ReservationController {
    * @throws ResourceNotFoundException if the token is invalid or expired.
    * @throws ConflictException if the reservation ID is missing.
    */
-  @Transactional
+
   @PostMapping("/toCancel")
   public ReservationView toCancel(
       @RequestBody Long reservationId, @RequestHeader("Authorization") String token) {
@@ -224,7 +220,6 @@ public class ReservationController {
    * @throws ResourceNotFoundException if the token is invalid or expired.
    * @throws ConflictException if the reservation ID is missing.
    */
-  @Transactional
   @PostMapping("/toAbandon")
   public ReservationView toAbandon(
       @RequestBody Long reservationId, @RequestHeader("Authorization") String token) {
@@ -289,7 +284,6 @@ public class ReservationController {
    * @return the cleared reservation as ReservationView.
    * @throws ResourceNotFoundException if the token is invalid or expired or reservation not found.
    */
-  @Transactional
   @PostMapping("/clear")
   public ReservationView clearReservation(
       @RequestBody Long reservationId, @RequestHeader("Authorization") String token) {
@@ -317,7 +311,6 @@ public class ReservationController {
    * @throws ResourceNotFoundException if the token is invalid or expired or reservation line not
    *     found
    */
-  @Transactional
   @PostMapping("/changeQuantity")
   public ReservationView changeQuantity(
       @RequestBody ChangeQuantityRequest request, @RequestHeader("Authorization") String token) {

@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 /** Service for managing notifications. */
@@ -37,7 +36,6 @@ public class NotificationService {
    * @param notification the notification to create
    * @return the created notification
    */
-  @Transactional
   public Notification createNotification(NewNotification notification) {
     System.out.println("Sout batch " + notification.getBatchId());
     System.out.println("Sout reject " + notification.getReasonOfReject());
@@ -72,7 +70,6 @@ public class NotificationService {
    * @param principal the user principal
    * @return a list of notifications for the user
    */
-  @Transactional(readOnly = true)
   public List<Notification> getNotificationsByUserPrincipal(Object principal) {
     if (!(principal instanceof User user)) {
       throw new ResponseStatusException(
@@ -88,7 +85,6 @@ public class NotificationService {
    * @param producerId the producer id
    * @return the updated notification
    */
-  @Transactional
   public Notification markNotificationAsRead(Long id, Long producerId) {
     Notification notification =
         notificationRepository
@@ -113,8 +109,7 @@ public class NotificationService {
    * Mark all notifications as read for a producer.
    *
    * @param producerId the producer id
-   */
-  @Transactional
+   */  
   public void markAllNotificationsAsRead(Long producerId) {
     List<Notification> notifications = notificationRepository.findByProducerId(producerId);
 

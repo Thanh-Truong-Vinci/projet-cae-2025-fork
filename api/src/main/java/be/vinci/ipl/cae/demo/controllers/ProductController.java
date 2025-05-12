@@ -7,7 +7,6 @@ import be.vinci.ipl.cae.demo.models.entities.Product;
 import be.vinci.ipl.cae.demo.services.AuthsService.SecurityConstants;
 import be.vinci.ipl.cae.demo.services.ProductService;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -67,8 +66,7 @@ public class ProductController {
    * @return the created Product.
    */
   @PostMapping({"", "/"})
-  @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
-  @Transactional
+  @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)  
   public Product addProduct(@RequestBody NewProduct newProduct) {
     if (newProduct == null
         || newProduct.getName() == null
@@ -88,7 +86,6 @@ public class ProductController {
    */
   @DeleteMapping("/{id}")
   @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
-  @Transactional
   public Product deleteProduct(@PathVariable long id) {
     Product product = productService.deleteProduct(id);
     if (product == null) {
@@ -106,7 +103,6 @@ public class ProductController {
    */
   @PatchMapping("/{id}")
   @PreAuthorize(SecurityConstants.HAS_ROLE_MANAGER)
-  @Transactional
   public Product updateProduct(@PathVariable long id, @RequestBody NewProduct newProduct) {
     if (newProduct == null
         || (newProduct.getName() != null && newProduct.getName().isBlank())
