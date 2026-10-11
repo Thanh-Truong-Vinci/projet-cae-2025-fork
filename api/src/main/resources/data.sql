@@ -118,29 +118,29 @@ VALUES ('Légumes'),
 -- Insérer quelques photos
 INSERT INTO photos (product_name, url)
 VALUES ('tomate bio',
-        '/api/src/main/resources/static/photos/tomate.jpg'),
+        'https://projet-cae-2025-fork.onrender.com/api/photos/tomate.jpg'),
        ('pomme rouge',
-        '/api/src/main/resources/static/photos/pomme_rouge.jpg'),
+        'https://projet-cae-2025-fork.onrender.com/api/photos/pomme_rouge.jpg'),
        ('pomme royal gala',
-        '/api/src/main/resources/static/photos/pomme_royal_gala.jpg'),
+        'https://projet-cae-2025-fork.onrender.com/api/photos/pomme_royal_gala.jpg'),
        ('pain artisanal',
-        '/api/src/main/resources/static/photos/pain-artisanal.jpg'),
+        'https://projet-cae-2025-fork.onrender.com/api/photos/pain-artisanal.jpg'),
        ('fromage',
-        '/api/src/main/resources/static/photos/fromage.jpg'),
+        'https://projet-cae-2025-fork.onrender.com/api/photos/fromage.jpg'),
        ('biere',
-        '/api/src/main/resources/static/photos/biere.jpg'),
+        'https://projet-cae-2025-fork.onrender.com/api/photos/biere.jpg'),
        ('poulet',
-        '/api/src/main/resources/static/photos/poulet.jpg'),
+        'https://projet-cae-2025-fork.onrender.com/api/photos/poulet.jpg'),
        ('yaourt',
-        '/api/src/main/resources/static/photos/yaourt.jpg'),
+        'https://projet-cae-2025-fork.onrender.com/api/photos/yaourt.jpg'),
        ('pomme jonagold',
-        '/api/src/main/resources/static/photos/pomme_verte.jpg'),
+        'https://projet-cae-2025-fork.onrender.com/api/photos/pomme_verte.jpg'),
        ('choufleur cheddar',
-        '/api/src/main/resources/static/photos/choufleur.jpg'),
+        'https://projet-cae-2025-fork.onrender.com/api/photos/choufleur.jpg'),
        ('pommes golden',
-        '/api/src/main/resources/static/photos/pomme_golden.jpg'),
+        'https://projet-cae-2025-fork.onrender.com/api/photos/pomme_golden.jpg'),
        ('tomate voyage',
-        '/api/src/main/resources/static/photos/tomate_voyage.jpg');
+        'https://projet-cae-2025-fork.onrender.com/api/photos/tomate_voyage.jpg');
 
 -- Insérer des produits
 INSERT INTO products (id_product_type, name, description, photo_id)
@@ -830,13 +830,13 @@ WHERE email = 'suzanne.droity@exemple.com';
 
 -- Ajouter les nouvelles photos pour les produits supplémentaires
 INSERT INTO photos (product_name, url)
-VALUES ('miel pissenlit', 'https://imagestoragecae09.blob.core.windows.net/dev/d5fcf24a-7744-4f45-9e0d-0a9d964e4041'),
-       ('laitue blonde', 'https://imagestoragecae09.blob.core.windows.net/dev/bad5f397-2f27-4c58-8b90-28de7be2ca5e'),
-       ('carottes cosmic', 'https://imagestoragecae09.blob.core.windows.net/dev/f962063f-acf3-4e86-a38d-a728f983f02f'),
+VALUES ('miel pissenlit', 'https://projet-cae-2025-fork.onrender.com/api/photos/miel.jpg'),
+       ('laitue blonde', 'https://projet-cae-2025-fork.onrender.com/api/photos/choufleur.jpg'),
+       ('carottes cosmic', 'https://projet-cae-2025-fork.onrender.com/api/photos/carotte.jpg'),
        ('courgette blanche',
-        'https://imagestoragecae09.blob.core.windows.net/dev/d24d89a5-a77f-485f-9e4c-949115d63399'),
-       ('cerise napoleon', 'https://imagestoragecae09.blob.core.windows.net/dev/2468799f-ba1b-4ae9-aad6-5e35d7dac415'),
-       ('haricots mistik', 'https://imagestoragecae09.blob.core.windows.net/dev/abe1c8dd-1a7e-4d70-9522-3c750c398b20');
+        'https://projet-cae-2025-fork.onrender.com/api/photos/courgette.jpg'),
+       ('cerise napoleon', 'https://projet-cae-2025-fork.onrender.com/api/photos/cerise.jpg'),
+       ('haricots mistik', 'https://projet-cae-2025-fork.onrender.com/api/photos/haricot.jpg');
 
 -- Insérer les nouveaux produits avec leurs types et photos
 INSERT INTO products (id_product_type, name, description, photo_id)
