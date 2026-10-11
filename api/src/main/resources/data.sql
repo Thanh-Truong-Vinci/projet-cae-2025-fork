@@ -18,7 +18,7 @@ ALTER TABLE batches
 -- Insérer un administrateur
 INSERT INTO users (name, firstname, email, password, date_inscription)
 VALUES ('Admin', 'Admin', 'admin@exemple.com',
-        '$2a$10$Gx8Kku6mS5PdMgiSne0neumKPPZWr28huUKo/joIs.79deMbi4M4i',
+        '$2a$12$dKvNdlr.afTwNjdFjGrxu.sJ9e/2j7x0Ay9f0RQc3hYI8D76NJnay',
         '2001-01-01');
 
 -- Récupérer l'ID généré et insérer dans la table manager
@@ -30,7 +30,7 @@ WHERE email = 'admin@exemple.com';
 -- Créer un producteur de test
 INSERT INTO users (name, firstname, email, password, date_inscription)
 VALUES ('Dupont', 'Jean', 'producteur@exemple.com',
-        '$2a$10$8Cv0QyLMQ.dDlswhLhd8peiW6.KWnQLl0VmL5lw41/trJgprkg2vm',
+        '$2a$12$nazHsdY5POBk0PbF/yiJJuwdRx9CN7Y3nk6mOV10OzESTbvZkW6iW',
         '2024-01-15');
 
 -- Récupérer l'ID et créer l'adresse du producteur
@@ -830,7 +830,7 @@ WHERE email = 'suzanne.droity@exemple.com';
 
 -- Ajouter les nouvelles photos pour les produits supplémentaires
 INSERT INTO photos (product_name, url)
-VALUES ('miel pissenlit', 'https://projet-cae-2025-fork.onrender.com/api/photos/miel.jpg'),
+VALUES ('miel pissenlit', 'https://projet-cae-2025-fork.onrender.com/api/photos/miel.png'),
        ('laitue blonde', 'https://projet-cae-2025-fork.onrender.com/api/photos/choufleur.jpg'),
        ('carottes cosmic', 'https://projet-cae-2025-fork.onrender.com/api/photos/carotte.jpg'),
        ('courgette blanche',
