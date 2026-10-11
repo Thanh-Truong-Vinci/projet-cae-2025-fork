@@ -9,6 +9,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 
 /** SecurityConfiguration to handle security configuration. */
 @Configuration
@@ -35,12 +37,18 @@ public class SecurityConfiguration {
    * @throws Exception the exception.
    */
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    return http.csrf(AbstractHttpConfigurer::disable)
-        .sessionManagement(
-            sessionManagement ->
-                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-        .build();
-  }
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+  return http
+      .cors(Customizer.withDefaults()) // 1. Active le CORS dans Spring Security
+      .csrf(AbstractHttpConfigurer::disable)
+      .authorizeHttpRequests(auth -> auth
+          .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 2. Laisse passer les requêtes de pré-vérification
+          .anyRequest().permitAll()
+      )
+      .sessionManagement(
+          sessionManagement ->
+              sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+      .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+      .build();
+}
 }
