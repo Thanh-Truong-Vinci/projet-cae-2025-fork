@@ -683,7 +683,7 @@ WHERE email = 'admin@exemple.com';
 -- Ajouter l'utilisateur benevole
 INSERT INTO users (name, firstname, email, password, date_inscription)
 VALUES ('benevole', 'User', 'benevole@exemple.com',
-        '$2a$10$Gx8Kku6mS5PdMgiSne0neumKPPZWr28huUKo/joIs.79deMbi4M4i',
+        '$2a$12$Pfkk8Dccs3ABIUQ1LN7e8e5k0nQcewaw/.nWTAt/M96jsk3n8Q1pu',
         '2001-01-01');
 
 INSERT INTO manager (id_user, manager)
@@ -719,7 +719,7 @@ WHERE email = 'client@exemple.com';
 
 INSERT INTO users (name, firstname, email, password, date_inscription)
 VALUES ('Dupont', 'Michel', 'clientlibre@exemple.com',
-        '$2a$10$8Cv0QyLMQ.dDlswhLhd8peiW6.KWnQLl0VmL5lw41/trJgprkg2vm',
+        '$2a$12$P/oG8P9Oqo0806vu8lK2jugyA82JSPsnBp0Y0Pw2Nqnmk3rOOCAQm',
         CURRENT_DATE);
 
 -- 2. Ajouter l'adresse (obligatoire pour un UserWithAddress)
