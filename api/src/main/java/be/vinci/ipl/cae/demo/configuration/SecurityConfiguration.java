@@ -2,6 +2,8 @@ package be.vinci.ipl.cae.demo.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -9,46 +11,50 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-/** SecurityConfiguration to handle security configuration. */
+import java.util.Arrays;
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity()
+@EnableMethodSecurity
 public class SecurityConfiguration {
 
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-  /**
-   * Constructor for SecurityConfiguration.
-   *
-   * @param jwtAuthenticationFilter the injected JwtAuthenticationFilter.
-   */
   public SecurityConfiguration(JwtAuthenticationFilter jwtAuthenticationFilter) {
     this.jwtAuthenticationFilter = jwtAuthenticationFilter;
   }
 
-  /**
-   * FilterChain for the security configuration.
-   *
-   * @param http the HttpSecurity.
-   * @return the SecurityFilterChain.
-   * @throws Exception the exception.
-   */
   @Bean
-public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-  return http
-      .cors(Customizer.withDefaults()) // 1. Active le CORS dans Spring Security
-      .csrf(AbstractHttpConfigurer::disable)
-      .authorizeHttpRequests(auth -> auth
-          .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 2. Laisse passer les requêtes de pré-vérification
-          .anyRequest().permitAll()
-      )
-      .sessionManagement(
-          sessionManagement ->
-              sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-      .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-      .build();
-}
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    return http
+        .cors(Customizer.withDefaults()) // Utilise le bean défini juste en bas
+        .csrf(AbstractHttpConfigurer::disable)
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Laisse passer les requêtes du navigateur
+            .anyRequest().permitAll() // Tes annotations @PreAuthorize sur les routes feront le reste du travail
+        )
+        .sessionManagement(
+            sessionManagement ->
+                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .build();
+  }
+
+  // Configuration CORS intégrée directement pour Spring Security
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+      CorsConfiguration configuration = new CorsConfiguration();
+      configuration.setAllowedOrigins(List.of("*"));
+      configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+      configuration.setAllowedHeaders(List.of("*"));
+      
+      UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+      source.registerCorsConfiguration("/**", configuration);
+      return source;
+  }
 }
