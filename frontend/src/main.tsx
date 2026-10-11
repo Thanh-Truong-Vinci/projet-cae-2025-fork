@@ -36,9 +36,8 @@ import NotificationsPage from './components/pages/NotificationPage.tsx'
 import { NotificationProvider } from './contexts/NotificationProvider.tsx'
 import ReceiveBatchesPage from './components/pages/ReceiveBatchesPage.tsx'
 
-if (import.meta.env.VITE_API_URL) {
   axios.defaults.baseURL = import.meta.env.VITE_API_URL;
-}
+
 
 const router = createHashRouter([
   {
