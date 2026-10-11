@@ -7,6 +7,7 @@ import checker from 'vite-plugin-checker'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/projet-cae-2025-fork/',
   test: {
     environment: 'jsdom',
     globals: true,
