@@ -12,8 +12,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,38 +23,36 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfiguration {
 
-  private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-  public SecurityConfiguration(JwtAuthenticationFilter jwtAuthenticationFilter) {
-    this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-  }
+    public SecurityConfiguration(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
 
-  @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    return http
-        .cors(Customizer.withDefaults()) // Utilise le bean défini juste en bas
-        .csrf(AbstractHttpConfigurer::disable)
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Laisse passer les requêtes du navigateur
-            .anyRequest().permitAll() // Tes annotations @PreAuthorize sur les routes feront le reste du travail
-        )
-        .sessionManagement(
-            sessionManagement ->
-                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-        .build();
-  }
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http
+                .cors(Customizer.withDefaults()) // Branche le filtre CORS ci-dessous
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Autorise les requêtes du navigateur
+                        .anyRequest().permitAll()
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
+    }
 
-  // Configuration CORS intégrée directement pour Spring Security
-  @Bean
-  public CorsConfigurationSource corsConfigurationSource() {
-      CorsConfiguration configuration = new CorsConfiguration();
-      configuration.setAllowedOrigins(List.of("*"));
-      configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-      configuration.setAllowedHeaders(List.of("*"));
-      
-      UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-      source.registerCorsConfiguration("/**", configuration);
-      return source;
-  }
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.setAllowedOriginPatterns(List.of("*")); // Autorise toutes les URL (dont GitHub Pages)
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config); // Applique le CORS à toutes les routes
+        return new CorsFilter(source);
+    }
 }
