@@ -57,7 +57,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
       }
 
       // Utilisation de fetch avec méthode GET
-      const response = await fetch('/api/batches/mybatches', {
+      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/batches/mybatches', {
         method: 'GET',
         headers: {
           Authorization: authenticatedUser.token,
@@ -101,7 +101,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
       }
 
       // Utilisation de fetch avec méthode GET
-      const response = await fetch('/api/batches/pending', {
+      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/batches/pending', {
         method: 'GET',
         headers: {
           Authorization: authenticatedUser.token,
@@ -135,7 +135,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
     setError(null)
 
     try {
-      const response = await fetch('/api/batches/approved')
+      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/batches/approved')
 
       if (!response.ok) {
         throw new Error(`Erreur: ${response.status}`)
@@ -162,7 +162,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
     setError(null)
 
     try {
-      const response = await fetch('/api/batches/received')
+      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/batches/received')
 
       if (!response.ok) {
         throw new Error(`Erreur: ${response.status}`)
@@ -255,7 +255,7 @@ export const BatchProvider = ({ children }: BatchProviderProps) => {
         },
       }
 
-      const response = await fetch('/api/batches/createbatch', options)
+      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/batches/createbatch', options)
 
       if (!response.ok)
         throw new Error(

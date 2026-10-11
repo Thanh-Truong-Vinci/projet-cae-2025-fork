@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
-
+import axios from 'axios';
 import { RouterProvider, createBrowserRouter, Navigate } from 'react-router-dom'
 import App from './components/App/index.tsx'
 import RegisterPage from './components/pages/RegisterPage.tsx'
@@ -35,6 +35,10 @@ import { StatisticsProvider } from './contexts/StatisticsProvider'
 import NotificationsPage from './components/pages/NotificationPage.tsx'
 import { NotificationProvider } from './contexts/NotificationProvider.tsx'
 import ReceiveBatchesPage from './components/pages/ReceiveBatchesPage.tsx'
+
+if (import.meta.env.VITE_API_URL) {
+  axios.defaults.baseURL = import.meta.env.VITE_API_URL;
+}
 
 const router = createBrowserRouter([
   {

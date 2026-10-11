@@ -51,7 +51,7 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
   const authsMe = useCallback(async (token: string): Promise<void> => {
     try {
       console.log('Validating token with server...')
-      const response = await fetch('/api/auths/me', {
+      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/auths/me', {
         method: 'POST',
         headers: {
           'Content-Type': 'text/plain',
@@ -109,7 +109,7 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
         },
       }
 
-      const response = await fetch('/api/auths/register', options)
+      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/auths/register', options)
 
       if (!response.ok)
         throw new Error(
@@ -153,7 +153,7 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
           },
         }
 
-        const response = await fetch('/api/manager/registermanager', options)
+        const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/manager/registermanager', options)
 
         if (!response.ok)
           throw new Error(
@@ -199,7 +199,7 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
           },
         }
 
-        const response = await fetch('/api/manager/registerproducer', options)
+        const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/manager/registerproducer', options)
 
         if (!response.ok)
           throw new Error(
@@ -230,7 +230,7 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
           },
         }
 
-        const response = await fetch('/api/auths/login', options)
+        const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/auths/login', options)
 
         if (!response.ok) {
           console.error('Login failed:', response.status, response.statusText)
@@ -297,7 +297,7 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
           },
         }
 
-        const response = await fetch('/api/auths/changepassword', options)
+        const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/auths/changepassword', options)
 
         if (!response.ok)
           throw new Error(

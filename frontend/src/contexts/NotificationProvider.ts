@@ -6,7 +6,7 @@ export const createNotification = async (
 ): Promise<void> => {
   console.log('Appel API pour créer une notification :', notification)
 
-  const response = await fetch('/api/notifications/create', {
+  const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/notifications/create', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -30,7 +30,7 @@ export const fetchNotificationsAPI = async (
   token: string
 ): Promise<Notification[]> => {
   console.log('notificationApi: GET /api/notifications/producer, token=', token)
-  const response = await fetch('/api/notifications/producer', {
+  const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/notifications/producer', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -118,7 +118,7 @@ export const markAllNotificationsAsRead = async (
   token: string
 ): Promise<void> => {
   try {
-    const response = await fetch('/api/notifications/read-all', {
+    const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/notifications/read-all', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

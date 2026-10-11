@@ -91,7 +91,7 @@ const VolunteerHomePage = () => {
   const fetchAgglomeratedProducts = useCallback(async () => {
     try {
       setLoadingAgglomerated(true)
-      const response = await fetch('/api/batches/received/available-view')
+      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/batches/received/available-view')
 
       if (!response.ok) {
         throw new Error(`Error ${response.status}: ${response.statusText}`)

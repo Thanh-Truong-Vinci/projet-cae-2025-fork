@@ -13,7 +13,7 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     const fetchProducts = async () => {
       try {
         setIsLoading(true)
-        const response = await fetch('/api/batches/received/available-view')
+        const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/batches/received/available-view')
 
         if (!response.ok) {
           throw new Error(`Error ${response.status}: ${response.statusText}`)
@@ -39,7 +39,7 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
   const fetchAllProducts = useCallback(async () => {
     try {
       setLoadingAllProducts(true)
-      const response = await fetch('/api/products')
+      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/products')
       if (!response.ok) {
         throw new Error(`Error ${response.status}: ${response.statusText}`)
       }

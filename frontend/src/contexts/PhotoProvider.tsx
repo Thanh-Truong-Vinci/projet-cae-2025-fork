@@ -16,7 +16,7 @@ export const PhotoProvider = ({ children }: PhotoProviderProps) => {
     setError(null)
 
     try {
-      const response = await fetch('/api/photo')
+      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/photo')
 
       if (!response.ok) {
         throw new Error(`Erreur: ${response.status} ${response.statusText}`)

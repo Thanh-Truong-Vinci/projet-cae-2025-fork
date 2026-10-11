@@ -38,7 +38,7 @@ export const ProductTypeProvider: React.FC<ProductTypeProviderProps> = ({
     setError(null)
 
     try {
-      const response = await fetch('/api/product-types')
+      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/product-types')
 
       if (!response.ok) {
         throw new Error(`Erreur: ${response.status} ${response.statusText}`)
@@ -78,7 +78,7 @@ export const ProductTypeProvider: React.FC<ProductTypeProviderProps> = ({
         )
       }
 
-      const response = await fetch('/api/product-types/', {
+      const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/product-types/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
