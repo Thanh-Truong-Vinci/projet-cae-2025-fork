@@ -371,7 +371,7 @@ const ManagerDashboardPage = () => {
       setBatchesError(null)
 
       try {
-        const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/batches', {
+        const response = await fetch('https://projet-cae-2025-fork.onrender.com/api/batches', {
           headers: {
             Authorization: authenticatedUser?.token || '',
           },

@@ -74,7 +74,7 @@ const HomePage = () => {
       setTypeError(null)
 
       try {
-        const response = await fetch((import.meta.env.VITE_API_URL || '') + '/api/product-types')
+        const response = await fetch('https://projet-cae-2025-fork.onrender.com/api/product-types')
         if (!response.ok) {
           throw new Error(`Erreur: ${response.status}`)
         }
@@ -341,7 +341,7 @@ const HomePage = () => {
     console.log('Rafraîchissement forcé des produits...')
 
     // Ajouter un paramètre nocache pour éviter les problèmes de mise en cache
-    return fetch((import.meta.env.VITE_API_URL || '') + '/api/batches/received/available-view?nocache=' + now, {
+    return fetch('https://projet-cae-2025-fork.onrender.com/api/batches/received/available-view?nocache=' + now, {
       headers: {
         pragma: 'no-cache',
         'cache-control': 'no-cache',
